@@ -1,0 +1,199 @@
+EXT_L  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP
+EXT_L   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  ori  lacI   RNAP   RNAP   RNAP   RNAP   RNAP   RNAP  lacI   RNAP   RNAP   RNAP   RNAP

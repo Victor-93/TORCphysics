@@ -1,0 +1,6 @@
+type	name	site	conc	k_on	k_off	k_cat	size	model
+topo	topoI	DNA	0.25	0.0	0.0	0.001	120	topo_continium
+topo	gyrase	DNA	0.25	0.0	0.0	0.001	120	gyrase_continium
+ATP	ATP	none	0.0	0.0	0.0	0.0	0.0	none
+NAP	lacI	lacOP	0.0	0.0	0.0	0.0	0.0	none
+RNAP	RNAP	gene	0.0	0.0	0.0	0.0	32	none

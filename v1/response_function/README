@@ -1,0 +1,23 @@
+18/10/2022
+
+in disc-10_sequence.txt I prepare the sequences for creating the fasta files...
+I also added some info in there...
+
+I will explore this free energy of melting when considering the 14bp of sequence (-10+discriminator) as done in
+2019HoudaigiNAR, and the case where I consider the sequence of the 39bps that correspond the -30, spacer, -10, discriminator
+
+I think the case of the 39bp makes more sense to me because the promoter is always going to be present...
+So there's no point in isolating the 14bp region? We'll see once I plot the curves:
+
+13/12/2022
+
+I will run it for the 14bp sequence...
+
+Benham_code/ - Runs SIDD on the discriminator sequence, where the 14bp.fasta file is the input.
+
+filtering/   - process results from SIDD for plotting
+
+plots/       - plots the SIDD profiles and calculates the fitting for the openning energy.
+
+So first go to Benham_code/ run the bash file, then go to filtering/ to process results, and then to 
+plot/ to fit the curves and obtain the curve parametrization

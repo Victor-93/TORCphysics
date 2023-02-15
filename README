@@ -1,0 +1,11 @@
+31/01/2023-----------------------------
+v1/ - It uses a sigmoid curve for describing the rate function. It is parametrised
+      by the shape of the sigmoid, and its maximums/minimum rates.
+    - I also add new inputs to better describe/simulate the system...
+    - These new inputs correspond to:
+      * genome.csv:     gives global information about system
+      * genes.csv:      information about genes:
+      * objects.csv:    info about enzymes bound to DNA
+      * enviroment.csv: info about enviromental signals/enzymes that may affect the
+                        system's state, these enzymes can be topos, ATP, LACI concentration, etc..
+
