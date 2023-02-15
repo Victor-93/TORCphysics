@@ -1,0 +1,28 @@
+type	name	start	end	k_min	k_max	model	oparams	bound	pos	direction	size	twist	superhelical
+gene	tetA	85.0	1276.0	0.016	0.016	poisson	none						
+gene	CDS	1914.0	2106.0	0.001	0.001	poisson	none						
+origin	ori	3085.0	0.0	0.0	0.0	none	none						
+lacOP	lac1	3167.0	0.0	0.0	0.0	none	none						
+gene	mKalama1	4267.0	3449.0	0.002	0.0244	maxmin	mkal.params						
+lacOP	lac2	4371.0	0.0	0.0	0.0	none	none						
+gene	Raspberry	4491.0	5273.0	0.002	0.0244	maxmin	mrasp.params						
+gene	tetA	85.0	1276.0	0.016	0.016	poisson	none						
+gene	CDS	1914.0	2106.0	0.001	0.001	poisson	none						
+origin	ori	3085.0	0.0	0.0	0.0	none	none						
+lacOP	lac1	3167.0	0.0	0.0	0.0	none	none						
+gene	mKalama1	4267.0	3449.0	0.002	0.0244	maxmin	mkal.params						
+lacOP	lac2	4371.0	0.0	0.0	0.0	none	none						
+gene	Raspberry	4491.0	5273.0	0.002	0.0244	maxmin	mrasp.params						
+EXT	EXT_L								-752.0	0.0	0.0	-91.2349382990562	-0.1825930057919499
+ RNAP	 RNAP							tetA	115.0	1.0	32.0	0.6398569515150672	-0.033415067668937766
+ RNAP	 RNAP							tetA	115.0	1.0	32.0	-0.13819603063194247	0.007216972018840706
+ RNAP	 RNAP							tetA	115.0	1.0	32.0	-2.0434224114893227	0.1067130676543597
+ RNAP	 RNAP							tetA	115.0	1.0	32.0	143.46416370480347	0.08353547857377201
+origin	ori							ori	3085.0	0.0	100.0	-1.3021587445994733	-0.035097943699679064
+NAP	lacI							lac1	3167.0	0.0	20.0	-24.867031509770705	-0.03509794369967923
+NAP	lacI							lac2	4371.0	0.0	20.0	-163.38415385186835	-2.313861482528149
+ RNAP	 RNAP							Raspberry	4521.0	1.0	32.0	4.305462412735141	-0.22484293954603546
+ RNAP	 RNAP							Raspberry	4521.0	1.0	32.0	4.544533332404496	-0.23732787221655063
+ RNAP	 RNAP							Raspberry	4521.0	1.0	32.0	4.798336239956487	-0.25058214930198636
+ RNAP	 RNAP							Raspberry	4521.0	1.0	32.0	-91.2349382990562	-0.1825930057919499
+EXT	EXT_R								5356.0	0.0	0.0	0.0	0.0
