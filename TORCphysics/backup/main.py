@@ -10,7 +10,7 @@ import sys
 #DESCRIPTION
 #---------------------------------------------------------------------------------------------------------------------
 #This program simulates a genetic circuit under certain conditions given the inputs:
-#circuit.csv, genome.csv, objects.csv and enviroment.csv
+#circuit.csv, sites.csv, enzymes.csv and environment.csv
 #According these inputs, RNAPs will stochastically bind the DNA and will generate
 #supercoiling accordingly.
 #---------------------------------------------------------------------------------------------------------------------
@@ -40,9 +40,9 @@ parser = argparse.ArgumentParser(description="Version1 of the physical model oft
 parser.add_argument("-f", "--frames", type=int, action="store", help="Number of frames (timesteps)", default=5000)
 parser.add_argument("-c", "--continuation", action="store_true", help="Continuation of a simulation")
 parser.add_argument("-ic", "--input_circuit", action="store", help="Circuit input file", default="circuit.csv")
-parser.add_argument("-ig", "--input_genome", action="store", help="Genome input file", default="genome.csv")
-parser.add_argument("-io", "--input_objects", action="store", help="Objects input file", default="objects.csv")
-parser.add_argument("-ie", "--input_enviroment", action="store", help="Enviroment input file", default="enviroment.csv")
+parser.add_argument("-ig", "--input_genome", action="store", help="Genome input file", default="sites.csv")
+parser.add_argument("-io", "--input_objects", action="store", help="Objects input file", default="enzymes.csv")
+parser.add_argument("-ie", "--input_enviroment", action="store", help="Enviroment input file", default="environment.csv")
 parser.add_argument("-s", "--series", action="store_true", help="Print dynamic results per timestep")
 parser.add_argument("-t", "--test", action="store_true", help="Run series of tests stored in the test folder")
 parser.add_argument("-o", "--output", action="store", help="Output prefix for output files", default="output")

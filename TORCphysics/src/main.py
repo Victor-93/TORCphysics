@@ -1,16 +1,20 @@
-import params
-import mechanical_model as mm
-import statistical_model as sm
 import argparse
-import numpy as np
-import pandas as pd
 import sys
+
+import numpy as np
+import pandas
+
+import mechanical_model as mm
+import params
+import statistical_model as sm
+
+from TORCphysics import Circuit
 
 #---------------------------------------------------------------------------------------------------------------------
 #DESCRIPTION
 #---------------------------------------------------------------------------------------------------------------------
 #This program simulates a genetic circuit under certain conditions given the inputs:
-#circuit.csv, genome.csv, objects.csv and enviroment.csv
+#circuit.csv, sites.csv, enzymes.csv and environment.csv
 #According these inputs, RNAPs will stochastically bind the DNA and will generate
 #supercoiling accordingly.
 #---------------------------------------------------------------------------------------------------------------------
@@ -39,10 +43,10 @@ namefile='object.txt'
 parser = argparse.ArgumentParser(description="Version1 of the physical model oftranscription-supercoiling")
 parser.add_argument("-f", "--frames", type=int, action="store", help="Number of frames (timesteps)", default=5000)
 parser.add_argument("-c", "--continuation", action="store_true", help="Continuation of a simulation")
-parser.add_argument("-ic", "--input_circuit", action="store", help="Circuit input file", default="circuit.csv")
-parser.add_argument("-ig", "--input_genome", action="store", help="Genome input file", default="genome.csv")
-parser.add_argument("-io", "--input_objects", action="store", help="Objects input file", default="objects.csv")
-parser.add_argument("-ie", "--input_enviroment", action="store", help="Enviroment input file", default="enviroment.csv")
+parser.add_argument("-ic", "--input_circuit", action="store", help="Circuit input file", default="../circuit.csv")
+parser.add_argument("-ig", "--input_sites", action="store", help="Genome input file", default="../sites.csv")
+parser.add_argument("-io", "--input_enzymes", action="store", help="Objects input file", default="../enzymes.csv")
+parser.add_argument("-ie", "--input_enviroment", action="store", help="Enviroment input file", default="../environment.csv")
 parser.add_argument("-s", "--series", action="store_true", help="Print dynamic results per timestep")
 parser.add_argument("-t", "--test", action="store_true", help="Run series of tests stored in the test folder")
 parser.add_argument("-o", "--output", action="store", help="Output prefix for output files", default="output")
@@ -57,12 +61,12 @@ parser.add_argument("-im", "--initiation_model", action="store", help="Initiatio
 args = parser.parse_args()
 
 #Let's put this information into variables
-frames        = args.frames                   #Number of frames
-c_circuit     = args.input_circuit            #Circuit file
-c_genome      = args.input_genome             #Genome file
-c_objects     = args.input_objects            #Objects file
-c_enviroment  = args.input_enviroment         #Enviroment file
-coutput       = args.output                   #Output file prefix
+frames = args.frames                   #Number of frames
+circuit_filename = args.input_circuit            #Circuit file
+sites_filename = args.input_sites              #Sites file
+enzymes_filename = args.input_enzymes            #Enzymes file
+environment_filename = args.input_enviroment         #Enviroment file
+output_prefix = args.output                   #Output file prefix
 
 if args.continuation:        #If this is the continuation of a previous run
     continuation=True
@@ -77,91 +81,20 @@ if args.test:                #If true, then we run some tests and stop
 else:
     test=False
 
-# Read the input files (*csv) and prepare data frames
-#---------------------------------------------------------------------------------------------------------------------
+# Pass the command line inputs, read csvs and initialize "my_circuit"
+my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                     output_prefix, frames, series, continuation)
+# TODO: Don't forget do your tests
 
-# Circuit
-circuit_df = pd.read_csv(c_circuit,sep='\t')
-# Genome
-genome_df = pd.read_csv(c_genome,sep='\t')
-genome_df = genome_df.drop_duplicates(subset=['name']) #Be careful with this
-#genome_df = genome_df.sort_values(by=["start"])
-genome_df = genome_df.reset_index(drop=True)
-# Objects
-o_df = pd.read_csv(c_objects,sep='\t')
-o_df = o_df.sort_values(by=["pos"])
-o_df = o_df.reset_index(drop=True)
-# Enviroment
-enviroment_df = pd.read_csv(c_enviroment,sep='\t')
-enviroment_df = enviroment_df.drop_duplicates(subset=['name']) #Just in case
-enviroment_df = enviroment_df.reset_index(drop=True)
+# Let's print some info of the system
+my_circuit.print_general_information()
+sys.exit()
 
-
-#df = pd.read_csv(cinput,sep='\t')
-#genome_df = df[ df[ 'type' ].isin(['genome']) ]          #dataframe of genome (to get size)
-#genome_df = genome_df.reset_index(drop=True)
-#genome_df  = df[ df[ 'type' ].isin(['gene']) ]            #dataframe of genes (to get orientations...)
-#genome_df = genome_df.reset_index(drop=True)
-#o_df  = df[ df[ 'type' ].isin(['NAP', 'RNAP', 'EXT', 'origin']) ]   #dataframe of objects (NAPs and bound RNAPs)
-
-#Get sizes and number of objects
-#------------------
-nbp =  circuit_df['size'][0]       #number of bp in circuit
-n_genome = len(genome_df['start']) #number of functional sites in genome (genes, operators, etc...)
-N = len(o_df['pos'])               #number of objects bound to the DNA (NAPs, RNAPs,...)
-n_env = len(enviroment_df['type']) #number of molecule types in the enviroment
-
-#Check if structure is linear or circular
-#------------------
-if circuit_df['struc'][0] == 'circle':
-    circular=True
-elif circuit_df['struc'][0] == 'linear':
-    circular=False
-else:
-    print( "Circuit's structure not recognized, assuming linear structure")
-    circular=False
-
-#Let's add a direction column for genome
-#------------------
-genome_df['direction'] = 0 #genes
-for i in range(n_genome):
-    if genome_df.iloc[i]['type'] != "gene": #Only genes have direction!
-        continue
-    if genome_df.iloc[i]['start'] < genome_df.iloc[i]['end']:
-        genome_df.at[i,'direction'] = 1
-    if genome_df.iloc[i]['start'] > genome_df.iloc[i]['end']:
-        genome_df.at[i,'direction'] = -1
-
-#Here, instead of this, maybe I should check that it is actually attacthed to a site in the genome.
-#------------------
-#And since we are here, let's add START and END to o_df
-o_df['start'] = 0 #NANs
-o_df['end'] = 0
-for i in range(N):
-    if not ( genome_df['name'].eq( o_df.iloc[i]['bound'] ) ).any():
-        if not o_df.iloc['bound'] == 'DNA': #Enzymes such as topo's could just bind anywhere in the DNA
-                                           #so we forgive them and do not count them
-            print( "An object is not related to a genome site.", o_df.iloc[i]['bound']  )
-
-    b = o_df.iloc[i]['bound']
-    mask = genome_df['name'] == b
-    o_df.at[i,'start'] = genome_df[mask]['start']
-    o_df.at[i,'end'] = genome_df[mask]['end']
-
-#Let's print some info of the system
-#----------------------------------------------------------------
-if circular:
-    print("Running {0} frames for circular system of {1} bp \n".format(frames, nbp))
-else:
-    print("Running {0} frames for linear system of {1} bp \n".format(frames, nbp))
-
-#Sort models to use
-#----------------------------------------------------------------
-
-#For the genome
+# TODO: add params to site
 genome_df['fun'] = ''    #This one is the initiation function
 genome_df['params'] = 0  #This o
 genome_df['params'] = genome_df['params'].astype(object)
+# TODO: add to stats model
 for i in range(n_genome):
     if genome_df.iloc[i]['model'] == 'none':
         continue
@@ -175,11 +108,12 @@ for i in range(n_genome):
         genome_df.at[i,'fun'] = sm.promoter_curve_Meyer
     else:
         print("Sorry, couldn't recognise initiation model for genome site:", genome_df.iloc[i]['name'])
-
+    # TODO: add to sites and make as dictionary
     #And the params
     if genome_df.iloc[i]['oparams'] != 'none':
         genome_df.at[i, 'params' ] = np.loadtxt( genome_df.iloc[i]['oparams'] )
 
+# TODO: add to environment
 #And now the enviroment
 enviroment_df['fun'] = '' #This will be erased at the end
 for i in range(n_env):
@@ -215,6 +149,7 @@ for i in range(n_env):
 
 #Let's add fake ends (to stablish boundaries for either linear or circular structures)
 #----------------------------------------------------------------
+# TODO: make function in circuit
 if continuation:    #I need to fix this. It would be better if the output doesn't have EXT_L and EXT_R
     a = 'EXT_L' in o_df['name'].unique()
     b = 'EXT_R' in o_df['name'].unique()
@@ -294,6 +229,7 @@ N = len(o_df['start'])                #and update the number of objects
 #are resuming a simulation or if it's a new one.
 #----------------------------------------------------------
 #print(o_df)
+# TODO: add to circuit update function
 for i in range(N-1): #And calculate the true twist
     #twist = mm.calculate_twist( o_df.iloc[i], o_df.iloc[i+1] )
     #o_df.iloc[i]['twist'] = twist
@@ -308,7 +244,7 @@ for i in range(N-1): #And calculate the true twist
 #print(o_df)
 #print("")
 #sys.exit()
-
+# TODO: think about output and where this happens
 sfile = open(sigmafile, "w")
 pfile = open(posfile, "w")
 nfile = open(namefile, "w")
@@ -366,6 +302,7 @@ n_RNAPs = len(o_df[mask]['start']) #Number of RNAPs bound
 
 #print(genome_df)
 #sys.exit()
+# TODO: add to run function in circuit
 for k in range(frames): #Go by frame 
 
     #--------------------------------------------------------------------------
@@ -383,6 +320,7 @@ for k in range(frames): #Go by frame
        # if k  != 30:
        #     break
 
+        # TODO: stats model
         #For now, only genes!
         #-----------------------------------------------------------
         if genome_df.iloc[i]['type'] != 'gene': 
@@ -559,6 +497,7 @@ for k in range(frames): #Go by frame
     #--------------------------------------------------------------------------
 
     #THE MOTION AND TWIST INJECTION
+    # TODO: mechanical model
     #--------------------------------------------------------------------------
     #if N_RNAPs > 0: #There is no point in doing this loop if there are no RNAPs bound
     for i in range(1,N-1):    #Let's go through each object, updating its twist and
@@ -670,7 +609,7 @@ for k in range(frames): #Go by frame
             o_df.at[0,'pos']  = 1
             o_df.at[N-1,'pos'] = nbp
     #--------------------------------------------------------------------------
-
+    # TODO: add to circuit update
     #UPDATE SUPERCOILING
     #--------------------------------------------------------------------------
     for i in range(0,N-1):  
@@ -679,7 +618,7 @@ for k in range(frames): #Go by frame
     #print(o_df)
     #sys.exit()
     #--------------------------------------------------------------------------
-
+    # TODO: add topo
     #--------------------------------------------------------------------------
     #--------------------------------------------------------------------------
     #TOPOISOMERASE I AND GYRASE ACTIVITY
@@ -720,7 +659,7 @@ for k in range(frames): #Go by frame
     sfile.write(  sup_l )
     nfile.write( name_l )
     #--------------------------------------------------------------------------
-
+    # TODO: add to circuit update
     #Additional*****************
     #Let's save the global superhelical density and time (to observe the evolution)
     #--------------------------------------------------------------------------
@@ -746,7 +685,7 @@ for k in range(frames): #Go by frame
 pfile.close()
 sfile.close()
 nfile.close()
-
+# TODO: think output
 #and the additional global sigma
 np.savetxt('global_sigma.txt', globalsigma)
 
@@ -765,7 +704,7 @@ genome_df = genome_df.drop( columns='fun'  )
 genome_df = genome_df.drop( columns='params'  )
 
 enviroment_df = enviroment_df.drop( columns='fun'  )
-
+# TODO: update circuit
 #Circuit will now contain the average supercoiling and twist.
 print(N)
 if circular:
