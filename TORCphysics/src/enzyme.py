@@ -27,6 +27,7 @@ class EnzymeFactory:
     def get_enzyme_list(self):
         return self.enzyme_list
 
+# In these inputs, site is actually giving the site's name. So there cannot be multiple names?
     def read_csv(self):
         df = pd.read_csv(self.filename)
         for index, row in df.iterrows():
