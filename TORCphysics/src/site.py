@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import sys
 
 
@@ -12,17 +13,20 @@ class Site:
         self.k_min = k_min
         self.k_max = k_max
         self.site_model = s_model
-        self.oparams = oparams
         self.direction = self.get_direction()
-#        self.oparams = self.set_up_oparams(oparams)
-        # TODO: add direction
+        if oparams == 'None' or oparams == 'none':  # Not completely sure if this is the way to do it
+            self.oparams = None
+        else:
+            self.oparams = np.loadtxt(oparams)
+    # TODO: add twist and supercoiling at site
 
-    def set_up_oparams(self, param_string):
-        oparams = {}
-        if self.site_type == x:
-            # TODO: process param_string for different site types
-            oparams[p] = x.split(",")[3]
-        return oparams
+#   def set_up_oparams(self, param_string):
+#        oparams = {}
+#        if self.site_type == x:
+#            # TODO: process param_string for different site types
+#            oparams[p] = x.split(",")[3]
+#        oparams = np.loadtxt(param_string)  # Simply loads the parameters
+#        return oparams
 
     # According start and end, gets the direction.
     # Only genes can have directions
