@@ -55,18 +55,13 @@ def calculate_twist(Z0,Z1):
 #the twist of the current object Z0, and the distance between
 #Z1-Z0
 def calculate_supercoiling(Z0, Z1):
-    length = calculate_length(Z0,Z1) #First, I need to get the length
-    twist  = Z0['twist']             #and twist
+    length = calculate_length(Z0,Z1) # First, I need to get the length
+    twist = Z0.twist                # and twist
     if length != 0:
-        sigma  = twist/(w0*length)       #and calculate the supercoiling
+        sigma = twist/(w0*length)       # and calculate the supercoiling
     else:
-        sigma = 0 #I don't know if this is a solution... #But basically, this happens when a RNAP
-                  #binds right after one has bound
-    #if length == 0:
-    #    print("Aqui")
-    #    print(Z0)
-    #    print(Z1)
-    #    sys.exit()
+        sigma = 0 # I don't know if this is a solution... #But basically, this happens when a RNAP
+                  # binds right after one has bound
     return sigma
 
 #----------------------------------------------------------
