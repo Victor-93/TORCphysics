@@ -5,7 +5,7 @@ import sys
 
 class Site:
 
-    def __init__(self, s_type, name, start, end, k_min, k_max, s_model, oparams):
+    def __init__(self, s_type, name, start, end, k_min, k_max, s_model, oparams):#, twist, superhelical):
         self.site_type = s_type
         self.name = name
         self.start = start
@@ -14,11 +14,12 @@ class Site:
         self.k_max = k_max
         self.site_model = s_model
         self.direction = self.get_direction()
-        if oparams == 'None' or oparams == 'none':  # Not completely sure if this is the way to do it
+        if oparams == 'None' or oparams == 'none' or oparams == None:  # Not completely sure if this is the way to do it
             self.oparams = None
         else:
             self.oparams = np.loadtxt(oparams)
-    # TODO: add twist and supercoiling at site
+        #self.twist = twist
+        #self.superhelical = superhelical
 
 #   def set_up_oparams(self, param_string):
 #        oparams = {}
@@ -62,5 +63,5 @@ class SiteFactory:
         for index, row in df.iterrows():
             new_site = Site(s_type=row['type'], name=row['name'], start=float(row['start']), end=float(row['end']),
                             k_min=float(row['k_min']), k_max=float(row['k_max']), s_model=row['model'],
-                            oparams=row['oparams'])
+                            oparams=row['oparams'])#, twist=row['twist'], superhelical=['superhelical'])
             self.site_list.append(new_site)

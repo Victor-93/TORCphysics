@@ -9,11 +9,16 @@ class Enzyme:
         self.site = site
         self.position = position
         self.size = size
-        self.twist = twist
-        self.superhelical = superhelical
         self.start = self.site.start
         self.end = self.site.end
         self.direction = self.site.get_direction()
+        self.twist = twist
+        self.superhelical = superhelical
+        #I'm not sure if defining twist_front/behind was a good idea
+        #self.twist_front = 0.0
+        #self.twist_behind = 0.0
+        #self.superhelical_front = 0.0
+        #self.superhelical_behind = 0.0
 
 
 class EnzymeFactory:
@@ -32,8 +37,8 @@ class EnzymeFactory:
         df = pd.read_csv(self.filename)
         for index, row in df.iterrows():
             new_enzyme = Enzyme(e_type=row['type'], name=row['name'], site=self.site_match(row['site']),
-                                position=float(row['position']), size=float(row['size']), twist=float(row['twist']),
-                                superhelical=float(row['superhelical']))
+                                position=float(row['position']), size=float(row['size']),
+                                twist=float(row['twist']), superhelical=float(row['superhelical']))
 
             self.enzyme_list.append(new_enzyme)
 

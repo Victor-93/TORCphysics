@@ -1,6 +1,7 @@
-import numpy as np
-import pandas as pd
-import params
+#import numpy as np
+#import pandas as pd
+#import params
+from TORCphysics import params
 import sys
 
 #---------------------------------------------------------------------------------------------------------------------
@@ -20,18 +21,18 @@ dt     = params.dt
 #----------------------------------------------------------
 #This function calculates the length between two objects (proteins) considering their sizes
 def calculate_length(Z0, Z1):
-    x0 = Z0['pos']  #positions
-    x1 = Z1['pos']
-    b0 = Z0['size'] #size -_-
-    b1 = Z1['size']
+    x0 = Z0.position  #positions
+    x1 = Z1.position
+    b0 = Z0.size #size -_-
+    b1 = Z1.size
     #There are 4 posibilities
-    if Z0['direction'] >= 0 and Z1['direction'] >= 0:
+    if Z0.direction >= 0 and Z1.direction >= 0:
         length = (x1 - b1) - x0
-    elif Z0['direction'] >= 0 and Z1['direction'] < 0:
+    elif Z0.direction >= 0 and Z1.direction < 0:
         length = x1 - x0
-    elif Z0['direction'] < 0 and Z1['direction'] >= 0:
+    elif Z0.direction < 0 and Z1.direction >= 0:
         length = (x1 - b1) - (x0 + b0)
-    elif Z0['direction'] < 0 and Z1['direction'] < 0:
+    elif Z0.direction < 0 and Z1.direction < 0:
         length = x1 - (x0 + b0)
     else:
         print("Something went wrong in lengths")
@@ -45,8 +46,8 @@ def calculate_length(Z0, Z1):
 #the length between object Z0 and Z1.
 def calculate_twist(Z0,Z1):
     length = calculate_length(Z0,Z1) #First, I need to get the length
-    sigma = Z0['superhelical']
-    twist  = sigma*w0*length
+    sigma = Z0.superhelical
+    twist = sigma*w0*length
     return twist
 
 #----------------------------------------------------------
@@ -93,24 +94,24 @@ def twist_injected(Z):
 # in case that you have N objects including the fake boundaries, Z_N -> [N-2]
 def get_start_end_c(Z_0, Z_N, nbp):
 
-    b_0 = Z_0['size']
-    b_N = Z_N['size']
-    x_0 = Z_0['pos']                        #position of first object
-    x_N = Z_N['pos']                        #position of last object
+    b_0 = Z_0.size
+    b_N = Z_N.size
+    x_0 = Z_0.position                        #position of first object
+    x_N = Z_N.position                        #position of last object
 
-    #fake start
-    if  Z_N['direction'] >= 0: #depends on the direction
-        start_0 = 0 - (nbp - x_N)       #this is the start site of the fake bit,
+    #fake position on the left
+    if  Z_N.direction >= 0: #depends on the direction
+        position_left = 0 - (nbp - x_N)       #this is the position of the fake bit,
     else:
-        start_0   = 0 - ( nbp - (x_N + b_N) ) # the size of the last object is considered
+        position_left = 0 - ( nbp - (x_N + b_N) ) # the size of the last object is considered
 
     #fake end
-    if  Z_0['direction'] >= 0: #depends on the direction
-        start_N   = nbp + x_0 - b_0     #I think I had the sign wrong...
+    if  Z_0.direction >= 0: #depends on the direction
+        position_right = nbp + x_0 - b_0     #I think I had the sign wrong...
     else:
-        start_N   = nbp + x_0
+        position_right = nbp + x_0
 
-    return start_0, start_N
+    return position_left, position_right
 
 #-----------------------------------------------------------------------
 

@@ -14,7 +14,7 @@ class TestCircuit(TestCase):
         output_prefix = 'output'
         frames = 5
         series = True
-        continuation = True
+        continuation = False
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation)
         self.assertGreater(my_circuit.get_num_enzymes(), 0, "Empty enzyme list")
