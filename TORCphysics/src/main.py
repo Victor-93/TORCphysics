@@ -84,11 +84,17 @@ else:
 # Pass the command line inputs, read csvs and initialize "my_circuit"
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation)
-# TODO: Don't forget do your tests
 
+# TODO: Don't forget do your tests
 # Let's print some info of the system
 my_circuit.print_general_information()
+print(my_circuit.sites[0].name)
 sys.exit()
+
+# TODO: Initialize system - build local domains according "continuation"
+# TODO: I was able to add the fake boundaries, but I haven't updated twist
+#my_circuit.initialize
+
 
 # TODO: add params to site
 genome_df['fun'] = ''    #This one is the initiation function
