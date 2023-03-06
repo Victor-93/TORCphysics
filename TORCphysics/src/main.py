@@ -4,9 +4,9 @@ import sys
 import numpy as np
 import pandas
 
-import mechanical_model as mm
+import effect_model as mm
 import params
-import statistical_model as sm
+import binding_model as sm
 
 from TORCphysics import Circuit
 
@@ -50,6 +50,7 @@ parser.add_argument("-ie", "--input_enviroment", action="store", help="Enviromen
 parser.add_argument("-s", "--series", action="store_true", help="Print dynamic results per timestep")
 parser.add_argument("-t", "--test", action="store_true", help="Run series of tests stored in the test folder")
 parser.add_argument("-o", "--output", action="store", help="Output prefix for output files", default="output")
+parser.add_argument("-dt", "--timestep", action="store", help="Output prefix for output files", default=dt)
 
 
 #BORRAESTO
@@ -67,6 +68,7 @@ sites_filename = args.input_sites              #Sites file
 enzymes_filename = args.input_enzymes            #Enzymes file
 environment_filename = args.input_enviroment         #Enviroment file
 output_prefix = args.output                   #Output file prefix
+dt = abs(args.timestep) #The time step
 
 if args.continuation:        #If this is the continuation of a previous run
     continuation=True
@@ -83,12 +85,15 @@ else:
 
 # Pass the command line inputs, read csvs and initialize "my_circuit"
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                     output_prefix, frames, series, continuation)
+                     output_prefix, frames, series, continuation, dt)
 
 # TODO: Don't forget do your tests
 # Let's print some info of the system
 my_circuit.print_general_information()
-print(my_circuit.sites[0].name)
+print(my_circuit.site_list[0].name)
+
+# Now run
+my_circuit.run()
 sys.exit()
 
 # TODO: Initialize system - build local domains according "continuation"
