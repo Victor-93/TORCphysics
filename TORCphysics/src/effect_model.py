@@ -12,10 +12,66 @@ import sys
 # RNAPs modify the topology of our system.
 
 #All parameters are already in the params module, but I prefer to have them here with more simple names:
-v0     = params.v0
-w0     = params.w0
-gamma  = params.gamma
-dt     = params.dt
+v0 = params.v0
+w0 = params.w0
+gamma = params.gamma
+#dt     = params.dt
+
+
+class Effect:
+    # I thought it'll be easier to describe the effects as an object.
+    # Because the current effects are taken place at the current enzyme i=index, I use the index to locate the enzyme
+    # in the enzyme_list which is applying the effect.
+    # These effects act locally, so they can modify the enzyme's position, and the twist at the neighbouring domains.
+
+    def __init__(self, index, position, twist_left, twist_right):
+        # I'll save the input filenames just in case
+        self.index = index
+        self.position = position
+        self.twist_left = twist_left
+        self.twist_right = twist_right
+
+# Runs through each bound enzyme (in enzyme_list) and creates an effect.
+# It a effects_list which contains indications on how to update the current position and how the twist on the local
+# neighbouring domains are effected
+def effect_model(enzyme_list, dt):
+
+    # list of effects: effect = [index, position, twist_left, twist_right]
+    # I use an effect list because it's easier because there are multiple changes in the local twists
+    effect_list = []
+    for i, enzyme in enumerate(enzyme_list):
+
+        if enzyme.enzyme_type == 'EXT':  # We can speed up things a little bit by ignoring the fake boundaries
+            continue
+
+        # TODO: add effect for other type of enzymes, like NAPs? Maybe their effect is to do nothing. And definitely
+        #  an effect for topos
+        # Administer the effect model to use.
+        # -------------------------------------------------------------------------------------------------------------
+        # From these models, they can update the position of the current enzyme and affect the local twist on the right
+        # and left
+        if enzyme.enzyme_type == 'RNAP':          # For now, only RNAPs have an effect
+            # TODO: in the future, according the input we may choose between different motion models, maybe one with
+            #  torques and not uniform motion
+            # Calculates change in position and the twist that it injected on the left and right
+            position, twist_left, twist_right = RNAP_uniform_motion(enzyme, dt)
+        else:
+            continue
+
+        # Now create the effect taken place at the enzyme i
+        effect_list.append(Effect(index=i, position=position, twist_left=twist_left, twist_right=twist_right))
+
+    return effect_list
+
+# Returns new RNAP position, and the twist it injected on the left and right
+def RNAP_uniform_motion(Z,dt):
+    # Object moves: simple uniform motion
+    #position = Z.position + Z.direction * v0 * dt
+    position = Z.direction * v0 * dt
+    # Injects twist: denatures w=gamma*v0*dt base-pairs
+    twist_left = -Z.direction * gamma * v0 * dt
+    twist_right = Z.direction * gamma * v0 * dt
+    return position, twist_left, twist_right
 
 
 #----------------------------------------------------------
@@ -63,25 +119,6 @@ def calculate_supercoiling(Z0, Z1):
         sigma = 0 # I don't know if this is a solution... #But basically, this happens when a RNAP
                   # binds right after one has bound
     return sigma
-
-#----------------------------------------------------------
-#This function calculates/updates the position of an RNAP Z
-def RNAP_motion(Z):
-
-    Zn = Z['start'] + Z['direction']*v0*dt  #Zn = new Z (new position)
-
-    return Zn
-
-#----------------------------------------------------------
-#This function calculates twist inyected on the left and right
-#by the RNAP Z
-def twist_injected(Z):
-
-    twist_left  = -Z['direction']*gamma*v0*dt
-    twist_right =  Z['direction']*gamma*v0*dt
-
-    return twist_left, twist_right
-
 
 #-----------------------------------------------------------------------
 #Get's the start and end positions of the fake boundaries (for circular DNA) 

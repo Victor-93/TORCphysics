@@ -34,11 +34,11 @@ class Circuit:
         # create a time-based seed and save it
         self.seed = random.randrange(sys.maxsize)
 
-        #-----------------------------------------------
-        #We add another SIDD which is the one we will link topos binding with DNA
-        self.site_list.append( Site(s_type='DNA', name='DNA', start=1, end=self.size, k_min=0, k_max=0, s_model=None,
-                                    oparams=None))
-        #Sort list of enzymes and sites by position/start
+        # -----------------------------------------------
+        # We add another SIDD which is the one we will link topos binding with DNA
+        self.site_list.append(Site(s_type='DNA', name='DNA', start=1, end=self.size, k_min=0, k_max=0, s_model=None,
+                                   oparams=None))
+        # Sort list of enzymes and sites by position/start
         self.sort_lists()
         # Distribute twist/supercoiling
         self.add_fake_boundaries()
@@ -50,39 +50,44 @@ class Circuit:
         self.update_global_twist()
         self.update_global_superhelical()
         # Define local sites
-#        self.calculate_local_sites()
 
-        # TODO: I have to think about the update, what does the update do? Do I really need one? Or maybe many updates
-        #  for example, a twist update, a supercoiling update, a local sites update?
-        #  maybe I can update sites as well,
-        # TODO: My update should update twist, supercoiling and the local sites?
+    #        self.calculate_local_sites()
 
-        # TODO: sites, enzymes and superhelical have been loaded, but still needs to define the local sites/domains
-        #  (bare DNA) - or is it the update?
+    # TODO: I have to think about the update, what does the update do? Do I really need one? Or maybe many updates
+    #  for example, a twist update, a supercoiling update, a local sites update?
+    #  maybe I can update sites as well,
+    # TODO: My update should update twist, supercoiling and the local sites?
+
+    # TODO: sites, enzymes and superhelical have been loaded, but still needs to define the local sites/domains
+    #  (bare DNA) - or is it the update?
 
     # This one runs the simulation
     # TODO: finish the run
     # TODO: test all these functions
     def run(self):
-        
+
         for frame in range(self.frames):
-            self.time = frame*self.dt
+            print('frame =',frame)
+            self.time = frame * self.dt
             # BINDING
             # --------------------------------------------------------------
             # Get list of new enzymes
             new_enzyme_list = bm.binding_model(self.site_list, self.enzyme_list, self.environmental_list,
-                                           self.dt, self.circle)
+                                               self.dt, self.circle)
             # These new enzymes are lacking twist and superhelical, we need to fix them and actually add them
             # to the enzyme_list
-            self.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates superhelicals
+            self.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
+            # (superhelical)
 
-            #EFFECT
+            # EFFECT
             # --------------------------------------------------------------
-            #Update?
-            #UNBINDING
-            # --------------------------------------------------------------
-            #Update?
+            effects_list = em.effect_model(self.enzyme_list, self.dt)
+            self.apply_effects(effects_list)
 
+            # Update?
+            # UNBINDING
+            # --------------------------------------------------------------
+            # Update?
 
     # Calculates the global twist (just  sums the excess of twist)
     def update_global_twist(self):
@@ -109,19 +114,18 @@ class Circuit:
     def sort_enzyme_list(self):
         self.enzyme_list.sort(key=lambda x: x.position)
 
-
-#    def calculate_local_sites(self):
-#    #This function calculates the local sites with naked DNA.
-#    #If there are N enzymes, then there is N-1 local sites (or local domains).
-#        for i in range(self.get_num_enzymes()):
-#            self.site_list.append( Site())
-#        for enzyme in self.enzyme_list:
-#            print(0)
+    #    def calculate_local_sites(self):
+    #    #This function calculates the local sites with naked DNA.
+    #    #If there are N enzymes, then there is N-1 local sites (or local domains).
+    #        for i in range(self.get_num_enzymes()):
+    #            self.site_list.append( Site())
+    #        for enzyme in self.enzyme_list:
+    #            print(0)
 
     def add_fake_boundaries(self):
-        #I  need to add a fake site so I can link the fake boundaries
+        # I  need to add a fake site, so I can link the fake boundaries
         self.site_list.append(Site(s_type='EXT', name='EXT', start=1, end=self.size, k_min=0, k_max=0, s_model=None,
-                                    oparams=None))  # twist=self.twist, superhelical=self.superhelical) )
+                                   oparams=None))  # twist=self.twist, superhelical=self.superhelical) )
 
         # TODO: So the way you define continuations is with the fake boundaries? I should also include the local
         #  DNA sites
@@ -138,7 +142,8 @@ class Circuit:
         else:  # If it is a new run
             if self.get_num_enzymes() > 0:  # This can only happen if there are objects bound to the DNA
                 if self.circle:  # For circular DNA
-                    position_left, position_right = em.get_start_end_c(self.enzyme_list[0], self.enzyme_list[-1], self.size)
+                    position_left, position_right = em.get_start_end_c(self.enzyme_list[0], self.enzyme_list[-1],
+                                                                       self.size)
 
                 else:  # For linear DNA
                     position_left = 1
@@ -149,11 +154,11 @@ class Circuit:
                 position_right = self.size  # it is the same in this case for either linear or circular
 
             # TODO: I can distribute the supercoiling when defining the sites?
-#            for site in self.site_list:  # Distribute supercoiling -
-#                site.superhelical = self.superhelical
+            #            for site in self.site_list:  # Distribute supercoiling -
+            #                site.superhelical = self.superhelical
             for enzyme in self.enzyme_list:  # Distribute supercoiling -
-                #enzyme.superhelical_front = self.superhelical
-                #enzyme.superhelical_behind = self.superhelical
+                # enzyme.superhelical_front = self.superhelical
+                # enzyme.superhelical_behind = self.superhelical
                 enzyme.superhelical = self.superhelical
 
             # Let's treat the boundaries of our system as objects.
@@ -165,10 +170,10 @@ class Circuit:
             extra_right = Enzyme(e_type='EXT', name='EXT_R', site=self.site_match('EXT'), position=position_right,
                                  size=0, twist=0, superhelical=self.superhelical)
 
-            self.enzyme_list.append( extra_left)
-            self.enzyme_list.append( extra_right)
+            self.enzyme_list.append(extra_left)
+            self.enzyme_list.append(extra_right)
             self.sort_lists()
-            #And finally, update the twist
+            # And finally, update the twist
             self.update_twist()
 
             print(0)
@@ -179,12 +184,12 @@ class Circuit:
     def update_twist(self):
 
         for i, enzyme in enumerate(self.enzyme_list[:-1]):
-            enzyme.twist = em.calculate_twist(enzyme, self.enzyme_list[i+1])
+            enzyme.twist = em.calculate_twist(enzyme, self.enzyme_list[i + 1])
 
     # Updates the supercoiling/superhelical in enzymes
     def update_supercoiling(self):
         for i, enzyme in enumerate(self.enzyme_list[:-1]):
-            enzyme.superhelical = em.calculate_supercoiling(enzyme, self.enzyme_list[i+1])
+            enzyme.superhelical = em.calculate_supercoiling(enzyme, self.enzyme_list[i + 1])
 
     # This reads the circuit csv and sorts out the twist and structure
     def read_csv(self):
@@ -200,7 +205,6 @@ class Circuit:
         self.size = df['size'][0]
         self.twist = df['twist'][0]
         self.superhelical = df['superhelical'][0]
-        # TODO: Update twist - even if it's provided, it has to match the supercoiling density
         # (Maybe it shouldn't be provided)
 
     # Get number of enzymes
@@ -242,8 +246,12 @@ class Circuit:
     # Adds to the self.enzyme_list, the newly bound enzymes in new_enzyme_list
     def add_new_enzymes(self, new_enzyme_list):
 
-        #Let's first sort the new list
+        # Let's first sort the new list
         new_enzyme_list.sort(key=lambda x: x.position)
+
+        #        print('before')
+        #        print([enzyme.name for enzyme in self.enzyme_list])
+        #        print([enzyme.twist for enzyme in self.enzyme_list])
 
         for new_enzyme in new_enzyme_list:
 
@@ -266,15 +274,15 @@ class Circuit:
             # We are still missing the supercoiling density and the excess of twist...
             # We need to partition the twist, so it is conserved...
             # --------------------------------------------------------
-            #These quantities are the sizes of the new local domains on the left and right of the new enzyme
-            new_length_left = mm.calculate_length(enzyme_before, enzyme)
-            new_length_left = mm.calculate_length(enzyme, enzyme_after)
+            # These quantities are the sizes of the new local domains on the left and right of the new enzyme
+            new_length_left = em.calculate_length(enzyme_before, new_enzyme)
+            new_length_right = em.calculate_length(new_enzyme, enzyme_after)
 
             # now to calculate the new twists
             # NOTE that I don't partition using the supercoiling density because the region that is actually bound
             # is assumed to be relaxed by the enzyme
-            new_twist_left = region_twist * ((new_length_left + 0.5 * new_enzyme.size)/region_length)
-            new_twist_right = region_twist * ((new_length_right + 0.5 * new_enzyme.size)/region_length)
+            new_twist_left = region_twist * ((new_length_left + 0.5 * new_enzyme.size) / region_length)
+            new_twist_right = region_twist * ((new_length_right + 0.5 * new_enzyme.size) / region_length)
 
             # update twists
             # ------------CIRCULAR DNA--------------------
@@ -288,7 +296,7 @@ class Circuit:
 
                 # There is one EXT at the left
                 elif enzyme_before.name == 'EXT_L' and enzyme_after.name != 'EXT_R':
-                    # TODO: Check if this is how I can update a property in the enzymes
+                    # Check if this is how I can update a property in the enzymes - I think it does!
                     enzyme_before.twist = new_twist_left
                     self.enzyme_list[-1].twist = new_twist_left
                     new_enzyme.twist = new_twist_right
@@ -315,5 +323,25 @@ class Circuit:
             self.sort_enzyme_list()
 
         # And update supercoiling
+        self.update_supercoiling()
+
+#        print('after')
+#        print([enzyme.name for enzyme in self.enzyme_list])
+#        print([enzyme.twist for enzyme in self.enzyme_list])
+
+    # Apply effects in effects_list
+    def apply_effects(self, effects_list):
+        # And apply the effects for the specified enzymes in the effects_list
+        for effect in effects_list:
+            self.enzyme_list[effect.index].position += effect.position
+            self.enzyme_list[effect.index].twist += effect.twist_right
+            # In case we affect the boundary on the left - it affects the last (not fake) enzyme
+            # because the fake boundaries don't exist and just reflect the first and last enzymes.
+            if self.circle and effect.index == 1:
+                self.enzyme_list[self.get_num_enzymes() - 2].twist += effect.twist_left
+            else:  # In any other case just update the enzyme on the left
+                self.enzyme_list[effect.index - 1].twist += effect.twist_left
+
+        # And update supercoiling - because twist was modified
         self.update_supercoiling()
 

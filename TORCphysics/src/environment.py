@@ -34,7 +34,7 @@ class EnvironmentFactory:
             self.environment_list.append(new_environment)
 
     def site_match(self, label):
-        enzyme_before = [enzyme.position for enzyme in enzyme_list if enzyme.position <= site.start][-1]
+#        enzyme_before = [enzyme.position for enzyme in enzyme_list if enzyme.position <= site.start][-1]
         site_list = [site for site in self.site_list if site.site_type == label]
         return site_list
 
