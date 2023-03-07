@@ -53,7 +53,41 @@ EE_alpha = params.EE_alpha
 #sigma  = supercoiling density that the binding site
 #f_ini  = initiation function
 
-def binding_model(site_list, enzyme_list, environmental_list, dt, circle):
+# Goes through the enzymes in enzymes list and according to their unbinding condition unbind them.
+# Returns a list of enzyme indexes that will unbind
+def unbinding_model(enzymes_list):
+    drop_list = [] # This list will have the indices of the enzymes that will unbind
+    for i, enzyme in enumerate(enzymes_list):
+
+        if enzyme.enzyme_type == 'EXT': # The fake boundaries can't unbind
+            continue
+
+        unbind = False # True if it unbinds
+
+        # According enzyme_type, apply unbinding condition
+        # ------------------------------------------------------------------
+        # TODO: add unbinding condition for more enzyme types!
+        # Right now, only RNAPs can unbind
+        if enzyme.enzyme_type == 'RNAP':
+            # condition for transcription in >>>>>>>>>>>>> right direction or
+            # condition for transcription in <<<<<<<<<<<<< left  direction
+            if (enzyme.direction == 1 and enzyme.end - enzyme.position <= 0) or \
+                    (enzyme.direction == -1 and enzyme.end - enzyme.position >= 0):
+                unbind = True
+        else:
+            continue
+
+        # Now add the to the drop_list if the enzyme will unbind
+        # ------------------------------------------------------------------
+        if unbind:
+            drop_list.append(i)
+
+    return drop_list
+
+# Goes through enzymes in the environment (environmental_list) and search for the available sites that it recognizes.
+# If the site is available, then, according site model (and in the future also environmental model) calculate the
+# binding probability. It then returns a list of new_enzymes that will bind the DNA
+def binding_model(enzyme_list, environmental_list, dt):
 
     new_enzymes = []  # here I will include the new enzymes
 

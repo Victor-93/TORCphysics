@@ -71,22 +71,86 @@ class Circuit:
             self.time = frame * self.dt
             # BINDING
             # --------------------------------------------------------------
-            # Get list of new enzymes
-            new_enzyme_list = bm.binding_model(self.site_list, self.enzyme_list, self.environmental_list,
-                                               self.dt, self.circle)
+            # Apply binding model and get list of new enzymes
+            new_enzyme_list = bm.binding_model(self.enzyme_list, self.environmental_list, self.dt)
             # These new enzymes are lacking twist and superhelical, we need to fix them and actually add them
             # to the enzyme_list
             self.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
-            # (superhelical)
 
             # EFFECT
             # --------------------------------------------------------------
             effects_list = em.effect_model(self.enzyme_list, self.dt)
             self.apply_effects(effects_list)
-
-            # Update?
+            # TODO: I'm missing the  continium topo model.
             # UNBINDING
             # --------------------------------------------------------------
+            drop_list = bm.unbinding_model(self.enzymes_list)
+            self.drop_enzymes(drop_list)
+
+
+    # Drop enzymes specifed in the drop_list. This list contains the indices in the self.enzyme_list that are unbinding
+    # the DNA
+
+    # TODO: AQUI ME QUEDE. Ten cuidado que si empiezas a quitar elementos, entonces los indices en drop_list ya no
+    #  tienen sentido. Opcion 1: Trackea estos indices (mas rapido computacional mente). Opcion 2: pon mas info en el
+    #  drop_list para que asocie la enzyme (mas tardado, muchos ifs y mas codigo)
+    #
+    def drop_enzymes(self,drop_list):
+
+        for i in drop_list:
+
+            n = self.get_num_enzymes()
+            if self.circle: # As always, we need to be careful with the circular case
+
+                # There is no other domains besides the newly bound protein.
+                # EXT_________O_____EXT
+                if self.enzyme_list[i-1].name == 'EXT_L' and self.enzyme_list[i+1].name == 'EXT_R':
+                    self.enzyme_list[0].twist = self.enzyme_list[i].twist  # Everything should have the same twist...?
+                # There is one EXT at the left
+                # EXT_________O_________E_______E_____E_____EXT
+                if self.enzyme_list[i - 1].name == 'EXT_L' and self.enzyme_list[i + 1].name != 'EXT_R':
+                    self.enzyme_list[ ]
+
+                    # update twists -  because i t is absorved
+                    # ------------CIRCULAR DNA--------------------
+                    if circular:
+
+                        # There is no other domains besides the newly bound protein.
+                        if o_df.iloc[i - 1]['name'] == 'EXT_L' and o_df.iloc[i + 1]['name'] == 'EXT_R':
+                            o_df.at[i, 'twist'] = o_df.iloc[i]['twist']
+                            o_df.at[0, 'twist'] = o_df.at[N - 2, 'twist']  # I added this on 15/08/2022
+
+                        # There is one EXT at the left
+                        elif o_df.iloc[i - 1]['name'] == 'EXT_L' and o_df.iloc[i + 1]['name'] != 'EXT_R':
+                            o_df.at[N - 2, 'twist'] += o_df.at[i, 'twist']  # twist on the other side is absorbed
+                            o_df.at[0, 'twist'] = o_df.at[N - 2, 'twist']  # I added this on 15/08/2022
+
+                        # In any other case
+                        else:
+                            o_df.at[i - 1, 'twist'] += o_df.at[
+                                i, 'twist']  # twist is absorved by the domain on the left
+
+                    # ------------LINEAR DNA--------------------
+                    else:
+                        o_df.at[i - 1, 'twist'] += o_df.at[i, 'twist']  # twist is absorved by the domain on the left
+                    # ------------------------------------------
+
+                    # Before dropping, let's find which gene it just transcribed
+                    mask = genome_df['end'] == o_df.iloc[i]['end']
+                    a = genome_df[mask].index
+                    aux_array[a, 0] -= 1  # And let's remove the unbound RNAP from the count
+                    aux_array[a, 2] = 1  # And let's register the time of termination
+
+                    # Drop object and update number of objects/RNAPs
+                    o_df = o_df.drop([i])  # And we drop the object
+                    o_df = o_df.reset_index(drop=True)  # And reset indixees
+                    N = len(o_df['start'])  # and update the number of objects
+
+                    mask = o_df['type'] == 'RNAP'
+                    n_RNAPs = len(o_df[mask]['start'])  # Let's count the number of RNAPs bound
+                    i = i - 1  # so we keep tracking the protein because if now N, changed, but it didn't affect
+                    # the loop
+
             # Update?
 
     # Calculates the global twist (just  sums the excess of twist)
