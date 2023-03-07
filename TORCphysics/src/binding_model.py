@@ -1,6 +1,6 @@
 import numpy as np
-from TORCphysics import params, Enzyme
-from TORCphysics import effect_model as em
+from TORCphysics import params
+from TORCphysics import Enzyme
 
 #---------------------------------------------------------------------------------------------------------------------
 #DESCRIPTION
@@ -68,6 +68,7 @@ def binding_model(site_list, enzyme_list, environmental_list, dt, circle):
         if environment.concentration < 0.0:
             continue
 
+        # Go through sites
         for j, site in enumerate(environment.site_list):
             # We will do the binding process in this order:
             # Check site and model to use.
@@ -82,7 +83,6 @@ def binding_model(site_list, enzyme_list, environmental_list, dt, circle):
             # -----------------------------------------------------------
             if site.site_type != 'gene':
                 continue
-            # Go through sites
 
             # Get superhelical density at site
             enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
@@ -162,9 +162,9 @@ def check_site_availability( site, enzyme_list, size):
     # It assumes that the probability has already been calculated, and we have a candidate enzyme for the binding
     # with size=size.
     # We need the list of current enzymes to see if the one before and after the site overlap with the start site.
-#    enzyme_before = [enzyme.position for enzyme in enzyme_list if enzyme.position <= site.start][-1]
     enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
     enzyme_after = [enzyme for enzyme in enzyme_list if enzyme.position >= site.start][0]
+    #And a range of their occupancy
     range_before = [enzyme_before.position, enzyme_before.position + enzyme_before.size]
     range_after = [enzyme_after.position, enzyme_after.position + enzyme_after.size]
     if site.direction >0:
@@ -173,7 +173,7 @@ def check_site_availability( site, enzyme_list, size):
         my_range = [site.start, site.start - size]
 
     #If any of them intersect
-    if ( set(enzyme_before) & set(my_range) ) or ( set(enzyme_after) & set(my_range)):
+    if ( set(range_before) & set(my_range) ) or ( set(range_after) & set(my_range)):
         available = False
     # there is an intersection
     else:

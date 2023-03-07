@@ -16,7 +16,27 @@ class TestCircuit(TestCase):
         series = True
         continuation = False
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, 1)
+                             output_prefix, frames, series, continuation, dt=1)
         self.assertGreater(my_circuit.get_num_enzymes(), 0, "Empty enzyme list")
         self.assertGreater(my_circuit.get_num_sites(), 0, "Empty enzyme list")
         self.assertGreater(my_circuit.get_num_environmentals(), 0, "Empty enzyme list")
+
+    # TODO: This can be several tests in one? 1.- Prove that statistical binding works, 2.- That the effects take place
+    #  3.- And that the proteins unbind at the end?
+    def test_run(self):
+        circuit_filename = '../circuit.csv'
+        sites_filename = '../sites.csv'
+        enzymes_filename = '../enzymes.csv'
+        environment_filename = '../environment.csv'
+        output_prefix = 'output'
+        frames = 5
+        series = True
+        continuation = False
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt=1)
+        for site in my_circuit.site_list:  # I'll increase the rates
+            site.k_min = site.k_min*100
+        #Let's make the rates
+        my_circuit.run()
+        print(0)
+
