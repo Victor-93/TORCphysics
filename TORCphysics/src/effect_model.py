@@ -1,17 +1,17 @@
 import numpy as np
-#import pandas as pd
-#import params
+# import pandas as pd
+# import params
 from TORCphysics import params
 import sys
 
-#---------------------------------------------------------------------------------------------------------------------
-#DESCRIPTION
-#---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+# DESCRIPTION
+# ---------------------------------------------------------------------------------------------------------------------
 # This module contains the mathematical functions that compose the effects model.
 # Effects can describe the motion of RNAPs as well as twist injection; topoisomerase activity; overall mechanics of
 # enzymes bound to DNA, etc...
 
-#All parameters are already in the params module, but I prefer to have them here with more simple names:
+# All parameters are already in the params module, but I prefer to have them here with more simple names:
 v0 = params.v0
 w0 = params.w0
 gamma = params.gamma
@@ -34,17 +34,17 @@ class Effect:
         self.twist_left = twist_left
         self.twist_right = twist_right
 
+
 # Runs through each bound enzyme (in enzyme_list) and creates an effect.
-# It a effects_list which contains indications on how to update the current position and how the twist on the local
+# It an effects_list which contains indications on how to update the current position and how the twist on the local
 # neighbouring domains are effected
 def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mechanical_model):
-
     # list of effects: effect = [index, position, twist_left, twist_right]
     # I use an effect list because it's easier because there are multiple changes in the local twists
     effect_list = []
     for i, enzyme in enumerate(enzyme_list):
 
-        if enzyme.enzyme_type == 'EXT':  # We can speed up things a little bit by ignoring the fake boundaries
+        if enzyme.enzyme_type == 'EXT':  # We can speed up things a bit by ignoring the fake boundaries
             continue
 
         # TODO: add effect for other type of enzymes, like NAPs? Maybe their effect is to do nothing. And definitely
@@ -53,12 +53,12 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
         # -------------------------------------------------------------------------------------------------------------
         # From these models, they can update the position of the current enzyme and affect the local twist on the right
         # and left
-        if enzyme.enzyme_type == 'RNAP':          # For now, only RNAPs have an effect
+        if enzyme.enzyme_type == 'RNAP':  # For now, only RNAPs have an effect
             # TODO: in the future, according the input we may choose between different motion models, maybe one with
             #  torques and not uniform motion
             if mechanical_model == 'uniform':
                 # Calculates change in position and the twist that it injected on the left and right
-                position, twist_left, twist_right = RNAP_uniform_motion(enzyme, dt)
+                position, twist_left, twist_right = rnap_uniform_motion(enzyme, dt)
             else:
                 print('Sorry, cannot recognise mechanistic model')
                 sys.exit()
@@ -71,18 +71,18 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
     # Topoisomerase continuum model - If we are using a continuum model, then we need to add the topos effects
     # --------------------------------------------------------------
     if topoisomerase_model == 'continuum':
-        # Get's list of topoisomerase enzymes in the environment
+        # Gets list of topoisomerase enzymes in the environment
         topo_list = [environment for environment in environmental_list
                      if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
         position = 0  # topoisomerases cannot change enzymes positions and only affect each local site (twist_right)
         twist_left = 0
         for topo in topo_list:
             for i, enzyme in enumerate(enzyme_list):
-                if enzyme.enzyme_type == 'EXT':  # We can speed up things a little bit by ignoring the fake boundaries
+                if enzyme.enzyme_type == 'EXT':  # We can speed up things a bit by ignoring the fake boundaries
                     continue
 
                 if topo.name == 'topoI':
-                    twist_right = topoI_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
+                    twist_right = topo1_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
                 elif topo.name == 'gyrase':
                     twist_right = gyrase_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
                 else:
@@ -102,7 +102,7 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
 # Calculates the amount of coils removed by topoisomerase I
 # activity. This function only depends on the supercoiling density (sigma)
 # I took this function from Sam Meyer's paper (2019)
-def topoI_continuum(sigma, topo_c, topo_k, dt):
+def topo1_continuum(sigma, topo_c, topo_k, dt):
     # the function has the form of (concentration*sigmoid)*rate*dt
     a = topo_c * topo_k * dt
     b = 1 + np.exp((sigma - topo_t) / topo_w)
@@ -121,89 +121,89 @@ def gyrase_continuum(sigma, gyra_c, gyra_k, dt):
     sigma_removed = -a / b
     return sigma_removed
 
+
 # Returns new RNAP position, and the twist it injected on the left and right
-def RNAP_uniform_motion(Z,dt):
+def rnap_uniform_motion(z, dt):
     # Object moves: simple uniform motion
-    #position = Z.position + Z.direction * v0 * dt
-    position = Z.direction * v0 * dt
+    # position = Z.position + Z.direction * v0 * dt
+    position = z.direction * v0 * dt
     # Injects twist: denatures w=gamma*v0*dt base-pairs
-    twist_left = -Z.direction * gamma * v0 * dt
-    twist_right = Z.direction * gamma * v0 * dt
+    twist_left = -z.direction * gamma * v0 * dt
+    twist_right = z.direction * gamma * v0 * dt
     return position, twist_left, twist_right
 
 
-#----------------------------------------------------------
-#This function calculates the length between two objects (proteins) considering their sizes
-def calculate_length(Z0, Z1):
-    x0 = Z0.position  #positions
-    x1 = Z1.position
-    b0 = Z0.size #size -_-
-    b1 = Z1.size
-    #There are 4 posibilities
-    if Z0.direction >= 0 and Z1.direction >= 0:
+# ----------------------------------------------------------
+# This function calculates the length between two objects (proteins) considering their sizes
+def calculate_length(z0, z1):
+    x0 = z0.position  # positions
+    x1 = z1.position
+    b0 = z0.size  # size -_-
+    b1 = z1.size
+    # There are 4 posibilities
+    if z0.direction >= 0 and z1.direction >= 0:
         length = (x1 - b1) - x0
-    elif Z0.direction >= 0 and Z1.direction < 0:
+    elif z0.direction >= 0 and z1.direction < 0:
         length = x1 - x0
-    elif Z0.direction < 0 and Z1.direction >= 0:
+    elif z0.direction < 0 and z1.direction >= 0:
         length = (x1 - b1) - (x0 + b0)
-    elif Z0.direction < 0 and Z1.direction < 0:
+    elif z0.direction < 0 and z1.direction < 0:
         length = x1 - (x0 + b0)
     else:
         print("Something went wrong in lengths")
         sys.exit()
-    #length+=1 #1 bp needs to be added
+    # length+=1 #1 bp needs to be added
     return length
 
-#----------------------------------------------------------
-#This function calculates/updates the twist parameter according
-#the supercoiling value of the current object Z0, and according
-#the length between object Z0 and Z1.
-def calculate_twist(Z0,Z1):
-    length = calculate_length(Z0,Z1) #First, I need to get the length
-    sigma = Z0.superhelical
-    twist = sigma*w0*length
+
+# ----------------------------------------------------------
+# This function calculates/updates the twist parameter according
+# the supercoiling value of the current object Z0, and according
+# the length between object Z0 and Z1.
+def calculate_twist(z0, z1):
+    length = calculate_length(z0, z1)  # First, I need to get the length
+    sigma = z0.superhelical
+    twist = sigma * w0 * length
     return twist
 
-#----------------------------------------------------------
-#This function calculates/updates the supercoiling according
-#the twist of the current object Z0, and the distance between
-#Z1-Z0
-def calculate_supercoiling(Z0, Z1):
-    length = calculate_length(Z0,Z1) # First, I need to get the length
-    twist = Z0.twist                # and twist
+
+# ----------------------------------------------------------
+# This function calculates/updates the supercoiling according
+# the twist of the current object Z0, and the distance between
+# Z1-Z0
+def calculate_supercoiling(z0, z1):
+    length = calculate_length(z0, z1)  # First, I need to get the length
+    twist = z0.twist  # and twist
     if length != 0:
-        sigma = twist/(w0*length)       # and calculate the supercoiling
+        sigma = twist / (w0 * length)  # and calculate the supercoiling
     else:
-        sigma = 0 # I don't know if this is a solution... #But basically, this happens when a RNAP
-                  # binds right after one has bound
+        sigma = 0  # I don't know if this is a solution... #But basically, this happens when a RNAP
+        # binds right after one has bound
     return sigma
 
-#-----------------------------------------------------------------------
-#Get's the start and end positions of the fake boundaries (for circular DNA) 
+
+# -----------------------------------------------------------------------
+# Get's the start and end positions of the fake boundaries (for circular DNA)
 # In case that there is not fake boundaries, Z_N should be the last element [-1],
 # in case that you have N objects including the fake boundaries, Z_N -> [N-2]
-def get_start_end_c(Z_0, Z_N, nbp):
+def get_start_end_c(z0, zn, nbp):
+    b_0 = z0.size
+    b_n = zn.size
+    x_0 = z0.position  # position of first object
+    x_n = zn.position  # position of last object
 
-    b_0 = Z_0.size
-    b_N = Z_N.size
-    x_0 = Z_0.position                        #position of first object
-    x_N = Z_N.position                        #position of last object
-
-    #fake position on the left
-    if  Z_N.direction >= 0: #depends on the direction
-        position_left = 0 - (nbp - x_N)       #this is the position of the fake bit,
+    # fake position on the left
+    if zn.direction >= 0:  # depends on the direction
+        position_left = 0 - (nbp - x_n)  # this is the position of the fake bit,
     else:
-        position_left = 0 - ( nbp - (x_N + b_N) ) # the size of the last object is considered
+        position_left = 0 - (nbp - (x_n + b_n))  # the size of the last object is considered
 
-    #fake end
-    if  Z_0.direction >= 0: #depends on the direction
-        position_right = nbp + x_0 - b_0     #I think I had the sign wrong...
+    # fake end
+    if z0.direction >= 0:  # depends on the direction
+        position_right = nbp + x_0 - b_0  # I think I had the sign wrong...
     else:
         position_right = nbp + x_0
 
     return position_left, position_right
 
-#-----------------------------------------------------------------------
-
-
-
+# -----------------------------------------------------------------------
