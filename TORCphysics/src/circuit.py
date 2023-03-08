@@ -110,6 +110,7 @@ class Circuit:
                 # EXT_________O_________E_______E_____E_____EXT
                 if self.enzyme_list[i - 1].name == 'EXT_L' and self.enzyme_list[i + 1].name != 'EXT_R':
                     self.enzyme_list[ ]
+                    #AQUI ES DONDE ME HABIA QUEDADO EN CODING
 
                     # update twists -  because i t is absorved
                     # ------------CIRCULAR DNA--------------------
