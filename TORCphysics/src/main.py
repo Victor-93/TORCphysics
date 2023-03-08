@@ -40,22 +40,22 @@ namefile='object.txt'
 
 # Create the parser
 #---------------------------------------------------------------------------------------------------------------------
-parser = argparse.ArgumentParser(description="Version1 of the physical model oftranscription-supercoiling")
+parser = argparse.ArgumentParser(description="Version1 of the physical model of transcription-supercoiling")
 parser.add_argument("-f", "--frames", type=int, action="store", help="Number of frames (timesteps)", default=5000)
 parser.add_argument("-c", "--continuation", action="store_true", help="Continuation of a simulation")
 parser.add_argument("-ic", "--input_circuit", action="store", help="Circuit input file", default="../circuit.csv")
 parser.add_argument("-ig", "--input_sites", action="store", help="Genome input file", default="../sites.csv")
 parser.add_argument("-io", "--input_enzymes", action="store", help="Objects input file", default="../enzymes.csv")
-parser.add_argument("-ie", "--input_enviroment", action="store", help="Enviroment input file", default="../environment.csv")
+parser.add_argument("-ie", "--input_environment", action="store", help="Environment input file",
+                    default="../environment.csv")
 parser.add_argument("-s", "--series", action="store_true", help="Print dynamic results per timestep")
 parser.add_argument("-t", "--test", action="store_true", help="Run series of tests stored in the test folder")
 parser.add_argument("-o", "--output", action="store", help="Output prefix for output files", default="output")
-parser.add_argument("-dt", "--timestep", action="store", help="Output prefix for output files", default=dt)
+parser.add_argument("-dt", "--timestep", action="store", help="Simulation time step", default=dt)
+parser.add_argument("-tm", "--topoisomerase_model", action="store", help="Model for topoisomerase activity",
+                    default='continuum')
+parser.add_argument("-mm", "--mechanical_model", action="store", help="Model for enzyme mechanics", default='uniform')
 
-
-#BORRAESTO
-parser.add_argument("-l", "--linear", action="store_true", help="Include this option if linear DNA")
-parser.add_argument("-im", "--initiation_model", action="store", help="Initiation method", default="maxmin")
 
 # Process terminal commands
 #---------------------------------------------------------------------------------------------------------------------
@@ -69,6 +69,8 @@ enzymes_filename = args.input_enzymes            #Enzymes file
 environment_filename = args.input_enviroment         #Enviroment file
 output_prefix = args.output                   #Output file prefix
 dt = abs(args.timestep) #The time step
+topoisomerase_model = args.topoisomerase_model
+mechanical_model = args.mechanical_model
 
 if args.continuation:        #If this is the continuation of a previous run
     continuation=True
@@ -85,7 +87,7 @@ else:
 
 # Pass the command line inputs, read csvs and initialize "my_circuit"
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                     output_prefix, frames, series, continuation, dt)
+                     output_prefix, frames, series, continuation, dt, topoisomerase_model, mechanical_model)
 
 # TODO: Don't forget do your tests
 # Let's print some info of the system

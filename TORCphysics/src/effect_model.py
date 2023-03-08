@@ -1,4 +1,4 @@
-#import numpy as np
+import numpy as np
 #import pandas as pd
 #import params
 from TORCphysics import params
@@ -7,15 +7,18 @@ import sys
 #---------------------------------------------------------------------------------------------------------------------
 #DESCRIPTION
 #---------------------------------------------------------------------------------------------------------------------
-#This module contains the mathematical functions that compose the mechanical part of my model
-# It also includes the functions that update the fake ends, as well as how the addition of
-# RNAPs modify the topology of our system.
+# This module contains the mathematical functions that compose the effects model.
+# Effects can describe the motion of RNAPs as well as twist injection; topoisomerase activity; overall mechanics of
+# enzymes bound to DNA, etc...
 
 #All parameters are already in the params module, but I prefer to have them here with more simple names:
 v0 = params.v0
 w0 = params.w0
 gamma = params.gamma
-#dt     = params.dt
+topo_w = params.topo_w
+topo_t = params.topo_t
+gyra_w = params.gyra_w
+gyra_t = params.gyra_t
 
 
 class Effect:
@@ -34,7 +37,7 @@ class Effect:
 # Runs through each bound enzyme (in enzyme_list) and creates an effect.
 # It a effects_list which contains indications on how to update the current position and how the twist on the local
 # neighbouring domains are effected
-def effect_model(enzyme_list, dt):
+def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mechanical_model):
 
     # list of effects: effect = [index, position, twist_left, twist_right]
     # I use an effect list because it's easier because there are multiple changes in the local twists
@@ -53,15 +56,70 @@ def effect_model(enzyme_list, dt):
         if enzyme.enzyme_type == 'RNAP':          # For now, only RNAPs have an effect
             # TODO: in the future, according the input we may choose between different motion models, maybe one with
             #  torques and not uniform motion
-            # Calculates change in position and the twist that it injected on the left and right
-            position, twist_left, twist_right = RNAP_uniform_motion(enzyme, dt)
+            if mechanical_model == 'uniform':
+                # Calculates change in position and the twist that it injected on the left and right
+                position, twist_left, twist_right = RNAP_uniform_motion(enzyme, dt)
+            else:
+                print('Sorry, cannot recognise mechanistic model')
+                sys.exit()
         else:
             continue
 
         # Now create the effect taken place at the enzyme i
         effect_list.append(Effect(index=i, position=position, twist_left=twist_left, twist_right=twist_right))
 
+    # Topoisomerase continuum model - If we are using a continuum model, then we need to add the topos effects
+    # --------------------------------------------------------------
+    if topoisomerase_model == 'continuum':
+        # Get's list of topoisomerase enzymes in the environment
+        topo_list = [environment for environment in environmental_list
+                     if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
+        position = 0  # topoisomerases cannot change enzymes positions and only affect each local site (twist_right)
+        twist_left = 0
+        for topo in topo_list:
+            for i, enzyme in enumerate(enzyme_list):
+                if enzyme.enzyme_type == 'EXT':  # We can speed up things a little bit by ignoring the fake boundaries
+                    continue
+
+                if topo.name == 'topoI':
+                    twist_right = topoI_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
+                elif topo.name == 'gyrase':
+                    twist_right = gyrase_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
+                else:
+                    twist_right = 0  # If it doesn't recognize the topo, then don't do anything
+
+                # Now create the effect taken place at the enzyme i
+                effect_list.append(Effect(index=i, position=position, twist_left=twist_left, twist_right=twist_right))
+
     return effect_list
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# TOPOISOMERASE ACTIVITY FUNCTIONS
+# ---------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------
+# Calculates the amount of coils removed by topoisomerase I
+# activity. This function only depends on the supercoiling density (sigma)
+# I took this function from Sam Meyer's paper (2019)
+def topoI_continuum(sigma, topo_c, topo_k, dt):
+    # the function has the form of (concentration*sigmoid)*rate*dt
+    a = topo_c * topo_k * dt
+    b = 1 + np.exp((sigma - topo_t) / topo_w)
+    sigma_removed = a / b
+    return sigma_removed
+
+
+# ----------------------------------------------------------
+# Calculates the amount of coils removed by gyrase
+# activity. This function only depends on the supercoiling density (sigma)
+# I took this function from Sam Meyer's paper (2019)
+def gyrase_continuum(sigma, gyra_c, gyra_k, dt):
+    # the function has the form of (concentration*sigmoid)*rate*dt
+    a = gyra_c * gyra_k * dt
+    b = 1 + np.exp(-(sigma - gyra_t) / gyra_w)
+    sigma_removed = -a / b
+    return sigma_removed
 
 # Returns new RNAP position, and the twist it injected on the left and right
 def RNAP_uniform_motion(Z,dt):

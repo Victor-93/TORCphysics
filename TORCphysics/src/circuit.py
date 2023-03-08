@@ -9,7 +9,7 @@ from TORCphysics import binding_model as bm
 class Circuit:
 
     def __init__(self, circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                 output_prefix, frames, series, continuation, dt):
+                 output_prefix, frames, series, continuation, dt, topoisomerase_model, mechanical_model):
         # I'll save the input filenames just in case
         self.circuit_filename = circuit_filename
         self.sites_filename = sites_filename
@@ -26,6 +26,8 @@ class Circuit:
         self.twist = None
         self.superhelical = None
         self.dt = dt  # time step
+        self.topoisomerase_model = topoisomerase_model
+        self.mechanical_model = mechanical_model
         self.read_csv()  # Here, it gets the name,structure, etc
         self.site_list = SiteFactory(sites_filename).site_list
         self.enzyme_list = EnzymeFactory(enzymes_filename, self.site_list).enzyme_list
@@ -64,10 +66,15 @@ class Circuit:
     # This one runs the simulation
     # TODO: finish the run
     # TODO: test all these functions
+    # TODO: Think about the updating of twist/supercoiling. When new enzymes bind, they can have an impact on the
+    #  supercoiling, in which depending on the size of the local domain, the supercoiling can increase considerably.
+    #  So when, these enzymes are added, they start moving?  Or is it assumed that during this dt it took them a lot
+    #  of time to bind? And when the effects are taking place, the enzymes react to these new supercoiling/twist or
+    #  they feel the one prior binding? Maybe if dt is sufficiently small, it just doesn't matter?
     def run(self):
 
         for frame in range(self.frames):
-            print('frame =',frame)
+#            print('frame =', frame)
             self.time = frame * self.dt
             # BINDING
             # --------------------------------------------------------------
@@ -79,80 +86,68 @@ class Circuit:
 
             # EFFECT
             # --------------------------------------------------------------
-            effects_list = em.effect_model(self.enzyme_list, self.dt)
+            effects_list = em.effect_model(self.enzyme_list, self.environmental_list, self.dt,
+                                           self.topoisomerase_model, self.mechanical_model)
             self.apply_effects(effects_list)
-            # TODO: I'm missing the  continium topo model.
+            # TODO: I'm missing the  continuum topo model.
+
             # UNBINDING
             # --------------------------------------------------------------
-            drop_list = bm.unbinding_model(self.enzymes_list)
+            drop_list = bm.unbinding_model(self.enzyme_list)
             self.drop_enzymes(drop_list)
 
+            # UPDATE GLOBALS
+            # --------------------------------------------------------------
+            self.update_global_twist()
+            self.update_global_superhelical()
 
-    # Drop enzymes specifed in the drop_list. This list contains the indices in the self.enzyme_list that are unbinding
+    # Drop enzymes specified in the drop_list. This list contains the indices in the self.enzyme_list that are unbinding
     # the DNA
+    def drop_enzymes(self, drop_list):
 
-    # TODO: AQUI ME QUEDE. Ten cuidado que si empiezas a quitar elementos, entonces los indices en drop_list ya no
-    #  tienen sentido. Opcion 1: Trackea estos indices (mas rapido computacional mente). Opcion 2: pon mas info en el
-    #  drop_list para que asocie la enzyme (mas tardado, muchos ifs y mas codigo)
-    #
-    def drop_enzymes(self,drop_list):
+        for j, index in enumerate(drop_list):
 
-        for i in drop_list:
+            i = index - j  # This "i" is our true index. We subtract j because the indices (index) change by -1
+            # everytime 1 enzyme is removed, hence we subtract -j
 
-            n = self.get_num_enzymes()
-            if self.circle: # As always, we need to be careful with the circular case
+            # ------------CIRCULAR DNA--------------------
+            if self.circle:  # As always, we need to be careful with the circular case
 
-                # There is no other domains besides the newly bound protein.
-                # EXT_________O_____EXT
-                if self.enzyme_list[i-1].name == 'EXT_L' and self.enzyme_list[i+1].name == 'EXT_R':
+                # There is no other domains besides the newly bound protein. (O is the enzyme to be removed)
+                # EXT_L........O..........EXT_R / The twist in O is passed to the left boundary (maybe a bit redundant?)
+                if self.enzyme_list[i - 1].name == 'EXT_L' and self.enzyme_list[i + 1].name == 'EXT_R':
                     self.enzyme_list[0].twist = self.enzyme_list[i].twist  # Everything should have the same twist...?
                 # There is one EXT at the left
-                # EXT_________O_________E_______E_____E_____EXT
+                # EXT_L.............O........------------.....E......EXT_R / Twist in O has to be added to E,
+                # and EXT_L becomes a mirrored version of E, so it has the same twist as E (which index is = N-2)
                 if self.enzyme_list[i - 1].name == 'EXT_L' and self.enzyme_list[i + 1].name != 'EXT_R':
-                    self.enzyme_list[ ]
-                    #AQUI ES DONDE ME HABIA QUEDADO EN CODING
+                    self.enzyme_list[self.get_num_enzymes() - 2].twist += self.enzyme_list[i].twist
+                    self.enzyme_list[0].twist = self.enzyme_list[self.get_num_enzymes() - 2].twist
 
-                    # update twists -  because i t is absorved
-                    # ------------CIRCULAR DNA--------------------
-                    if circular:
+                # ------.......E.......O.....---------- / Twist in O is added to E
+                else:
+                    self.enzyme_list[i - 1].twist += self.enzyme_list[i].twist
 
-                        # There is no other domains besides the newly bound protein.
-                        if o_df.iloc[i - 1]['name'] == 'EXT_L' and o_df.iloc[i + 1]['name'] == 'EXT_R':
-                            o_df.at[i, 'twist'] = o_df.iloc[i]['twist']
-                            o_df.at[0, 'twist'] = o_df.at[N - 2, 'twist']  # I added this on 15/08/2022
+            # ------------LINEAR DNA--------------------
+            else:
+                # ------.......E.......O.....---------- / Twist in O is added to E
+                self.enzyme_list[i - 1].twist += self.enzyme_list[i].twist
 
-                        # There is one EXT at the left
-                        elif o_df.iloc[i - 1]['name'] == 'EXT_L' and o_df.iloc[i + 1]['name'] != 'EXT_R':
-                            o_df.at[N - 2, 'twist'] += o_df.at[i, 'twist']  # twist on the other side is absorbed
-                            o_df.at[0, 'twist'] = o_df.at[N - 2, 'twist']  # I added this on 15/08/2022
+            # Remove element of list
+            # ------------------------------------------
+            del self.enzyme_list[i]
 
-                        # In any other case
-                        else:
-                            o_df.at[i - 1, 'twist'] += o_df.at[
-                                i, 'twist']  # twist is absorved by the domain on the left
+        # Update fake boundaries positions if circular structure
+        if self.circle:
+            if self.get_num_enzymes() > 2:
+                self.enzyme_list[0].position, self.enzyme_list[-1].position = \
+                    em.get_start_end_c(self.enzyme_list[1], self.enzyme_list[-2], self.size)
+            else:
+                self.enzyme_list[0].position = 1
+                self.enzyme_list[-1].position = self.size
 
-                    # ------------LINEAR DNA--------------------
-                    else:
-                        o_df.at[i - 1, 'twist'] += o_df.at[i, 'twist']  # twist is absorved by the domain on the left
-                    # ------------------------------------------
-
-                    # Before dropping, let's find which gene it just transcribed
-                    mask = genome_df['end'] == o_df.iloc[i]['end']
-                    a = genome_df[mask].index
-                    aux_array[a, 0] -= 1  # And let's remove the unbound RNAP from the count
-                    aux_array[a, 2] = 1  # And let's register the time of termination
-
-                    # Drop object and update number of objects/RNAPs
-                    o_df = o_df.drop([i])  # And we drop the object
-                    o_df = o_df.reset_index(drop=True)  # And reset indixees
-                    N = len(o_df['start'])  # and update the number of objects
-
-                    mask = o_df['type'] == 'RNAP'
-                    n_RNAPs = len(o_df[mask]['start'])  # Let's count the number of RNAPs bound
-                    i = i - 1  # so we keep tracking the protein because if now N, changed, but it didn't affect
-                    # the loop
-
-            # Update?
+        self.sort_enzyme_list()
+        self.update_supercoiling()
 
     # Calculates the global twist (just  sums the excess of twist)
     def update_global_twist(self):
@@ -241,7 +236,6 @@ class Circuit:
             # And finally, update the twist
             self.update_twist()
 
-            print(0)
             # WARNING!!!!
             # There could be a big mistake in case of linear structures that have a NAP in positions 1 or nbp
 
@@ -390,9 +384,9 @@ class Circuit:
         # And update supercoiling
         self.update_supercoiling()
 
-#        print('after')
-#        print([enzyme.name for enzyme in self.enzyme_list])
-#        print([enzyme.twist for enzyme in self.enzyme_list])
+    #        print('after')
+    #        print([enzyme.name for enzyme in self.enzyme_list])
+    #        print([enzyme.twist for enzyme in self.enzyme_list])
 
     # Apply effects in effects_list
     def apply_effects(self, effects_list):
@@ -409,4 +403,3 @@ class Circuit:
 
         # And update supercoiling - because twist was modified
         self.update_supercoiling()
-
