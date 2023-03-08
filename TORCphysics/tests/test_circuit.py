@@ -15,8 +15,11 @@ class TestCircuit(TestCase):
         frames = 5
         series = True
         continuation = False
+        tm = 'continuum'
+        mm = 'uniform'
+        dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt=1)
+                             output_prefix, frames, series, continuation, dt, tm, mm)
         self.assertGreater(my_circuit.get_num_enzymes(), 0, "Empty enzyme list")
         self.assertGreater(my_circuit.get_num_sites(), 0, "Empty enzyme list")
         self.assertGreater(my_circuit.get_num_environmentals(), 0, "Empty enzyme list")
@@ -32,11 +35,13 @@ class TestCircuit(TestCase):
         frames = 5
         series = True
         continuation = False
+        dt = 1
+        tm = 'continuum'
+        mm = 'uniform'
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt=1)
+                             output_prefix, frames, series, continuation, dt, tm, mm)
         for site in my_circuit.site_list:  # I'll increase the rates
-            site.k_min = site.k_min*100
-        #Let's make the rates
+            site.k_min = site.k_min * 100
+        # Let's make the rates
         my_circuit.run()
         print(0)
-
