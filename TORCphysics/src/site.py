@@ -38,10 +38,10 @@ class Site:
             return direction
         else:
             if self.start < self.end:
-                direction = -1
+                direction = 1
                 return direction
             elif self.start > self.end:
-                direction = 1
+                direction = -1
                 return direction
             else:
                 print("Cannot work out gene's direction")
