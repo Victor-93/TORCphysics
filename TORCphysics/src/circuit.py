@@ -1,7 +1,7 @@
 import pandas as pd
 import random
 import sys
-from TORCphysics import Site, SiteFactory, Enzyme, EnzymeFactory, EnvironmentFactory, params
+from TORCphysics import Site, SiteFactory, Enzyme, EnzymeFactory, EnvironmentFactory, Event, Log, params
 from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 
@@ -17,6 +17,7 @@ class Circuit:
         self.environment_filename = environment_filename
         self.output_prefix = output_prefix
         self.frames = frames
+        self.frame = 0
         self.series = series
         self.continuation = continuation
         self.name = None
@@ -51,7 +52,12 @@ class Circuit:
         #  of the bound region. For now I'll take option 2, when an enzyme binds, the region becomes flat(relax)
         self.update_global_twist()
         self.update_global_superhelical()
-        # Define local sites
+
+        # Let's initialize the log
+        self.log = Log(self.size, self.frames, self.frames*self.dt, self.structure, self.name, self.site_list,
+                       self.twist, self.superhelical)
+
+    # Define local sites
 
     #        self.calculate_local_sites()
 
@@ -75,6 +81,7 @@ class Circuit:
 
         for frame in range(self.frames):
 #            print('frame =', frame)
+            self.frame = frame
             self.time = frame * self.dt
             # BINDING
             # --------------------------------------------------------------
@@ -82,6 +89,8 @@ class Circuit:
             new_enzyme_list = bm.binding_model(self.enzyme_list, self.environmental_list, self.dt)
             # These new enzymes are lacking twist and superhelical, we need to fix them and actually add them
             # to the enzyme_list
+            # But before, add the binding events to the log  (it's easier to do it first)
+            self.add_binding_events_to_log(new_enzyme_list)
             self.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
 
             # EFFECT
@@ -89,65 +98,17 @@ class Circuit:
             effects_list = em.effect_model(self.enzyme_list, self.environmental_list, self.dt,
                                            self.topoisomerase_model, self.mechanical_model)
             self.apply_effects(effects_list)
-            # TODO: I'm missing the  continuum topo model.
 
             # UNBINDING
             # --------------------------------------------------------------
             drop_list = bm.unbinding_model(self.enzyme_list)
             self.drop_enzymes(drop_list)
+            self.add_unbinding_events_to_log(drop_list)
 
             # UPDATE GLOBALS
             # --------------------------------------------------------------
             self.update_global_twist()
             self.update_global_superhelical()
-
-    # Drop enzymes specified in the drop_list. This list contains the indices in the self.enzyme_list that are unbinding
-    # the DNA
-    def drop_enzymes(self, drop_list):
-
-        for j, index in enumerate(drop_list):
-
-            i = index - j  # This "i" is our true index. We subtract j because the indices (index) change by -1
-            # everytime 1 enzyme is removed, hence we subtract -j
-
-            # ------------CIRCULAR DNA--------------------
-            if self.circle:  # As always, we need to be careful with the circular case
-
-                # There is no other domains besides the newly bound protein. (O is the enzyme to be removed)
-                # EXT_L........O..........EXT_R / The twist in O is passed to the left boundary (maybe a bit redundant?)
-                if self.enzyme_list[i - 1].name == 'EXT_L' and self.enzyme_list[i + 1].name == 'EXT_R':
-                    self.enzyme_list[0].twist = self.enzyme_list[i].twist  # Everything should have the same twist...?
-                # There is one EXT at the left
-                # EXT_L.............O........------------.....E......EXT_R / Twist in O has to be added to E,
-                # and EXT_L becomes a mirrored version of E, so it has the same twist as E (which index is = N-2)
-                if self.enzyme_list[i - 1].name == 'EXT_L' and self.enzyme_list[i + 1].name != 'EXT_R':
-                    self.enzyme_list[self.get_num_enzymes() - 2].twist += self.enzyme_list[i].twist
-                    self.enzyme_list[0].twist = self.enzyme_list[self.get_num_enzymes() - 2].twist
-
-                # ------.......E.......O.....---------- / Twist in O is added to E
-                else:
-                    self.enzyme_list[i - 1].twist += self.enzyme_list[i].twist
-
-            # ------------LINEAR DNA--------------------
-            else:
-                # ------.......E.......O.....---------- / Twist in O is added to E
-                self.enzyme_list[i - 1].twist += self.enzyme_list[i].twist
-
-            # Remove element of list
-            # ------------------------------------------
-            del self.enzyme_list[i]
-
-        # Update fake boundaries positions if circular structure
-        if self.circle:
-            if self.get_num_enzymes() > 2:
-                self.enzyme_list[0].position, self.enzyme_list[-1].position = \
-                    em.get_start_end_c(self.enzyme_list[1], self.enzyme_list[-2], self.size)
-            else:
-                self.enzyme_list[0].position = 1
-                self.enzyme_list[-1].position = self.size
-
-        self.sort_enzyme_list()
-        self.update_supercoiling()
 
     # Calculates the global twist (just  sums the excess of twist)
     def update_global_twist(self):
@@ -303,6 +264,8 @@ class Circuit:
         print("Random seed: {0}".format(self.seed))
 
     # Adds to the self.enzyme_list, the newly bound enzymes in new_enzyme_list
+    # Also, creates the binding events and add them to the log. Notice that the twist and superhelical density are
+    # the ones at the time of binding, before the effect and update
     def add_new_enzymes(self, new_enzyme_list):
 
         # Let's first sort the new list
@@ -320,9 +283,18 @@ class Circuit:
 
             # And quantities prior binding
             region_twist = enzyme_before.twist
+            region_superhelical = enzyme_before.superhelical
             region_length = em.calculate_length(enzyme_before, enzyme_after)
 
-            # We need to update the positions of the fake boundaries in circular DNA
+            # Before updating local parameters, create the new event and add it to log
+            # --------------------------------------------------------------------------
+            new_event = Event(self.time, self.frame, 'binding_event', enzyme_before.twist,
+                              enzyme_before.superhelical,
+                              self.twist, self.superhelical, enzyme_before.site, new_enzyme, new_enzyme.position)
+            # And add it to the log
+            self.log.metadata.append(new_event)
+
+            # Now we need to update the positions of the fake boundaries in circular DNA
             # --------------------------------------------------------------------------
             if self.circle:
                 position_left, position_right = em.get_start_end_c(self.enzyme_list[1], self.enzyme_list[-2],
@@ -388,6 +360,71 @@ class Circuit:
     #        print([enzyme.name for enzyme in self.enzyme_list])
     #        print([enzyme.twist for enzyme in self.enzyme_list])
 
+    # Drop enzymes specified in the drop_list. This list contains the indices in the self.enzyme_list that are unbinding
+    # the DNA
+    def drop_enzymes(self, drop_list):
+
+        new_events = []  # List containing the new unbinding events
+
+        for j, index in enumerate(drop_list):
+
+            i = index - j  # This "i" is our true index. We subtract j because the indices (index) change by -1
+            # everytime 1 enzyme is removed, hence we subtract -j
+
+            # ------------CIRCULAR DNA--------------------
+            if self.circle:  # As always, we need to be careful with the circular case
+
+                # There is no other domains besides the newly bound protein. (O is the enzyme to be removed)
+                # EXT_L........O..........EXT_R / The twist in O is passed to the left boundary (maybe a bit redundant?)
+                if self.enzyme_list[i - 1].name == 'EXT_L' and self.enzyme_list[i + 1].name == 'EXT_R':
+                    self.enzyme_list[0].twist = self.enzyme_list[i].twist  # Everything should have the same twist...?
+                # There is one EXT at the left
+                # EXT_L.............O........------------.....E......EXT_R / Twist in O has to be added to E,
+                # and EXT_L becomes a mirrored version of E, so it has the same twist as E (which index is = N-2)
+                if self.enzyme_list[i - 1].name == 'EXT_L' and self.enzyme_list[i + 1].name != 'EXT_R':
+                    self.enzyme_list[self.get_num_enzymes() - 2].twist += self.enzyme_list[i].twist
+                    self.enzyme_list[0].twist = self.enzyme_list[self.get_num_enzymes() - 2].twist
+
+                # ------.......E.......O.....---------- / Twist in O is added to E
+                else:
+                    self.enzyme_list[i - 1].twist += self.enzyme_list[i].twist
+
+            # ------------LINEAR DNA--------------------
+            else:
+                # ------.......E.......O.....---------- / Twist in O is added to E
+                self.enzyme_list[i - 1].twist += self.enzyme_list[i].twist
+
+            # Before removing the enzyme from the list, let's create the event and add it to the list of events
+            # --------------------------------------------------------------------------
+            new_event = Event(self.time, self.frame, 'unbinding_event', self.enzyme_list[i - 1].twist,
+                              self.enzyme_list[i - 1].superhelical,
+                              0, 0, self.enzyme_list[i-1].site, self.enzyme_list[i], self.enzyme_list[i].position)
+            new_events.append(new_event)
+
+            # Remove element of list
+            # ------------------------------------------
+            del self.enzyme_list[i]
+
+        # Update fake boundaries positions if circular structure
+        if self.circle:
+            if self.get_num_enzymes() > 2:
+                self.enzyme_list[0].position, self.enzyme_list[-1].position = \
+                    em.get_start_end_c(self.enzyme_list[1], self.enzyme_list[-2], self.size)
+            else:
+                self.enzyme_list[0].position = 1
+                self.enzyme_list[-1].position = self.size
+
+        self.sort_enzyme_list()
+        self.update_supercoiling()
+
+        # Now that the global supercoiling is updated, let's add the new unbinding events to the log
+        for new_event in new_events:
+            new.event.global_superhelical = self.superhelical
+            new.event.global_twist = self.twist
+
+            # And add it to the log
+            self.log.metadata.append(new_event)
+
     # Apply effects in effects_list
     def apply_effects(self, effects_list):
         # And apply the effects for the specified enzymes in the effects_list
@@ -403,3 +440,24 @@ class Circuit:
 
         # And update supercoiling - because twist was modified
         self.update_supercoiling()
+
+
+
+    # Similar to adding binding events, but this time is for unbinding
+    # A difference, is that now, the local twist/superhelical are after the unbinding, and the globals are after the
+    # update.
+    def add_unbinding_events_to_log(self, drop_list):
+
+        drop_list.sort(key=lambda x: x.position)
+
+        for drop_enzyme in drop_list:
+
+            # Get enzyme before so we can get the twist and superhelical density before
+            enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= new_enzyme.position][-1]
+
+            # Create the new event
+            new_event = Event(self.time, self.frame, 'binding_event', enzyme_before.twist, enzyme_before.superhelical,
+                              self.twist, self.superhelical, enzyme_before.site, new_enzyme, new_enzyme.position)
+
+            # And add it to the log
+            self.log.metadata.append(new_event)
