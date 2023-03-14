@@ -90,7 +90,7 @@ class Circuit:
             # These new enzymes are lacking twist and superhelical, we need to fix them and actually add them
             # to the enzyme_list
             # But before, add the binding events to the log  (it's easier to do it first)
-            self.add_binding_events_to_log(new_enzyme_list)
+#            self.add_binding_events_to_log(new_enzyme_list)
             self.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
 
             # EFFECT
@@ -103,7 +103,7 @@ class Circuit:
             # --------------------------------------------------------------
             drop_list = bm.unbinding_model(self.enzyme_list)
             self.drop_enzymes(drop_list)
-            self.add_unbinding_events_to_log(drop_list)
+#            self.add_unbinding_events_to_log(drop_list)
 
             # UPDATE GLOBALS
             # --------------------------------------------------------------
@@ -290,7 +290,7 @@ class Circuit:
             # --------------------------------------------------------------------------
             new_event = Event(self.time, self.frame, 'binding_event', enzyme_before.twist,
                               enzyme_before.superhelical,
-                              self.twist, self.superhelical, enzyme_before.site, new_enzyme, new_enzyme.position)
+                              self.twist, self.superhelical, new_enzyme.site, new_enzyme, new_enzyme.position)
             # And add it to the log
             self.log.metadata.append(new_event)
 
@@ -398,7 +398,7 @@ class Circuit:
             # --------------------------------------------------------------------------
             new_event = Event(self.time, self.frame, 'unbinding_event', self.enzyme_list[i - 1].twist,
                               self.enzyme_list[i - 1].superhelical,
-                              0, 0, self.enzyme_list[i-1].site, self.enzyme_list[i], self.enzyme_list[i].position)
+                              0, 0, self.enzyme_list[i].site, self.enzyme_list[i], self.enzyme_list[i].position)
             new_events.append(new_event)
 
             # Remove element of list
@@ -419,8 +419,8 @@ class Circuit:
 
         # Now that the global supercoiling is updated, let's add the new unbinding events to the log
         for new_event in new_events:
-            new.event.global_superhelical = self.superhelical
-            new.event.global_twist = self.twist
+            new_event.global_superhelical = self.superhelical
+            new_event.global_twist = self.twist
 
             # And add it to the log
             self.log.metadata.append(new_event)
@@ -441,23 +441,3 @@ class Circuit:
         # And update supercoiling - because twist was modified
         self.update_supercoiling()
 
-
-
-    # Similar to adding binding events, but this time is for unbinding
-    # A difference, is that now, the local twist/superhelical are after the unbinding, and the globals are after the
-    # update.
-    def add_unbinding_events_to_log(self, drop_list):
-
-        drop_list.sort(key=lambda x: x.position)
-
-        for drop_enzyme in drop_list:
-
-            # Get enzyme before so we can get the twist and superhelical density before
-            enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= new_enzyme.position][-1]
-
-            # Create the new event
-            new_event = Event(self.time, self.frame, 'binding_event', enzyme_before.twist, enzyme_before.superhelical,
-                              self.twist, self.superhelical, enzyme_before.site, new_enzyme, new_enzyme.position)
-
-            # And add it to the log
-            self.log.metadata.append(new_event)
