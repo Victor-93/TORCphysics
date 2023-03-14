@@ -110,7 +110,7 @@ class Circuit:
             self.update_global_twist()
             self.update_global_superhelical()
 
-            self.log.log_out()
+            #self.log.log_out()
 
         self.log.log_out()
 
