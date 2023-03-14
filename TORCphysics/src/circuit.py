@@ -54,8 +54,8 @@ class Circuit:
         self.update_global_superhelical()
 
         # Let's initialize the log
-        self.log = Log(self.size, self.frames, self.frames*self.dt, self.structure, self.name, self.site_list,
-                       self.twist, self.superhelical)
+        self.log = Log(self.size, self.frames, self.frames*self.dt, self.structure, self.name, self.seed,
+                       self.site_list, self.twist, self.superhelical)
 
     # Define local sites
 
@@ -109,6 +109,10 @@ class Circuit:
             # --------------------------------------------------------------
             self.update_global_twist()
             self.update_global_superhelical()
+
+            self.log.log_out()
+
+        self.log.log_out()
 
     # Calculates the global twist (just  sums the excess of twist)
     def update_global_twist(self):
@@ -440,4 +444,3 @@ class Circuit:
 
         # And update supercoiling - because twist was modified
         self.update_supercoiling()
-

@@ -32,17 +32,41 @@ class TestCircuit(TestCase):
         enzymes_filename = '../enzymes.csv'
         environment_filename = '../environment.csv'
         output_prefix = 'output'
-        frames = 200
+        frames = 1500
         series = True
         continuation = False
-        dt = 1
+        dt = 0.5
         tm = 'continuum'
         mm = 'uniform'
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation, dt, tm, mm)
         for site in my_circuit.site_list:  # I'll increase the rates
             # site.k_min = site.k_min * 100
-            site.k_min = site.k_min * 10
+            site.k_min = site.k_min * 5
+        # Let's make the rates
+        my_circuit.run()
+        print(0)
+
+    def test_run2(self):
+        circuit_filename = '../circuit.csv'
+        sites_filename = '../sites.csv'
+        enzymes_filename = '../enzymes.csv'
+        environment_filename = '../environment.csv'
+        output_prefix = 'output'
+        frames = 1500
+        series = True
+        continuation = False
+        dt = 0.5
+        tm = 'continuum'
+        mm = 'uniform'
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt, tm, mm)
+        my_circuit.environmental_list[0].concentration = 0
+        my_circuit.environmental_list[1].concentration = 0
+        print(my_circuit.environmental_list)
+        for site in my_circuit.site_list:  # I'll increase the rates
+            # site.k_min = site.k_min * 100
+            site.k_min = site.k_min * 5
         # Let's make the rates
         my_circuit.run()
         print(0)
