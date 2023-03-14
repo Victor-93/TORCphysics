@@ -64,6 +64,7 @@ class Log:
         f.write("---------------------------------------------------------------------------------------\n")
 #        '{:-9} YES votes  {:2.2%}'.format(yes_votes, percentage)
 
+        # TODO: make a better format
         for event in self.metadata:
 #            line = str(event.frame) + " " + str(event.time) + " " + event.event_type + " " + event.site.site_type + \
  #                  " " + event.site.name + " " + event.enzyme.name + " " + str(event.twist) + " " + \
