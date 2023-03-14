@@ -89,7 +89,7 @@ else:
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation, dt, topoisomerase_model, mechanical_model)
 
-# TODO: Don't forget do your tests
+# TODO: Don't forget to do your tests
 # TODO: Events - series?
 # TODO: Log
 # TODO: Output

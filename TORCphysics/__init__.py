@@ -4,4 +4,6 @@ from .src.site import Site, SiteFactory
 from .src.enzyme import Enzyme, EnzymeFactory
 from .src.environment import Environment, EnvironmentFactory
 from .src import binding_model
+from .src. event import Event
+from .src. log import Log
 from .src.circuit import Circuit
