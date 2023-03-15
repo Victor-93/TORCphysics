@@ -54,70 +54,64 @@ class Circuit:
         self.update_global_superhelical()
 
         # Let's initialize the log
-        self.log = Log(self.size, self.frames, self.frames*self.dt, self.structure, self.name, self.seed,
+        self.log = Log(self.size, self.frames, self.frames * self.dt, self.structure, self.name, self.seed,
                        self.site_list, self.twist, self.superhelical)
 
-        # Let's define output dataframes
-#        self.sites_df =
-        #TODO: I need to find a way to update these dfs
+        # Let's define the dictionaries that will become dataframes, in case the series option was selected
+        if self.series:
+            self.enzymes_df = []
+            self.enzymes_dict_list = []
+            self.append_enzymes_to_dict()
+            # TODO: I need to find a way to do it as well for the sites...
 
-        self.sites_df = pd.DataFrame(data={'frame': [], 'time': [], 'type': [], 'name': [], 'twist': [],
-                                           'superhelical': [], '#enzymes': [], 'binding': [], 'unbinding': []})
-
-        #self.enzymes_df = pd.DataFrame(data={'frame': [], 'time': [], 'name': [], 'site': [], 'twist': [],
-        #                                     'superhelical': []})
-        self.enzymes_list_dict = []
-        #pd.DataFrame(data={'frame': [], 'time': [], 'name': [], 'site': [], 'twist': [],
-        #                                    'superhelical': []})
-
-        self.enzymes_df = []
-        self.append_enzymes_v2()
+#        self.sites_df = pd.DataFrame(data={'frame': [], 'time': [], 'type': [], 'name': [], 'twist': [],
+#                                           'superhelical': [], '#enzymes': [], 'binding': [], 'unbinding': []})
 
 
-    # TODO: Make it look nicer
-    def append_enzymes_v2(self):
+    # Append new enzymes to the self.enzymes_dict_list
+    def append_enzymes_to_dict(self):
         for enzyme in self.enzyme_list:
-            #if enzyme.enzyme_type == 'EXT':
+            # if enzyme.enzyme_type == 'EXT':
             #    continue
             d = {'frame': self.frame, 'time': self.time, 'name': enzyme.name, 'site': enzyme.site.name,
                  'position': enzyme.position, 'twist': enzyme.twist, 'superhelical': enzyme.superhelical,
-                 'gtwist': self.twist,'gsuperhelical': self.superhelical}
-            self.enzymes_list_dict.append(d)
-#    def append_enzymes_df(self):
-#        for enzyme in self.enzyme_list:
-#            if enzyme.enzyme_type == 'EXT':
-#                continue
-#            d = pd.DataFrame(data={'frame': [self.frame], 'time': [self.time], 'name': [enzyme.name],
-#                                   'site': [enzyme.site.name], 'twist': [enzyme.twist],
-#                                   'superhelical': [enzyme.superhelical]})
-#            self.enzymes_df = pd.concat([self.enzymes_df, d], ignore_index=True)
-#            self.enzymes_df.append(d, ignore_index=True)
+                 'gtwist': self.twist, 'gsuperhelical': self.superhelical}
+            self.enzymes_dict_list.append(d)
 
-#    def append_sites_df(self, new_enzyme_list):
+    #    def append_enzymes_df(self):
+    #        for enzyme in self.enzyme_list:
+    #            if enzyme.enzyme_type == 'EXT':
+    #                continue
+    #            d = pd.DataFrame(data={'frame': [self.frame], 'time': [self.time], 'name': [enzyme.name],
+    #                                   'site': [enzyme.site.name], 'twist': [enzyme.twist],
+    #                                   'superhelical': [enzyme.superhelical]})
+    #            self.enzymes_df = pd.concat([self.enzymes_df, d], ignore_index=True)
+    #            self.enzymes_df.append(d, ignore_index=True)
 
-#        d = pd.DataFrame(data={'frame': [self.frame], 'time': [self.time], 'type': ['circuit'], 'name': [self.name],
-#                               'twist': [self.twist], 'superhelical': [self.superhelical],
-#                               '#enzymes': [len(self.enzyme_list)-2], 'binding': [0], 'unbinding': [0]})
-#        self.sites_df = pd.concat( [self.sites_df, d], ignore_index=True)
+    #    def append_sites_df(self, new_enzyme_list):
 
-#        for j, site in enumerate(self.site_list):
+    #        d = pd.DataFrame(data={'frame': [self.frame], 'time': [self.time], 'type': ['circuit'], 'name': [self.name],
+    #                               'twist': [self.twist], 'superhelical': [self.superhelical],
+    #                               '#enzymes': [len(self.enzyme_list)-2], 'binding': [0], 'unbinding': [0]})
+    #        self.sites_df = pd.concat( [self.sites_df, d], ignore_index=True)
 
-            # Get twist and superhelical density at site
-#            enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
-#            site_superhelical = enzyme_before.superhelical
-            # Let's first sort the new list
-#            new_enzyme_list.sort(key=lambda x: x.position)
+    #        for j, site in enumerate(self.site_list):
 
-#        for new_enzyme in new_enzyme_list:
-#            # Get neighbour enzymes
-#            enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= new_enzyme.position][-1]
-#            enzyme_after = [enzyme for enzyme in self.enzyme_list if enzyme.position >= new_enzyme.position][0]
+    # Get twist and superhelical density at site
+    #            enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
+    #            site_superhelical = enzyme_before.superhelical
+    # Let's first sort the new list
+    #            new_enzyme_list.sort(key=lambda x: x.position)
 
-#                # And quantities prior binding
-#                region_twist = enzyme_before.twist
-#                region_superhelical = enzyme_before.superhelical
-#                region_length = em.calculate_length(enzyme_before, enzyme_after)
+    #        for new_enzyme in new_enzyme_list:
+    #            # Get neighbour enzymes
+    #            enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= new_enzyme.position][-1]
+    #            enzyme_after = [enzyme for enzyme in self.enzyme_list if enzyme.position >= new_enzyme.position][0]
 
+    #                # And quantities prior binding
+    #                region_twist = enzyme_before.twist
+    #                region_superhelical = enzyme_before.superhelical
+    #                region_length = em.calculate_length(enzyme_before, enzyme_after)
 
     # TODO: I have to think about the update, what does the update do? Do I really need one? Or maybe many updates
     #  for example, a twist update, a supercoiling update, a local sites update?
@@ -137,8 +131,8 @@ class Circuit:
     #  they feel the one prior binding? Maybe if dt is sufficiently small, it just doesn't matter?
     def run(self):
 
-        for frame in range(1,self.frames+1):
-#            print('frame =', frame)
+        for frame in range(1, self.frames + 1):
+            #            print('frame =', frame)
             self.frame = frame
             self.time = frame * self.dt
             # BINDING
@@ -148,7 +142,7 @@ class Circuit:
             # These new enzymes are lacking twist and superhelical, we need to fix them and actually add them
             # to the enzyme_list
             # But before, add the binding events to the log  (it's easier to do it first)
-#            self.add_binding_events_to_log(new_enzyme_list)
+            #            self.add_binding_events_to_log(new_enzyme_list)
             self.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
 
             # EFFECT
@@ -161,23 +155,28 @@ class Circuit:
             # --------------------------------------------------------------
             drop_list = bm.unbinding_model(self.enzyme_list)
             self.drop_enzymes(drop_list)
-#            self.add_unbinding_events_to_log(drop_list)
+            #            self.add_unbinding_events_to_log(drop_list)
 
             # UPDATE GLOBALS
             # --------------------------------------------------------------
             self.update_global_twist()
             self.update_global_superhelical()
 
-            #self.log.log_out()
+            # self.log.log_out()
 
-            # Add to series df
+            # Add to series df if the series option was selected (default=True)
             # --------------------------------------------------------------
-            self.append_enzymes_v2()
+            if self.series:
+                self.append_enzymes_to_dict()
 
-        self.enzymes_df = pd.DataFrame.from_dict(self.enzymes_list_dict)
+        # Output the dataframes: (series)
+        # TODO: I need a function that can save this to a csv
+        if self.series:
+            self.enzymes_df = pd.DataFrame.from_dict(self.enzymes_dict_list)
+            self.enzymes_df.to_csv('enzymes_df.csv', index=False, sep=',')
 
+        # Output the log of events
         self.log.log_out()
-        print(0)
 
     # Calculates the global twist (just  sums the excess of twist)
     def update_global_twist(self):
@@ -352,8 +351,11 @@ class Circuit:
 
             # And quantities prior binding
             region_twist = enzyme_before.twist
-            region_superhelical = enzyme_before.superhelical
             region_length = em.calculate_length(enzyme_before, enzyme_after)
+
+            # First, add the enzyme to the list and sort it
+            self.enzyme_list.append(new_enzyme)
+            self.sort_enzyme_list()
 
             # Before updating local parameters, create the new event and add it to log
             # --------------------------------------------------------------------------
@@ -398,14 +400,14 @@ class Circuit:
                 elif enzyme_before.name == 'EXT_L' and enzyme_after.name != 'EXT_R':
                     # Check if this is how I can update a property in the enzymes - I think it does!
                     enzyme_before.twist = new_twist_left
-                    self.enzyme_list[-1].twist = new_twist_left
+                    self.enzyme_list[-2].twist = new_twist_left
                     new_enzyme.twist = new_twist_right
 
                 # There is one EXT at the right
                 elif enzyme_before.name != 'EXT_L' and enzyme_before.name == 'EXT_R':
                     enzyme_before.twist = new_twist_left
                     self.enzyme_list[0] = new_twist_right
-                    self.enzyme_list[-1] = new_twist_right
+                    self.enzyme_list[-2] = new_twist_right
                     new_enzyme.twist = new_twist_right
 
                 # In any other case where there's no neighbour boundaries
@@ -419,8 +421,8 @@ class Circuit:
                 new_enzyme.twist = new_twist_right
 
             # Now add the enzyme to the list, sort it
-            self.enzyme_list.append(new_enzyme)
-            self.sort_enzyme_list()
+            # self.enzyme_list.append(new_enzyme)
+            # self.sort_enzyme_list()
 
         # And update supercoiling
         self.update_supercoiling()
