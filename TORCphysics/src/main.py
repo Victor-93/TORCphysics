@@ -1,45 +1,35 @@
 import argparse
 import sys
 
-import numpy as np
-import pandas
-
-import effect_model as mm
 import params
-import binding_model as sm
 
 from TORCphysics import Circuit
 
-#---------------------------------------------------------------------------------------------------------------------
-#DESCRIPTION
-#---------------------------------------------------------------------------------------------------------------------
-#This program simulates a genetic circuit under certain conditions given the inputs:
-#circuit.csv, sites.csv, enzymes.csv and environment.csv
-#According these inputs, RNAPs will stochastically bind the DNA and will generate
-#supercoiling accordingly.
-#---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+# DESCRIPTION
+# ---------------------------------------------------------------------------------------------------------------------
+# This program simulates a genetic circuit under certain conditions given the inputs:
+# circuit.csv, sites.csv, enzymes.csv and environment.csv
+# According these inputs, RNAPs will stochastically bind the DNA and will generate
+# supercoiling accordingly.
+# ---------------------------------------------------------------------------------------------------------------------
 
-#---------------------------------------------------------------------------------------------------------------------
-#PARAMETERS
-#---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+# PARAMETERS
+# ---------------------------------------------------------------------------------------------------------------------
 
-#All parameters are already in the params module, but I prefer to have them here with more simple names:
-v0     = params.v0
-w0     = params.w0
-gamma  = params.gamma
-dt     = params.dt
+# All parameters are already in the params module, but I prefer to have them here with more simple names:
+v0 = params.v0
+w0 = params.w0
+gamma = params.gamma
+dt = params.dt
 
-posfile='positions.txt'
-sigmafile='supercoiling.txt'
-namefile='object.txt'
-
-
-#---------------------------------------------------------------------------------------------------------------------
-#INPUTS
-#---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+# INPUTS
+# ---------------------------------------------------------------------------------------------------------------------
 
 # Create the parser
-#---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 parser = argparse.ArgumentParser(description="Version1 of the physical model of transcription-supercoiling")
 parser.add_argument("-f", "--frames", type=int, action="store", help="Number of frames (timesteps)", default=5000)
 parser.add_argument("-c", "--continuation", action="store_true", help="Continuation of a simulation")
@@ -56,34 +46,33 @@ parser.add_argument("-tm", "--topoisomerase_model", action="store", help="Model 
                     default='continuum')
 parser.add_argument("-mm", "--mechanical_model", action="store", help="Model for enzyme mechanics", default='uniform')
 
-
 # Process terminal commands
-#---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 args = parser.parse_args()
 
-#Let's put this information into variables
-frames = args.frames                   #Number of frames
-circuit_filename = args.input_circuit            #Circuit file
-sites_filename = args.input_sites              #Sites file
-enzymes_filename = args.input_enzymes            #Enzymes file
-environment_filename = args.input_environment         #Enviroment file
-output_prefix = args.output                   #Output file prefix
-dt = abs(args.timestep) #The time step
+# Let's put this information into variables
+frames = args.frames  # Number of frames
+circuit_filename = args.input_circuit  # Circuit file
+sites_filename = args.input_sites  # Sites file
+enzymes_filename = args.input_enzymes  # Enzymes file
+environment_filename = args.input_environment  # Environment file
+output_prefix = args.output  # Output file prefix
+dt = abs(args.timestep)  # The time step
 topoisomerase_model = args.topoisomerase_model
 mechanical_model = args.mechanical_model
 
-if args.continuation:        #If this is the continuation of a previous run
-    continuation=True
+if args.continuation:  # If this is the continuation of a previous run
+    continuation = True
 else:
-    continuation=False
-if args.series:              #If series, then it will print dynamic output files (.txt)
-    series=True
+    continuation = False
+if args.series:  # If series, then it will print dynamic output files (.txt)
+    series = True
 else:
-    series=False
-if args.test:                #If true, then we run some tests and stop
-    test=True
+    series = False
+if args.test:  # If true, then we run some tests and stop
+    test = True
 else:
-    test=False
+    test = False
 
 # Pass the command line inputs, read csvs and initialize "my_circuit"
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
@@ -101,7 +90,3 @@ print(my_circuit.site_list[0].name)
 # Now run
 my_circuit.run()
 sys.exit()
-
-
-
-
