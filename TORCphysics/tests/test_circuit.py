@@ -66,7 +66,9 @@ class TestCircuit(TestCase):
         print(my_circuit.environmental_list)
         for site in my_circuit.site_list:  # I'll increase the rates
             # site.k_min = site.k_min * 100
-            site.k_min = site.k_min * 5
+            site.k_min = site.k_min * 0
+        print(my_circuit.site_list[2].name)
+        my_circuit.site_list[2].k_min = 0.01
         # Let's make the rates
         my_circuit.run()
         print(0)
