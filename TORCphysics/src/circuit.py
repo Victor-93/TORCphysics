@@ -264,12 +264,12 @@ class Circuit:
                                                                        self.size)
 
                 else:  # For linear DNA
-                    position_left = 1
-                    position_right = self.size
+                    position_left = 0
+                    position_right = self.size + 1
 
             else:  # If nothing is bound
-                position_left = 1
-                position_right = self.size  # it is the same in this case for either linear or circular
+                position_left = 0
+                position_right = self.size + 1  # it is the same in this case for either linear or circular
 
             # TODO: I can distribute the supercoiling when defining the sites?
             #            for site in self.site_list:  # Distribute supercoiling -
@@ -361,6 +361,7 @@ class Circuit:
     # Adds to the self.enzyme_list, the newly bound enzymes in new_enzyme_list
     # Also, creates the binding events and add them to the log. Notice that the twist and superhelical density are
     # the ones at the time of binding, before the effect and update
+    # TODO: test this function!!!!
     def add_new_enzymes(self, new_enzyme_list):
 
         # Let's first sort the new list
@@ -407,6 +408,7 @@ class Circuit:
             new_length_left = em.calculate_length(enzyme_before, new_enzyme)
             new_length_right = em.calculate_length(new_enzyme, enzyme_after)
 
+            # TODO: define twist model when binding
             # now to calculate the new twists
             # NOTE that I don't partition using the supercoiling density because the region that is actually bound
             # is assumed to be relaxed by the enzyme

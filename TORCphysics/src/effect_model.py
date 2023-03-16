@@ -1,7 +1,5 @@
 import numpy as np
-# import pandas as pd
-# import params
-from TORCphysics import params, Environment
+from TORCphysics import params
 import sys
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -61,11 +59,11 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
             else:
                 print('Sorry, cannot recognise mechanistic model')
                 sys.exit()
-            #size = abs(enzyme.site.start - enzyme.site.end + 1)
-            #output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
+            # size = abs(enzyme.site.start - enzyme.site.end + 1)
+            # output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
             #                                 k_on=0, k_off=0, k_cat=0, size=size)
-#            output_enzyme = Enzyme(e_type='mRNA', name=enzyme.site.name, site=None, position=None, size=size,
-#                                   twist=0, superhelical=0)
+        #            output_enzyme = Enzyme(e_type='mRNA', name=enzyme.site.name, site=None, position=None, size=size,
+        #                                   twist=0, superhelical=0)
         else:
             continue
 
@@ -143,19 +141,20 @@ def calculate_length(z0, z1):
     x0 = z0.position  # positions
     x1 = z1.position
     b0 = z0.size  # size -_-
-    b1 = z1.size
-    # There are 4 posibilities
-    if z0.direction >= 0 and z1.direction >= 0:
-        length = (x1 - b1) - x0
-    elif z0.direction >= 0 and z1.direction < 0:
-        length = x1 - x0
-    elif z0.direction < 0 and z1.direction >= 0:
-        length = (x1 - b1) - (x0 + b0)
-    elif z0.direction < 0 and z1.direction < 0:
-        length = x1 - (x0 + b0)
-    else:
-        print("Something went wrong in lengths")
-        sys.exit()
+    # b1 = z1.size
+    length = abs(x1 - (x0 + b0))
+    # There are 4 possibilities
+    # if z0.direction >= 0 and z1.direction >= 0:
+    #    length = (x1 - b1) - x0
+    # elif z0.direction >= 0 and z1.direction < 0:
+    #    length = x1 - x0
+    # elif z0.direction < 0 and z1.direction >= 0:
+    #    length = (x1 - b1) - (x0 + b0)
+    # elif z0.direction < 0 and z1.direction < 0:
+    #    length = x1 - (x0 + b0)
+    # else:
+    #    print("Something went wrong in lengths")
+    #    sys.exit()
     # length+=1 #1 bp needs to be added
     return length
 
@@ -187,28 +186,28 @@ def calculate_supercoiling(z0, z1):
 
 
 # -----------------------------------------------------------------------
-# Get's the start and end positions of the fake boundaries (for circular DNA)
+# Gets the start and end positions of the fake boundaries (for circular DNA)
 # In case that there is not fake boundaries, Z_N should be the last element [-1],
 # in case that you have N objects including the fake boundaries, Z_N -> [N-2]
 def get_start_end_c(z0, zn, nbp):
-    b_0 = z0.size
+    #b_0 = z0.size
     b_n = zn.size
     x_0 = z0.position  # position of first object
     x_n = zn.position  # position of last object
 
     # fake position on the left
-    # position_left = 0 - (nbp - (x_n + b_n))  # the size of the last object is considered
-    if zn.direction >= 0:  # depends on the direction
-        position_left = 0 - (nbp - x_n)  # this is the position of the fake bit,
-    else:
-        position_left = 0 - (nbp - (x_n + b_n))  # the size of the last object is considered
+    position_left = 1 + x_n + b_n - nbp  # the size of the last object is considered
+    # if zn.direction >= 0:  # depends on the direction
+    #    position_left = 0 - (nbp - x_n)  # this is the position of the fake bit,
+    # else:
+    #    position_left = 0 - (nbp - (x_n + b_n))  # the size of the last object is considered
 
     # fake end
-    # position_right = nbp + x_0
-    if z0.direction >= 0:  # depends on the direction
-        position_right = nbp + x_0 - b_0  # I think I had the sign wrong...
-    else:
-        position_right = nbp + x_0
+    position_right = nbp + x_0
+    # if z0.direction >= 0:  # depends on the direction
+    #    position_right = nbp + x_0 - b_0  # I think I had the sign wrong...
+    # else:
+    #    position_right = nbp + x_0
 
     return position_left, position_right
 
