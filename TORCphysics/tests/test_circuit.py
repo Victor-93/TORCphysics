@@ -40,9 +40,9 @@ class TestCircuit(TestCase):
         mm = 'uniform'
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation, dt, tm, mm)
-        for site in my_circuit.site_list:  # I'll increase the rates
-            # site.k_min = site.k_min * 100
-            site.k_min = site.k_min * 5
+#        for site in my_circuit.site_list:  # I'll increase the rates
+#             site.k_min = site.k_min * 100
+            #site.k_min = site.k_min * 5
         # Let's make the rates
         my_circuit.run()
         print(0)

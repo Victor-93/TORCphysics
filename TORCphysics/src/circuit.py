@@ -1,7 +1,7 @@
 import pandas as pd
 import random
 import sys
-from TORCphysics import Site, SiteFactory, Enzyme, EnzymeFactory, EnvironmentFactory, Event, Log, params
+from TORCphysics import Site, SiteFactory, Enzyme, EnzymeFactory, Environment, EnvironmentFactory, Event, Log, params
 from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 
@@ -9,9 +9,9 @@ from TORCphysics import binding_model as bm
 # TODO: TODAY:
 #  1.- Move Events to log. - DONE
 #  2.- List of new binding enzymes "new_enzymes" an object, that contains useful information for the dict. DONE
-#  3.- Move size functions to circuit module.
-#  4.- Add Effect object, a product that can realise to the environment.
-#  5.- Modify environment so it has site_type and name.
+#  3.- Move size functions to circuit module. - MAYBE NO NEED TO DO IT
+#  4.- When enzymes unbound, a product can be realised to the environment.  DONE
+#  5.- Modify environment so it has site_type and name. DONE? I DIDNT DO ANYTHING
 #  6.- Test the size functions by making test cases (bind/unbind)
 #  7- Define function that specifies how enzymes bind. Do they absorb twist or relax it.
 
@@ -67,93 +67,18 @@ class Circuit:
                        self.site_list, self.twist, self.superhelical)
 
         # Let's define the dictionaries that will become dataframes, in case the series option was selected
-        if self.series:
-            self.enzymes_df = []
-            self.enzymes_dict_list = []
-            self.append_enzymes_to_dict()
-            self.sites_df = []
-            self.sites_dict_list = []
-            self.sites_dict_list_aux = []  # this one is an auxiliar
-            self.append_sites_to_dict_step1()
-            self.append_sites_to_dict_step2([], [])
+        self.enzymes_df = []
+        self.enzymes_dict_list = []
+        self.append_enzymes_to_dict()
+        self.sites_df = []
+        self.sites_dict_list = []
+        self.sites_dict_list_aux = []  # this one is an auxiliary
+        self.append_sites_to_dict_step1()
+        self.append_sites_to_dict_step2([], [])
 
-            # TODO: I need to find a way to do it as well for the sites...
-
-    # Append new enzymes to the self.enzymes_dict_list
-    # These quantities are at the end of the frame/time, where enzymes already bound/unbound and had an effect on the
-    # circuit
-    def append_enzymes_to_dict(self):
-        for enzyme in self.enzyme_list:
-            # if enzyme.enzyme_type == 'EXT':
-            #    continue
-            d = {'frame': self.frame, 'time': self.time, 'name': enzyme.name, 'site': enzyme.site.name,
-                 'position': enzyme.position, 'twist': enzyme.twist, 'superhelical': enzyme.superhelical,
-                 'global_twist': self.twist, 'global_superhelical': self.superhelical}
-            self.enzymes_dict_list.append(d)
-
-    # Append new useful data to the sites_dict_list.
-    # This information corresponds to the events that happened during the current frame/time, where some enzymes
-    # bound and unbound the DNA. The twist and superhelical density correspond to the ones before the binding happened,
-    # so those two parameters do not correspond to the ones at the end of the time step
-    # So this step1 function, it collects local twist and superhelical before binding. The step2 will count the
-    # number of bound enzymes.
-    def append_sites_to_dict_step1(self):
-        self.sites_dict_list_aux.clear() # Empty list
-        d = {'frame': self.frame, 'time': self.time, 'type': 'circuit', 'name': self.name, 'twist': self.twist,
-             'superhelical': self.superhelical, '#enzymes': 0,
-             'binding': 0, 'unbinding': 0}
-        self.sites_dict_list_aux.append(d)  # the first one is always the one corresponding to the circuit
-
-        # Then collect local twist/supercoiling at each site before binding
-        for site in self.site_list:
-            if site.site_type == 'EXT':
-                continue
-            enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start][-1]
-            site_twist = enzyme_before.twist
-            site_superhelical = enzyme_before.superhelical
-            d = {'frame': self.frame, 'time': self.time, 'type': site.site_type, 'name': site.name, 'twist': site_twist,
-                 'superhelical': site_superhelical, '#enzymes': 0, 'binding': 0, 'unbinding': 0}
-
-            self.sites_dict_list_aux.append(d)
-
-    # And the step2, where enzymes already bound/unbound. Here, it counts the number of enzymes that bound to each
-    # site at the end of the frame. It also counts if during that frame, enzymes bound/unbound
-    def append_sites_to_dict_step2(self, new_enzymes_list, drop_list_enzyme):
-        # Let's modify the dictionary related to the whole circuit
-        self.sites_dict_list_aux[0]['#enzymes'] = self.get_num_enzymes()-2
-        self.sites_dict_list_aux[0]['binding'] = len(new_enzymes_list)
-        self.sites_dict_list_aux[0]['unbinding'] = len(drop_list_enzyme)
-        self.sites_dict_list.append(self.sites_dict_list_aux[0]) # And add it to the big true list of dictionaries
-
-        # Then collect local twist/supercoiling at each site before binding
-        i = 0
-        for site in self.site_list:
-            if site.site_type == 'EXT':
-                continue
-            i = i+1
-            for new_enzyme in new_enzymes_list:
-                if new_enzyme.site.name == site.name:
-                    self.sites_dict_list_aux[i]['binding'] = 1
-
-            for drop_enzyme in drop_list_enzyme:
-                if drop_enzyme.site.name == site.name:
-                    self.sites_dict_list_aux[i]['unbinding'] = 1
-
-            self.sites_dict_list_aux[i]['#enzymes'] = \
-                len([enzyme for enzyme in self.enzyme_list if enzyme.site.name == site.name])
-
-            self.sites_dict_list.append(self.sites_dict_list_aux[i])  # And add it to the big true list of dictionaries
-
-    # TODO: I have to think about the update, what does the update do? Do I really need one? Or maybe many updates
-    #  for example, a twist update, a supercoiling update, a local sites update?
-    #  maybe I can update sites as well,
-    # TODO: My update should update twist, supercoiling and the local sites?
-
-    # TODO: sites, enzymes and superhelical have been loaded, but still needs to define the local sites/domains
-    #  (bare DNA) - or is it the update?
+        # TODO: I need to find a way to do it as well for the sites...
 
     # This one runs the simulation
-    # TODO: finish the run
     # TODO: test all these functions
     # TODO: Think about the updating of twist/supercoiling. When new enzymes bind, they can have an impact on the
     #  supercoiling, in which depending on the size of the local domain, the supercoiling can increase considerably.
@@ -188,6 +113,7 @@ class Circuit:
             # --------------------------------------------------------------
             drop_list_index, drop_list_enzyme = bm.unbinding_model(self.enzyme_list)
             self.drop_enzymes(drop_list_index)
+            self.add_to_environment(drop_list_enzyme)
             #            self.add_unbinding_events_to_log(drop_list)
 
             # UPDATE GLOBALS
@@ -207,12 +133,79 @@ class Circuit:
         # TODO: I need a function that can save this to a csv
         if self.series:
             self.enzymes_df = pd.DataFrame.from_dict(self.enzymes_dict_list)
-            self.enzymes_df.to_csv('enzymes_df.csv', index=False, sep=',')
+            self.enzymes_df.to_csv(self.name + '_enzymes_df.csv', index=False, sep=',')
             self.sites_df = pd.DataFrame.from_dict(self.sites_dict_list)
-            self.sites_df.to_csv('sites_df.csv', index=False, sep=',')
+            self.sites_df.to_csv(self.name + '_sites_df.csv', index=False, sep=',')
 
         # Output the log of events
         self.log.log_out()
+
+    # Append new enzymes to the self.enzymes_dict_list
+    # These quantities are at the end of the frame/time, where enzymes already bound/unbound and had an effect on the
+    # circuit
+    def append_enzymes_to_dict(self):
+        for enzyme in self.enzyme_list:
+            # if enzyme.enzyme_type == 'EXT':
+            #    continue
+            d = {'frame': self.frame, 'time': self.time, 'name': enzyme.name, 'site': enzyme.site.name,
+                 'position': enzyme.position, 'twist': enzyme.twist, 'superhelical': enzyme.superhelical,
+                 'global_twist': self.twist, 'global_superhelical': self.superhelical}
+            self.enzymes_dict_list.append(d)
+
+    # Append new useful data to the sites_dict_list.
+    # This information corresponds to the events that happened during the current frame/time, where some enzymes
+    # bound and unbound the DNA. The twist and superhelical density correspond to the ones before the binding happened,
+    # so those two parameters do not correspond to the ones at the end of the time step
+    # So this step1 function, it collects local twist and superhelical before binding. The step2 will count the
+    # number of bound enzymes.
+    def append_sites_to_dict_step1(self):
+        self.sites_dict_list_aux.clear()  # Empty list
+        d = {'frame': self.frame, 'time': self.time, 'type': 'circuit', 'name': self.name, 'twist': self.twist,
+             'superhelical': self.superhelical, '#enzymes': 0,
+             'binding': 0, 'unbinding': 0}
+        self.sites_dict_list_aux.append(d)  # the first one is always the one corresponding to the circuit
+
+        # Then collect local twist/supercoiling at each site before binding
+        for site in self.site_list:
+            if site.site_type == 'EXT':
+                continue
+            enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start][-1]
+            site_twist = enzyme_before.twist
+            site_superhelical = enzyme_before.superhelical
+            d = {'frame': self.frame, 'time': self.time, 'type': site.site_type, 'name': site.name, 'twist': site_twist,
+                 'superhelical': site_superhelical, '#enzymes': 0, 'binding': 0, 'unbinding': 0}
+
+            self.sites_dict_list_aux.append(d)
+
+    # And the step2, where enzymes already bound/unbound. Here, it counts the number of enzymes that bound to each
+    # site at the end of the frame. It also counts if during that frame, enzymes bound/unbound
+    def append_sites_to_dict_step2(self, new_enzymes_list, drop_list_enzyme):
+        # Let's modify the dictionary related to the whole circuit
+        self.sites_dict_list_aux[0]['#enzymes'] = self.get_num_enzymes() - 2
+        self.sites_dict_list_aux[0]['binding'] = len(new_enzymes_list)
+        self.sites_dict_list_aux[0]['unbinding'] = len(drop_list_enzyme)
+        self.sites_dict_list.append(self.sites_dict_list_aux[0])  # And add it to the big true list of dictionaries
+
+        # Then collect local twist/supercoiling at each site before binding
+        i = 0
+        for site in self.site_list:
+            if site.site_type == 'EXT':
+                continue
+            i = i + 1
+            for new_enzyme in new_enzymes_list:
+                if new_enzyme.site.name == site.name:
+                    self.sites_dict_list_aux[i]['binding'] = 1
+
+            for drop_enzyme in drop_list_enzyme:
+                if drop_enzyme.site.name == site.name:
+                    self.sites_dict_list_aux[i]['unbinding'] = 1
+
+            self.sites_dict_list_aux[i]['#enzymes'] = \
+                len([enzyme for enzyme in self.enzyme_list if enzyme.site.name == site.name])
+
+            self.sites_dict_list.append(self.sites_dict_list_aux[i])  # And add it to the big true list of dictionaries
+
+
 
     # Calculates the global twist (just  sums the excess of twist)
     def update_global_twist(self):
@@ -282,8 +275,6 @@ class Circuit:
             #            for site in self.site_list:  # Distribute supercoiling -
             #                site.superhelical = self.superhelical
             for enzyme in self.enzyme_list:  # Distribute supercoiling -
-                # enzyme.superhelical_front = self.superhelical
-                # enzyme.superhelical_behind = self.superhelical
                 enzyme.superhelical = self.superhelical
 
             # Let's treat the boundaries of our system as objects.
@@ -532,7 +523,7 @@ class Circuit:
             # And add it to the log
             self.log.metadata.append(new_event)
 
-    # Apply effects in effects_list
+    # Apply effects in effects_list and realise output environment
     def apply_effects(self, effects_list):
         # And apply the effects for the specified enzymes in the effects_list
         for effect in effects_list:
@@ -548,3 +539,21 @@ class Circuit:
         # And update supercoiling - because twist was modified
         self.update_supercoiling()
 
+    # Adds the output to the environment
+    def add_to_environment(self, drop_list_enzymes):
+
+        for enzyme in drop_list_enzymes:
+
+            if enzyme.name == 'RNAP':
+                size = abs(enzyme.site.start - enzyme.site.end + 1)
+                output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
+                                                 k_on=0, k_off=0, k_cat=0, size=size)
+            else:
+                continue
+
+            environment = [x for x in self.environmental_list if x.enzyme_type == output_environment.enzyme_type and
+                           x.name == output_environment.name]
+            if len(environment) > 0:
+                environment[0].concentration += 1  # Maybe is not concentration in this case...
+            else:
+                self.environmental_list.append(output_environment)
