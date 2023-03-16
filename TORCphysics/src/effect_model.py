@@ -1,7 +1,7 @@
 import numpy as np
 # import pandas as pd
 # import params
-from TORCphysics import params
+from TORCphysics import params, Environment
 import sys
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -26,7 +26,6 @@ class Effect:
     # Because the current effects are taken place at the current enzyme i=index, I use the index to locate the enzyme
     # in the enzyme_list which is applying the effect.
     # These effects act locally, so they can modify the enzyme's position, and the twist at the neighbouring domains.
-
     def __init__(self, index, position, twist_left, twist_right):
         # I'll save the input filenames just in case
         self.index = index
@@ -62,6 +61,11 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
             else:
                 print('Sorry, cannot recognise mechanistic model')
                 sys.exit()
+            #size = abs(enzyme.site.start - enzyme.site.end + 1)
+            #output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
+            #                                 k_on=0, k_off=0, k_cat=0, size=size)
+#            output_enzyme = Enzyme(e_type='mRNA', name=enzyme.site.name, site=None, position=None, size=size,
+#                                   twist=0, superhelical=0)
         else:
             continue
 

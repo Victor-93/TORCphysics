@@ -1,6 +1,5 @@
 import numpy as np
-from TORCphysics import params
-from TORCphysics import Enzyme
+from TORCphysics import params, Enzyme, Environment
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -56,7 +55,7 @@ EE_alpha = params.EE_alpha
 # f_ini  = initiation function
 
 # Goes through the enzymes in enzymes list and according to their unbinding condition unbind them.
-# Returns a list of enzyme indexes that will unbind
+# Returns a list of enzyme indexes that will unbind, the enzyme that unbinds
 def unbinding_model(enzymes_list):
     drop_list_index = []  # This list will have the indices of the enzymes that will unbind, and the enzyme
     drop_list_enzyme = []  # And a list with the enzymes
