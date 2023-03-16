@@ -8,7 +8,7 @@ from TORCphysics import binding_model as bm
 
 # TODO: TODAY:
 #  1.- Move Events to log. - DONE
-#  2.- List of new binding enzymes "new_enzymes" an object, that contains useful information for the dict.
+#  2.- List of new binding enzymes "new_enzymes" an object, that contains useful information for the dict. DONE
 #  3.- Move size functions to circuit module.
 #  4.- Add Effect object, a product that can realise to the environment.
 #  5.- Modify environment so it has site_type and name.
@@ -102,10 +102,10 @@ class Circuit:
         d = {'frame': self.frame, 'time': self.time, 'type': 'circuit', 'name': self.name, 'twist': self.twist,
              'superhelical': self.superhelical, '#enzymes': 0,
              'binding': 0, 'unbinding': 0}
-        self.sites_dict_list_aux.append(d) # the first one is always the one corresponding to the circuit
+        self.sites_dict_list_aux.append(d)  # the first one is always the one corresponding to the circuit
 
         # Then collect local twist/supercoiling at each site before binding
-        for i, site in enumerate(self.site_list):
+        for site in self.site_list:
             if site.site_type == 'EXT':
                 continue
             enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start][-1]
@@ -116,6 +116,8 @@ class Circuit:
 
             self.sites_dict_list_aux.append(d)
 
+    # And the step2, where enzymes already bound/unbound. Here, it counts the number of enzymes that bound to each
+    # site at the end of the frame. It also counts if during that frame, enzymes bound/unbound
     def append_sites_to_dict_step2(self, new_enzymes_list, drop_list_enzyme):
         # Let's modify the dictionary related to the whole circuit
         self.sites_dict_list_aux[0]['#enzymes'] = self.get_num_enzymes()-2
@@ -124,65 +126,23 @@ class Circuit:
         self.sites_dict_list.append(self.sites_dict_list_aux[0]) # And add it to the big true list of dictionaries
 
         # Then collect local twist/supercoiling at each site before binding
-        for i, site in enumerate(self.site_list):
+        i = 0
+        for site in self.site_list:
             if site.site_type == 'EXT':
                 continue
+            i = i+1
             for new_enzyme in new_enzymes_list:
-                if new_enzyme.name == site.name:
+                if new_enzyme.site.name == site.name:
                     self.sites_dict_list_aux[i]['binding'] = 1
 
             for drop_enzyme in drop_list_enzyme:
-                if drop_enzyme.name == site.name:
+                if drop_enzyme.site.name == site.name:
                     self.sites_dict_list_aux[i]['unbinding'] = 1
 
             self.sites_dict_list_aux[i]['#enzymes'] = \
-                [enzyme for enzyme in self.enzyme_list if enzyme.name == site.name]
+                len([enzyme for enzyme in self.enzyme_list if enzyme.site.name == site.name])
 
             self.sites_dict_list.append(self.sites_dict_list_aux[i])  # And add it to the big true list of dictionaries
-
-    #    def append_sites_to_dict_step1(self, new_enzyme_list, drop_enzyme_list):
-#        self.sites_dict_list_step1.clear()  # Empty list
-#        d = {'frame': self.frame, 'time': self.time, 'type': 'circuit', 'name': self.name, 'twist': self.twist,
-#             'superhelical': self.superhelical, '#enzymes': self.get_num_enzymes() - 2,
-#             'binding': len(new_enzyme_list), 'unbinding': len(drop_enzyme_list)}
-#        for i, site in enumerate(self.site_list):#
-
-#        self.sites_dict_list.append(d)
-
-    #    def append_enzymes_df(self):
-    #        for enzyme in self.enzyme_list:
-    #            if enzyme.enzyme_type == 'EXT':
-    #                continue
-    #            d = pd.DataFrame(data={'frame': [self.frame], 'time': [self.time], 'name': [enzyme.name],
-    #                                   'site': [enzyme.site.name], 'twist': [enzyme.twist],
-    #                                   'superhelical': [enzyme.superhelical]})
-    #            self.enzymes_df = pd.concat([self.enzymes_df, d], ignore_index=True)
-    #            self.enzymes_df.append(d, ignore_index=True)
-
-    #    def append_sites_df(self, new_enzyme_list):
-
-    #       d = pd.DataFrame(data={'frame': [self.frame], 'time': [self.time], 'type': ['circuit'], 'name': [self.name],
-    #                               'twist': [self.twist], 'superhelical': [self.superhelical],
-    #                               '#enzymes': [len(self.enzyme_list)-2], 'binding': [0], 'unbinding': [0]})
-    #        self.sites_df = pd.concat( [self.sites_df, d], ignore_index=True)
-
-    #        for j, site in enumerate(self.site_list):
-
-    # Get twist and superhelical density at site
-    #            enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
-    #            site_superhelical = enzyme_before.superhelical
-    # Let's first sort the new list
-    #            new_enzyme_list.sort(key=lambda x: x.position)
-
-    #        for new_enzyme in new_enzyme_list:
-    #            # Get neighbour enzymes
-    #            enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= new_enzyme.position][-1]
-    #            enzyme_after = [enzyme for enzyme in self.enzyme_list if enzyme.position >= new_enzyme.position][0]
-
-    #                # And quantities prior binding
-    #                region_twist = enzyme_before.twist
-    #                region_superhelical = enzyme_before.superhelical
-    #                region_length = em.calculate_length(enzyme_before, enzyme_after)
 
     # TODO: I have to think about the update, what does the update do? Do I really need one? Or maybe many updates
     #  for example, a twist update, a supercoiling update, a local sites update?
@@ -587,3 +547,4 @@ class Circuit:
 
         # And update supercoiling - because twist was modified
         self.update_supercoiling()
+
