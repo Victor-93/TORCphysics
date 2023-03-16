@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 from TORCphysics import params, Enzyme, Environment
 
@@ -180,9 +182,12 @@ def binding_model(enzyme_list, environmental_list, dt):
 
                 # position:
                 if site.direction > 0:
+                    position = site.start - environment.size
+                elif site.direction <= 0:
                     position = site.start
                 else:
-                    position = site.start - environment.size
+                    print("Error in adding new enzyme to list of new enzymes")
+                    sys.exit()
 
                 # Create enzyme, and note that it is missing twist and the superhelical density.
                 # I think it's better to fix it in the circuit module
@@ -206,9 +211,15 @@ def check_site_availability(site, enzyme_list, size):
     range_before = [enzyme_before.position, enzyme_before.position + enzyme_before.size]
     range_after = [enzyme_after.position, enzyme_after.position + enzyme_after.size]
     if site.direction > 0:
+        my_range = [site.start-size, site.start]
+#        my_range = [site.start, site.start + size]
+    elif site.direction <= 0:
         my_range = [site.start, site.start + size]
     else:
-        my_range = [site.start, site.start - size]
+        print('Error in checking site availability. Site=', site.site_type, site.name)
+        sys.exit()
+        my_range = [site.start, site.start + size]
+#        my_range = [site.start, site.start - size]
 
     # If any of them intersect
     if (set(range_before) & set(my_range)) or (set(range_after) & set(my_range)):

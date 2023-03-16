@@ -73,4 +73,9 @@ class TestCircuit(TestCase):
         my_circuit.run()
         print(0)
 
+    # TODO: test if enzymes bind correctly just before the start sites
+    # TODO: test where one molecule binds, and the global superhelical must remain the same. create the system with 1
+    #  gene, where only one RNAP binds, and unbinds. the global should remain the same.
+    #  Maybe create a custom case using the functions in the circuit.
+
 #    def test_add_1_enzyme(self):
