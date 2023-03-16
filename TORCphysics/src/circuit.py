@@ -6,6 +6,15 @@ from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 
 
+# TODO: TODAY:
+#  1.- Move Events to log. - DONE
+#  2.- List of new binding enzymes "new_enzymes" an object, that contains useful information for the dict.
+#  3.- Move size functions to circuit module.
+#  4.- Add Effect object, a product that can realise to the environment.
+#  5.- Modify environment so it has site_type and name.
+#  6.- Test the size functions by making test cases (bind/unbind)
+#  7- Define function that specifies how enzymes bind. Do they absorb twist or relax it.
+
 class Circuit:
 
     def __init__(self, circuit_filename, sites_filename, enzymes_filename, environment_filename,
@@ -62,21 +71,83 @@ class Circuit:
             self.enzymes_df = []
             self.enzymes_dict_list = []
             self.append_enzymes_to_dict()
+            self.sites_df = []
+            self.sites_dict_list = []
+            self.sites_dict_list_aux = []  # this one is an auxiliar
+            self.append_sites_to_dict_step1()
+            self.append_sites_to_dict_step2([], [])
+
             # TODO: I need to find a way to do it as well for the sites...
 
-#        self.sites_df = pd.DataFrame(data={'frame': [], 'time': [], 'type': [], 'name': [], 'twist': [],
-#                                           'superhelical': [], '#enzymes': [], 'binding': [], 'unbinding': []})
-
-
     # Append new enzymes to the self.enzymes_dict_list
+    # These quantities are at the end of the frame/time, where enzymes already bound/unbound and had an effect on the
+    # circuit
     def append_enzymes_to_dict(self):
         for enzyme in self.enzyme_list:
             # if enzyme.enzyme_type == 'EXT':
             #    continue
             d = {'frame': self.frame, 'time': self.time, 'name': enzyme.name, 'site': enzyme.site.name,
                  'position': enzyme.position, 'twist': enzyme.twist, 'superhelical': enzyme.superhelical,
-                 'gtwist': self.twist, 'gsuperhelical': self.superhelical}
+                 'global_twist': self.twist, 'global_superhelical': self.superhelical}
             self.enzymes_dict_list.append(d)
+
+    # Append new useful data to the sites_dict_list.
+    # This information corresponds to the events that happened during the current frame/time, where some enzymes
+    # bound and unbound the DNA. The twist and superhelical density correspond to the ones before the binding happened,
+    # so those two parameters do not correspond to the ones at the end of the time step
+    # So this step1 function, it collects local twist and superhelical before binding. The step2 will count the
+    # number of bound enzymes.
+    def append_sites_to_dict_step1(self):
+        self.sites_dict_list_aux.clear() # Empty list
+        d = {'frame': self.frame, 'time': self.time, 'type': 'circuit', 'name': self.name, 'twist': self.twist,
+             'superhelical': self.superhelical, '#enzymes': 0,
+             'binding': 0, 'unbinding': 0}
+        self.sites_dict_list_aux.append(d) # the first one is always the one corresponding to the circuit
+
+        # Then collect local twist/supercoiling at each site before binding
+        for i, site in enumerate(self.site_list):
+            if site.site_type == 'EXT':
+                continue
+            enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start][-1]
+            site_twist = enzyme_before.twist
+            site_superhelical = enzyme_before.superhelical
+            d = {'frame': self.frame, 'time': self.time, 'type': site.site_type, 'name': site.name, 'twist': site_twist,
+                 'superhelical': site_superhelical, '#enzymes': 0, 'binding': 0, 'unbinding': 0}
+
+            self.sites_dict_list_aux.append(d)
+
+    def append_sites_to_dict_step2(self, new_enzymes_list, drop_list_enzyme):
+        # Let's modify the dictionary related to the whole circuit
+        self.sites_dict_list_aux[0]['#enzymes'] = self.get_num_enzymes()-2
+        self.sites_dict_list_aux[0]['binding'] = len(new_enzymes_list)
+        self.sites_dict_list_aux[0]['unbinding'] = len(drop_list_enzyme)
+        self.sites_dict_list.append(self.sites_dict_list_aux[0]) # And add it to the big true list of dictionaries
+
+        # Then collect local twist/supercoiling at each site before binding
+        for i, site in enumerate(self.site_list):
+            if site.site_type == 'EXT':
+                continue
+            for new_enzyme in new_enzymes_list:
+                if new_enzyme.name == site.name:
+                    self.sites_dict_list_aux[i]['binding'] = 1
+
+            for drop_enzyme in drop_list_enzyme:
+                if drop_enzyme.name == site.name:
+                    self.sites_dict_list_aux[i]['unbinding'] = 1
+
+            self.sites_dict_list_aux[i]['#enzymes'] = \
+                [enzyme for enzyme in self.enzyme_list if enzyme.name == site.name]
+
+            self.sites_dict_list.append(self.sites_dict_list_aux[i])  # And add it to the big true list of dictionaries
+
+    #    def append_sites_to_dict_step1(self, new_enzyme_list, drop_enzyme_list):
+#        self.sites_dict_list_step1.clear()  # Empty list
+#        d = {'frame': self.frame, 'time': self.time, 'type': 'circuit', 'name': self.name, 'twist': self.twist,
+#             'superhelical': self.superhelical, '#enzymes': self.get_num_enzymes() - 2,
+#             'binding': len(new_enzyme_list), 'unbinding': len(drop_enzyme_list)}
+#        for i, site in enumerate(self.site_list):#
+
+#        self.sites_dict_list.append(d)
 
     #    def append_enzymes_df(self):
     #        for enzyme in self.enzyme_list:
@@ -90,7 +161,7 @@ class Circuit:
 
     #    def append_sites_df(self, new_enzyme_list):
 
-    #        d = pd.DataFrame(data={'frame': [self.frame], 'time': [self.time], 'type': ['circuit'], 'name': [self.name],
+    #       d = pd.DataFrame(data={'frame': [self.frame], 'time': [self.time], 'type': ['circuit'], 'name': [self.name],
     #                               'twist': [self.twist], 'superhelical': [self.superhelical],
     #                               '#enzymes': [len(self.enzyme_list)-2], 'binding': [0], 'unbinding': [0]})
     #        self.sites_df = pd.concat( [self.sites_df, d], ignore_index=True)
@@ -135,6 +206,8 @@ class Circuit:
             #            print('frame =', frame)
             self.frame = frame
             self.time = frame * self.dt
+            if self.series:
+                self.append_sites_to_dict_step1()
             # BINDING
             # --------------------------------------------------------------
             # Apply binding model and get list of new enzymes
@@ -153,8 +226,8 @@ class Circuit:
 
             # UNBINDING
             # --------------------------------------------------------------
-            drop_list = bm.unbinding_model(self.enzyme_list)
-            self.drop_enzymes(drop_list)
+            drop_list_index, drop_list_enzyme = bm.unbinding_model(self.enzyme_list)
+            self.drop_enzymes(drop_list_index)
             #            self.add_unbinding_events_to_log(drop_list)
 
             # UPDATE GLOBALS
@@ -168,12 +241,15 @@ class Circuit:
             # --------------------------------------------------------------
             if self.series:
                 self.append_enzymes_to_dict()
+                self.append_sites_to_dict_step2(new_enzyme_list, drop_list_enzyme)
 
         # Output the dataframes: (series)
         # TODO: I need a function that can save this to a csv
         if self.series:
             self.enzymes_df = pd.DataFrame.from_dict(self.enzymes_dict_list)
             self.enzymes_df.to_csv('enzymes_df.csv', index=False, sep=',')
+            self.sites_df = pd.DataFrame.from_dict(self.sites_dict_list)
+            self.sites_df.to_csv('sites_df.csv', index=False, sep=',')
 
         # Output the log of events
         self.log.log_out()
@@ -420,7 +496,7 @@ class Circuit:
                 enzyme_before.twist = new_twist_left
                 new_enzyme.twist = new_twist_right
 
-            # Now add the enzyme to the list, sort it
+            # Now add the enzyme to the list, sort itself
             # self.enzyme_list.append(new_enzyme)
             # self.sort_enzyme_list()
 
