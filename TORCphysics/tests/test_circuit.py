@@ -72,3 +72,5 @@ class TestCircuit(TestCase):
         # Let's make the rates
         my_circuit.run()
         print(0)
+
+#    def test_add_1_enzyme(self):

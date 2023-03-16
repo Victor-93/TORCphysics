@@ -27,6 +27,18 @@ SM_m = params.SM_m
 EE_alpha = params.EE_alpha
 
 
+#class Add_enzyme:
+#    # For handling the data in the data frames, it is more useful to create a class that contains information
+#    # regarding the twist and superhelical density at the site prior binding.#
+
+#    # So, the twist and superhelical density are the local values at the site prior binding.
+#    def __init__(self, will_bind, enzyme, twist, superhelical):
+#        # I'll save the input filenames just in case
+#        self.will_bind = will_bind
+#        self.enzyme = enzyme
+#        self.twist = twist
+#        self.superhelical = superhelical
+
 # ---------------------------------------------------------------------------------------------------------------------
 # BINDING FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
@@ -46,7 +58,8 @@ EE_alpha = params.EE_alpha
 # Goes through the enzymes in enzymes list and according to their unbinding condition unbind them.
 # Returns a list of enzyme indexes that will unbind
 def unbinding_model(enzymes_list):
-    drop_list = []  # This list will have the indices of the enzymes that will unbind
+    drop_list_index = []  # This list will have the indices of the enzymes that will unbind, and the enzyme
+    drop_list_enzyme = []  # And a list with the enzymes
     for i, enzyme in enumerate(enzymes_list):
 
         if enzyme.enzyme_type == 'EXT':  # The fake boundaries can't unbind
@@ -70,9 +83,10 @@ def unbinding_model(enzymes_list):
         # Now add the to the drop_list if the enzyme will unbind
         # ------------------------------------------------------------------
         if unbind:
-            drop_list.append(i)
+            drop_list_index.append(i)
+            drop_list_enzyme.append(enzyme)
 
-    return drop_list
+    return drop_list_index, drop_list_enzyme
 
 
 # Goes through enzymes in the environment (environmental_list) and search for the available sites that it recognizes.
