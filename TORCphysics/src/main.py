@@ -74,6 +74,7 @@ if args.test:  # If true, then we run some tests and stop
 else:
     test = False
 
+series = True
 # Pass the command line inputs, read csvs and initialize "my_circuit"
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation, dt, topoisomerase_model, mechanical_model)
