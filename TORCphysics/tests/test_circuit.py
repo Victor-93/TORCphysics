@@ -1,5 +1,8 @@
 from unittest import TestCase
 from TORCphysics import Circuit
+from TORCphysics import effect_model as em
+from TORCphysics import binding_model as bm
+import pandas as pd
 
 
 class TestCircuit(TestCase):
@@ -40,9 +43,9 @@ class TestCircuit(TestCase):
         mm = 'uniform'
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation, dt, tm, mm)
-#        for site in my_circuit.site_list:  # I'll increase the rates
-#             site.k_min = site.k_min * 100
-            #site.k_min = site.k_min * 5
+        #        for site in my_circuit.site_list:  # I'll increase the rates
+        #             site.k_min = site.k_min * 100
+        # site.k_min = site.k_min * 5
         # Let's make the rates
         my_circuit.run()
         print(0)
@@ -73,9 +76,227 @@ class TestCircuit(TestCase):
         my_circuit.run()
         print(0)
 
-    # TODO: test if enzymes bind correctly just before the start sites
-    # TODO: test where one molecule binds, and the global superhelical must remain the same. create the system with 1
-    #  gene, where only one RNAP binds, and unbinds. the global should remain the same.
-    #  Maybe create a custom case using the functions in the circuit.
+    # TODO: test fake ends - circular and linear. No enzymes, 1 enzyme, 2 enzymes
+    # Tests the positions of the fake enzymes
+    def test_fake_ends(self):
+        # CIRCULAR
+        # -----------------------------------------------------------------------------------------
+        # Empty case
+        circuit_filename = 'test_inputs/test_circuit_circular.csv'
+        sites_filename = 'test_inputs/sites_1_gene.csv'
+        enzymes_filename = 'test_inputs/empty_enzymes.csv'
+        environment_filename = 'test_inputs/RNAP_environment.csv'
+        output_prefix = 'output'
+        frames = 5
+        series = True
+        continuation = False
+        tm = 'continuum'
+        mm = 'uniform'
+        dt = 1
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt, tm, mm)
+        self.assertEqual(my_circuit.enzyme_list[0].position, 0, "Wrong position of left fake enzyme")
+        self.assertEqual(my_circuit.enzyme_list[-1].position, my_circuit.size + 1,
+                         "Wrong position of right fake enzyme")
+
+        # One Enzyme bound
+        enzymes1_filename = 'test_inputs/enzymes_1.csv'
+        my_circuit_1 = Circuit(circuit_filename, sites_filename, enzymes1_filename, environment_filename,
+                               output_prefix, frames, series, continuation, dt, tm, mm)
+        enzyme1 = my_circuit_1.enzyme_list[1]
+        self.assertEqual(my_circuit_1.enzyme_list[0].position, 1 + enzyme1.position + enzyme1.size - my_circuit_1.size,
+                         "Wrong position of left fake enzyme")
+        self.assertEqual(my_circuit_1.enzyme_list[-1].position, enzyme1.position + my_circuit_1.size,
+                         "Wrong position of right fake enzyme")
+
+        # Two Enzymes bound
+        enzymes2_filename = 'test_inputs/enzymes_2.csv'
+        my_circuit_2 = Circuit(circuit_filename, sites_filename, enzymes2_filename, environment_filename,
+                               output_prefix, frames, series, continuation, dt, tm, mm)
+        enzyme1 = my_circuit_2.enzyme_list[1]
+        enzyme2 = my_circuit_2.enzyme_list[2]
+        self.assertEqual(my_circuit_2.enzyme_list[0].position, 1 + enzyme2.position + enzyme2.size - my_circuit_2.size,
+                         "Wrong position of left fake enzyme")
+        self.assertEqual(my_circuit_2.enzyme_list[-1].position, enzyme1.position + my_circuit_2.size,
+                         "Wrong position of right fake enzyme")
+        # LINEAR
+        # -----------------------------------------------------------------------------------------
+        circuit_filename_linear = 'test_inputs/test_circuit_linear.csv'
+        # No enzymes
+        my_circuit_linear = Circuit(circuit_filename_linear, sites_filename, enzymes_filename, environment_filename,
+                                    output_prefix, frames, series, continuation, dt, tm, mm)
+        self.assertEqual(my_circuit_linear.enzyme_list[0].position, 0, "Wrong position of left fake enzyme")
+        self.assertEqual(my_circuit_linear.enzyme_list[-1].position, my_circuit_linear.size + 1,
+                         "Wrong position of right fake enzyme")
+        # 1 enzyme
+        my_circuit_linear1 = Circuit(circuit_filename_linear, sites_filename, enzymes1_filename, environment_filename,
+                                     output_prefix, frames, series, continuation, dt, tm, mm)
+        self.assertEqual(my_circuit_linear1.enzyme_list[0].position, 0, "Wrong position of left fake enzyme")
+        self.assertEqual(my_circuit_linear1.enzyme_list[-1].position, my_circuit_linear1.size + 1,
+                         "Wrong position of right fake enzyme")
+        # 2 enzymes
+        my_circuit_linear2 = Circuit(circuit_filename_linear, sites_filename, enzymes2_filename, environment_filename,
+                                     output_prefix, frames, series, continuation, dt, tm, mm)
+        self.assertEqual(my_circuit_linear2.enzyme_list[0].position, 0, "Wrong position of left fake enzyme")
+        self.assertEqual(my_circuit_linear2.enzyme_list[-1].position, my_circuit_linear2.size + 1,
+                         "Wrong position of right fake enzyme")
+
+    # TODO: test bind/unbind no topo - one gene, a RNAP binds, then unbinds and twist is conserved. - test with 2 genes
+    def test_bind_unbind_1_RNAP_1_gene(self):
+        circuit_filename = 'test_inputs/test_circuit_circular.csv'
+        sites_filename = 'test_inputs/sites_1_gene.csv'
+        enzymes_filename = 'test_inputs/empty_enzymes.csv'
+        environment_filename = 'test_inputs/RNAP_environment.csv'
+        output_prefix = 'output'
+        frames = 500
+        series = True
+        continuation = False
+        tm = 'continuum'
+        mm = 'uniform'
+        dt = 1
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt, tm, mm)
+        my_circuit.site_list[2].k_min = 0.0
+        s0 = my_circuit.superhelical
+
+        # This is similar to the Run function... but the idea is that we will control the rate
+        for frame in range(1, frames + 1):
+            my_circuit.frame = frame
+            my_circuit.time = frame * dt
+            if my_circuit.series:
+                my_circuit.append_sites_to_dict_step1()
+
+            if frame == 100:
+                my_circuit.site_list[2].k_min = .1
+
+            # Apply binding model and get list of new enzymes
+            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt)
+
+            if len(new_enzyme_list) > 0:
+                my_circuit.site_list[2].k_min = 0.0
+            my_circuit.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
+
+            # EFFECT
+            # --------------------------------------------------------------
+            effects_list = em.effect_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
+                                           my_circuit.topoisomerase_model, my_circuit.mechanical_model)
+            my_circuit.apply_effects(effects_list)
+
+            # UNBINDING
+            drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list)
+            my_circuit.drop_enzymes(drop_list_index)
+            my_circuit.add_to_environment(drop_list_enzyme)
+
+            # UPDATE GLOBALS
+            my_circuit.update_global_twist()
+            my_circuit.update_global_superhelical()
+
+            # Add to series df if the series option was selected (default=True)
+            if series:
+                my_circuit.append_enzymes_to_dict()
+                my_circuit.append_sites_to_dict_step2(new_enzyme_list, drop_list_enzyme)
+
+        # Output the dataframes: (series)
+        if series:
+            my_circuit.enzymes_df = pd.DataFrame.from_dict(my_circuit.enzymes_dict_list)
+            my_circuit.enzymes_df.to_csv(my_circuit.name + '_enzymes_df.csv', index=False, sep=',')
+            my_circuit.sites_df = pd.DataFrame.from_dict(my_circuit.sites_dict_list)
+            my_circuit.sites_df.to_csv(my_circuit.name + '_sites_df.csv', index=False, sep=',')
+
+        # Output the log of events
+        my_circuit.log.log_out()
+        sf = my_circuit.superhelical  # final superhelical
+        self.assertEqual(abs(s0-sf), 0, "Superhelical changed")
+
+    def test_bind_unbind_many_RNAPs_1_gene(self):
+        circuit_filename = 'test_inputs/test_circuit_circular.csv'
+        sites_filename = 'test_inputs/sites_1_gene.csv'
+        enzymes_filename = 'test_inputs/empty_enzymes.csv'
+        environment_filename = 'test_inputs/RNAP_environment.csv'
+        output_prefix = 'output'
+        frames = 1000
+        series = True
+        continuation = False
+        tm = 'continuum'
+        mm = 'uniform'
+        dt = 1
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt, tm, mm)
+        my_circuit.site_list[2].k_min = 0.0
+        superhelical0 = my_circuit.superhelical
+        twist0 = my_circuit.twist
+        err = 20
+        # This is similar to the Run function... but the idea is that we will control the rate
+        for frame in range(1, frames + 1):
+            my_circuit.frame = frame
+            my_circuit.time = frame * dt
+            if my_circuit.series:
+                my_circuit.append_sites_to_dict_step1()
+
+            my_circuit.update_global_twist()
+            my_circuit.update_global_superhelical()
+            if abs(twist0-my_circuit.twist) > err:
+                print('error')
+
+            if frame == 100:
+                my_circuit.site_list[2].k_min = .1
+            elif frame == 900:
+                my_circuit.site_list[2].k_min = 0.0
+
+            # Apply binding model and get list of new enzymes
+            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt)
+
+            my_circuit.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
+
+            my_circuit.update_global_twist()
+            my_circuit.update_global_superhelical()
+            if abs(twist0-my_circuit.twist) > err:
+                print('error')
+
+            # EFFECT
+            # --------------------------------------------------------------
+            effects_list = em.effect_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
+                                           my_circuit.topoisomerase_model, my_circuit.mechanical_model)
+            my_circuit.apply_effects(effects_list)
+
+            my_circuit.update_global_twist()
+            my_circuit.update_global_superhelical()
+            if abs(twist0-my_circuit.twist) > err:
+                print('error')
+
+            # UNBINDING
+            drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list)
+            my_circuit.drop_enzymes(drop_list_index)
+
+            my_circuit.update_global_twist()
+            my_circuit.update_global_superhelical()
+            if abs(twist0-my_circuit.twist) > err:
+                print('error')
+            my_circuit.add_to_environment(drop_list_enzyme)
+
+            # UPDATE GLOBALS
+            my_circuit.update_global_twist()
+            my_circuit.update_global_superhelical()
+            if abs(twist0-my_circuit.twist) > err:
+                print('error')
+
+            # Add to series df if the series option was selected (default=True)
+            if series:
+                my_circuit.append_enzymes_to_dict()
+                my_circuit.append_sites_to_dict_step2(new_enzyme_list, drop_list_enzyme)
+
+        # Output the dataframes: (series)
+        if series:
+            my_circuit.enzymes_df = pd.DataFrame.from_dict(my_circuit.enzymes_dict_list)
+            my_circuit.enzymes_df.to_csv(my_circuit.name + '_enzymes_df.csv', index=False, sep=',')
+            my_circuit.sites_df = pd.DataFrame.from_dict(my_circuit.sites_dict_list)
+            my_circuit.sites_df.to_csv(my_circuit.name + '_sites_df.csv', index=False, sep=',')
+
+        # Output the log of events
+        my_circuit.log.log_out()
+        sf = my_circuit.superhelical  # final superhelical
+        self.assertEqual(abs(s0-sf), 0, "Superhelical changed")
+
+    # TODO: test empty circuit -
 
 #    def test_add_1_enzyme(self):

@@ -89,6 +89,8 @@ class Circuit:
 
         for frame in range(1, self.frames + 1):
             #            print('frame =', frame)
+            #if self.enzyme_list[0].position > 0:
+            #    print(0)
             self.frame = frame
             self.time = frame * self.dt
             if self.series:
@@ -169,6 +171,9 @@ class Circuit:
         for site in self.site_list:
             if site.site_type == 'EXT':
                 continue
+            enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start]
+            if len(enzyme_before) <= 0:
+                print(0)
             enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start][-1]
             site_twist = enzyme_before.twist
             site_superhelical = enzyme_before.superhelical
@@ -481,9 +486,11 @@ class Circuit:
                 # There is one EXT at the left
                 # EXT_L.............O........------------.....E......EXT_R / Twist in O has to be added to E,
                 # and EXT_L becomes a mirrored version of E, so it has the same twist as E (which index is = N-2)
-                if self.enzyme_list[i - 1].name == 'EXT_L' and self.enzyme_list[i + 1].name != 'EXT_R':
-                    self.enzyme_list[self.get_num_enzymes() - 2].twist += self.enzyme_list[i].twist
-                    self.enzyme_list[0].twist = self.enzyme_list[self.get_num_enzymes() - 2].twist
+                elif self.enzyme_list[i - 1].name == 'EXT_L' and self.enzyme_list[i + 1].name != 'EXT_R':
+#                    self.enzyme_list[self.get_num_enzymes() - 2].twist += self.enzyme_list[i].twist
+#                    self.enzyme_list[0].twist = self.enzyme_list[self.get_num_enzymes() - 2].twist
+                    self.enzyme_list[-2].twist += self.enzyme_list[i].twist
+                    self.enzyme_list[0].twist = self.enzyme_list[-2].twist
 
                 # ------.......E.......O.....---------- / Twist in O is added to E
                 else:
@@ -506,14 +513,18 @@ class Circuit:
             del self.enzyme_list[i]
 
         # Update fake boundaries positions if circular structure
+        if self.enzyme_list[0].position > 0:
+            print(0)
         if self.circle:
             if self.get_num_enzymes() > 2:
                 self.enzyme_list[0].position, self.enzyme_list[-1].position = \
                     em.get_start_end_c(self.enzyme_list[1], self.enzyme_list[-2], self.size)
             else:
-                self.enzyme_list[0].position = 1
-                self.enzyme_list[-1].position = self.size
+                self.enzyme_list[0].position = 0
+                self.enzyme_list[-1].position = self.size + 1
 
+        if self.enzyme_list[0].position > 0:
+            print(0)
         self.sort_enzyme_list()
         self.update_supercoiling()
 
