@@ -80,7 +80,10 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
         twist_left = 0
         for topo in topo_list:
             for i, enzyme in enumerate(enzyme_list):
-                if enzyme.enzyme_type == 'EXT':  # We can speed up things a bit by ignoring the fake boundaries
+                # We can speed up things a bit by ignoring the fake boundaries
+                if enzyme.name == 'EXT_L' and len(enzyme_list) > 2:
+                    continue
+                elif enzyme.name == 'EXT_R':
                     continue
 
                 if topo.name == 'topoI':
