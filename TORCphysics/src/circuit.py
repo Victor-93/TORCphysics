@@ -225,7 +225,10 @@ class Circuit:
     # And updates the global superhelical density
     # Important, assumes that global twist is updated
     def update_global_superhelical(self):
-        self.superhelical = self.twist / (params.w0 * (self.size - sum(enzyme.size for enzyme in self.enzyme_list)))
+        if self.get_num_enzymes() >2:
+            self.superhelical = self.twist / (params.w0 * (self.size - sum(enzyme.size for enzyme in self.enzyme_list)))
+        else:
+            self.superhelical = self.twist/ (params.w0 * self.size)
 
     def sort_lists(self):
         self.enzyme_list.sort(key=lambda x: x.position)
@@ -384,6 +387,7 @@ class Circuit:
 
             # And quantities prior binding
             region_twist = enzyme_before.twist
+            region_superhelical = enzyme_before.superhelical
             region_length = em.calculate_length(enzyme_before, enzyme_after)
 
             # First, add the enzyme to the list and sort it
@@ -393,8 +397,8 @@ class Circuit:
             # Before updating local parameters, create the new event and add it to log
             # --------------------------------------------------------------------------
             new_event = Event(self.time, self.frame, 'binding_event', enzyme_before.twist,
-                              enzyme_before.superhelical,
-                              self.twist, self.superhelical, new_enzyme.site, new_enzyme, new_enzyme.position)
+                              region_superhelical, self.twist, self.superhelical, new_enzyme.site, new_enzyme,
+                              new_enzyme.position)
             # And add it to the log
             self.log.metadata.append(new_event)
 
@@ -417,8 +421,11 @@ class Circuit:
             # now to calculate the new twists
             # NOTE that I don't partition using the supercoiling density because the region that is actually bound
             # is assumed to be relaxed by the enzyme
-            new_twist_left = region_twist * ((new_length_left + 0.5 * new_enzyme.size) / region_length)
-            new_twist_right = region_twist * ((new_length_right + 0.5 * new_enzyme.size) / region_length)
+            #new_twist_left = region_twist * ((new_length_left + 0.5 * new_enzyme.size) / region_length)
+            #new_twist_right = region_twist * ((new_length_right + 0.5 * new_enzyme.size) / region_length)
+            new_twist_left = region_superhelical*region_length*new_length_left*params.w0/(new_length_left+new_length_right)
+            new_twist_right = region_superhelical*region_length*new_length_right*params.w0/(new_length_left+new_length_right)
+
 
             # update twists
             # ------------CIRCULAR DNA--------------------
@@ -433,8 +440,10 @@ class Circuit:
                 # There is one EXT at the left
                 elif enzyme_before.name == 'EXT_L' and enzyme_after.name != 'EXT_R':
                     # Check if this is how I can update a property in the enzymes - I think it does!
-                    enzyme_before.twist = new_twist_left
-                    self.enzyme_list[-2].twist = new_twist_left
+#                    enzyme_before.twist = new_twist_left
+                    self.enzyme_list[0].twist = new_twist_left
+                    self.enzyme_list[self.get_num_enzymes()-2].twist = new_twist_left
+                    #self.enzyme_list[-1].twist = new_twist_left
                     new_enzyme.twist = new_twist_right
 
                 # There is one EXT at the right
@@ -495,6 +504,8 @@ class Circuit:
                 # ------.......E.......O.....---------- / Twist in O is added to E
                 else:
                     self.enzyme_list[i - 1].twist += self.enzyme_list[i].twist
+#                    self.enzyme_list[0].twist = self.enzyme_list[-2].twist
+                    self.enzyme_list[0].twist = self.enzyme_list[i-1].twist
 
             # ------------LINEAR DNA--------------------
             else:
@@ -523,8 +534,8 @@ class Circuit:
                 self.enzyme_list[0].position = 0
                 self.enzyme_list[-1].position = self.size + 1
 
-        if self.enzyme_list[0].position > 0:
-            print(0)
+        #if self.enzyme_list[0].position > 0:
+        #    print(0)
         self.sort_enzyme_list()
         self.update_supercoiling()
 
@@ -548,6 +559,14 @@ class Circuit:
                 self.enzyme_list[self.get_num_enzymes() - 2].twist += effect.twist_left
             else:  # In any other case just update the enzyme on the left
                 self.enzyme_list[effect.index - 1].twist += effect.twist_left
+
+        # Now we need to update the positions of the fake boundaries in circular DNA
+        # --------------------------------------------------------------------------
+        if self.circle:
+            position_left, position_right = em.get_start_end_c(self.enzyme_list[1], self.enzyme_list[-2],
+                                                               self.size)
+            self.enzyme_list[0].position = position_left
+            self.enzyme_list[-1].position = position_right
 
         # And update supercoiling - because twist was modified
         self.update_supercoiling()

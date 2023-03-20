@@ -196,7 +196,8 @@ def get_start_end_c(z0, zn, nbp):
     x_n = zn.position  # position of last object
 
     # fake position on the left
-    position_left = 1 + x_n + b_n - nbp  # the size of the last object is considered
+#    position_left = 1 + x_n + b_n - nbp  # the size of the last object is considered
+    position_left = x_n + b_n - nbp  # the size of the last object is considered
     # if zn.direction >= 0:  # depends on the direction
     #    position_left = 0 - (nbp - x_n)  # this is the position of the fake bit,
     # else:
