@@ -48,7 +48,6 @@ class TestCircuit(TestCase):
         # site.k_min = site.k_min * 5
         # Let's make the rates
         my_circuit.run()
-        print(0)
 
     def test_run2(self):
         circuit_filename = '../circuit.csv'

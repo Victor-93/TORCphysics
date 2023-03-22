@@ -87,9 +87,11 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
                     continue
 
                 if topo.name == 'topoI':
-                    twist_right = topo1_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
+                    sigma = topo1_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
+                    twist_right = calculate_twist_from_sigma( enzyme, enzyme_list[i+1], sigma )
                 elif topo.name == 'gyrase':
-                    twist_right = gyrase_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
+                    sigma = gyrase_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
+                    twist_right = calculate_twist_from_sigma( enzyme, enzyme_list[i+1], sigma )
                 else:
                     twist_right = 0  # If it doesn't recognize the topo, then don't do anything
 
@@ -110,8 +112,11 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
 def topo1_continuum(sigma, topo_c, topo_k, dt):
     # the function has the form of (concentration*sigmoid)*rate*dt
     a = topo_c * topo_k * dt
-    b = 1 + np.exp((sigma - topo_t) / topo_w)
-    sigma_removed = a / b
+    try:
+        b = 1 + np.exp((sigma - topo_t) / topo_w)
+        sigma_removed = a / b
+    except OverflowError as oe:
+        sigma_removed = 0.0
     return sigma_removed
 
 
@@ -122,8 +127,11 @@ def topo1_continuum(sigma, topo_c, topo_k, dt):
 def gyrase_continuum(sigma, gyra_c, gyra_k, dt):
     # the function has the form of (concentration*sigmoid)*rate*dt
     a = gyra_c * gyra_k * dt
-    b = 1 + np.exp(-(sigma - gyra_t) / gyra_w)
-    sigma_removed = -a / b
+    try:
+        b = 1 + np.exp(-(sigma - gyra_t) / gyra_w)
+        sigma_removed = -a / b
+    except OverflowError as oe:
+        sigma_removed = 0.0
     return sigma_removed
 
 
@@ -188,18 +196,28 @@ def calculate_supercoiling(z0, z1):
     return sigma
 
 
+# ----------------------------------------------------------
+# This function is equivalent to calculate_twist(), however, we use this function when
+# the twist stored in the enzyme is not reliable. For example, when topoisomerases act on the DNA in the continumm
+# model, we might need to convert from superhelical to twist
+def calculate_twist_from_sigma(z0, z1, sigma):
+    length = calculate_length(z0, z1)  # First, I need to get the length
+    twist = sigma * w0 * length
+    return twist
+
+
 # -----------------------------------------------------------------------
 # Gets the start and end positions of the fake boundaries (for circular DNA)
 # In case that there is not fake boundaries, Z_N should be the last element [-1],
 # in case that you have N objects including the fake boundaries, Z_N -> [N-2]
 def get_start_end_c(z0, zn, nbp):
-    #b_0 = z0.size
+    # b_0 = z0.size
     b_n = zn.size
     x_0 = z0.position  # position of first object
     x_n = zn.position  # position of last object
 
     # fake position on the left
-#    position_left = 1 + x_n + b_n - nbp  # the size of the last object is considered
+    #    position_left = 1 + x_n + b_n - nbp  # the size of the last object is considered
     position_left = x_n + b_n - nbp  # the size of the last object is considered
     # if zn.direction >= 0:  # depends on the direction
     #    position_left = 0 - (nbp - x_n)  # this is the position of the fake bit,
