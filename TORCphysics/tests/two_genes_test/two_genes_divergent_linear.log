@@ -1,0 +1,18 @@
+TORCphysics log file 
+
+General information: 
+---------------------------------------------------------------------------------------
+Circuit name: two_genes_divergent_linear
+Size: 
+Structure: 
+Number of sites: 
+Number of frames: 
+Simulation time: 
+Seed:
+ 
+Events
+---------------------------------------------------------------------------------------
+frame 10 time 5.0 binding_event at gene left enzyme RNAP with twist 0.0 superhelical 0.0 global twist 0.0 global supercoiling 0.0
+frame 10 time 5.0 binding_event at gene right enzyme RNAP with twist 0.0 superhelical 0.0 global twist 0.0 global supercoiling 0.0
+frame 76 time 38.0 unbinding_event at gene left enzyme RNAP with twist -120.27811873743869 superhelical 0.2020100502512563 global twist -8.526512829121202e-13 global supercoiling -2.400418627519635e-16
+frame 76 time 38.0 unbinding_event at gene right enzyme RNAP with twist -8.810729923425242e-13 superhelical 0.2020100502512563 global twist -8.526512829121202e-13 global supercoiling -2.400418627519635e-16

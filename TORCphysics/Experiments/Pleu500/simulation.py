@@ -14,14 +14,14 @@ sites_filename = 'sites.csv'
 enzymes_filename = 'enzymes.csv'
 environment_filename = 'environment.csv'
 output_prefix = 'output'
-frames = 14800
+frames = 10000
 series = True
 continuation = False
 tm = 'continuum'
 mm = 'uniform'
 dt = 1.0
 n_simulations = 1
-bridge_time = 7200
+bridge_time = 5000
 
 for ns in range(n_simulations):
     my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,

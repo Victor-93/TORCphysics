@@ -7,7 +7,7 @@ from TORCphysics import effect_model as em
 width = 6
 height = 4
 
-x = np.arange(-.05,.0,.001)
+x = np.arange(-.1,.1,.001)
 dt = 1
 sites_filename = 'sites.csv'
 environment_filename = 'environment.csv'
@@ -21,7 +21,7 @@ gyracurve = em.gyrase_continuum(x, gyra.concentration, gyra.k_cat, dt)
 
 fig, ax = plt.subplots(1, figsize=(width, height), tight_layout=True)
 
-#ax.plot(x,topocurve+gyracurve, 'black',  label='diff', lw=2)
+ax.plot(x,topocurve+gyracurve, 'black',  label='diff', lw=2)
 ax.plot(x,topocurve, 'orange', label='topo I', lw=2)
 ax.plot(x,gyracurve, 'purple', label='gyra', lw=2)
 
