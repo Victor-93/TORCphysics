@@ -10,5 +10,5 @@ class TestSite(TestCase):
         sf_list = sf.get_site_list()
         self.assertEqual("tetA", sf_list[0].name, "Did not load tetA correctly")
 
-    def test_set_up_oparams(self):
-        self.fail()
+#    def test_set_up_oparams(self):
+#        self.fail()

@@ -3,10 +3,11 @@ import pandas as pd
 
 class Environment:
 
-    def __init__(self, e_type, name, site_list, concentration, k_on, k_off, k_cat, size):#, eff_model):
+    def __init__(self, e_type, name, site_list, concentration, k_on, k_off, k_cat, size, site_type):#, eff_model):
         self.enzyme_type = e_type
         self.name = name
         self.site_list = site_list  # It recognizes a list of sites, rather than a specific site
+        self.site_type = site_type # We need to remember the type
         self.concentration = concentration
         self.k_on = k_on
         self.k_off = k_off
@@ -32,8 +33,9 @@ class EnvironmentFactory:
                                           site_list=self.site_match(row['site_type']),
                                           concentration=float(row['concentration']), k_on=float(row['k_on']),
                                           k_off=float(row['k_off']), k_cat=float(row['k_cat']),
-                                          size=float(row['size']))  # eff_model=row['model'])
+                                          size=float(row['size']), site_type=row['site_type'])  # eff_model=row['model'])
             self.environment_list.append(new_environment)
+
 
     def site_match(self, label):
 #        enzyme_before = [enzyme.position for enzyme in enzyme_list if enzyme.position <= site.start][-1]

@@ -1,19 +1,11 @@
 import pandas as pd
 import random
+import numpy as np
 import sys
 from TORCphysics import Site, SiteFactory, Enzyme, EnzymeFactory, Environment, EnvironmentFactory, Event, Log, params
 from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 
-
-# TODO: TODAY:
-#  1.- Move Events to log. - DONE
-#  2.- List of new binding enzymes "new_enzymes" an object, that contains useful information for the dict. DONE
-#  3.- Move size functions to circuit module. - MAYBE NO NEED TO DO IT
-#  4.- When enzymes unbound, a product can be realised to the environment.  DONE
-#  5.- Modify environment so it has site_type and name. DONE? I DIDNT DO ANYTHING
-#  6.- Test the size functions by making test cases (bind/unbind)
-#  7- Define function that specifies how enzymes bind. Do they absorb twist or relax it.
 
 class Circuit:
 
@@ -43,8 +35,9 @@ class Circuit:
         self.enzyme_list = EnzymeFactory(enzymes_filename, self.site_list).enzyme_list
         self.environmental_list = EnvironmentFactory(environment_filename, self.site_list).environment_list
         self.time = 0
-        # create a time-based seed and save it
+        # create a time-based seed and save it, and initialize our random generator with this seed
         self.seed = random.randrange(sys.maxsize)
+        self.rng = np.random.default_rng(self.seed)
 
         # -----------------------------------------------
         # We add another SIDD which is the one we will link topos binding with DNA
@@ -56,9 +49,6 @@ class Circuit:
         self.add_fake_boundaries()
         self.sort_lists()
 
-        # TODO: test that the update of global superhelical correctly  matches the initial sigma. I think the problem is
-        #  due to the sizes of enzymes. I have two options: 1-include those sizes, 2-include the twist
-        #  of the bound region. For now I'll take option 2, when an enzyme binds, the region becomes flat(relax)
         self.update_global_twist()
         self.update_global_superhelical()
 
@@ -70,27 +60,21 @@ class Circuit:
         self.enzymes_df = []
         self.enzymes_dict_list = []
         self.append_enzymes_to_dict()
+
         self.sites_df = []
         self.sites_dict_list = []
         self.sites_dict_list_aux = []  # this one is an auxiliary
         self.append_sites_to_dict_step1()
         self.append_sites_to_dict_step2([], [])
 
-        # TODO: I need to find a way to do it as well for the sites...
+        self.environmental_df = []
+        self.environmental_dict_list = []
+        self.append_environmental_to_dict()
 
     # This one runs the simulation
-    # TODO: test all these functions
-    # TODO: Think about the updating of twist/supercoiling. When new enzymes bind, they can have an impact on the
-    #  supercoiling, in which depending on the size of the local domain, the supercoiling can increase considerably.
-    #  So when, these enzymes are added, they start moving?  Or is it assumed that during this dt it took them a lot
-    #  of time to bind? And when the effects are taking place, the enzymes react to these new supercoiling/twist or
-    #  they feel the one prior binding? Maybe if dt is sufficiently small, it just doesn't matter?
     def run(self):
 
         for frame in range(1, self.frames + 1):
-            #            print('frame =', frame)
-            #if self.enzyme_list[0].position > 0:
-            #    print(0)
             self.frame = frame
             self.time = frame * self.dt
             if self.series:
@@ -98,7 +82,7 @@ class Circuit:
             # BINDING
             # --------------------------------------------------------------
             # Apply binding model and get list of new enzymes
-            new_enzyme_list = bm.binding_model(self.enzyme_list, self.environmental_list, self.dt)
+            new_enzyme_list = bm.binding_model(self.enzyme_list, self.environmental_list, self.dt, self.rng)
             # These new enzymes are lacking twist and superhelical, we need to fix them and actually add them
             # to the enzyme_list
             # But before, add the binding events to the log  (it's easier to do it first)
@@ -130,6 +114,7 @@ class Circuit:
             if self.series:
                 self.append_enzymes_to_dict()
                 self.append_sites_to_dict_step2(new_enzyme_list, drop_list_enzyme)
+                self.append_environmental_to_dict()
 
         # Output the dataframes: (series)
         # TODO: I need a function that can save this to a csv
@@ -138,9 +123,58 @@ class Circuit:
             self.enzymes_df.to_csv(self.name + '_enzymes_df.csv', index=False, sep=',')
             self.sites_df = pd.DataFrame.from_dict(self.sites_dict_list)
             self.sites_df.to_csv(self.name + '_sites_df.csv', index=False, sep=',')
+            self.environmental_df = pd.DataFrame.from_dict(self.environmental_dict_list)
+            self.environmental_df.to_csv(self.name + '_environment_df.csv', index=False, sep=',')
 
         # Output the log of events
         self.log.log_out()
+
+        # Output csvs
+        self.enzyme_list_to_df().to_csv(self.name + '_enzymes_'+self.output_prefix+'.csv', index=False, sep=',')
+        self.site_list_to_df().to_csv(self.name + '_sites_'+self.output_prefix+'.csv', index=False, sep=',')
+        self.environmental_list_to_df().to_csv(self.name + '_environment_'+self.output_prefix+'.csv', index=False, sep=',')
+
+    # Returns list of enzymes in the form of dataframe. This function is with the intention of outputting the system
+    def enzyme_list_to_df(self):
+        enzyme_aux = [] #This will be a list of dicts
+        for enzyme in self.enzyme_list:
+            d = {'type': enzyme.enzyme_type, 'name': enzyme.name, 'site': enzyme.site.name,
+                 'position': enzyme.position, 'direction': enzyme.direction, 'size': enzyme.size, 'twist': enzyme.twist,
+                 'superhelical': enzyme.superhelical}
+            enzyme_aux.append(d)
+        my_df = pd.DataFrame.from_dict(enzyme_aux)
+        return my_df
+
+    # Returns environmental list in the form of dataframe. This function is with the intention of outputting the system
+    def environmental_list_to_df(self):
+        environmental_aux = [] #This will be a list of dicts
+        for environmental in self.environmental_list:
+
+            d = {'type': environmental.enzyme_type, 'name': environmental.name,
+                 'site_type': environmental.site_type, 'concentration': environmental.concentration,
+                 'k_on': environmental.k_on, 'k_off': environmental.k_off, 'k_cat': environmental.k_cat,
+                 'size': environmental.size}
+            environmental_aux.append(d)
+        my_df = pd.DataFrame.from_dict(environmental_aux)
+        return my_df
+
+    # Returns list of sites in the form of dataframe. This function is with the intention of outputting the system
+    def site_list_to_df(self):
+        site_aux = [] #This will be a list of dicts
+        for site in self.site_list:
+            d = {'type': site.site_type, 'name': site.name,'start': site.start, 'end': site.end, 'k_min': site.k_min,
+                 'k_max': site.k_max, 'model': site.site_model, 'oparams': site.oparams}
+            site_aux.append(d)
+        my_df = pd.DataFrame.from_dict(site_aux)
+        return my_df
+
+    # Append new substances in the environment to the self.environmental_dict_list
+    # These quantities are the frame, time, type of enzyme/substance, name and concentration
+    def append_environmental_to_dict(self):
+        for environmental in self.environmental_list:
+            d = {'frame': self.frame, 'time': self.time, 'type': environmental.enzyme_type, 'name': environmental.name,
+                 'concentration': environmental.concentration}
+            self.environmental_dict_list.append(d)
 
     # Append new enzymes to the self.enzymes_dict_list
     # These quantities are at the end of the frame/time, where enzymes already bound/unbound and had an effect on the
@@ -210,8 +244,6 @@ class Circuit:
 
             self.sites_dict_list.append(self.sites_dict_list_aux[i])  # And add it to the big true list of dictionaries
 
-
-
     # Calculates the global twist (just  sums the excess of twist)
     def update_global_twist(self):
         if self.circle:
@@ -225,10 +257,10 @@ class Circuit:
     # And updates the global superhelical density
     # Important, assumes that global twist is updated
     def update_global_superhelical(self):
-        if self.get_num_enzymes() >2:
+        if self.get_num_enzymes() > 2:
             self.superhelical = self.twist / (params.w0 * (self.size - sum(enzyme.size for enzyme in self.enzyme_list)))
         else:
-            self.superhelical = self.twist/ (params.w0 * self.size)
+            self.superhelical = self.twist / (params.w0 * self.size)
 
     def sort_lists(self):
         self.enzyme_list.sort(key=lambda x: x.position)
@@ -421,13 +453,14 @@ class Circuit:
             # now to calculate the new twists
             # NOTE that I don't partition using the supercoiling density because the region that is actually bound
             # is assumed to be relaxed by the enzyme
-            #new_twist_left = region_twist * ((new_length_left + 0.5 * new_enzyme.size) / region_length)
-            #new_twist_right = region_twist * ((new_length_right + 0.5 * new_enzyme.size) / region_length)
-            new_twist_left = region_superhelical*region_length*new_length_left*params.w0/(new_length_left+new_length_right)
-            new_twist_right = region_superhelical*region_length*new_length_right*params.w0/(new_length_left+new_length_right)
-            #new_superhelical_left = new_twist_left / (params.w0*new_length_left)
-            #new_superhelical_right = new_twist_right / (params.w0 * new_length_right)
-
+            # new_twist_left = region_twist * ((new_length_left + 0.5 * new_enzyme.size) / region_length)
+            # new_twist_right = region_twist * ((new_length_right + 0.5 * new_enzyme.size) / region_length)
+            new_twist_left = region_superhelical * region_length * new_length_left * params.w0 / (
+                        new_length_left + new_length_right)
+            new_twist_right = region_superhelical * region_length * new_length_right * params.w0 / (
+                        new_length_left + new_length_right)
+            # new_superhelical_left = new_twist_left / (params.w0*new_length_left)
+            # new_superhelical_right = new_twist_right / (params.w0 * new_length_right)
 
             # update twists
             # ------------CIRCULAR DNA--------------------
@@ -442,10 +475,10 @@ class Circuit:
                 # There is one EXT at the left
                 elif enzyme_before.name == 'EXT_L' and enzyme_after.name != 'EXT_R':
                     # Check if this is how I can update a property in the enzymes - I think it does!
-#                    enzyme_before.twist = new_twist_left
+                    #                    enzyme_before.twist = new_twist_left
                     self.enzyme_list[0].twist = new_twist_left
-                    self.enzyme_list[self.get_num_enzymes()-2].twist = new_twist_left
-                    #self.enzyme_list[-1].twist = new_twist_left
+                    self.enzyme_list[self.get_num_enzymes() - 2].twist = new_twist_left
+                    # self.enzyme_list[-1].twist = new_twist_left
                     new_enzyme.twist = new_twist_right
 
                 # There is one EXT at the right
@@ -498,16 +531,16 @@ class Circuit:
                 # EXT_L.............O........------------.....E......EXT_R / Twist in O has to be added to E,
                 # and EXT_L becomes a mirrored version of E, so it has the same twist as E (which index is = N-2)
                 elif self.enzyme_list[i - 1].name == 'EXT_L' and self.enzyme_list[i + 1].name != 'EXT_R':
-#                    self.enzyme_list[self.get_num_enzymes() - 2].twist += self.enzyme_list[i].twist
-#                    self.enzyme_list[0].twist = self.enzyme_list[self.get_num_enzymes() - 2].twist
+                    #                    self.enzyme_list[self.get_num_enzymes() - 2].twist += self.enzyme_list[i].twist
+                    #                    self.enzyme_list[0].twist = self.enzyme_list[self.get_num_enzymes() - 2].twist
                     self.enzyme_list[-2].twist += self.enzyme_list[i].twist
                     self.enzyme_list[0].twist = self.enzyme_list[-2].twist
 
                 # ------.......E.......O.....---------- / Twist in O is added to E
                 else:
                     self.enzyme_list[i - 1].twist += self.enzyme_list[i].twist
-#                    self.enzyme_list[0].twist = self.enzyme_list[-2].twist
-                    self.enzyme_list[0].twist = self.enzyme_list[i-1].twist
+                    #                    self.enzyme_list[0].twist = self.enzyme_list[-2].twist
+                    self.enzyme_list[0].twist = self.enzyme_list[i - 1].twist
 
             # ------------LINEAR DNA--------------------
             else:
@@ -536,7 +569,7 @@ class Circuit:
                 self.enzyme_list[0].position = 0
                 self.enzyme_list[-1].position = self.size + 1
 
-        #if self.enzyme_list[0].position > 0:
+        # if self.enzyme_list[0].position > 0:
         #    print(0)
         self.sort_enzyme_list()
         self.update_supercoiling()
@@ -562,25 +595,29 @@ class Circuit:
             if self.get_num_enzymes() > 2:  # In any other case just update the enzyme on the left
                 self.enzyme_list[effect.index - 1].twist += effect.twist_left
 
-#            print(effect.index)
-#            print(0)
-            #else:
-            #    print('We have some issues in the effects, this shouldnt be happening')
-            #    sys.exit()
+        #            print(effect.index)
+        #            print(0)
+        # else:
+        #    print('We have some issues in the effects, this should not be happening')
+        #    sys.exit()
 
         # Now we need to update the positions of the fake boundaries in circular DNA
         # --------------------------------------------------------------------------
         if self.circle and self.get_num_enzymes() > 2:
-            position_left, position_right = em.get_start_end_c(self.enzyme_list[1], self.enzyme_list[self.get_num_enzymes()-2],
+            position_left, position_right = em.get_start_end_c(self.enzyme_list[1],
+                                                               self.enzyme_list[self.get_num_enzymes() - 2],
                                                                self.size)
             self.enzyme_list[0].position = position_left
             self.enzyme_list[-1].position = position_right
-            self.enzyme_list[0].twist = self.enzyme_list[self.get_num_enzymes()-2].twist
+            self.enzyme_list[0].twist = self.enzyme_list[self.get_num_enzymes() - 2].twist
 
         # And update supercoiling - because twist was modified
         self.update_supercoiling()
 
     # Adds the output to the environment
+    # TODO: there might be a better way to realise enzymes/substances to the environment.
+    #  1.- Currently, only the concentration is summed. 2.- But will this still be the case if we add degradation?
+    #  3.- And, will there be a more automatic way of defining these output to the environment?
     def add_to_environment(self, drop_list_enzymes):
 
         for enzyme in drop_list_enzymes:
@@ -588,7 +625,7 @@ class Circuit:
             if enzyme.name == 'RNAP':
                 size = abs(enzyme.site.start - enzyme.site.end + 1)
                 output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
-                                                 k_on=0, k_off=0, k_cat=0, size=size)
+                                                 k_on=0, k_off=0, k_cat=0, size=size, site_type=None)
             else:
                 continue
 
