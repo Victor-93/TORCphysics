@@ -1,0 +1,10 @@
+type,name,site_type,concentration,k_on,k_off,k_cat,size
+topo,topoI,DNA,0.25,0.0,0.0,0.001,120.0
+topo,gyrase,DNA,0.25,0.0,0.0,0.001,120.0
+ATP,ATP,none,0.0,0.0,0.0,0.0,0.0
+NAP,lacI,lacOP,0.0,0.0,0.0,0.0,0.0
+RNAP,RNAP,gene,1.0,0.0,0.0,0.0,32.0
+mRNA,tetA,,94.0,0.0,0.0,0.0,1190.0
+mRNA,Raspberry,,80.0,0.0,0.0,0.0,781.0
+mRNA,mKalama1,,20.0,0.0,0.0,0.0,819.0
+mRNA,CDS,,8.0,0.0,0.0,0.0,191.0

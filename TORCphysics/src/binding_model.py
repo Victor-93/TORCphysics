@@ -93,7 +93,8 @@ def unbinding_model(enzymes_list):
 # Goes through enzymes in the environment (environmental_list) and search for the available sites that it recognizes.
 # If the site is available, then, according site model (and in the future also environmental model) calculate the
 # binding probability. It then returns a list of new_enzymes that will bind the DNA
-def binding_model(enzyme_list, environmental_list, dt):
+# rng - is a numpy random generator
+def binding_model(enzyme_list, environmental_list, dt, rng):
     new_enzymes = []  # here I will include the new enzymes
 
     # Go through environment
@@ -104,7 +105,7 @@ def binding_model(enzyme_list, environmental_list, dt):
             continue
 
         # If we ran out of the enzyme in the environment, then there's nothing to do
-        if environment.concentration < 0.0:
+        if environment.concentration <= 0.0:
             continue
 
         # Go through sites
@@ -171,7 +172,7 @@ def binding_model(enzyme_list, environmental_list, dt):
 
             # Decide if the enzyme will bind
             # -------------------------------------------------------------
-            urandom = np.random.uniform()  # we need a random number
+            urandom = rng.uniform()  # we need a random number
 
             if urandom <= binding_probability:  # and decide
 

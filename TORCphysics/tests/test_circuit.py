@@ -4,7 +4,7 @@ from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 import pandas as pd
 
-
+# TODO: Sort output names of tests
 class TestCircuit(TestCase):
 
     # For this test, Circuit should be able to process these non-empty input files (which hopefully are correct).
@@ -173,7 +173,8 @@ class TestCircuit(TestCase):
                 my_circuit.site_list[2].k_min = .1
 
             # Apply binding model and get list of new enzymes
-            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt)
+            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
+                                               my_circuit.rng)
 
             if len(new_enzyme_list) > 0:
                 my_circuit.site_list[2].k_min = 0.0
@@ -250,7 +251,8 @@ class TestCircuit(TestCase):
                 my_circuit.site_list[2].k_min = .0
 
             # Apply binding model and get list of new enzymes
-            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt)
+            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
+                                               my_circuit.rng)
 
 #            if len(new_enzyme_list) > 0:
 #                my_circuit.site_list[2].k_min = 0.0
@@ -337,7 +339,8 @@ class TestCircuit(TestCase):
                 my_circuit.site_list[2].k_min = .1
 
             # Apply binding model and get list of new enzymes
-            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt)
+            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
+                                               my_circuit.rng)
 
             if len(new_enzyme_list) > 0:
                 my_circuit.site_list[2].k_min = 0.0
@@ -422,7 +425,8 @@ class TestCircuit(TestCase):
                 my_circuit.site_list[2].k_min = 0.0
 
             # Apply binding model and get list of new enzymes
-            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt)
+            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
+                                               my_circuit.rng)
 
             if len(new_enzyme_list) > 0:
                 my_circuit.site_list[2].k_min = 0.0
@@ -508,7 +512,8 @@ class TestCircuit(TestCase):
                 my_circuit.site_list[2].k_min = 0.0
 
             # Apply binding model and get list of new enzymes
-            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt)
+            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
+                                               my_circuit.rng)
 
             my_circuit.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
 
@@ -596,7 +601,8 @@ class TestCircuit(TestCase):
                 my_circuit.append_sites_to_dict_step1()
 
             # Apply binding model and get list of new enzymes
-            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt)
+            new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
+                                               my_circuit.rng)
 
             my_circuit.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
 
