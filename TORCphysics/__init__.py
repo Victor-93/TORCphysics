@@ -6,3 +6,4 @@ from .src import effect_model
 from .src import binding_model
 from .src.log import Event, Log
 from .src.circuit import Circuit
+from .Analysis import analysis
