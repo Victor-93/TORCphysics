@@ -1,8 +1,4 @@
 import numpy as np
-import matplotlib.patches as mpatches
-import matplotlib.pyplot as plt
-import pandas as pd
-import params
 
 
 # TODO: Make the following functions:
@@ -35,7 +31,14 @@ def build_signal(x):
             signal[k] = 1
     return signal
 
-def build_signal_by_type(sites_df, my_type):
 
-    mask = sites_df['type'] == 'circuit'
-    n_enzymes_df = sites_df[mask]
+def build_signal_by_type(sites_df, my_type):
+    mask = sites_df['type'] == my_type
+    my_df = sites_df[mask]
+    sites_names = my_df.drop_duplicates(subset='name')['name']
+    signals = []
+    for name in sites_names:
+        mask = my_df['name'] == name
+        signal = my_df[mask]['#enzymes'].to_numpy()
+        signals.append(build_signal(signal))
+    return signals
