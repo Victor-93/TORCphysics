@@ -56,7 +56,7 @@ sites_df = pd.read_csv(csites_df, sep=',')
 dt = 1.0  # This should be extracted from the log file
 # Create Figure
 # ---------------------------------------------------------
-fig, axs = plt.subplots(3, figsize=(width, 2 * height), tight_layout=True)
+fig, axs = plt.subplots(3, figsize=(width, 3 * height), tight_layout=True)
 
 # Signals
 # ---------------------------------------------------------
@@ -87,7 +87,21 @@ for i, name in enumerate(genes_names):
 ax.plot(time, global_sigma, color='black', label='global')
 ax_params(axis=ax, xl='time (seconds)', yl='Supercoiling at site', grid=True, legend=True)
 
+# Cross-correlations
 # ---------------------------------------------------------
+ax = axs[2]
+t0 = 2000  # Time in which we assume the system has reached the steady state
+# Signals from t0 to end
+signals_t0 = []
+for signal in signals:
+    signals_t0.append(signal[t0:])
+cross, lag = an.cross_correlation_hmatrix(signals_t0, dt)
+for i, name in enumerate(genes_names):
+    if name == 'tetA':
+        continue
+    ax.plot(lag, cross[0,i,:], color=colors[i], label=name)
+ax_params(axis=ax, xl='time lag (seconds)', yl='Cross-correlation w tetA', grid=True, legend=True)
 
+ax.set_xlim(-200, 200)
 
 plt.savefig('signals.png')

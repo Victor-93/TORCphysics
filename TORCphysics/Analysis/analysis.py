@@ -51,24 +51,24 @@ def cross_correlation_hmatrix(signals, dt):
         return None, None
     frames = len(signals[0])
     n = len(signals)
-    matrix = np.zeros(n, n, frames)  # This is the hypermatrix
+    autocorr = np.zeros((n, frames))  # This is the hyper-matrix
+    matrix = np.zeros((n, n, frames))  # This is the hyper-matrix
     lag = np.arange(-frames * dt * .5, frames * dt * .5, dt)
+
+    # Let's first compute the auto-correlations
     for i, signal_i in enumerate(signals):
+        autocorr[i, :] = np.correlate(signal_i, signal_i, "same")
 
-        # Let's first compute the auto-correlations
-        matrix[i, i, :] = np.correlate(signal_i, signal_i, "same")
-
-        # Then the cross-correlation
+    # Then the cross-correlation
+    for i, signal_i in enumerate(signals):
         for j, signal_j in enumerate(signals):
-            if j == i:  # Let's skip diagonal elements since we already processed them
-                continue
             matrix[i, j, :] = np.correlate(signal_i, signal_j, 'same')
-            # And normalize if needed
             if np.max(matrix[i, j, :]) > 0:
-                matrix[i, j, :] = matrix[i, j, :] / np.sqrt(np.max(matrix[i, i, :]) * matrix[j, j, :])
+                matrix[i, j, :] = matrix[i, j, :] / np.sqrt(np.max(autocorr[i, :]) * np.max(autocorr[j, :]))
 
     return matrix, lag
 
+# TODO: continue with the binding curves
 
 # TODO: Make the following functions:
 #  In the plotting script, maybe I should load the circuit and the DFs - not this script
