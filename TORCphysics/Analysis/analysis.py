@@ -5,7 +5,7 @@ import numpy as np
 #  In the plotting script, maybe I should load the circuit and the DFs - not this script
 #  1.- Binding signals:
 #   1.1.- Build signal - Give it a site #enzyme - return signal with 0s/1s (frames)
-#   1.2.- Build signals by type - Give sites_df - Return array of (n_type,frames)
+#   1.2.- Build signals by type - Give sites_df - Return array of list with signals and list with names
 #   1.3.- Build signals of all sites_df - Give sites_df - Returns array of (n_sites, frames)
 #  2.- Compute cross-correlation hyper matrix: give signals and time t0
 #      return matrix(n_sites,n_sites,frames) - diagonal is auto-correlations and off-diagonal cross-correlations
@@ -23,7 +23,7 @@ import numpy as np
 #  7.- Superhelical distribution at site - give sigma at site, return distribution.
 
 # This function inputs x, which indicates the number of enzymes bound to the corresponding site at time k
-def build_signal(x):
+def build_1_signal(x):
     frames = len(x)
     signal = np.zeros(frames)
     for k in range(frames):
@@ -32,13 +32,29 @@ def build_signal(x):
     return signal
 
 
+# Build signals by site type. Returns list of signals and list of site names (with same order than signals).
 def build_signal_by_type(sites_df, my_type):
     mask = sites_df['type'] == my_type
     my_df = sites_df[mask]
     sites_names = my_df.drop_duplicates(subset='name')['name']
     signals = []
+    names = []
     for name in sites_names:
         mask = my_df['name'] == name
         signal = my_df[mask]['#enzymes'].to_numpy()
-        signals.append(build_signal(signal))
-    return signals
+        signals.append(build_1_signal(signal))
+        names.append(name)
+    return signals, names
+
+
+# Build all signals in input sites_df. Returns list of signals and list of names
+def build_signals(sites_df):
+    sites_names = sites_df.drop_duplicates(subset='name')['name']
+    signals = []
+    names = []
+    for name in sites_names:
+        mask = sites_df['name'] == name
+        signal = sites_df[mask]['#enzymes'].to_numpy()
+        signals.append(build_1_signal(signal))
+        names.append(name)
+    return signals, names

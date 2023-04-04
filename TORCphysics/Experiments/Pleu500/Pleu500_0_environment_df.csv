@@ -1,0 +1,5 @@
+frame,time,type,name,concentration
+0,0,topo,topoI,0.25
+0,0,topo,gyrase,0.25
+0,0,RNAP,RNAP,1.0
+0,0,NAP,lacI,0.0

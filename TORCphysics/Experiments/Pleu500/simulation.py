@@ -41,8 +41,8 @@ for ns in range(n_simulations):
                   position=my_circuit.site_list[7].start + 500,
                   size=my_circuit.environmental_list[-1].size, twist=0.0, superhelical=0.0)
 
-    #for site in my_circuit.site_list:
-    #    site.k_min = 0.0
+#    for site in my_circuit.site_list:
+#        site.k_min = 0.01
     # This is similar to the Run function... but the idea is that we will control when the bridge is formed
     for frame in range(1, frames + 1):
         # print(frame)
@@ -52,8 +52,8 @@ for ns in range(n_simulations):
             my_circuit.append_sites_to_dict_step1()
 
         # Apply binding model and get list of new enzymes
-        new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt)
-        if frame == bridge_time:
+        new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt, my_circuit.rng)
+        if frame == bridge_time:  # Manually add the lacs
             new_enzyme_list.append(Lac1)
             new_enzyme_list.append(Lac2)
         my_circuit.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
@@ -84,6 +84,13 @@ for ns in range(n_simulations):
         my_circuit.enzymes_df.to_csv(my_circuit.name + '_enzymes_df.csv', index=False, sep=',')
         my_circuit.sites_df = pd.DataFrame.from_dict(my_circuit.sites_dict_list)
         my_circuit.sites_df.to_csv(my_circuit.name + '_sites_df.csv', index=False, sep=',')
+        my_circuit.environmental_df = pd.DataFrame.from_dict(my_circuit.environmental_dict_list)
+        my_circuit.environmental_df.to_csv(my_circuit.name + '_environment_df.csv', index=False, sep=',')
 
     # Output the log of events
     my_circuit.log.log_out()
+
+    # Output csvs
+    my_circuit.enzyme_list_to_df().to_csv(my_circuit.name + '_enzymes_' + my_circuit.output_prefix + '.csv', index=False, sep=',')
+    my_circuit.site_list_to_df().to_csv(my_circuit.name + '_sites_' + my_circuit.output_prefix + '.csv', index=False, sep=',')
+    my_circuit.environmental_list_to_df().to_csv(my_circuit.name + '_environment_' + my_circuit.output_prefix + '.csv', index=False, sep=',')
