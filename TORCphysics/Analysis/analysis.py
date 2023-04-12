@@ -115,26 +115,79 @@ def topoisomerase_activity_curves_continuum(topo, sigma_min=-.2, sigma_max=.1, d
         topo_curve = np.zeros_like(sigma)
     return topo_curve, sigma
 
+
+# This function returns a very simple rate, which is calculated as the sum of events (average) in a time interval.
+# Inputs: Initiation_signal = binding signal (1 when a initiation event took place, 0 when initiation didn't happen), &
+# time, which is an array composed of the times (in general we only care about the last and initial times.
+# Outputs: rate = which is simple the sum of initiation events divided by the time interval.
+def simple_initiation_rate(initiation_signal, t0, tf):
+    rate = np.sum(initiation_signal) / (tf - t0)
+    return rate
+
+
+# Function that calculates rates from the steady state.
+# The steady state is assumed to be covered by the intervals time[ta,tb].
+# This steady state is calculated with the curve = log( sum of initiation events / time ).
+# When this curve reaches a plateau, it is assumed that the steady state was reached.
+# Inputs: sites_df (the binding signal is taken), the time array, and the ranges [ta, tb] which indicate the interval
+# of the steady state.
+# Outputs: 1.- curves, which is the curve is the logarithmic curve we use to determine the steady state.
+# 2.- rates, which are calculated from the plateau of the curve. 3.- the corresponding site names...
+def initiation_rates(sites_df, time, ta=0, tb=-1):
+    sites_names = sites_df.drop_duplicates(subset='name')['name']
+    curves = []
+    rates = []
+    names = []
+    for name in sites_names:
+        mask = sites_df['name'] == name
+        signal = sites_df[mask]['binding'].to_numpy()
+        curve, rate = calculate_steady_state_initiation_curve(signal, time, ta, tb)
+        curves.append(curve)
+        rates.append(rate)
+        names.append(name)
+    return curves, rates, names
+
+
+# Similar than the previous function, except it calculates the initiation rates by site type, e.g. genes.
 # TODO: plotea el sumini y logsumini para ver la diferencia, anotalo a tu cuaderno/latex, y luego comentalo
-def initiation_rate(signal, time, ta=0, tb=-1):
-    frames = len(signal)
-    sum_ini = np.zeros(frames)
-    log_sum_ini = np.zeros(frames)
-    for k in range(1,frames):
-        sum_ini[k] = np.sum(signal[0:k])
+def initiation_rates_by_type(sites_df, my_type, time, ta=0, tb=-1):
+    mask = sites_df['type'] == my_type
+    my_df = sites_df[mask]
+    sites_names = my_df.drop_duplicates(subset='name')['name']
+    curves = []
+    rates = []
+    names = []
+    for name in sites_names:
+        mask = my_df['name'] == name
+        signal = my_df[mask]['binding'].to_numpy()
+        curve, rate = calculate_steady_state_initiation_curve(signal, time, ta, tb)
+        curves.append(curve)
+        rates.append(rate)
+        names.append(name)
+    return curves, rates, names
+
+
+# This function is the one that actually calculates the steady state initiation curve.
+# Inputs: 1.- y=binding signal. 2.- time array. 3.- intervals [ta,tb] in which the plateau of the steady state is
+# calculated
+# Outputs: 1.- curve = steady state curve. 2.- The corresponding rate calculated from the curve
+def calculate_steady_state_initiation_curve(y, time, ta, tb):
+    frames = len(y)
+    sum_ini = np.zeros(frames)  # this is the sum of the initiation events
+    log_sum_ini = np.zeros(frames)  # And the logarithm of these sum of events divided by the time.
+    for k in range(1, frames):
+        sum_ini[k] = np.sum(y[0:k])
 
     if np.sum(sum_ini) <= 0.0:
-
-        rate = 0.0000001
+        rate = 0.0000000001
     else:
-        log_sum_ini = np.log( sum_ini/time )
-        plateau = np.mean( log_sum_ini[ta:tb] )
+        log_sum_ini = np.log(sum_ini / time)
+        plateau = np.mean(log_sum_ini[ta:tb])
         rate = np.exp(plateau)
-    curve = sum_ini
+    curve = log_sum_ini
     return curve, rate
 
-
-# TODO: Rates are next!!!
+# TODO: Relative initiation rate is next, what is that?
 
 # TODO: Make the following functions:
 #  In the plotting script, maybe I should load the circuit and the DFs - not this script
