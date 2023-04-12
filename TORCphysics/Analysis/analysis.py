@@ -1,4 +1,6 @@
 import numpy as np
+from TORCphysics import binding_model as bm
+from TORCphysics import effect_model as em
 
 
 # This function inputs x, which indicates the number of enzymes bound to the corresponding site at time k
@@ -68,7 +70,71 @@ def cross_correlation_hmatrix(signals, dt):
 
     return matrix, lag
 
-# TODO: continue with the binding curves
+
+# It computes the activity curves of site as a function of the supercoiling density.
+# Input: 1.- Site. Optionals= sigma_min, sigma_max and delta_sigma
+# Output: 1.- Modulated rates. 2.- Supercoiling density.
+def site_activity_curves(site, sigma_min=-.2, sigma_max=.1, delta_sigma=.001):
+    sigma = np.arange(sigma_min, sigma_max, delta_sigma)
+
+    # Simple poisson process (constant binding)
+    if site.site_model == 'poisson' or site.site_model == 'Poisson':
+        rate = site.k_min * np.ones_like(sigma)
+    # Sam's Meyer model
+    elif site.site_model == 'sam' or site.site_model == 'Sam':
+        rate = bm.promoter_curve_Meyer(site.k_min, sigma)
+    # Max-min model according oparams measured with SIDD
+    elif site.site_model == 'maxmin' or site.site_model == 'Maxmin':
+        rate = bm.promoter_curve_opening_E_maxmin(site.k_min, site.k_max, sigma, *site.oparams)
+    # Inverted max-min model (where it is positive supercoiling sensitive)
+    elif site.site_model == 'maxmin_I' or site.site_model == 'Maxmin_I':
+        rate = bm.promoter_curve_opening_E_maxmin_I(site.k_min, site.k_max, sigma, *site.oparams)
+    # Similar to max-min but with the effective energy
+    elif site.site_model == 'effE' or site.site_model == 'EffE':
+        rate = bm.promoter_curve_opening_E(site.k_min, sigma, sigma0=0, *site.oparams)
+    elif site.site_model == 'none' or site.site_model == 'None' or site.site_model is None:
+        print('This site ', site.name, ' does not have a binding model')
+        rate = site.k_min * np.ones_like(sigma)
+    else:  # If there's no model, there's no binding
+        print('This site model ', site.site_model, ' cannot be recognized')
+        rate = site.k_min * np.ones_like(sigma)
+    return rate, sigma
+
+
+# It computes the activity curves of topoisomerase activity with a continuum model.
+# Input: 1.- topoisomerase. Optionals= sigma_min, sigma_max, delta_sigma, dt
+# Output: 1.- Supercoiling density removed by time-step dt (topo_curve)
+def topoisomerase_activity_curves_continuum(topo, sigma_min=-.2, sigma_max=.1, delta_sigma=.001, dt=1):
+    sigma = np.arange(sigma_min, sigma_max, delta_sigma)
+    if topo.name == 'topoI':
+        topo_curve = em.topo1_continuum(sigma, topo.concentration, topo.k_cat, dt)
+    elif topo.name == 'gyrase':
+        topo_curve = em.gyrase_continuum(sigma, topo.concentration, topo.k_cat, dt)
+    else:
+        print('Could not recognize name of topoisomerase')
+        topo_curve = np.zeros_like(sigma)
+    return topo_curve, sigma
+
+# TODO: plotea el sumini y logsumini para ver la diferencia, anotalo a tu cuaderno/latex, y luego comentalo
+def initiation_rate(signal, time, ta=0, tb=-1):
+    frames = len(signal)
+    sum_ini = np.zeros(frames)
+    log_sum_ini = np.zeros(frames)
+    for k in range(1,frames):
+        sum_ini[k] = np.sum(signal[0:k])
+
+    if np.sum(sum_ini) <= 0.0:
+
+        rate = 0.0000001
+    else:
+        log_sum_ini = np.log( sum_ini/time )
+        plateau = np.mean( log_sum_ini[ta:tb] )
+        rate = np.exp(plateau)
+    curve = sum_ini
+    return curve, rate
+
+
+# TODO: Rates are next!!!
 
 # TODO: Make the following functions:
 #  In the plotting script, maybe I should load the circuit and the DFs - not this script
