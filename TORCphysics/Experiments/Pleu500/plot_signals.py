@@ -1,3 +1,4 @@
+from TORCphysics import Circuit
 from TORCphysics import analysis as an
 import pandas as pd
 import numpy as np
@@ -16,11 +17,28 @@ csites_df = 'Pleu500_0_sites_df.csv'
 cenzymes_df = 'Pleu500_0_enzymes_df.csv'
 cenvironment_df = 'Pleu500_0_environment_df.csv'
 
-sites_csv = 'Pleu500_0_sites_output.csv'
-environment_csv = 'Pleu500_0_environment_output.csv'
-
 log_file = 'Pleu500_0.log'
 
+# circuit_csv = 'circuit.csv'
+# sites_csv = 'Pleu500_0_sites_output.csv'
+# enzymes_csv = 'Pleu500_0_enzymes_output.csv'
+# environment_csv = 'Pleu500_0_environment_output.csv'
+circuit_filename = 'circuit.csv'
+sites_filename = 'sites.csv'
+enzymes_filename = 'enzymes.csv'
+environment_filename = 'environment.csv'
+output_prefix = 'output'
+frames = 10000
+series = True
+continuation = False
+tm = 'continuum'
+mm = 'uniform'
+dt = 1.0
+n_simulations = 1
+bridge_time = 40000
+
+my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                     output_prefix, frames, series, continuation, dt, tm, mm)
 # Figure initial conditions
 # ---------------------------------------------------------
 width = 8
@@ -52,11 +70,11 @@ def ax_params(axis, xl, yl, grid, legend):
 # Load inputs
 # ---------------------------------------------------------
 sites_df = pd.read_csv(csites_df, sep=',')
-#enzymes_df = pd.read_csv(cenzymes_df, sep=',')
+# enzymes_df = pd.read_csv(cenzymes_df, sep=',')
 dt = 1.0  # This should be extracted from the log file
 # Create Figure
 # ---------------------------------------------------------
-fig, axs = plt.subplots(3, figsize=(width, 3 * height), tight_layout=True)
+fig, axs = plt.subplots(5, figsize=(width, 5 * height), tight_layout=True)
 
 # Signals
 # ---------------------------------------------------------
@@ -99,9 +117,37 @@ cross, lag = an.cross_correlation_hmatrix(signals_t0, dt)
 for i, name in enumerate(genes_names):
     if name == 'tetA':
         continue
-    ax.plot(lag, cross[0,i,:], color=colors[i], label=name)
+    ax.plot(lag, cross[0, i, :], color=colors[i], label=name)
 ax_params(axis=ax, xl='time lag (seconds)', yl='Cross-correlation w tetA', grid=True, legend=True)
 
 ax.set_xlim(-200, 200)
+
+# Sites rate curves - Let's plot the rates modulated by supercoiling
+# ---------------------------------------------------------
+ax = axs[3]
+i = -1
+for site in my_circuit.site_list:
+    if site.site_type == 'gene':
+        i += 1
+        rate, x = an.site_activity_curves(site)
+        ax.plot(x, rate, color=colors[i], label=site.name)
+
+ax_params(axis=ax, xl=r'\sigma', yl=r'Initiation rate ($s^{-1}$)', grid=True, legend=True)
+
+# Topoisomerase activity curves - Let's plot the rates modulated by supercoiling
+# ---------------------------------------------------------
+ax = axs[4]
+i = -1
+for environmental in my_circuit.environmental_list:
+    if environmental.enzyme_type == 'topo':
+        i += 1
+
+        topo_curve, x = an.topoisomerase_activity_curves_continuum(environmental, dt=dt)
+        ax.plot(x, topo_curve, color=colors[i], label=environmental.name)
+        if i == 0:
+            topo_sum = np.zeros_like(topo_curve)
+        topo_sum += topo_curve
+ax.plot(x, topo_sum, color='black', label='sum')
+ax_params(axis=ax, xl=r'\sigma', yl=r'$\sigma$ removed per timestep', grid=True, legend=True)
 
 plt.savefig('signals.png')
