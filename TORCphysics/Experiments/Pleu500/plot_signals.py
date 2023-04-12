@@ -74,7 +74,7 @@ sites_df = pd.read_csv(csites_df, sep=',')
 dt = 1.0  # This should be extracted from the log file
 # Create Figure
 # ---------------------------------------------------------
-fig, axs = plt.subplots(5, figsize=(width, 5 * height), tight_layout=True)
+fig, axs = plt.subplots(6, figsize=(width, 6 * height), tight_layout=True)
 
 # Signals
 # ---------------------------------------------------------
@@ -149,5 +149,15 @@ for environmental in my_circuit.environmental_list:
         topo_sum += topo_curve
 ax.plot(x, topo_sum, color='black', label='sum')
 ax_params(axis=ax, xl=r'\sigma', yl=r'$\sigma$ removed per timestep', grid=True, legend=True)
+
+# Initiation rate
+# ---------------------------------------------------------
+ax = axs[5]
+curves, rates, labels = an.initiation_rate_by_type(sites_df, 'gene', time, ta=5000, tb=-1)
+
+for i, curve in enumerate(curves):
+    ax.plot(time, curve, color=colors[i], label=names[i], alpha=0.5)
+    print(rates[i])
+ax_params(axis=ax, xl='time (seconds)', yl='curve', grid=True, legend=True)
 
 plt.savefig('signals.png')
