@@ -7,8 +7,8 @@ from TORCphysics import params, Enzyme, Environment
 # DESCRIPTION
 # ---------------------------------------------------------------------------------------------------------------------
 # This module contains the mathematical functions that compose the statistical part of my model
-# It comprasis the necessary equations required for simulating the stochastic binding, and the
-# topoisomerases/gyrases activities
+# It comprises the necessary equations required for simulating the stochastic binding, and the
+# topoisomerases/gyrase activities
 
 # All parameters are already in the params module, but I prefer to have them here with more simple names:
 v0 = params.v0
@@ -27,8 +27,14 @@ SM_m = params.SM_m
 # EFFECTIVE ENERGY PROMOTER CURVE (inspired by Houdaigi NAR 2019)
 EE_alpha = params.EE_alpha
 
+# Topoisomerase activity parameters
+topo_w = params.topo_w
+topo_t = params.topo_t
+gyra_w = params.gyra_w
+gyra_t = params.gyra_t
 
-#class Add_enzyme:
+
+# class Add_enzyme:
 #    # For handling the data in the data frames, it is more useful to create a class that contains information
 #    # regarding the twist and superhelical density at the site prior binding.#
 
@@ -212,15 +218,15 @@ def check_site_availability(site, enzyme_list, size):
     range_before = [enzyme_before.position, enzyme_before.position + enzyme_before.size]
     range_after = [enzyme_after.position, enzyme_after.position + enzyme_after.size]
     if site.direction > 0:
-        my_range = [site.start-size, site.start]
-#        my_range = [site.start, site.start + size]
+        my_range = [site.start - size, site.start]
+    #        my_range = [site.start, site.start + size]
     elif site.direction <= 0:
         my_range = [site.start, site.start + size]
     else:
         print('Error in checking site availability. Site=', site.site_type, site.name)
         sys.exit()
         my_range = [site.start, site.start + size]
-#        my_range = [site.start, site.start - size]
+    #        my_range = [site.start, site.start - size]
 
     # If any of them intersect
     if (set(range_before) & set(my_range)) or (set(range_after) & set(my_range)):
@@ -321,3 +327,27 @@ def promoter_curve_opening_E_maxmin_I(k_min, k_max, sigma, *opening_p):
     rate = k_min * np.exp(a / b)
     return rate
 
+
+# TODO: Define binding model for topo I and gyrase.
+#  AQUI ME QUEDE
+def topoI_binding(basal_rate, concentration, sigma):
+    a = concentration * basal_rate
+    b = 1 + np.exp((sigma - topo_t) / topo_w)
+#    rate = a * np.exp(1 / b)
+    rate = a/b# * np.exp(1 / b)
+#    rate = 1/b
+#    rate = b
+    #    try:
+    #        b = 1 + np.exp((sigma - topo_t) / topo_w)
+    #        rate = a / b
+    #    except OverflowError as oe:
+    #        sigma_removed = 0.0
+    return rate
+
+
+def gyrase_binding(basal_rate, concentration, sigma):
+    a = concentration * basal_rate
+    b = 1 + np.exp(-(sigma - gyra_t) / gyra_w)
+#    rate = a * np.exp(1 / b)
+    rate = a/b
+    return rate

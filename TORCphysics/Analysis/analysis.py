@@ -116,6 +116,19 @@ def topoisomerase_activity_curves_continuum(topo, sigma_min=-.2, sigma_max=.1, d
     return topo_curve, sigma
 
 
+# TODO: Write what this function does
+def topoisomerase_activity_curves_stochastic(topo, sigma_min=-.2, sigma_max=.1, delta_sigma=.001, dt=1):
+    sigma = np.arange(sigma_min, sigma_max, delta_sigma)
+    if topo.name == 'topoI':
+        topo_curve = bm.topoI_binding(topo.k_on, topo.concentration, sigma)
+    elif topo.name == 'gyrase':
+        topo_curve = bm.gyrase_binding(topo.k_on, topo.concentration, sigma)
+    else:
+        print('Could not recognize name of topoisomerase')
+        topo_curve = np.zeros_like(sigma)
+    return topo_curve, sigma
+
+
 # This function returns a very simple rate, which is calculated as the sum of events (average) in a time interval.
 # Inputs: Initiation_signal = binding signal (1 when a initiation event took place, 0 when initiation didn't happen), &
 # time, which is an array composed of the times (in general we only care about the last and initial times.
