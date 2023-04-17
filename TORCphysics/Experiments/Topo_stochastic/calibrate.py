@@ -1,0 +1,1 @@
+# TODO: Run a simulation with the continous model and many with the stochastic to calibrate the kcat.

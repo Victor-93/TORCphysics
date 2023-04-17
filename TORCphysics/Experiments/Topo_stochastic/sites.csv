@@ -1,0 +1,2 @@
+type,name,start,end,k_min,k_max,model,oparams
+gene,gene1,2000,3000,0.000,0.000,poisson,none
