@@ -40,9 +40,22 @@ class Circuit:
         self.rng = np.random.default_rng(self.seed)
 
         # -----------------------------------------------
-        # We add another SIDD which is the one we will link topos binding with DNA
-        self.site_list.append(Site(s_type='DNA', name='DNA', start=1, end=self.size, k_min=0, k_max=0, s_model=None,
-                                   oparams=None))
+        # We add new DNA sites which is the ones that we will link topos binding
+        # Note: In the future there might be cases in which new enzymes will be added to the environment, so maybe,
+        # these new sites will need to be created
+        if topoisomerase_model == 'stochastic':
+            topo_list = [environment for environment in self.environmental_list
+                         if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
+            for topo in topo_list:
+                # The idea is that the topos will recognize these specific sites.
+                # These sites will be created dynamically, and will have different names :0,1,2,3,...
+                # I will have to ignore this first site in specfic, because this one will be the overall, and is the
+                # one that is output in the sites_df.csv
+                self.site_list.append(
+                    Site(s_type='DNA_' + topo.name, name='DNA', start=1, end=self.size, k_min=0, k_max=0,
+                         s_model='stochastic_topo_binding', oparams=None))
+                topo.site_type = 'DNA_' + topo.name
+
         # Sort list of enzymes and sites by position/start
         self.sort_lists()
         # Distribute twist/supercoiling
@@ -79,10 +92,15 @@ class Circuit:
             self.time = frame * self.dt
             if self.series:
                 self.append_sites_to_dict_step1()
+
+            # If we are modeling the topoisomerase binding as a stochastic process, we need to define the sites.
+            if self.topoisomerase_model == 'stochastic':
+                self.define_topoisomerase_binding_sites()
             # BINDING
             # --------------------------------------------------------------
             # Apply binding model and get list of new enzymes
-            new_enzyme_list = bm.binding_model(self.enzyme_list, self.environmental_list, self.dt, self.rng)
+            new_enzyme_list = bm.binding_model(self.enzyme_list, self.environmental_list, self.dt, self.rng,
+                                               self.topoisomerase_model)
             # These new enzymes are lacking twist and superhelical, we need to fix them and actually add them
             # to the enzyme_list
             # But before, add the binding events to the log  (it's easier to do it first)
@@ -130,13 +148,14 @@ class Circuit:
         self.log.log_out()
 
         # Output csvs
-        self.enzyme_list_to_df().to_csv(self.name + '_enzymes_'+self.output_prefix+'.csv', index=False, sep=',')
-        self.site_list_to_df().to_csv(self.name + '_sites_'+self.output_prefix+'.csv', index=False, sep=',')
-        self.environmental_list_to_df().to_csv(self.name + '_environment_'+self.output_prefix+'.csv', index=False, sep=',')
+        self.enzyme_list_to_df().to_csv(self.name + '_enzymes_' + self.output_prefix + '.csv', index=False, sep=',')
+        self.site_list_to_df().to_csv(self.name + '_sites_' + self.output_prefix + '.csv', index=False, sep=',')
+        self.environmental_list_to_df().to_csv(self.name + '_environment_' + self.output_prefix + '.csv', index=False,
+                                               sep=',')
 
     # Returns list of enzymes in the form of dataframe. This function is with the intention of outputting the system
     def enzyme_list_to_df(self):
-        enzyme_aux = [] #This will be a list of dicts
+        enzyme_aux = []  # This will be a list of dicts
         for enzyme in self.enzyme_list:
             d = {'type': enzyme.enzyme_type, 'name': enzyme.name, 'site': enzyme.site.name,
                  'position': enzyme.position, 'direction': enzyme.direction, 'size': enzyme.size, 'twist': enzyme.twist,
@@ -147,9 +166,8 @@ class Circuit:
 
     # Returns environmental list in the form of dataframe. This function is with the intention of outputting the system
     def environmental_list_to_df(self):
-        environmental_aux = [] #This will be a list of dicts
+        environmental_aux = []  # This will be a list of dicts
         for environmental in self.environmental_list:
-
             d = {'type': environmental.enzyme_type, 'name': environmental.name,
                  'site_type': environmental.site_type, 'concentration': environmental.concentration,
                  'k_on': environmental.k_on, 'k_off': environmental.k_off, 'k_cat': environmental.k_cat,
@@ -160,9 +178,9 @@ class Circuit:
 
     # Returns list of sites in the form of dataframe. This function is with the intention of outputting the system
     def site_list_to_df(self):
-        site_aux = [] #This will be a list of dicts
+        site_aux = []  # This will be a list of dicts
         for site in self.site_list:
-            d = {'type': site.site_type, 'name': site.name,'start': site.start, 'end': site.end, 'k_min': site.k_min,
+            d = {'type': site.site_type, 'name': site.name, 'start': site.start, 'end': site.end, 'k_min': site.k_min,
                  'k_max': site.k_max, 'model': site.site_model, 'oparams': site.oparams}
             site_aux.append(d)
         my_df = pd.DataFrame.from_dict(site_aux)
@@ -322,9 +340,9 @@ class Circuit:
             # Notice that we don't specify the end
             # TODO: the site needs to be defined first
             extra_left = Enzyme(e_type='EXT', name='EXT_L', site=self.site_match('EXT'), position=position_left,
-                                size=0, twist=0, superhelical=self.superhelical)
+                                size=0, k_cat=0, k_off=0, twist=0, superhelical=self.superhelical)
             extra_right = Enzyme(e_type='EXT', name='EXT_R', site=self.site_match('EXT'), position=position_right,
-                                 size=0, twist=0, superhelical=self.superhelical)
+                                 size=0, k_cat=0, k_off=0, twist=0, superhelical=self.superhelical)
 
             self.enzyme_list.append(extra_left)
             self.enzyme_list.append(extra_right)
@@ -456,9 +474,9 @@ class Circuit:
             # new_twist_left = region_twist * ((new_length_left + 0.5 * new_enzyme.size) / region_length)
             # new_twist_right = region_twist * ((new_length_right + 0.5 * new_enzyme.size) / region_length)
             new_twist_left = region_superhelical * region_length * new_length_left * params.w0 / (
-                        new_length_left + new_length_right)
+                    new_length_left + new_length_right)
             new_twist_right = region_superhelical * region_length * new_length_right * params.w0 / (
-                        new_length_left + new_length_right)
+                    new_length_left + new_length_right)
             # new_superhelical_left = new_twist_left / (params.w0*new_length_left)
             # new_superhelical_right = new_twist_right / (params.w0 * new_length_right)
 
@@ -635,3 +653,30 @@ class Circuit:
                 environment[0].concentration += 1  # Maybe is not concentration in this case...
             else:
                 self.environmental_list.append(output_environment)
+
+    # This function define topoisomerase binding sites when using the stochastic binding model.
+    # The way it works is that, it goes through the topoisomerases in the environment, then checks the empty space
+    # between the enzymes O_____________________________O, then divides these empty spaces into binding sites in which
+    # the topoisomerases would fit...
+    def define_topoisomerase_binding_sites(self):
+        topo_list = [environment for environment in self.environmental_list
+                     if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
+        for topo in topo_list:
+            s = 0
+            for i, enzyme in enumerate(self.enzyme_list[:-1]):
+                next_enzyme = self.enzyme_list[i + 1]
+                length = em.calculate_length(enzyme, next_enzyme)
+                n_sites = int(length / topo.size)
+                for n in range(n_sites):  # The 1+n is to leave some space 1 empty space between enzymes
+                    start = enzyme.position + enzyme.size + topo.size * n + (1 + n)
+                    end = 1 + enzyme.position + enzyme.size + topo.size * (1 + n)
+                    if end > next_enzyme.position:  # Little break to avoid the overlapping of enzymes
+                        continue
+                    topo_site = Site(s_type='DNA_' + topo.name, name=str(s), start=start, end=end, k_min=0, k_max=0,
+                                     s_model='stochastic_' + topo.name, oparams=None)
+                    self.site_list.append(topo_site)
+
+                    s = s + 1
+                    topo.site_list.append(topo_site)
+        self.sort_site_list()
+        return
