@@ -64,6 +64,10 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
             #                                 k_on=0, k_off=0, k_cat=0, size=size)
         #            output_enzyme = Enzyme(e_type='mRNA', name=enzyme.site.name, site=None, position=None, size=size,
         #                                   twist=0, superhelical=0)
+        elif enzyme.enzyme_type == 'topo':
+            topo = [environment for environment in environmental_list
+                    if environment.name == enzyme.name][0]
+            position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
         else:
             continue
 
@@ -135,6 +139,16 @@ def gyrase_continuum(sigma, gyra_c, gyra_k, dt):
     return sigma_removed
 
 
+# TODO: I think the twist injection is more complicated than I thought, I need to think it carefully.
+def topoisomerase_supercoiling_injection(z, dt):
+    position = 0.0
+#    if z.name == 'topoI':
+#        twist_left =
+
+
+    return position, twist_left, twist_right #
+
+# TODO: Add stoping mechanism. If there's an enzyme ahead, it might stay in place...
 # Returns new RNAP position, and the twist it injected on the left and right
 def rnap_uniform_motion(z, dt):
     # Object moves: simple uniform motion

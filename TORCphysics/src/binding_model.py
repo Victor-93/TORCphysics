@@ -100,15 +100,15 @@ def unbinding_model(enzymes_list):
 # If the site is available, then, according site model (and in the future also environmental model) calculate the
 # binding probability. It then returns a list of new_enzymes that will bind the DNA
 # rng - is a numpy random generator
-def binding_model(enzyme_list, environmental_list, dt, rng):
+def binding_model(enzyme_list, environmental_list, dt, rng, topoisomerase_model):
     new_enzymes = []  # here I will include the new enzymes
 
     # Go through environment
     for i, environment in enumerate(environmental_list):
 
         # For now, only RNAPs/genes
-        if environment.enzyme_type != 'RNAP':
-            continue
+        # if environment.enzyme_type != 'RNAP':
+        #    continue
 
         # If we ran out of the enzyme in the environment, then there's nothing to do
         if environment.concentration <= 0.0:
@@ -127,8 +127,8 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
             # TODO: Generalize it for other enzymes like lacs, and topos
             # For now, only genes!
             # -----------------------------------------------------------
-            if site.site_type != 'gene':
-                continue
+            # if site.site_type != 'gene':
+            #    continue
 
             # Get superhelical density at site
             enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
@@ -167,6 +167,12 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
                 binding_probability = P_binding_Nonh_Poisson(rate, dt)
             elif site.site_model == 'none' or site.site_model == 'None' or site.site_model == None:
                 continue
+            elif site.site_model == 'stochastic_topoI':
+                rate = topoI_binding(environment.k_on, environment.concentration, site_superhelical)
+                binding_probability = P_binding_Nonh_Poisson(rate, dt)
+            elif site.site_model == 'stochastic_gyrase':
+                rate = gyrase_binding(environment.k_on, environment.concentration, site_superhelical)
+                binding_probability = P_binding_Nonh_Poisson(rate, dt)
             else:  # If there's no model, there's no binding
                 continue
 
@@ -199,7 +205,8 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
                 # Create enzyme, and note that it is missing twist and the superhelical density.
                 # I think it's better to fix it in the circuit module
                 enzyme = Enzyme(e_type=environment.enzyme_type, name=environment.name, site=site, position=position,
-                                size=environment.size, twist=0.0, superhelical=0.0)
+                                size=environment.size, k_cat=environment.k_cat, k_off=environment.k_off,
+                                twist=0.0, superhelical=0.0)
 
                 new_enzymes.append(enzyme)
 
