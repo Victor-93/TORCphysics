@@ -153,7 +153,7 @@ ax_params(axis=ax, xl=r'\sigma', yl=r'$\sigma$ removed per timestep', grid=True,
 # Initiation rate
 # ---------------------------------------------------------
 ax = axs[5]
-curves, rates, labels = an.initiation_rate_by_type(sites_df, 'gene', time, ta=5000, tb=-1)
+curves, rates, labels = an.initiation_rates_by_type(sites_df, 'gene', time, ta=5000, tb=-1)
 
 for i, curve in enumerate(curves):
     ax.plot(time, curve, color=colors[i], label=names[i], alpha=0.5)
