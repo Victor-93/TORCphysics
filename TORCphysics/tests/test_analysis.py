@@ -1,6 +1,7 @@
 from unittest import TestCase
 from TORCphysics import Circuit
-from TORCphysics import analysis as an
+from TORCphysics.src import analysis as an
+
 
 class TestAnalysis(TestCase):
 

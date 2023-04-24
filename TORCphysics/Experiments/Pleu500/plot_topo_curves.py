@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from TORCphysics import EnvironmentFactory
 from TORCphysics import effect_model as em
-from TORCphysics import analysis as an
+from TORCphysics.src import analysis as an
 
 width = 6
 height = 4

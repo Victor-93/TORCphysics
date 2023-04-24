@@ -89,10 +89,12 @@ class Circuit:
         self.append_environmental_to_dict()
 
     # This one runs the simulation
+    # TODO: Think a way of making your run() function run for additional number of frames. This will make the code more
+    #  versatile and will allow you create experiments where you add stuff manually
     def run(self):
 
         for frame in range(1, self.frames + 1):
-            self.frame = frame
+            self.frame += 1
             self.time = frame * self.dt
             if self.series:
                 self.append_sites_to_dict_step1()
@@ -148,6 +150,8 @@ class Circuit:
             self.environmental_df.to_csv(self.name + '_environment_df.csv', index=False, sep=',')
 
         # Output the log of events
+        self.log.final_twist = self.twist
+        self.log.final_superhelical = self.superhelical
         self.log.log_out()
 
         # Output csvs

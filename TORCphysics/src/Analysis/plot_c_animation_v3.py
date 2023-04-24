@@ -9,8 +9,6 @@ from datetime import datetime
 import statistical_model as sm
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.patheffects as pe
-import sys
-
 
 #--------------------------------------------------------------------------
 #DESCRIPTION
