@@ -692,7 +692,7 @@ class Circuit:
 
         for environment in environment_list:
             # No point in defining topoisomerase binding sites if it's a continuum model
-            if environment.site_type == 'topo' and self.topoisomerase_model == 'continuum':
+            if environment.enzyme_type == 'topo' and self.topoisomerase_model == 'continuum':
                 continue
             n_sites = int(self.size / environment.size)
             s = 0
