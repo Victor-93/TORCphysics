@@ -40,6 +40,7 @@ class Circuit:
         self.rng = np.random.default_rng(self.seed)
 
         # -----------------------------------------------
+        # TODO: I think it is better idea to partition the DNA into topoisomerase binding sites since the beginning.
         # We add new DNA sites which is the ones that we will link topos binding
         # Note: In the future there might be cases in which new enzymes will be added to the environment, so maybe,
         # these new sites will need to be created
@@ -54,7 +55,10 @@ class Circuit:
                 self.site_list.append(
                     Site(s_type='DNA_' + topo.name, name='DNA', start=1, end=self.size, k_min=0, k_max=0,
                          s_model='stochastic_topo_binding', oparams=None))
-                topo.site_type = 'DNA_' + topo.name
+                #topo.site_type = 'DNA_' + topo.name
+
+        # Define bare DNA binding sites for bare DNA binding enzymes
+        self.define_bare_DNA_binding_sites()
 
         # Sort list of enzymes and sites by position/start
         self.sort_lists()
@@ -94,13 +98,12 @@ class Circuit:
                 self.append_sites_to_dict_step1()
 
             # If we are modeling the topoisomerase binding as a stochastic process, we need to define the sites.
-            if self.topoisomerase_model == 'stochastic':
-                self.define_topoisomerase_binding_sites()
+            #if self.topoisomerase_model == 'stochastic':
+            #    self.define_topoisomerase_binding_sites()
             # BINDING
             # --------------------------------------------------------------
             # Apply binding model and get list of new enzymes
-            new_enzyme_list = bm.binding_model(self.enzyme_list, self.environmental_list, self.dt, self.rng,
-                                               self.topoisomerase_model)
+            new_enzyme_list = bm.binding_model(self.enzyme_list, self.environmental_list, self.dt, self.rng)
             # These new enzymes are lacking twist and superhelical, we need to fix them and actually add them
             # to the enzyme_list
             # But before, add the binding events to the log  (it's easier to do it first)
@@ -115,7 +118,7 @@ class Circuit:
 
             # UNBINDING
             # --------------------------------------------------------------
-            drop_list_index, drop_list_enzyme = bm.unbinding_model(self.enzyme_list)
+            drop_list_index, drop_list_enzyme = bm.unbinding_model(self.enzyme_list, self.dt, self.rng)
             self.drop_enzymes(drop_list_index)
             self.add_to_environment(drop_list_enzyme)
             #            self.add_unbinding_events_to_log(drop_list)
@@ -678,5 +681,35 @@ class Circuit:
 
                     s = s + 1
                     topo.site_list.append(topo_site)
+        self.sort_site_list()
+        return
+
+    # This function defines the binding sites of enzymes that recognize bare DNA, that means just DNA.
+    # It partitions the DNA in N binding sites of size enzyme.size
+    def define_bare_DNA_binding_sites(self):
+        environment_list = [environment for environment in self.environmental_list
+                            if environment.site_type == 'DNA']
+
+        for environment in environment_list:
+            # No point in defining topoisomerase binding sites if it's a continuum model
+            if environment.site_type == 'topo' and self.topoisomerase_model == 'continuum':
+                continue
+            n_sites = int(self.size / environment.size)
+            s = 0
+            for n in range(n_sites):
+                start = 1 + environment.size * n
+                end = environment.size * (1 + n)
+                if end > self.size:  # Little break to avoid making it bigger than the actual plasmid
+                    continue
+                environment_site = Site(s_type='DNA_' + environment.name, name=str(s), start=start, end=end, k_min=0,
+                                        k_max=0, s_model='stochastic_' + environment.name, oparams=None)
+                self.site_list.append(environment_site)
+
+                s = s + 1
+                environment.site_list.append(environment_site)
+
+            # The next line makes the environmental recognize the specific binding site
+            environment.site_type = 'DNA_' + environment.name
+
         self.sort_site_list()
         return

@@ -64,7 +64,7 @@ gyra_t = params.gyra_t
 
 # Goes through the enzymes in enzymes list and according to their unbinding condition unbind them.
 # Returns a list of enzyme indexes that will unbind, the enzyme that unbinds
-def unbinding_model(enzymes_list):
+def unbinding_model(enzymes_list, dt, rng):
     drop_list_index = []  # This list will have the indices of the enzymes that will unbind, and the enzyme
     drop_list_enzyme = []  # And a list with the enzymes
     for i, enzyme in enumerate(enzymes_list):
@@ -84,10 +84,16 @@ def unbinding_model(enzymes_list):
             if (enzyme.direction == 1 and enzyme.end - enzyme.position <= 0) or \
                     (enzyme.direction == -1 and enzyme.end - enzyme.position >= 0):
                 unbind = True
+        # the unbinding condition is another Poisson process so we can use the P_binding_Poisson function
+        elif enzyme.enzyme_type == 'topo' or enzyme.enzyme_type == 'topoisomerase':
+            unbinding_probability = P_binding_Poisson(enzyme.k_off, dt)
+            urandom = rng.uniform()  # we need a random number
+            if urandom <= unbinding_probability:  # and decide
+                unbind = True
         else:
             continue
 
-        # Now add the to the drop_list if the enzyme will unbind
+        # Now add it to the drop_list if the enzyme will unbind
         # ------------------------------------------------------------------
         if unbind:
             drop_list_index.append(i)
@@ -100,7 +106,7 @@ def unbinding_model(enzymes_list):
 # If the site is available, then, according site model (and in the future also environmental model) calculate the
 # binding probability. It then returns a list of new_enzymes that will bind the DNA
 # rng - is a numpy random generator
-def binding_model(enzyme_list, environmental_list, dt, rng, topoisomerase_model):
+def binding_model(enzyme_list, environmental_list, dt, rng):
     new_enzymes = []  # here I will include the new enzymes
 
     # Go through environment
@@ -209,6 +215,10 @@ def binding_model(enzyme_list, environmental_list, dt, rng, topoisomerase_model)
                                 twist=0.0, superhelical=0.0)
 
                 new_enzymes.append(enzyme)
+
+                # TODO: We still need to check if the new enzymes are not overlapping. If more than 1 enzyme
+                #  passed the probability test and are binding the same overlapping region, we need to flip a coin to
+                #  check which one will be binding
 
     return new_enzymes
 

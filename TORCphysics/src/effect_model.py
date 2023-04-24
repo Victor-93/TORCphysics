@@ -142,11 +142,9 @@ def gyrase_continuum(sigma, gyra_c, gyra_k, dt):
 # TODO: I think the twist injection is more complicated than I thought, I need to think it carefully.
 def topoisomerase_supercoiling_injection(z, dt):
     position = 0.0
-#    if z.name == 'topoI':
-#        twist_left =
-
-
-    return position, twist_left, twist_right #
+    twist_left = 0.0
+    twist_right = 0.0
+    return position, twist_left, twist_right
 
 # TODO: Add stoping mechanism. If there's an enzyme ahead, it might stay in place...
 # Returns new RNAP position, and the twist it injected on the left and right
