@@ -7,7 +7,7 @@ class Environment:
         self.enzyme_type = e_type
         self.name = name
         self.site_list = site_list  # It recognizes a list of sites, rather than a specific site
-        self.site_type = site_type # We need to remember the type
+        self.site_type = site_type  # We need to remember the type
         self.concentration = concentration
         self.k_on = k_on
         self.k_off = k_off

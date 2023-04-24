@@ -29,5 +29,4 @@ for ns in range(n_simulations):
     my_circuit.name = my_circuit.name + '_' + str(ns)
     my_circuit.log.name = my_circuit.name
     my_circuit.print_general_information()
-
     my_circuit.run()

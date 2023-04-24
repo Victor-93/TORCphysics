@@ -34,12 +34,12 @@ for ns in range(n_simulations):
     Lac1 = Enzyme(e_type=my_circuit.environmental_list[-1].enzyme_type,
                   name=my_circuit.environmental_list[-1].name, site=my_circuit.site_list[5],
                   position=my_circuit.site_list[5].start,
-                  size=my_circuit.environmental_list[-1].size, twist=0.0, superhelical=0.0)
+                  size=my_circuit.environmental_list[-1].size, k_cat=0.0, k_off=0.0, twist=0.0, superhelical=0.0)
 
     Lac2 = Enzyme(e_type=my_circuit.environmental_list[-1].enzyme_type,
                   name=my_circuit.environmental_list[-1].name, site=my_circuit.site_list[7],
                   position=my_circuit.site_list[7].start + 500,
-                  size=my_circuit.environmental_list[-1].size, twist=0.0, superhelical=0.0)
+                  size=my_circuit.environmental_list[-1].size, k_cat=0.0, k_off=0.0, twist=0.0, superhelical=0.0)
 
 #    for site in my_circuit.site_list:
 #        site.k_min = 0.01
@@ -52,7 +52,8 @@ for ns in range(n_simulations):
             my_circuit.append_sites_to_dict_step1()
 
         # Apply binding model and get list of new enzymes
-        new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt, my_circuit.rng)
+        new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt, my_circuit.rng,
+                                           my_circuit.topoisomerase_model)
         if frame == bridge_time:  # Manually add the lacs
             new_enzyme_list.append(Lac1)
             new_enzyme_list.append(Lac2)

@@ -1,5 +1,4 @@
 type,name,start,end,k_min,k_max,model,oparams
-DNA,DNA,1.0,6000.0,0.0,0.0,,
 EXT,EXT,1.0,6000.0,0.0,0.0,,
 gene,tetA,85.0,1276.0,0.016,0.016,poisson,
 gene,CDS,1914.0,2106.0,0.0001,0.0001,poisson,
