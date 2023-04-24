@@ -1,7 +1,5 @@
 import numpy as np
-import pandas as pd
 import params
-import sys
 
 #---------------------------------------------------------------------------------------------------------------------
 #DESCRIPTION
@@ -26,7 +24,7 @@ gyra_t = params.gyra_t
 gyra_c = params.gyra_c
 gyra_k = params.gyra_k
 
-kBT = 310.0*params.kB_kcalmolK #The Boltzmann constant multiplied by 310K which is the temperature
+kBT = 310.0 * params.kB_kcalmolK #The Boltzmann constant multiplied by 310K which is the temperature
                                #at which the SIDD code is ran...
 
 #Sam Meyer's PROMOTER CURVE (parameters taken from Houdaigi NAR 2019)

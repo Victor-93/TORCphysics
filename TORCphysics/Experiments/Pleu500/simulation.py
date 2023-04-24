@@ -1,6 +1,7 @@
 from TORCphysics import Circuit, Enzyme
 from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
+from TORCphysics import visualization as vs
 import pandas as pd
 
 # Description: In this script, we will use the Circuit module to produce many simulations of the Pleu500 circuit.
@@ -14,7 +15,7 @@ sites_filename = 'sites.csv'
 enzymes_filename = 'enzymes.csv'
 environment_filename = 'environment.csv'
 output_prefix = 'output'
-frames = 10000
+frames = 100#00
 series = True
 continuation = False
 tm = 'continuum'
@@ -88,9 +89,15 @@ for ns in range(n_simulations):
         my_circuit.environmental_df.to_csv(my_circuit.name + '_environment_df.csv', index=False, sep=',')
 
     # Output the log of events
+    my_circuit.log.final_twist = my_circuit.twist
+    my_circuit.log.final_superhelical = my_circuit.superhelical
     my_circuit.log.log_out()
 
     # Output csvs
     my_circuit.enzyme_list_to_df().to_csv(my_circuit.name + '_enzymes_' + my_circuit.output_prefix + '.csv', index=False, sep=',')
     my_circuit.site_list_to_df().to_csv(my_circuit.name + '_sites_' + my_circuit.output_prefix + '.csv', index=False, sep=',')
     my_circuit.environmental_list_to_df().to_csv(my_circuit.name + '_environment_' + my_circuit.output_prefix + '.csv', index=False, sep=',')
+
+    # And create animation
+    vs.create_animation_linear(my_circuit, my_circuit.sites_df, my_circuit.enzymes_df, my_circuit.frames,
+                               output=my_circuit.name, out_format='.gif')

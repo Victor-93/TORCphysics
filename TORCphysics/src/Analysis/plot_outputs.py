@@ -1,14 +1,9 @@
 import numpy as np
-import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-from matplotlib import cm
-import matplotlib.gridspec as gridspec
-import matplotlib.animation as animation
 import pandas as pd
 import params
-import statistical_model as sm
+
 #from scipy import signal
-import sys
 
 
 #--------------------------------------------------------------------------
@@ -49,7 +44,7 @@ output_array = np.load(cpath+'output_1.npy') #just one to get the number of fram
 
 frames = len(output_array[:,0,0] )
 
-time = np.arange( 0, frames*params.dt, params.dt)
+time = np.arange(0, frames * params.dt, params.dt)
 
 #Better use these ones for the colors of genes...
 #Sort them according the input file...

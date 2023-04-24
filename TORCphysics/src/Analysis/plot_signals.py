@@ -1,14 +1,8 @@
 import numpy as np
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-from matplotlib import cm
-import matplotlib.gridspec as gridspec
-import matplotlib.animation as animation
 import pandas as pd
 import params
-import statistical_model as sm
-#from scipy import signal
-import sys
 
 
 #--------------------------------------------------------------------------
@@ -43,7 +37,7 @@ output_array = np.load('results/output_1.npy')
 
 frames = len(output_array[:,0,0] )
 
-time = np.arange( 0, frames*params.dt, params.dt)
+time = np.arange(0, frames * params.dt, params.dt)
 
 #Read global sigma
 globalsigma = np.loadtxt('results/global_sigma_1.txt')
@@ -230,7 +224,7 @@ t0 = 100 #600#10 mins of equilibration?
 N = len(signal[t0:])
 
 #This lag is the x axis of the cross correlation plot
-lag = np.arange( -N*params.dt*.5, N*params.dt*.5, params.dt)
+lag = np.arange(-N * params.dt * .5, N * params.dt * .5, params.dt)
 
 
 #Supercoiling

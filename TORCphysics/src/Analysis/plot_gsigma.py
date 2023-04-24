@@ -12,7 +12,7 @@ import sys
 width = 6
 height = 4
 
-globalsigma = np.loadtxt('../global_sigma.txt')
+globalsigma = np.loadtxt('../../global_sigma.txt')
 t = globalsigma[:,1]
 s = globalsigma[:,0]
 
