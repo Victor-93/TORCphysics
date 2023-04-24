@@ -52,8 +52,7 @@ for ns in range(n_simulations):
             my_circuit.append_sites_to_dict_step1()
 
         # Apply binding model and get list of new enzymes
-        new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt, my_circuit.rng,
-                                           my_circuit.topoisomerase_model)
+        new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt, my_circuit.rng)
         if frame == bridge_time:  # Manually add the lacs
             new_enzyme_list.append(Lac1)
             new_enzyme_list.append(Lac2)
@@ -66,7 +65,7 @@ for ns in range(n_simulations):
         my_circuit.apply_effects(effects_list)
 
         # UNBINDING
-        drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list)
+        drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list, my_circuit.dt, my_circuit.rng)
         my_circuit.drop_enzymes(drop_list_index)
         my_circuit.add_to_environment(drop_list_enzyme)
 
