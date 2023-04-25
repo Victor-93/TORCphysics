@@ -70,7 +70,7 @@ class Circuit:
         self.update_global_superhelical()
 
         # Let's initialize the log
-        self.log = Log(self.size, self.frames, self.frames * self.dt, self.structure, self.name, self.seed,
+        self.log = Log(self.size, self.frames, self.frames * self.dt, self.dt, self.structure, self.name, self.seed,
                        self.site_list, self.twist, self.superhelical)
 
         # Let's define the dictionaries that will become dataframes, in case the series option was selected
