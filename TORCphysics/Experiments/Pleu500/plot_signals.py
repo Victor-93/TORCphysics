@@ -108,7 +108,7 @@ ax_params(axis=ax, xl='time (seconds)', yl='Supercoiling at site', grid=True, le
 # Cross-correlations
 # ---------------------------------------------------------
 ax = axs[2]
-t0 = 2000  # Time in which we assume the system has reached the steady state
+t0 = 6000  # Time in which we assume the system has reached the steady state
 # Signals from t0 to end
 signals_t0 = []
 for signal in signals:

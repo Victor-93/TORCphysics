@@ -2,11 +2,12 @@ import numpy as np
 
 
 class Log:
-    def __init__(self, size, frames, time, structure, name, seed, site_list, initial_twist, initial_superhelical):
+    def __init__(self, size, frames, time, dt, structure, name, seed, site_list, initial_twist, initial_superhelical):
         self.metadata = []  # Will contain list of events
         self.size = size  # size of circuit
         self.frames = frames  # Total number of frames ran in simulation
         self.time = time  # Total simulation time
+        self.dt = dt  # Timestep
         self.structure = structure  # Structure - linear or circular
         self.name = name  # name of circuit/experiment
         self.seed = seed
@@ -72,6 +73,7 @@ class Log:
         f.write("Number of sites: " + str(int(self.n_sites)) + "\n")
         f.write("Number of frames: " + str(int(self.frames)) + "\n")
         f.write("Simulation time: " + str(self.time) + "\n")
+        f.write("Simulation timestep: " + str(self.dt) + "\n")
         f.write("Seed: " + str(self.seed) + "\n")
         f.write(" \n")
         f.write("Overall simulation information \n")

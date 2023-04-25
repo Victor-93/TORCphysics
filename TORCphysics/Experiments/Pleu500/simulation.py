@@ -15,7 +15,7 @@ sites_filename = 'sites.csv'
 enzymes_filename = 'enzymes.csv'
 environment_filename = 'environment.csv'
 output_prefix = 'output'
-frames = 100#00
+frames = 10000
 series = True
 continuation = False
 tm = 'continuum'
@@ -29,6 +29,7 @@ for ns in range(n_simulations):
                          output_prefix, frames, series, continuation, dt, tm, mm)
 
     my_circuit.name = my_circuit.name + '_' + str(ns)
+    my_circuit.sites_dict_list[0]['name'] = my_circuit.name
     my_circuit.log.name = my_circuit.name
     my_circuit.print_general_information()
 
@@ -99,5 +100,5 @@ for ns in range(n_simulations):
     my_circuit.environmental_list_to_df().to_csv(my_circuit.name + '_environment_' + my_circuit.output_prefix + '.csv', index=False, sep=',')
 
     # And create animation
-    vs.create_animation_linear(my_circuit, my_circuit.sites_df, my_circuit.enzymes_df, my_circuit.frames,
-                               output=my_circuit.name, out_format='.gif')
+    #vs.create_animation_linear(my_circuit, my_circuit.sites_df, my_circuit.enzymes_df, my_circuit.frames,
+    #                           output=my_circuit.name, out_format='.gif')
