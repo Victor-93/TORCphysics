@@ -40,7 +40,8 @@ my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environ
 width = 8
 height = 3
 
-colors_dict = {'tetA':'yellow', 'CDS':'green', 'mKalama1':'blue', 'Raspberry':'red'}
+colors_dict = {'tetA': 'yellow', 'CDS': 'green', 'mKalama1': 'blue', 'Raspberry': 'red'}
+kwargs = {'linewidth': 2, 'ls': '--'}
 
 # Load inputs
 # ---------------------------------------------------------
@@ -53,7 +54,7 @@ fig, axs = plt.subplots(6, figsize=(width, 6 * height), tight_layout=True)
 # Plot site response curves
 # ---------------------------------------------------------
 ax = axs[0]
-vs.plot_site_response_curves(my_circuit, ax, site_type='gene', colors=colors_dict)
+vs.plot_site_response_curves(my_circuit, ax, site_type='gene', colors=colors_dict, **kwargs)
 
 # Topoisomerase activity curves
 # ---------------------------------------------------------
@@ -73,14 +74,13 @@ vs.plot_supercoiling_profiles(my_circuit, sites_df, ax, colors=colors_dict, site
 # Plot cross-correlations
 # ---------------------------------------------------------
 ax = axs[4]
-vs.plot_cross_correlation_with_site(my_circuit, sites_df, 'tetA', ax, ta=6000, tb=-1,
+vs.plot_cross_correlation_with_site(my_circuit, sites_df, 'tetA', ax, fa=6000, fb=-1,
                                     ignore=['CDS'], site_type='gene', colors=colors_dict)
 
 # Plot steady state initiation curve
 # ---------------------------------------------------------
 ax = axs[5]
 vs.plot_steady_state_initiation_curve(my_circuit, sites_df, ax, ignore='CDS',
-                                      ta=6000, tb=-1, colors=colors_dict, site_type='gene')
+                                      fa=6000, fb=-1, colors=colors_dict, site_type='gene')
 
 plt.savefig('visualization_test.png')
-

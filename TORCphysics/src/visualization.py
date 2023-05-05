@@ -1,4 +1,3 @@
-import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
@@ -12,8 +11,10 @@ from TORCphysics import analysis as an
 width = 10
 height = 6
 
+# TODO: what if there are no colors?
 # colors
-enzyme_colors = {'RNAP': 'blue', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'black', 'ori': 'yellow'}
+enzyme_colors = {'RNAP': 'blue', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'black', 'ori': 'yellow', 'topoI': 'cyan',
+                 'gyrase': 'red'}
 gene_colour = 'green'
 DNA_colour = 'black'
 sigma_colour = 'red'
@@ -21,18 +22,13 @@ topoI_colour = 'red'
 gyrase_colour = 'cyan'
 
 # Sizes
-enzyme_sizes = {'RNAP': 300, 'IHF': 500, 'FIS': 500, 'lacI': 500, 'ori': 500}
-RNAP_size = 300
-FIS_size = 500
-IHF_size = 500
-LAC_size = 500
-ORI_size = 500
+enzyme_sizes = {'RNAP': 300, 'IHF': 500, 'FIS': 500, 'lacI': 500, 'ori': 500, 'topoI': 500, 'gyrase': 500}
 DNA_lw = 12
 gene_lw = 5
 sigma_lw = 5
 
 # Shapes
-enzyme_shapes = {'RNAP': 'o', 'IHF': 'o', 'FIS': 'o', 'lacI': 's', 'ori': 's'}
+enzyme_shapes = {'RNAP': 'o', 'IHF': 'o', 'FIS': 'o', 'lacI': 's', 'ori': 's', 'topoI': 'X', 'gyrase': 'X'}
 
 # text size
 slabel = 15
@@ -54,11 +50,8 @@ object_text = 10  # NAPs, genes, etc...
 #  3.- Animations
 #  3.1- Linear
 #  3.2- Circular
-# TODO: check how to use kwargs and all that
-# TODO: Also add the ignore feature to other relevant functions
 # TODO: Maybe one wants to include specific sites names? instead of ignoring?
 # TODO: You need to test these functions
-# TODO: Change ta,tb for fa,fb. Because ta is time, and we give it in frames
 
 def ax_params(axis, xl, yl, grid, legend):
     axis.grid(grid)
@@ -68,14 +61,31 @@ def ax_params(axis, xl, yl, grid, legend):
         axis.legend(loc='best')
 
 
+# PLOTTING CALCULATIONS FUNCTIONS
+# ----------------------------------------------------------------------------------------------------------------------
+# The following functions plot certain calculations using the analysis module.
+# These functions are provided as a tool to quickly analyse data, so the circuit is an input and it analyses it
+# according its sites, enzymes and environment.
+# Some functions may have the following inputs:
+# axs = axes to plot
+# colors = is a dictionary of colors in the form {site_name:color}
+# site_type = If you want to calculate/plot by certain site_type, e.g. 'gene'
+# labels = If you want the function to plot the x,y labels & grid
+# **kwargs = Additional plot arguments. Be careful when indicating the colors in the **kwargs when using colors=dict
+# [fa,fb] = frame ranges in which certain quantities are measured, e.g. cross-correlations, steady state curve...
+# ignore = List of site names to ignore
+
+
 # Plots the steady state curve: log( sum of initiation events / time ) vs time
-def plot_steady_state_initiation_curve(my_circuit, sites_df, axs, ignore=None,
-                                       ta=0, tb=-1, colors=None, site_type=None, labels=True):
+def plot_steady_state_initiation_curve(my_circuit, sites_df, axs=None, ignore=None,
+                                       fa=0, fb=-1, colors=None, site_type=None, labels=True, **kwargs):
+    if axs is None:
+        axs = plt.gca()
     time = np.arange(0, my_circuit.dt * (my_circuit.frames + 1), my_circuit.dt)
     if site_type is None:
-        curves, rates, names = an.initiation_rates(sites_df, time, ta, tb)
+        curves, rates, names = an.initiation_rates(sites_df, time, fa, fb)
     else:
-        curves, rates, names = an.initiation_rates_by_type(sites_df, site_type, time, ta, tb)
+        curves, rates, names = an.initiation_rates_by_type(sites_df, site_type, time, fa, fb)
 
     for i, name in enumerate(names):
         curve = curves[i]
@@ -85,28 +95,28 @@ def plot_steady_state_initiation_curve(my_circuit, sites_df, axs, ignore=None,
                 continue
         my_label = name + f' k={rate:.4f}s'
         if colors is not None:
-            axs.plot(time, curve, color=colors[name], label=my_label, alpha=0.5)
+            axs.plot(time, curve, color=colors[name], label=my_label, alpha=0.5, **kwargs)
         else:
-            axs.plot(time, curve, label=my_label, alpha=0.5)
+            axs.plot(time, curve, label=my_label, alpha=0.5, **kwargs)
     if labels:
         ax_params(axis=axs, xl='time (seconds)', yl=r'$\log$($\sum$initiation)/time', grid=True, legend=True)
 
 
 # TODO: Cross-correlation with no specific site? That might be a mess
 # Plot cross-correlations between sites with respect another site with name ref_name
-# t0 = Time in which we assume the system has reached the steady state
 # ref_name is the name of the site that you want to calculate the cross-correlation with. It has to have the same type
 # as site_type in case you specify.
-def plot_cross_correlation_with_site(my_circuit, sites_df, ref_name, axs, ignore=None,
-                                     ta=0, tb=-1, colors=None, site_type=None, labels=True):
+def plot_cross_correlation_with_site(my_circuit, sites_df, ref_name, axs=None, ignore=None,
+                                     fa=0, fb=-1, colors=None, site_type=None, labels=True, **kwargs):
+    if axs is None:
+        axs = plt.gca()
     if site_type is None:
         signals, names = an.build_signals(sites_df)
     else:
         signals, names = an.build_signal_by_type(sites_df, site_type)
-    time = np.arange(0, my_circuit.dt * len(signals[0]), my_circuit.dt)
     signals_t0 = []
     for signal in signals:
-        signals_t0.append(signal[ta:tb])
+        signals_t0.append(signal[fa:fb])
     for i, name in enumerate(names):
         if name == ref_name:
             index = i
@@ -124,16 +134,19 @@ def plot_cross_correlation_with_site(my_circuit, sites_df, ref_name, axs, ignore
         maxlag.append(lag[np.argmax(cross[index, i, :])])
         my_label = name + f' lag={maxlag[j]:.2f}s'
         if colors is not None:
-            axs.plot(lag, cross[index, i, :], color=colors[name], label=my_label)
+            axs.plot(lag, cross[index, i, :], color=colors[name], label=my_label, **kwargs)
         else:
-            axs.plot(lag, cross[index, i, :], label=my_label)
+            axs.plot(lag, cross[index, i, :], label=my_label, **kwargs)
     if labels:
         ax_params(axis=axs, xl='time lag (seconds)', yl='Cross-correlation w ' + ref_name, grid=True, legend=True)
     axs.set_xlim(-200, 200)
 
 
 # Plots supercoiling profiles at the sites and global
-def plot_supercoiling_profiles(my_circuit, sites_df, axs, colors=None, site_type=None, labels=True):
+def plot_supercoiling_profiles(my_circuit, sites_df, axs=None, ignore=None, colors=None, site_type=None,
+                               labels=True, **kwargs):
+    if axs is None:
+        axs = plt.gca()
     time = np.arange(0, my_circuit.dt * (my_circuit.frames + 1), my_circuit.dt)
     # Let's plot the global superhelical density
     mask = sites_df['type'] == 'circuit'  # This one contains global superhelical density
@@ -148,19 +161,26 @@ def plot_supercoiling_profiles(my_circuit, sites_df, axs, colors=None, site_type
         names = sites_df[mask].drop_duplicates(subset='name')['name']
     # And plot the superhelical density at sites
     for i, name in enumerate(names):
+        if ignore is not None:
+            if name in ignore:
+                continue
         mask = sites_df['name'] == name
         superhelical = sites_df[mask]['superhelical'].to_numpy()
         if colors is not None:
-            axs.plot(time, superhelical, color=colors[name], label=name, alpha=0.5)
+            axs.plot(time, superhelical, color=colors[name], label=name, alpha=0.5, **kwargs)
         else:
-            axs.plot(time, superhelical, label=name, alpha=0.5)
+            axs.plot(time, superhelical, label=name, alpha=0.5, **kwargs)
     axs.plot(time, global_sigma, color='black', label='global')  # and the global
 
-    ax_params(axis=axs, xl='time (seconds)', yl='Supercoiling at site', grid=True, legend=True)
+    if labels:
+        ax_params(axis=axs, xl='time (seconds)', yl='Supercoiling at site', grid=True, legend=True)
 
 
 # This one plots the signal profiles.
-def plot_signal_profiles(my_circuit, sites_df, axs, colors=None, site_type=None, labels=True):
+def plot_signal_profiles(my_circuit, sites_df, axs=None, ignore=None, colors=None, site_type=None,
+                         labels=True, **kwargs):
+    if axs is None:
+        axs = plt.gca()
     if site_type is None:
         signals, names = an.build_signals(sites_df)
     else:
@@ -168,48 +188,66 @@ def plot_signal_profiles(my_circuit, sites_df, axs, colors=None, site_type=None,
     time = np.arange(0, my_circuit.dt * len(signals[0]), my_circuit.dt)
     for i, signal in enumerate(signals):
         name = names[i]
+        if ignore is not None:
+            if name in ignore:
+                continue
         if colors is not None:
-            axs.plot(time, signal, color=colors[name], label=names[i], alpha=0.5)
+            axs.plot(time, signal, color=colors[name], label=names[i], alpha=0.5, **kwargs)
         else:
-            axs.plot(time, signal, label=names[i], alpha=0.5)
+            axs.plot(time, signal, label=names[i], alpha=0.5, **kwargs)
     if labels:
         ax_params(axis=axs, xl='time (seconds)', yl='Transcription signal', grid=True, legend=True)
 
 
-# Sites rate curves - Let's plot the rates modulated by supercoiling
-def plot_site_response_curves(my_circuit, axs, colors=None, site_type=None, labels=True):
+# Plots the site responses (rates) modulated by supercoiling
+def plot_site_response_curves(my_circuit, axs=None, ignore=None, colors=None, site_type=None, labels=True, **kwargs):
+    if axs is None:
+        axs = plt.gca()
     i = -1
     for site in my_circuit.site_list:
+        if ignore is not None:
+            if site.name in ignore:
+                continue
         if site_type is None or site.site_type == site_type:
             i += 1
             rate, x = an.site_activity_curves(site)
             if colors is not None:
-                axs.plot(x, rate, color=colors[site.name], label=site.name)
+                axs.plot(x, rate, color=colors[site.name], label=site.name, **kwargs)
             else:
-                axs.plot(x, rate, label=site.name)
+                axs.plot(x, rate, label=site.name, **kwargs)
 
     if labels:
         ax_params(axis=axs, xl=r'$\sigma$', yl=r'Initiation rate ($s^{-1}$)', grid=True, legend=True)
 
 
 # Plots the topoisomerase activity curves of a continuum model
-def plot_topoisomerase_activity_curves_continuum(my_circuit, axs, labels=True):
+def plot_topoisomerase_activity_curves_continuum(my_circuit, axs=None, ignore=None, labels=True, **kwargs):
+    if axs is None:
+        axs = plt.gca()
     i = -1
     for environmental in my_circuit.environmental_list:
         if environmental.enzyme_type == 'topo':
             i += 1
             topo_curve, x = an.topoisomerase_activity_curves_continuum(environmental, dt=my_circuit.dt)
-            axs.plot(x, topo_curve, label=environmental.name)
+            axs.plot(x, topo_curve, label=environmental.name, **kwargs)
             if i == 0:
                 topo_sum = np.zeros_like(topo_curve)
             topo_sum += topo_curve
-    axs.plot(x, topo_sum, color='black', label='sum')
+    axs.plot(x, topo_sum, color='black', label='sum', **kwargs)
     if labels:
         ax_params(axis=axs, xl=r'$\sigma$', yl=r'$\sigma$ removed per timestep', grid=True, legend=True)
 
 
+# PLOTTING REPRESENTATIONS FUNCTIONS
+# ----------------------------------------------------------------------------------------------------------------------
+
+# PLOTTING ANIMATIONS FUNCTIONS
+# ----------------------------------------------------------------------------------------------------------------------
+
 def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format,
                             site_type=None, site_colours=None):
+    # plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
+
     output_file = output + out_format
     h = 1.5
     dh = 0.5
@@ -311,7 +349,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
 
     scat = ax[0].scatter(xl[0], yl[0], s=sl[0], c=cl[0], marker="o", zorder=4)  # This plots RNAPs and NAPs
 
-    lines = [ax[1].plot([], [], c=sigma_colour, lw=sigma_lw)[0] for _ in range(10)]  # This plots supercoiling
+    lines = [ax[1].plot([], [], c=sigma_colour, lw=sigma_lw)[0] for _ in range(100)]  # This plots supercoiling
 
     # ------------------------------------------------------------
     # ANIMATION
@@ -352,11 +390,14 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
 
     # SAVE OR SHOW
     # -----------------------------------
-    #writervideo = animation.FFMpegWriter(fps=60)
-    #ani.save(output_file, writer=writervideo)
-    #ani.save(output_file, writer='imagemagick', fps=30)
-    ani.save(output_file, writer='Pillow', fps=30)
-    #ani.save(output_file, writer='HTMLwriter', fps=30)
-    #ani.save(output_file, fps=30)
-    #plt.show()
 
+    # writervideo = animation.FFMpegWriter(fps=60)
+    #writervideo = animation.FFMpegWriter()
+    writervideo = animation.PillowWriter(fps=60)
+    ani.save(output_file, writer=writervideo)
+    #ani.save(output, writer=writervideo)
+    # ani.save(output_file, writer='ImageMagick', fps=30)
+    # ani.save(output_file, writer='FFMpeg', fps=30)
+    # ani.save(output_file, writer='HTMLwriter', fps=30)
+    # ani.save(output_file, fps=30)
+    # plt.show()

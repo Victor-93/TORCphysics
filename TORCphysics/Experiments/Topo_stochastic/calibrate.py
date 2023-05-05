@@ -1,7 +1,4 @@
-from TORCphysics import Circuit, Enzyme
-from TORCphysics import effect_model as em
-from TORCphysics import binding_model as bm
-import pandas as pd
+from TORCphysics import Circuit
 
 # TODO:
 #  1.- Make the code work with stochastic topo binding.
@@ -14,7 +11,7 @@ sites_filename = 'sites.csv'
 enzymes_filename = 'enzymes.csv'
 environment_filename = 'environment.csv'
 output_prefix = 'output'
-frames = 1000
+frames = 100
 series = True
 continuation = False
 tm = 'stochastic'

@@ -11,16 +11,15 @@ from TORCphysics import visualization as vs
 
 # Inputs
 # ---------------------------------------------------------
-csites_df = 'Pleu500_0_sites_df.csv'
-cenzymes_df = 'Pleu500_0_enzymes_df.csv'
-cenvironment_df = 'Pleu500_0_environment_df.csv'
+csites_df = 'topos_0_sites_df.csv'
+cenzymes_df = 'topos_0_enzymes_df.csv'
+cenvironment_df = 'topos_0_environment_df.csv'
 sites_df = pd.read_csv(csites_df, sep=',')
 enzymes_df = pd.read_csv(cenzymes_df, sep=',')
 
-log_file = 'Pleu500_0.log'
-
 colors_dict = {'tetA': 'yellow', 'CDS': 'green', 'mKalama1': 'blue', 'Raspberry': 'red'}
 
+# Initial conditions
 circuit_filename = 'circuit.csv'
 sites_filename = 'sites.csv'
 enzymes_filename = 'enzymes.csv'
@@ -29,17 +28,16 @@ output_prefix = 'output'
 frames = 100
 series = True
 continuation = False
-tm = 'continuum'
+tm = 'stochastic'
 mm = 'uniform'
 dt = 1.0
 n_simulations = 1
-bridge_time = 40000
 
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation, dt, tm, mm)
 
-output = 'test_animation'
-out_format = '.mp4'
+output = 'topo_animation'
+out_format = '.gif'
 
 vs.create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format,
-                           site_type='gene', site_colours=colors_dict)
+                           site_type='gene')
