@@ -40,7 +40,6 @@ class Circuit:
         self.rng = np.random.default_rng(self.seed)
 
         # -----------------------------------------------
-        # TODO: I think it is better idea to partition the DNA into topoisomerase binding sites since the beginning.
         # We add new DNA sites which is the ones that we will link topos binding
         # Note: In the future there might be cases in which new enzymes will be added to the environment, so maybe,
         # these new sites will need to be created
@@ -53,9 +52,9 @@ class Circuit:
                 # I will have to ignore this first site in specfic, because this one will be the overall, and is the
                 # one that is output in the sites_df.csv
                 self.site_list.append(
-                    Site(s_type='DNA_' + topo.name, name='DNA', start=1, end=self.size, k_min=0, k_max=0,
+                    Site(s_type='DNA_' + topo.name, name='sum', start=1, end=self.size, k_min=0, k_max=0,
                          s_model='stochastic_topo_binding', oparams=None))
-                #topo.site_type = 'DNA_' + topo.name
+                # topo.site_type = 'DNA_' + topo.name
 
         # Define bare DNA binding sites for bare DNA binding enzymes
         self.define_bare_DNA_binding_sites()
@@ -91,6 +90,8 @@ class Circuit:
     # This one runs the simulation
     # TODO: Think a way of making your run() function run for additional number of frames. This will make the code more
     #  versatile and will allow you create experiments where you add stuff manually
+    # TODO: It might be worth adding an action and time? Or not? So that maybe it could perform an action at a given
+    #  time?
     def run(self):
 
         for frame in range(1, self.frames + 1):
@@ -100,7 +101,7 @@ class Circuit:
                 self.append_sites_to_dict_step1()
 
             # If we are modeling the topoisomerase binding as a stochastic process, we need to define the sites.
-            #if self.topoisomerase_model == 'stochastic':
+            # if self.topoisomerase_model == 'stochastic':
             #    self.define_topoisomerase_binding_sites()
             # BINDING
             # --------------------------------------------------------------
@@ -230,12 +231,19 @@ class Circuit:
         for site in self.site_list:
             if site.site_type == 'EXT':
                 continue
-            enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start]
-            if len(enzyme_before) <= 0:
-                print(0)
-            enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start][-1]
-            site_twist = enzyme_before.twist
-            site_superhelical = enzyme_before.superhelical
+            # This is for enzymes that bind bare DNA
+            if 'DNA' in site.site_type and 'sum' == site.name:
+                site_superhelical = self.superhelical
+                site_twist = self.twist
+            else:
+                enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start]
+                if len(enzyme_before) <= 0:
+                    print('Some error in append_sites_dict_step1')
+                    sys.exit()
+                    print(0)
+                enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start][-1]
+                site_twist = enzyme_before.twist
+                site_superhelical = enzyme_before.superhelical
             d = {'frame': self.frame, 'time': self.time, 'type': site.site_type, 'name': site.name, 'twist': site_twist,
                  'superhelical': site_superhelical, '#enzymes': 0, 'binding': 0, 'unbinding': 0}
 
@@ -256,14 +264,33 @@ class Circuit:
             if site.site_type == 'EXT':
                 continue
             i = i + 1
+
+            global_sum = False  # This variable is for enzymes that recognise bare DNA
+            # And is used to update its global quantities.
+
+            # This is for enzymes that bind bare DNA - Let's initialize it
+            if 'DNA' in site.site_type and 'sum' == site.name:
+                self.sites_dict_list_aux[i]['binding'] = 0
+                self.sites_dict_list_aux[i]['unbinding'] = 0
+                global_sum = True
+
+            # Change binding to 1
             for new_enzyme in new_enzymes_list:
                 if new_enzyme.site.name == site.name:
                     self.sites_dict_list_aux[i]['binding'] = 1
+                # For globals in case of enzymes that bind bare DNA
+                if global_sum and new_enzyme.site.site_type == site.site_type:
+                    self.sites_dict_list_aux[i]['binding'] += 1
 
+            # Change unbinding to 1
             for drop_enzyme in drop_list_enzyme:
                 if drop_enzyme.site.name == site.name:
                     self.sites_dict_list_aux[i]['unbinding'] = 1
+                # For globals in case of enzymes that bind bare DNA
+                if global_sum and drop_enzyme.site.site_type == site.site_type:
+                    self.sites_dict_list_aux[i]['unbinding'] += 1
 
+            # This is mostly applied to genes, and checks how many enzymes are currently bound to that site
             self.sites_dict_list_aux[i]['#enzymes'] = \
                 len([enzyme for enzyme in self.enzyme_list if enzyme.site.name == site.name])
 
@@ -705,8 +732,11 @@ class Circuit:
                 end = environment.size * (1 + n)
                 if end > self.size:  # Little break to avoid making it bigger than the actual plasmid
                     continue
-                environment_site = Site(s_type='DNA_' + environment.name, name=str(s), start=start, end=end, k_min=0,
-                                        k_max=0, s_model='stochastic_' + environment.name, oparams=None)
+                environment_site = Site(s_type='DNA_' + environment.name,
+                                        name='DNA_' + environment.name + '_' + str(s),
+                                        # name=str(s),
+                                        start=start, end=end, k_min=0, k_max=0,
+                                        s_model='stochastic_' + environment.name, oparams=None)
                 self.site_list.append(environment_site)
 
                 s = s + 1
