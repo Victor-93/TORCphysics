@@ -9,152 +9,120 @@ Number of sites: 86
 Number of frames: 1000
 Simulation time: 1000.0
 Simulation timestep: 1.0
-Seed: 4449221422162990267
+Seed: 9113529156323939380
  
 Overall simulation information 
 ---------------------------------------------------------------------------------------
 Initial twist: -179.55548
-Final twist: -179.55548
+Final twist: -47.90779
 Initial superhelical density: -0.06001
-Final superhelical density: -0.06001
+Final superhelical density: -0.01601
  
 Overall rates 
 ---------------------------------------------------------------------------------------
 site type            site name            #binding events      #unbinding events    binding rates        
- DNA_topoI            sum                                  21.0                 21.0                 0.021 
-DNA_gyrase           sum                                   3.0                  3.0                 0.003 
-DNA_topoI            DNA_topoI_0                           0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_0                          0.0                  0.0                   0.0 
+ DNA_topoI            sum                                   6.0                  6.0                 0.006 
+DNA_gyrase           sum                                   2.0                  2.0                 0.002 
+DNA_topoI            0                                     0.0                  0.0                   0.0 
+DNA_gyrase           0                                     0.0                  0.0                   0.0 
 EXT                  EXT                                   0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_1                           1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_1                          0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_2                           0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_2                          1.0                  1.0                 0.001 
-DNA_topoI            DNA_topoI_3                           1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_3                          0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_4                           1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_4                          0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_5                           0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_5                          0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_6                           0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_6                          0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_7                           0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_7                          0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_8                           0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_8                          0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_9                           1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_9                          0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_10                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_10                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_11                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_11                         1.0                  1.0                 0.001 
-DNA_topoI            DNA_topoI_12                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_12                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_13                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_13                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_14                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_14                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_15                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_15                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_16                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_16                         0.0                  0.0                   0.0 
+DNA_topoI            1                                     0.0                  0.0                   0.0 
+DNA_gyrase           1                                     0.0                  0.0                   0.0 
+DNA_topoI            2                                     0.0                  0.0                   0.0 
+DNA_gyrase           2                                     0.0                  0.0                   0.0 
+DNA_topoI            3                                     0.0                  0.0                   0.0 
+DNA_gyrase           3                                     0.0                  0.0                   0.0 
+DNA_topoI            4                                     0.0                  0.0                   0.0 
+DNA_gyrase           4                                     0.0                  0.0                   0.0 
+DNA_topoI            5                                     0.0                  0.0                   0.0 
+DNA_gyrase           5                                     0.0                  0.0                   0.0 
+DNA_topoI            6                                     0.0                  0.0                   0.0 
+DNA_gyrase           6                                     0.0                  0.0                   0.0 
+DNA_topoI            7                                     1.0                  1.0                 0.001 
+DNA_gyrase           7                                     1.0                  1.0                 0.001 
+DNA_topoI            8                                     0.0                  0.0                   0.0 
+DNA_gyrase           8                                     0.0                  0.0                   0.0 
+DNA_topoI            9                                     2.0                  2.0                 0.002 
+DNA_gyrase           9                                     2.0                  2.0                 0.002 
+DNA_topoI            10                                    0.0                  0.0                   0.0 
+DNA_gyrase           10                                    0.0                  0.0                   0.0 
+DNA_topoI            11                                    2.0                  2.0                 0.002 
+DNA_gyrase           11                                    2.0                  2.0                 0.002 
+DNA_topoI            12                                    0.0                  0.0                   0.0 
+DNA_gyrase           12                                    0.0                  0.0                   0.0 
+DNA_topoI            13                                    0.0                  0.0                   0.0 
+DNA_gyrase           13                                    0.0                  0.0                   0.0 
+DNA_topoI            14                                    0.0                  0.0                   0.0 
+DNA_gyrase           14                                    0.0                  0.0                   0.0 
+DNA_topoI            15                                    0.0                  0.0                   0.0 
+DNA_gyrase           15                                    0.0                  0.0                   0.0 
+DNA_topoI            16                                    0.0                  0.0                   0.0 
+DNA_gyrase           16                                    0.0                  0.0                   0.0 
 gene                 gene1                                 0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_17                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_17                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_18                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_18                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_19                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_19                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_20                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_20                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_21                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_21                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_22                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_22                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_23                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_23                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_24                          2.0                  2.0                 0.002 
-DNA_gyrase           DNA_gyrase_24                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_25                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_25                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_26                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_26                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_27                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_27                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_28                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_28                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_29                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_29                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_30                          2.0                  2.0                 0.002 
-DNA_gyrase           DNA_gyrase_30                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_31                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_31                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_32                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_32                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_33                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_33                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_34                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_34                         1.0                  1.0                 0.001 
-DNA_topoI            DNA_topoI_35                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_35                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_36                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_36                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_37                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_37                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_38                          0.0                  0.0                   0.0 
-DNA_gyrase           DNA_gyrase_38                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_39                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_39                         0.0                  0.0                   0.0 
-DNA_topoI            DNA_topoI_40                          1.0                  1.0                 0.001 
-DNA_gyrase           DNA_gyrase_40                         0.0                  0.0                   0.0 
+DNA_topoI            17                                    0.0                  0.0                   0.0 
+DNA_gyrase           17                                    0.0                  0.0                   0.0 
+DNA_topoI            18                                    0.0                  0.0                   0.0 
+DNA_gyrase           18                                    0.0                  0.0                   0.0 
+DNA_topoI            19                                    0.0                  0.0                   0.0 
+DNA_gyrase           19                                    0.0                  0.0                   0.0 
+DNA_topoI            20                                    0.0                  0.0                   0.0 
+DNA_gyrase           20                                    0.0                  0.0                   0.0 
+DNA_topoI            21                                    0.0                  0.0                   0.0 
+DNA_gyrase           21                                    0.0                  0.0                   0.0 
+DNA_topoI            22                                    0.0                  0.0                   0.0 
+DNA_gyrase           22                                    0.0                  0.0                   0.0 
+DNA_topoI            23                                    0.0                  0.0                   0.0 
+DNA_gyrase           23                                    0.0                  0.0                   0.0 
+DNA_topoI            24                                    0.0                  0.0                   0.0 
+DNA_gyrase           24                                    0.0                  0.0                   0.0 
+DNA_topoI            25                                    0.0                  0.0                   0.0 
+DNA_gyrase           25                                    0.0                  0.0                   0.0 
+DNA_topoI            26                                    0.0                  0.0                   0.0 
+DNA_gyrase           26                                    0.0                  0.0                   0.0 
+DNA_topoI            27                                    0.0                  0.0                   0.0 
+DNA_gyrase           27                                    0.0                  0.0                   0.0 
+DNA_topoI            28                                    0.0                  0.0                   0.0 
+DNA_gyrase           28                                    0.0                  0.0                   0.0 
+DNA_topoI            29                                    0.0                  0.0                   0.0 
+DNA_gyrase           29                                    0.0                  0.0                   0.0 
+DNA_topoI            30                                    0.0                  0.0                   0.0 
+DNA_gyrase           30                                    0.0                  0.0                   0.0 
+DNA_topoI            31                                    0.0                  0.0                   0.0 
+DNA_gyrase           31                                    0.0                  0.0                   0.0 
+DNA_topoI            32                                    0.0                  0.0                   0.0 
+DNA_gyrase           32                                    0.0                  0.0                   0.0 
+DNA_topoI            33                                    0.0                  0.0                   0.0 
+DNA_gyrase           33                                    0.0                  0.0                   0.0 
+DNA_topoI            34                                    0.0                  0.0                   0.0 
+DNA_gyrase           34                                    0.0                  0.0                   0.0 
+DNA_topoI            35                                    1.0                  1.0                 0.001 
+DNA_gyrase           35                                    1.0                  1.0                 0.001 
+DNA_topoI            36                                    0.0                  0.0                   0.0 
+DNA_gyrase           36                                    0.0                  0.0                   0.0 
+DNA_topoI            37                                    0.0                  0.0                   0.0 
+DNA_gyrase           37                                    0.0                  0.0                   0.0 
+DNA_topoI            38                                    1.0                  1.0                 0.001 
+DNA_gyrase           38                                    1.0                  1.0                 0.001 
+DNA_topoI            39                                    0.0                  0.0                   0.0 
+DNA_gyrase           39                                    0.0                  0.0                   0.0 
+DNA_topoI            40                                    1.0                  1.0                 0.001 
+DNA_gyrase           40                                    1.0                  1.0                 0.001 
  
 Events
 ---------------------------------------------------------------------------------------
-frame 74 time 74.0 binding_event at DNA_gyrase DNA_gyrase_11 enzyme gyrase with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 76 time 76.0 unbinding_event at DNA_gyrase DNA_gyrase_11 enzyme gyrase with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 114 time 114.0 binding_event at DNA_topoI DNA_topoI_24 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 115 time 115.0 unbinding_event at DNA_topoI DNA_topoI_24 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 143 time 143.0 binding_event at DNA_topoI DNA_topoI_19 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 147 time 147.0 unbinding_event at DNA_topoI DNA_topoI_19 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 157 time 157.0 binding_event at DNA_topoI DNA_topoI_23 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 157 time 157.0 unbinding_event at DNA_topoI DNA_topoI_23 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06001
-frame 172 time 172.0 binding_event at DNA_gyrase DNA_gyrase_2 enzyme gyrase with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 174 time 174.0 unbinding_event at DNA_gyrase DNA_gyrase_2 enzyme gyrase with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 200 time 200.0 binding_event at DNA_topoI DNA_topoI_1 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 203 time 203.0 unbinding_event at DNA_topoI DNA_topoI_1 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 253 time 253.0 binding_event at DNA_topoI DNA_topoI_30 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 258 time 258.0 unbinding_event at DNA_topoI DNA_topoI_30 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 267 time 267.0 binding_event at DNA_topoI DNA_topoI_39 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 270 time 270.0 unbinding_event at DNA_topoI DNA_topoI_39 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 313 time 313.0 binding_event at DNA_topoI DNA_topoI_9 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 317 time 317.0 unbinding_event at DNA_topoI DNA_topoI_9 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 384 time 384.0 binding_event at DNA_topoI DNA_topoI_15 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 385 time 385.0 unbinding_event at DNA_topoI DNA_topoI_15 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 403 time 403.0 binding_event at DNA_topoI DNA_topoI_4 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 407 time 407.0 unbinding_event at DNA_topoI DNA_topoI_4 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 479 time 479.0 binding_event at DNA_topoI DNA_topoI_30 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 490 time 490.0 unbinding_event at DNA_topoI DNA_topoI_30 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 520 time 520.0 binding_event at DNA_topoI DNA_topoI_17 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 520 time 520.0 unbinding_event at DNA_topoI DNA_topoI_17 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06001
-frame 530 time 530.0 binding_event at DNA_topoI DNA_topoI_28 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 530 time 530.0 unbinding_event at DNA_topoI DNA_topoI_28 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06001
-frame 560 time 560.0 binding_event at DNA_topoI DNA_topoI_3 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 561 time 561.0 unbinding_event at DNA_topoI DNA_topoI_3 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 607 time 607.0 binding_event at DNA_topoI DNA_topoI_24 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 607 time 607.0 unbinding_event at DNA_topoI DNA_topoI_24 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06001
-frame 638 time 638.0 binding_event at DNA_topoI DNA_topoI_37 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 638 time 638.0 unbinding_event at DNA_topoI DNA_topoI_37 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06001
-frame 730 time 730.0 binding_event at DNA_topoI DNA_topoI_26 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 731 time 731.0 unbinding_event at DNA_topoI DNA_topoI_26 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 777 time 777.0 binding_event at DNA_topoI DNA_topoI_35 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 778 time 778.0 unbinding_event at DNA_topoI DNA_topoI_35 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 858 time 858.0 binding_event at DNA_topoI DNA_topoI_32 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 858 time 858.0 unbinding_event at DNA_topoI DNA_topoI_32 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06001
-frame 915 time 915.0 binding_event at DNA_topoI DNA_topoI_25 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 915 time 915.0 unbinding_event at DNA_topoI DNA_topoI_25 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06001
-frame 945 time 945.0 binding_event at DNA_gyrase DNA_gyrase_34 enzyme gyrase with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 946 time 946.0 unbinding_event at DNA_gyrase DNA_gyrase_34 enzyme gyrase with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
-frame 967 time 967.0 binding_event at DNA_topoI DNA_topoI_40 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 967 time 967.0 unbinding_event at DNA_topoI DNA_topoI_40 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06001
-frame 992 time 992.0 binding_event at DNA_topoI DNA_topoI_18 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
-frame 993 time 993.0 unbinding_event at DNA_topoI DNA_topoI_18 enzyme topoI with twist -179.55548 superhelical -0.06149 global twist -179.55548 global supercoiling -0.06149
+frame 14 time 14.0 binding_event at DNA_topoI 9 enzyme topoI with twist -179.55548 superhelical -0.06000 global twist -179.55548 global supercoiling -0.06001
+frame 16 time 16.0 unbinding_event at DNA_topoI 9 enzyme topoI with twist -161.60353 superhelical -0.05534 global twist -167.58751 global supercoiling -0.05739
+frame 180 time 180.0 binding_event at DNA_topoI 9 enzyme topoI with twist -161.60353 superhelical -0.05400 global twist -161.60353 global supercoiling -0.05401
+frame 180 time 180.0 unbinding_event at DNA_topoI 9 enzyme topoI with twist -155.61954 superhelical -0.05329 global twist -161.60353 global supercoiling -0.05401
+frame 188 time 188.0 binding_event at DNA_topoI 7 enzyme topoI with twist -155.61954 superhelical -0.05200 global twist -155.61954 global supercoiling -0.05201
+frame 190 time 190.0 unbinding_event at DNA_topoI 7 enzyme topoI with twist -137.66758 superhelical -0.04714 global twist -143.65157 global supercoiling -0.04919
+frame 302 time 302.0 binding_event at DNA_topoI 11 enzyme topoI with twist -137.66758 superhelical -0.04600 global twist -137.66758 global supercoiling -0.04601
+frame 303 time 303.0 unbinding_event at DNA_topoI 11 enzyme topoI with twist -125.69961 superhelical -0.04305 global twist -131.68360 global supercoiling -0.04509
+frame 306 time 306.0 binding_event at DNA_topoI 11 enzyme topoI with twist -125.69961 superhelical -0.04200 global twist -125.69961 global supercoiling -0.04201
+frame 309 time 309.0 unbinding_event at DNA_topoI 11 enzyme topoI with twist -101.76367 superhelical -0.03485 global twist -107.74765 global supercoiling -0.03690
+frame 354 time 354.0 binding_event at DNA_topoI 38 enzyme topoI with twist -101.76367 superhelical -0.03401 global twist -101.76367 global supercoiling -0.03401
+frame 356 time 356.0 unbinding_event at DNA_topoI 38 enzyme topoI with twist -83.81171 superhelical -0.02870 global twist -89.79569 global supercoiling -0.03075
+frame 585 time 585.0 binding_event at DNA_gyrase 40 enzyme gyrase with twist -83.81171 superhelical -0.02801 global twist -83.81171 global supercoiling -0.02801
+frame 589 time 589.0 unbinding_event at DNA_gyrase 40 enzyme gyrase with twist -53.89178 superhelical -0.01845 global twist -59.87576 global supercoiling -0.02050
+frame 961 time 961.0 binding_event at DNA_gyrase 35 enzyme gyrase with twist -53.89178 superhelical -0.01801 global twist -53.89178 global supercoiling -0.01801
+frame 961 time 961.0 unbinding_event at DNA_gyrase 35 enzyme gyrase with twist -47.90779 superhelical -0.01641 global twist -53.89178 global supercoiling -0.01801

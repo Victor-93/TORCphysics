@@ -66,7 +66,7 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
         #                                   twist=0, superhelical=0)
         elif enzyme.enzyme_type == 'topo':
             topo = [environment for environment in environmental_list
-                    if environment.name == enzyme.name][0]
+                    if environment.name == enzyme.name][0]  # Can select the model from here?
             position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
         else:
             continue
@@ -92,10 +92,10 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
 
                 if topo.name == 'topoI':
                     sigma = topo1_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
-                    twist_right = calculate_twist_from_sigma( enzyme, enzyme_list[i+1], sigma )
+                    twist_right = calculate_twist_from_sigma(enzyme, enzyme_list[i + 1], sigma)
                 elif topo.name == 'gyrase':
                     sigma = gyrase_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
-                    twist_right = calculate_twist_from_sigma( enzyme, enzyme_list[i+1], sigma )
+                    twist_right = calculate_twist_from_sigma(enzyme, enzyme_list[i + 1], sigma)
                 else:
                     twist_right = 0  # If it doesn't recognize the topo, then don't do anything
 
@@ -139,14 +139,19 @@ def gyrase_continuum(sigma, gyra_c, gyra_k, dt):
     return sigma_removed
 
 
-# TODO: I think the twist injection is more complicated than I thought, I need to think it carefully.
-def topoisomerase_supercoiling_injection(z, dt):
+# Supercoiling injection of topoisomerases. It injects according the k_cat (injected twist per second), so be careful
+# because it can be both positive or negative
+def topoisomerase_supercoiling_injection(topo, dt):
     position = 0.0
-    twist_left = 0.0
-    twist_right = 0.0
+    # Note that k_cat is divided by two on each side because it is assumed that k_cat acts on the local region
+    # (both sides)
+    twist_left = 0.5 * topo.k_cat * params.w0 * dt
+    twist_right = 0.5 * topo.k_cat * params.w0 * dt
     return position, twist_left, twist_right
 
+
 # TODO: Add stoping mechanism. If there's an enzyme ahead, it might stay in place...
+# TODO: Because you have a k_cat now, this indicates how much twist RNAPs inject on each side.
 # Returns new RNAP position, and the twist it injected on the left and right
 def rnap_uniform_motion(z, dt):
     # Object moves: simple uniform motion
