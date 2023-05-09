@@ -501,10 +501,10 @@ class Circuit:
             new_length_left = em.calculate_length(enzyme_before, new_enzyme)
             new_length_right = em.calculate_length(new_enzyme, enzyme_after)
 
-            # TODO: define twist model when binding
             # now to calculate the new twists
             # NOTE that I don't partition using the supercoiling density because the region that is actually bound
-            # is assumed to be relaxed by the enzyme
+            # is assumed to be relaxed by the enzyme. So the twist in the region increases because of the relaxed
+            # bound region.
             # new_twist_left = region_twist * ((new_length_left + 0.5 * new_enzyme.size) / region_length)
             # new_twist_right = region_twist * ((new_length_right + 0.5 * new_enzyme.size) / region_length)
             new_twist_left = region_superhelical * region_length * new_length_left * params.w0 / (
@@ -733,8 +733,8 @@ class Circuit:
                 if end > self.size:  # Little break to avoid making it bigger than the actual plasmid
                     continue
                 environment_site = Site(s_type='DNA_' + environment.name,
-                                        name='DNA_' + environment.name + '_' + str(s),
-                                        # name=str(s),
+                                        # name='DNA_' + environment.name + '_' + str(s),
+                                        name=str(s),
                                         start=start, end=end, k_min=0, k_max=0,
                                         s_model='stochastic_' + environment.name, oparams=None)
                 self.site_list.append(environment_site)
