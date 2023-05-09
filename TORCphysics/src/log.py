@@ -33,8 +33,17 @@ class Log:
     # TODO: Think about how to calculate the elongation rate: should be the time between (unbinding-binding)
     def site_overall_analysis(self):
         for i, site in enumerate(self.site_list):
+            global_sum = False  # This variable is for enzymes that recognise bare DNA
+            # And is used to update its global quantities.
+
+            # This is for enzymes that bind bare DNA - Let's initialize it
+            if 'DNA' in site.site_type and 'sum' == site.name:
+                global_sum = True
+
             for event in self.metadata:
-                if event.site.name != site.name:
+                if event.site.name != site.name and not global_sum:
+                    continue
+                if global_sum and event.site.site_type != site.site_type:
                     continue
                 if event.event_type == 'binding_event':
                     self.total_binding_events[i] += 1
@@ -87,15 +96,17 @@ class Log:
         f.write("---------------------------------------------------------------------------------------\n")
         # TODO: Better format in this one as well
         self.site_overall_analysis()
-        c1 = 'site name'
-        c2 = '#binding events'
-        c3 = '#unbinding events'
-        c4 = 'binding rates'
+        c1 = 'site type'
+        c2 = 'site name'
+        c3 = '#binding events'
+        c4 = '#unbinding events'
+        c5 = 'binding rates'
         #c5 = 'Elongation rates'
-        f.write(f'{c1:20} {c2:20} {c3:20} {c4:20} \n ')  # {c5:20} \n')
+        f.write(f'{c1:20} {c2:20} {c3:20} {c4:20} {c5:20} \n ')  # {c5:20} \n')
         for i, site in enumerate(self.site_list):
-            f.write(f'{site.name:9} {self.total_binding_events[i]:20} {self.total_unbinding_events[i]:20} '
-                    f' {self.binding_rates[i]:20}')  # {self.elongation_rates[i]:20}')
+            f.write(f'{site.site_type:20} {site.name:20} {self.total_binding_events[i]:20} '
+                    f'{self.total_unbinding_events[i]:20}  {self.binding_rates[i]:20}')
+            # {self.elongation_rates[i]:20}')
             f.write(" \n")
         f.write(" \n")
         f.write("Events\n")
