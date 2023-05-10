@@ -9,6 +9,7 @@ import sys
 # Effects can describe the motion of RNAPs as well as twist injection; topoisomerase activity; overall mechanics of
 # enzymes bound to DNA, etc...
 
+# TODO: Decide which of these parameters you need
 # All parameters are already in the params module, but I prefer to have them here with more simple names:
 v0 = params.v0
 w0 = params.w0

@@ -1,7 +1,7 @@
 import sys
 
 import numpy as np
-from TORCphysics import params, Enzyme, Environment
+from TORCphysics import params, Enzyme
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -34,86 +34,29 @@ gyra_w = params.gyra_w
 gyra_t = params.gyra_t
 
 
-# class Add_enzyme:
-#    # For handling the data in the data frames, it is more useful to create a class that contains information
-#    # regarding the twist and superhelical density at the site prior binding.#
-
-#    # So, the twist and superhelical density are the local values at the site prior binding.
-#    def __init__(self, will_bind, enzyme, twist, superhelical):
-#        # I'll save the input filenames just in case
-#        self.will_bind = will_bind
-#        self.enzyme = enzyme
-#        self.twist = twist
-#        self.superhelical = superhelical
+# TODO: needs a unbinding model selector.
+# TODO: I need to find a way to set a method so it is easy to define binding models
+# TODO: We still need to check if the new enzymes are not overlapping. If more than 1 enzyme
+#  passed the probability test and are binding the same overlapping region, we need to flip a coin to
+#  check which one will be binding
 
 # ---------------------------------------------------------------------------------------------------------------------
-# BINDING FUNCTIONS
+# BINDING/UNBINDING MODEL SELECTION FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
+# If you create a new model, modify these functions so the program can process them, and select the appropriate
+# binding and unbinding models
 
-# ----------------------------------------------------------
-
-# This function is in charge of administrating the binding model.
-# According to the site's type and properties, it determines which binding model and probabilistic model to use
-# and then uses those models to determine if enzymes in the environment would actually bind the DNA
-
-# probabilistic model we will use for binding events.
-# model = poisson or not (non homogeneus Poisson)
-# genome = the dataframe with all the information in the piece of "genome"
-# sigma  = supercoiling density that the binding site
-# f_ini  = initiation function
-
-# Goes through the enzymes in enzymes list and according to their unbinding condition unbind them.
-# Returns a list of enzyme indexes that will unbind, the enzyme that unbinds
-def unbinding_model(enzymes_list, dt, rng):
-    drop_list_index = []  # This list will have the indices of the enzymes that will unbind, and the enzyme
-    drop_list_enzyme = []  # And a list with the enzymes
-    for i, enzyme in enumerate(enzymes_list):
-
-        if enzyme.enzyme_type == 'EXT':  # The fake boundaries can't unbind
-            continue
-
-        unbind = False  # True if it unbinds
-
-        # According enzyme_type, apply unbinding condition
-        # ------------------------------------------------------------------
-        # TODO: add unbinding condition for more enzyme types!
-        # Right now, only RNAPs can unbind
-        if enzyme.enzyme_type == 'RNAP':
-            # condition for transcription in >>>>>>>>>>>>> right direction or
-            # condition for transcription in <<<<<<<<<<<<< left  direction
-            if (enzyme.direction == 1 and enzyme.end - enzyme.position <= 0) or \
-                    (enzyme.direction == -1 and enzyme.end - enzyme.position >= 0):
-                unbind = True
-        # the unbinding condition is another Poisson process so we can use the P_binding_Poisson function
-        elif enzyme.enzyme_type == 'topo' or enzyme.enzyme_type == 'topoisomerase':
-            unbinding_probability = P_binding_Poisson(enzyme.k_off, dt)
-            urandom = rng.uniform()  # we need a random number
-            if urandom <= unbinding_probability:  # and decide
-                unbind = True
-        else:
-            continue
-
-        # Now add it to the drop_list if the enzyme will unbind
-        # ------------------------------------------------------------------
-        if unbind:
-            drop_list_index.append(i)
-            drop_list_enzyme.append(enzyme)
-
-    return drop_list_index, drop_list_enzyme
-
-
-#  This function is the one you need to update deciding which binding model to use
+# This function administrates the binding model to use
+# ---------------------------------------------------------------------------------------------------------------------
 def select_binding_model(site, environment, site_superhelical, dt):
     have_model = True  # Tells the function that called if the model exists
     rate = np.zeros_like(site_superhelical)
     binding_probability = 0.0
-    # TODO: Check if in some cases you need an array of binding probabilities...
 
     # Simple poisson process (constant binding)
     if site.site_model == 'poisson' or site.site_model == 'Poisson':
         rate = site.k_min * np.ones_like(site_superhelical)
-        binding_probability = P_binding_Poisson(site.k_min, dt)
-    # TODO: Check how the topo's are going to figure this out, and how to include the environment.
+        binding_probability = P_binding_Poisson(site.k_min * np.ones_like(site_superhelical), dt)
     # MODELS - This models include all enzymes?:
     # Sam's Meyer model
     elif site.site_model == 'sam' or site.site_model == 'Sam':
@@ -144,6 +87,30 @@ def select_binding_model(site, environment, site_superhelical, dt):
     return rate, binding_probability, have_model
 
 
+# This function is in charge of administrating the unbinding models to use
+# ---------------------------------------------------------------------------------------------------------------------
+def select_unbinding_model(enzyme, dt, rng):
+    unbind = False
+    if enzyme.enzyme_type == 'RNAP':
+        have_model = True
+        unbind = RNAP_unbinding_model(enzyme)
+    # TODO: some NAPs might not follow a Poisson_unbinding_model
+    elif enzyme.enzyme_type == 'topo' or enzyme.enzyme_type == 'NAP':
+        have_model = True
+        unbind = Poisson_unbinding_model(enzyme, dt, rng)
+    else:
+        print('Warning, we do not have the unbinding model for your enzyme type:', enzyme.enzyme_type)
+        have_model = False
+    return unbind, have_model
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# BINDING/UNBINDING OVERALL MODELS
+# ---------------------------------------------------------------------------------------------------------------------
+# These functions do not perform a particular binding model, but are the ones that implement the binding/unbinding
+# processes.
+
+
 # Goes through enzymes in the environment (environmental_list) and search for the available sites that it recognizes.
 # If the site is available, then, according site model (and in the future also environmental model) calculate the
 # binding probability. It then returns a list of new_enzymes that will bind the DNA
@@ -172,7 +139,6 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
             # TODO: In the future, check how to decide between overlapping sites. - with a list of ranges,
             #  probabilities and enzymes
 
-            # TODO: Generalize it for other enzymes like lacs, and topos
             # For now, only genes!
             # -----------------------------------------------------------
             # if site.site_type != 'gene':
@@ -185,9 +151,6 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
             site_superhelical = enzyme_before.superhelical
 
             # According model, calculate the binding probability
-            # TODO: for checking the binding of overlapping enzymes, maybe I can create a dictionary of site.
-            #  Or maybe with a list of ranges, sizes and probabilities, and then decide.
-            #  Also figure a way how to incorporate the concentration in the enviroment and all that
             # -----------------------------------------------------------
             # We need to figure out 1 or 2 models.
             # A model for the rate in case it is modulated by supercoiling
@@ -231,44 +194,72 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
 
                 new_enzymes.append(enzyme)
 
-                # TODO: We still need to check if the new enzymes are not overlapping. If more than 1 enzyme
-                #  passed the probability test and are binding the same overlapping region, we need to flip a coin to
-                #  check which one will be binding
-
+    # TODO: Here you should see how to decide to enzymes are binding at the same time. This needs testing
     return new_enzymes
 
 
-# ----------------------------------------------------------
-def check_site_availability(site, enzyme_list, size):
-    # Check if the site is available for binding.
-    # It assumes that the probability has already been calculated, and we have a candidate enzyme for the binding
-    # with size=size.
-    # We need the list of current enzymes to see if the one before and after the site overlap with the start site.
-    enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
-    enzyme_after = [enzyme for enzyme in enzyme_list if enzyme.position >= site.start][0]
-    # And a range of their occupancy
-    range_before = [enzyme_before.position, enzyme_before.position + enzyme_before.size]
-    range_after = [enzyme_after.position, enzyme_after.position + enzyme_after.size]
-    if site.direction > 0:
-        my_range = [site.start - size, site.start]
-    #        my_range = [site.start, site.start + size]
-    elif site.direction <= 0:
-        my_range = [site.start, site.start + size]
+# Goes through the enzymes in enzymes list and according to their unbinding condition unbind them.
+# Returns a list of enzyme indexes that will unbind, the enzyme that unbinds
+# ---------------------------------------------------------------------------------------------------------------------
+def unbinding_model(enzymes_list, dt, rng):
+    drop_list_index = []  # This list will have the indices of the enzymes that will unbind, and the enzyme
+    drop_list_enzyme = []  # And a list with the enzymes
+    for i, enzyme in enumerate(enzymes_list):
+
+        if enzyme.enzyme_type == 'EXT':  # The fake boundaries can't unbind
+            continue
+
+        # According enzyme_type, apply unbinding condition
+        # ------------------------------------------------------------------
+        unbind, have_model = select_unbinding_model(enzyme, dt, rng)
+        if not have_model:  # If I don't have a model, then we skip
+            continue
+
+        # Now add it to the drop_list if the enzyme will unbind
+        # ------------------------------------------------------------------
+        if unbind:
+            drop_list_index.append(i)
+            drop_list_enzyme.append(enzyme)
+
+    return drop_list_index, drop_list_enzyme
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# UNBINDING MODELS
+# ---------------------------------------------------------------------------------------------------------------------
+# These functions are for applying particular unbinding conditions.
+# Their output is "unbind", which can be True if the bound enzyme will unbind, or False if it will not unbind (stays).
+# If you need to add your own, create it here!
+
+# Model that controls the unbinding condition for DNA topoisomerases
+# ---------------------------------------------------------------------------------------------------------------------
+def RNAP_unbinding_model(enzyme):
+    # condition for transcription in >>>>>>>>>>>>> right direction or
+    # condition for transcription in <<<<<<<<<<<<< left  direction
+    unbind = False
+    if (enzyme.direction == 1 and enzyme.end - enzyme.position <= 0) or \
+            (enzyme.direction == -1 and enzyme.end - enzyme.position >= 0):
+        unbind = True
+    return unbind
+
+
+# Unbinding model for enzymes that unbind spontaneously
+# ---------------------------------------------------------------------------------------------------------------------
+def Poisson_unbinding_model(enzyme, dt, rng):
+    unbinding_probability = P_binding_Poisson(enzyme.k_off, dt)
+    urandom = rng.uniform()  # we need a random number
+    if urandom <= unbinding_probability:  # and decide
+        unbind = True
     else:
-        print('Error in checking site availability. Site=', site.site_type, site.name)
-        sys.exit()
-        my_range = [site.start, site.start + size]
-    #        my_range = [site.start, site.start - size]
+        unbind = False
+    return unbind
 
-    # If any of them intersect
-    if (set(range_before) & set(my_range)) or (set(range_after) & set(my_range)):
-        available = False
-    # there is an intersection
-    else:
-        available = True
 
-    return available
-
+# ---------------------------------------------------------------------------------------------------------------------
+# BINDING MODELS
+# ---------------------------------------------------------------------------------------------------------------------
+# These functions are for the particular binding model.
+# If you need a new one, define it here.
 
 # ----------------------------------------------------------
 # This equation calculates the probability of binding according
@@ -296,8 +287,8 @@ def P_binding_Nonh_Poisson(rate, dt):
 # The promoter activation curve according Sam Meyer 2019
 # For this function, we use the minimum rate
 def promoter_curve_Meyer(basal_rate, sigma):
-    U = 1.0 / (1.0 + np.exp((sigma - SM_sigma_t) / SM_epsilon_t))  # the energy required for melting
-    f = np.exp(SM_m * U)  # the activation curve
+    u = 1.0 / (1.0 + np.exp((sigma - SM_sigma_t) / SM_epsilon_t))  # the energy required for melting
+    f = np.exp(SM_m * u)  # the activation curve
     rate = basal_rate * f  # and the rate modulated through the activation curve
     return rate
 
@@ -321,12 +312,12 @@ def opening_energy(x, a, b, sigma_t, epsilon):
 # of the openning energy, and inspired by according Sam Meyer 2019
 # For this function, we use the minimum rate
 def promoter_curve_opening_E(basal_rate, sigma, sigma0, *opening_p):
-    U = opening_energy(sigma, *opening_p)  # the energy required for melting
-    U0 = opening_energy(sigma0, *opening_p)  # energy for melting at reference sigma0
+    u = opening_energy(sigma, *opening_p)  # the energy required for melting
+    u0 = opening_energy(sigma0, *opening_p)  # energy for melting at reference sigma0
     # (should be the sigma at which k0=basal_rate
     #  was measured...)
-    DU = U - U0  # Energy difference
-    f = np.exp(-DU / (EE_alpha))  # the activation curve
+    du = u - u0  # Energy difference
+    f = np.exp(-du / EE_alpha)  # the activation curve
     rate = basal_rate * f
     return rate
 
@@ -360,15 +351,11 @@ def promoter_curve_opening_E_maxmin_I(k_min, k_max, sigma, *opening_p):
     return rate
 
 
-# TODO: Define binding model for topo I and gyrase.
-#  AQUI ME QUEDE
+# TODO: Check the curve doesn't overflow?
 def topoI_binding(basal_rate, concentration, sigma):
     a = concentration * basal_rate
     b = 1 + np.exp((sigma - topo_t) / topo_w)
-    #    rate = a * np.exp(1 / b)
     rate = a / b  # * np.exp(1 / b)
-    #    rate = 1/b
-    #    rate = b
     #    try:
     #        b = 1 + np.exp((sigma - topo_t) / topo_w)
     #        rate = a / b
@@ -383,3 +370,42 @@ def gyrase_binding(basal_rate, concentration, sigma):
     #    rate = a * np.exp(1 / b)
     rate = a / b
     return rate
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# HELPFUL FUNCTIONS
+# ---------------------------------------------------------------------------------------------------------------------
+# These functions are used as auxiliars.
+# Can be for checking site availability, if multiple enzymes are trying to bind the same site, decide which one
+# will bind, etc...
+
+# ----------------------------------------------------------
+def check_site_availability(site, enzyme_list, size):
+    # Check if the site is available for binding.
+    # It assumes that the probability has already been calculated, and we have a candidate enzyme for the binding
+    # with size=size.
+    # We need the list of current enzymes to see if the one before and after the site overlap with the start site.
+    enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
+    enzyme_after = [enzyme for enzyme in enzyme_list if enzyme.position >= site.start][0]
+    # And a range of their occupancy
+    range_before = [enzyme_before.position, enzyme_before.position + enzyme_before.size]
+    range_after = [enzyme_after.position, enzyme_after.position + enzyme_after.size]
+    if site.direction > 0:
+        my_range = [site.start - size, site.start]
+    #        my_range = [site.start, site.start + size]
+    elif site.direction <= 0:
+        my_range = [site.start, site.start + size]
+    else:
+        print('Error in checking site availability. Site=', site.site_type, site.name)
+        sys.exit()
+        #  my_range = [site.start, site.start + size]
+    #        my_range = [site.start, site.start - size]
+
+    # If any of them intersect
+    if (set(range_before) & set(my_range)) or (set(range_after) & set(my_range)):
+        available = False
+    # there is an intersection
+    else:
+        available = True
+
+    return available

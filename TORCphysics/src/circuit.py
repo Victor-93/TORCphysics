@@ -49,7 +49,7 @@ class Circuit:
             for topo in topo_list:
                 # The idea is that the topos will recognize these specific sites.
                 # These sites will be created dynamically, and will have different names :0,1,2,3,...
-                # I will have to ignore this first site in specfic, because this one will be the overall, and is the
+                # I will have to ignore this first site in specific, because this one will be the overall, and is the
                 # one that is output in the sites_df.csv
                 self.site_list.append(
                     Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global', start=1, end=self.size,
@@ -69,7 +69,8 @@ class Circuit:
         self.update_global_superhelical()
 
         # Let's initialize the log
-        self.log = Log(self.size, self.frames, self.frames * self.dt, self.dt, self.structure, self.name, self.seed,
+        self.log = Log(self.size, self.frames, self.frames * self.dt, self.dt, self.structure,
+                       self.name + '_' + output_prefix, self.seed,
                        self.site_list, self.twist, self.superhelical)
 
         # Let's define the dictionaries that will become dataframes, in case the series option was selected
@@ -93,6 +94,15 @@ class Circuit:
     # TODO: It might be worth adding an action and time? Or not? So that maybe it could perform an action at a given
     #  time?
     def run(self):
+        #  What I need to do for including more frames is modify the log as well, and all other places where
+        #  self.frames is used...
+        #  if n_frames is not None:
+        #    frames_i = 1
+        #    frames_f = n_frames + 1
+        #  else:
+        #    frames_i = 1
+        #    frames_f = self.frames =
+        #
 
         for frame in range(1, self.frames + 1):
             self.frame += 1
@@ -141,14 +151,14 @@ class Circuit:
                 self.append_environmental_to_dict()
 
         # Output the dataframes: (series)
-        # TODO: I need a function that can save this to a csv
         if self.series:
             self.enzymes_df = pd.DataFrame.from_dict(self.enzymes_dict_list)
-            self.enzymes_df.to_csv(self.name + '_enzymes_df.csv', index=False, sep=',')
+            self.enzymes_df.to_csv(self.name + '_' + self.output_prefix + '_enzymes_df.csv', index=False, sep=',')
             self.sites_df = pd.DataFrame.from_dict(self.sites_dict_list)
-            self.sites_df.to_csv(self.name + '_sites_df.csv', index=False, sep=',')
+            self.sites_df.to_csv(self.name + '_' + self.output_prefix + '_sites_df.csv', index=False, sep=',')
             self.environmental_df = pd.DataFrame.from_dict(self.environmental_dict_list)
-            self.environmental_df.to_csv(self.name + '_environment_df.csv', index=False, sep=',')
+            self.environmental_df.to_csv(self.name + '_' + self.output_prefix + '_environment_df.csv',
+                                         index=False, sep=',')
 
         # Output the log of events
         self.log.final_twist = self.twist
@@ -156,10 +166,11 @@ class Circuit:
         self.log.log_out()
 
         # Output csvs
-        self.enzyme_list_to_df().to_csv(self.name + '_enzymes_' + self.output_prefix + '.csv', index=False, sep=',')
-        self.site_list_to_df().to_csv(self.name + '_sites_' + self.output_prefix + '.csv', index=False, sep=',')
-        self.environmental_list_to_df().to_csv(self.name + '_environment_' + self.output_prefix + '.csv', index=False,
-                                               sep=',')
+        self.enzyme_list_to_df().to_csv(self.name + '_' + self.output_prefix + '_enzymes' + '.csv',
+                                        index=False, sep=',')
+        self.site_list_to_df().to_csv(self.name + '_' + self.output_prefix + '_sites' + '.csv', index=False, sep=',')
+        self.environmental_list_to_df().to_csv(self.name + '_' + self.output_prefix + '_environment' + '.csv',
+                                               index=False, sep=',')
 
     # Returns list of enzymes in the form of dataframe. This function is with the intention of outputting the system
     def enzyme_list_to_df(self):
@@ -240,7 +251,6 @@ class Circuit:
                 if len(enzyme_before) <= 0:
                     print('Some error in append_sites_dict_step1')
                     sys.exit()
-                    print(0)
                 enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start][-1]
                 site_twist = enzyme_before.twist
                 site_superhelical = enzyme_before.superhelical
@@ -373,9 +383,10 @@ class Circuit:
             # ----------------------------------------------------------------
             # Notice that we don't specify the end
             # TODO: the site needs to be defined first
-            extra_left = Enzyme(e_type='EXT', name='EXT_L', site=self.site_match('EXT'), position=position_left,
+            extra_left = Enzyme(e_type='EXT', name='EXT_L', site=self.site_match('EXT', 'EXT'), position=position_left,
                                 size=0, k_cat=0, k_off=0, twist=0, superhelical=self.superhelical)
-            extra_right = Enzyme(e_type='EXT', name='EXT_R', site=self.site_match('EXT'), position=position_right,
+            extra_right = Enzyme(e_type='EXT', name='EXT_R', site=self.site_match('EXT', 'EXT'),
+                                 position=position_right,
                                  size=0, k_cat=0, k_off=0, twist=0, superhelical=self.superhelical)
 
             self.enzyme_list.append(extra_left)
@@ -426,11 +437,13 @@ class Circuit:
     def get_num_sites(self):
         return len(self.site_list)
 
-    def site_match(self, label):
-        if label in [site.name for site in self.site_list]:
+    # Matches labels with sites.
+    def site_match(self, label_name, label_type):
+        if label_name in [site.name for site in self.site_list] \
+                and label_type in [site.site_type for site in self.site_list]:
             # TODO check if this works!
             for site in self.site_list:
-                if site.name == label:
+                if site.name == label_name and site.site_type == label_type:
                     return site  # the first one?
         else:
             return None
