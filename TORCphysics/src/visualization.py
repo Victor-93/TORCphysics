@@ -52,6 +52,7 @@ object_text = 10  # NAPs, genes, etc...
 #  3.2- Circular
 # TODO: Maybe one wants to include specific sites names? instead of ignoring?
 # TODO: You need to test these functions
+# TODO: Check how these functions change with the stochastic topo binding
 
 def ax_params(axis, xl, yl, grid, legend):
     axis.grid(grid)
@@ -144,33 +145,34 @@ def plot_cross_correlation_with_site(my_circuit, sites_df, ref_name, axs=None, i
 
 # Plots supercoiling profiles at the sites and global
 def plot_supercoiling_profiles(my_circuit, sites_df, axs=None, ignore=None, colors=None, site_type=None,
-                               labels=True, **kwargs):
+                               only_global=False, labels=True, **kwargs):
     if axs is None:
         axs = plt.gca()
     time = np.arange(0, my_circuit.dt * (my_circuit.frames + 1), my_circuit.dt)
     # Let's plot the global superhelical density
     mask = sites_df['type'] == 'circuit'  # This one contains global superhelical density
     global_sigma = sites_df[mask]['superhelical'].to_numpy()
-    # get names
-    if site_type is None:
-        mask = sites_df['type'] != 'circuit'
-        # Let's filter the sites names
-        names = sites_df[mask].drop_duplicates(subset='name')['name']
-    else:
-        mask = sites_df['type'] == site_type
-        names = sites_df[mask].drop_duplicates(subset='name')['name']
-    # And plot the superhelical density at sites
-    for i, name in enumerate(names):
-        if ignore is not None:
-            if name in ignore:
-                continue
-        mask = sites_df['name'] == name
-        superhelical = sites_df[mask]['superhelical'].to_numpy()
-        if colors is not None:
-            axs.plot(time, superhelical, color=colors[name], label=name, alpha=0.5, **kwargs)
-        else:
-            axs.plot(time, superhelical, label=name, alpha=0.5, **kwargs)
     axs.plot(time, global_sigma, color='black', label='global')  # and the global
+    if not only_global:
+        # get names
+        if site_type is None:
+            mask = sites_df['type'] != 'circuit'
+            # Let's filter the sites names
+            names = sites_df[mask].drop_duplicates(subset='name')['name']
+        else:
+            mask = sites_df['type'] == site_type
+            names = sites_df[mask].drop_duplicates(subset='name')['name']
+        # And plot the superhelical density at sites
+        for i, name in enumerate(names):
+            if ignore is not None:
+                if name in ignore:
+                    continue
+            mask = sites_df['name'] == name
+            superhelical = sites_df[mask]['superhelical'].to_numpy()
+            if colors is not None:
+                axs.plot(time, superhelical, color=colors[name], label=name, alpha=0.5, **kwargs)
+            else:
+                axs.plot(time, superhelical, label=name, alpha=0.5, **kwargs)
 
     if labels:
         ax_params(axis=axs, xl='time (seconds)', yl='Supercoiling at site', grid=True, legend=True)
@@ -216,7 +218,6 @@ def plot_site_response_curves(my_circuit, axs=None, ignore=None, colors=None, si
                 continue
             else:
                 environment = environment[0]
-            print(site.name, site.name.isdigit())
             if site.name.isdigit() and 'DNA' in environment.site_type:  # skip non-specific binding proteins
                 continue
 

@@ -1,0 +1,28 @@
+TORCphysics log file 
+
+General information: 
+---------------------------------------------------------------------------------------
+Circuit name: topos_continuum
+Size: 5000
+Structure: circle
+Number of sites: 2
+Number of frames: 1500
+Simulation time: 1500.0
+Simulation timestep: 1.0
+Seed: 2229213337791577720
+ 
+Overall simulation information 
+---------------------------------------------------------------------------------------
+Initial twist: -179.55548
+Final twist: -71.21696
+Initial superhelical density: -0.06001
+Final superhelical density: -0.02380
+ 
+Overall rates 
+---------------------------------------------------------------------------------------
+site type            site name            #binding events      #unbinding events    binding rates        
+ EXT                  EXT                                   0.0                  0.0                   0.0 
+gene                 gene1                                 0.0                  0.0                   0.0 
+ 
+Events
+---------------------------------------------------------------------------------------
