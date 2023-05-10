@@ -37,7 +37,7 @@ class Log:
             # And is used to update its global quantities.
 
             # This is for enzymes that bind bare DNA - Let's initialize it
-            if 'DNA' in site.site_type and 'sum' == site.name:
+            if 'DNA' in site.site_type and '_global' in site.name:
                 global_sum = True
 
             for event in self.metadata:

@@ -52,8 +52,8 @@ class Circuit:
                 # I will have to ignore this first site in specfic, because this one will be the overall, and is the
                 # one that is output in the sites_df.csv
                 self.site_list.append(
-                    Site(s_type='DNA_' + topo.name, name='sum', start=1, end=self.size, k_min=0, k_max=0,
-                         s_model='stochastic_topo_binding', oparams=None))
+                    Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global', start=1, end=self.size,
+                         k_min=0, k_max=0, s_model='stochastic_' + topo.name, oparams=None))
                 # topo.site_type = 'DNA_' + topo.name
 
         # Define bare DNA binding sites for bare DNA binding enzymes
@@ -232,7 +232,7 @@ class Circuit:
             if site.site_type == 'EXT':
                 continue
             # This is for enzymes that bind bare DNA
-            if 'DNA' in site.site_type and 'sum' == site.name:
+            if 'DNA' in site.site_type and '_global' in site.name:
                 site_superhelical = self.superhelical
                 site_twist = self.twist
             else:
@@ -269,7 +269,7 @@ class Circuit:
             # And is used to update its global quantities.
 
             # This is for enzymes that bind bare DNA - Let's initialize it
-            if 'DNA' in site.site_type and 'sum' == site.name:
+            if 'DNA' in site.site_type and '_global' in site.name:
                 self.sites_dict_list_aux[i]['binding'] = 0
                 self.sites_dict_list_aux[i]['unbinding'] = 0
                 global_sum = True

@@ -217,7 +217,7 @@ def plot_site_response_curves(my_circuit, axs=None, ignore=None, colors=None, si
             else:
                 environment = environment[0]
             print(site.name, site.name.isdigit())
-            if site.name.isdigit() and environment.site_type == 'DNA':  # skip non-specific binding proteins
+            if site.name.isdigit() and 'DNA' in environment.site_type:  # skip non-specific binding proteins
                 continue
 
             rate, x = an.site_activity_curves(site, environment)

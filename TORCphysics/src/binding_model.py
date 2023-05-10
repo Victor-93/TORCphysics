@@ -177,6 +177,8 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
             # -----------------------------------------------------------
             # if site.site_type != 'gene':
             #    continue
+            if '_global' in site.name:  # We don't actually model it for globals
+                continue
 
             # Get superhelical density at site
             enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
