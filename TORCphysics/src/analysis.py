@@ -74,30 +74,9 @@ def cross_correlation_hmatrix(signals, dt):
 # It computes the activity curves of site as a function of the supercoiling density.
 # Input: 1.- Site. Optionals= sigma_min, sigma_max and delta_sigma
 # Output: 1.- Modulated rates. 2.- Supercoiling density.
-def site_activity_curves(site, sigma_min=-.2, sigma_max=.1, delta_sigma=.001):
+def site_activity_curves(site, environment, dt=1, sigma_min=-.2, sigma_max=.1, delta_sigma=.001):
     sigma = np.arange(sigma_min, sigma_max, delta_sigma)
-
-    # Simple poisson process (constant binding)
-    if site.site_model == 'poisson' or site.site_model == 'Poisson':
-        rate = site.k_min * np.ones_like(sigma)
-    # Sam's Meyer model
-    elif site.site_model == 'sam' or site.site_model == 'Sam':
-        rate = bm.promoter_curve_Meyer(site.k_min, sigma)
-    # Max-min model according oparams measured with SIDD
-    elif site.site_model == 'maxmin' or site.site_model == 'Maxmin':
-        rate = bm.promoter_curve_opening_E_maxmin(site.k_min, site.k_max, sigma, *site.oparams)
-    # Inverted max-min model (where it is positive supercoiling sensitive)
-    elif site.site_model == 'maxmin_I' or site.site_model == 'Maxmin_I':
-        rate = bm.promoter_curve_opening_E_maxmin_I(site.k_min, site.k_max, sigma, *site.oparams)
-    # Similar to max-min but with the effective energy
-    elif site.site_model == 'effE' or site.site_model == 'EffE':
-        rate = bm.promoter_curve_opening_E(site.k_min, sigma, sigma0=0, *site.oparams)
-    elif site.site_model == 'none' or site.site_model == 'None' or site.site_model is None:
-        print('This site ', site.name, ' does not have a binding model')
-        rate = site.k_min * np.ones_like(sigma)
-    else:  # If there's no model, there's no binding
-        print('This site model ', site.site_model, ' cannot be recognized')
-        rate = site.k_min * np.ones_like(sigma)
+    rate, binding_probability, have_model = bm.select_binding_model(site, environment, sigma, dt)
     return rate, sigma
 
 

@@ -102,6 +102,48 @@ def unbinding_model(enzymes_list, dt, rng):
     return drop_list_index, drop_list_enzyme
 
 
+#  This function is the one you need to update deciding which binding model to use
+def select_binding_model(site, environment, site_superhelical, dt):
+    have_model = True  # Tells the function that called if the model exists
+    rate = np.zeros_like(site_superhelical)
+    binding_probability = 0.0
+    # TODO: Check if in some cases you need an array of binding probabilities...
+
+    # Simple poisson process (constant binding)
+    if site.site_model == 'poisson' or site.site_model == 'Poisson':
+        rate = site.k_min * np.ones_like(site_superhelical)
+        binding_probability = P_binding_Poisson(site.k_min, dt)
+    # TODO: Check how the topo's are going to figure this out, and how to include the environment.
+    # MODELS - This models include all enzymes?:
+    # Sam's Meyer model
+    elif site.site_model == 'sam' or site.site_model == 'Sam':
+        rate = promoter_curve_Meyer(site.k_min, site_superhelical)
+        binding_probability = P_binding_Nonh_Poisson(rate, dt)
+    # Max-min model according oparams measured with SIDD
+    elif site.site_model == 'maxmin' or site.site_model == 'Maxmin':
+        rate = promoter_curve_opening_E_maxmin(site.k_min, site.k_max, site_superhelical, *site.oparams)
+        binding_probability = P_binding_Nonh_Poisson(rate, dt)
+    # Inverted max-min model (where it is positive supercoiling sensitive)
+    elif site.site_model == 'maxmin_I' or site.site_model == 'Maxmin_I':
+        rate = promoter_curve_opening_E_maxmin_I(site.k_min, site.k_max, site_superhelical, *site.oparams)
+        binding_probability = P_binding_Nonh_Poisson(rate, dt)
+    # Similar to max-min but with the effective energy
+    elif site.site_model == 'effE' or site.site_model == 'EffE':
+        rate = promoter_curve_opening_E(site.k_min, site_superhelical, sigma0=0, *site.oparams)
+        binding_probability = P_binding_Nonh_Poisson(rate, dt)
+    elif site.site_model == 'none' or site.site_model == 'None' or site.site_model is None:
+        have_model = False
+    elif site.site_model == 'stochastic_topoI':
+        rate = topoI_binding(environment.k_on, environment.concentration, site_superhelical)
+        binding_probability = P_binding_Nonh_Poisson(rate, dt)
+    elif site.site_model == 'stochastic_gyrase':
+        rate = gyrase_binding(environment.k_on, environment.concentration, site_superhelical)
+        binding_probability = P_binding_Nonh_Poisson(rate, dt)
+    else:  # If there's no model, there's no binding
+        have_model = False
+    return rate, binding_probability, have_model
+
+
 # Goes through enzymes in the environment (environmental_list) and search for the available sites that it recognizes.
 # If the site is available, then, according site model (and in the future also environmental model) calculate the
 # binding probability. It then returns a list of new_enzymes that will bind the DNA
@@ -149,37 +191,8 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
             # A model for the rate in case it is modulated by supercoiling
             # And a model for calculating the binding probability.
 
-            # Simple poisson process (constant binding)
-            if site.site_model == 'poisson' or site.site_model == 'Poisson':
-                binding_probability = P_binding_Poisson(site.k_min, dt)
-
-            # TODO: Check how the topo's are going to figure this out, and how to include the environment.
-            # MODELS - This models include all enzymes?:
-            # Sam's Meyer model
-            elif site.site_model == 'sam' or site.site_model == 'Sam':
-                rate = promoter_curve_Meyer(site.k_min, site_superhelical)
-                binding_probability = P_binding_Nonh_Poisson(rate, dt)
-            # Max-min model according oparams measured with SIDD
-            elif site.site_model == 'maxmin' or site.site_model == 'Maxmin':
-                rate = promoter_curve_opening_E_maxmin(site.k_min, site.k_max, site_superhelical, *site.oparams)
-                binding_probability = P_binding_Nonh_Poisson(rate, dt)
-            # Inverted max-min model (where it is positive supercoiling sensitive)
-            elif site.site_model == 'maxmin_I' or site.site_model == 'Maxmin_I':
-                rate = promoter_curve_opening_E_maxmin_I(site.k_min, site.k_max, site_superhelical, *site.oparams)
-                binding_probability = P_binding_Nonh_Poisson(rate, dt)
-            # Similar to max-min but with the effective energy
-            elif site.site_model == 'effE' or site.site_model == 'EffE':
-                rate = promoter_curve_opening_E(site.k_min, site_superhelical, sigma0=0, *site.oparams)
-                binding_probability = P_binding_Nonh_Poisson(rate, dt)
-            elif site.site_model == 'none' or site.site_model == 'None' or site.site_model == None:
-                continue
-            elif site.site_model == 'stochastic_topoI':
-                rate = topoI_binding(environment.k_on, environment.concentration, site_superhelical)
-                binding_probability = P_binding_Nonh_Poisson(rate, dt)
-            elif site.site_model == 'stochastic_gyrase':
-                rate = gyrase_binding(environment.k_on, environment.concentration, site_superhelical)
-                binding_probability = P_binding_Nonh_Poisson(rate, dt)
-            else:  # If there's no model, there's no binding
+            rate, binding_probability, have_model = select_binding_model(site, environment, site_superhelical, dt)
+            if not have_model:  # If I don't have a model, then we skip
                 continue
 
             # Check if site is available
@@ -350,10 +363,10 @@ def promoter_curve_opening_E_maxmin_I(k_min, k_max, sigma, *opening_p):
 def topoI_binding(basal_rate, concentration, sigma):
     a = concentration * basal_rate
     b = 1 + np.exp((sigma - topo_t) / topo_w)
-#    rate = a * np.exp(1 / b)
-    rate = a/b# * np.exp(1 / b)
-#    rate = 1/b
-#    rate = b
+    #    rate = a * np.exp(1 / b)
+    rate = a / b  # * np.exp(1 / b)
+    #    rate = 1/b
+    #    rate = b
     #    try:
     #        b = 1 + np.exp((sigma - topo_t) / topo_w)
     #        rate = a / b
@@ -365,6 +378,6 @@ def topoI_binding(basal_rate, concentration, sigma):
 def gyrase_binding(basal_rate, concentration, sigma):
     a = concentration * basal_rate
     b = 1 + np.exp(-(sigma - gyra_t) / gyra_w)
-#    rate = a * np.exp(1 / b)
-    rate = a/b
+    #    rate = a * np.exp(1 / b)
+    rate = a / b
     return rate
