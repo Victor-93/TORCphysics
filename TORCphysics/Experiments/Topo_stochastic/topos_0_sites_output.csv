@@ -1,6 +1,6 @@
 type,name,start,end,k_min,k_max,model,oparams
-DNA_topoI,sum,1.0,5000.0,0.0,0.0,stochastic_topo_binding,
-DNA_gyrase,sum,1.0,5000.0,0.0,0.0,stochastic_topo_binding,
+DNA_topoI,DNA_topoI_global,1.0,5000.0,0.0,0.0,stochastic_topoI,
+DNA_gyrase,DNA_gyrase_global,1.0,5000.0,0.0,0.0,stochastic_gyrase,
 DNA_topoI,0,1.0,120.0,0.0,0.0,stochastic_topoI,
 DNA_gyrase,0,1.0,120.0,0.0,0.0,stochastic_gyrase,
 EXT,EXT,1.0,5000.0,0.0,0.0,,
