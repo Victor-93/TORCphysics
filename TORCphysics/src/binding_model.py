@@ -195,6 +195,8 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
                 new_enzymes.append(enzyme)
 
     # TODO: Here you should see how to decide to enzymes are binding at the same time. This needs testing
+    new_enzymes = check_binding_conflicts(new_enzymes, rng)
+
     return new_enzymes
 
 
@@ -375,11 +377,12 @@ def gyrase_binding(basal_rate, concentration, sigma):
 # ---------------------------------------------------------------------------------------------------------------------
 # HELPFUL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
-# These functions are used as auxiliars.
+# These functions are used as auxiliary.
 # Can be for checking site availability, if multiple enzymes are trying to bind the same site, decide which one
 # will bind, etc...
 
 # ----------------------------------------------------------
+# This function checks if a site is not blocked by other enzymes
 def check_site_availability(site, enzyme_list, size):
     # Check if the site is available for binding.
     # It assumes that the probability has already been calculated, and we have a candidate enzyme for the binding
@@ -390,6 +393,8 @@ def check_site_availability(site, enzyme_list, size):
     # And a range of their occupancy
     range_before = [enzyme_before.position, enzyme_before.position + enzyme_before.size]
     range_after = [enzyme_after.position, enzyme_after.position + enzyme_after.size]
+    # TODO: Check if this is correct! I think it is assuming that enzymes bind just before the start site, which might
+    #  not be true.
     if site.direction > 0:
         my_range = [site.start - size, site.start]
     #        my_range = [site.start, site.start + size]
@@ -409,3 +414,36 @@ def check_site_availability(site, enzyme_list, size):
         available = True
 
     return available
+
+
+# ----------------------------------------------------------
+# This function makes sure that only one enzyme will end up binding a region.
+# It checks that the enzymes in the list of new_enzymes do not overlap and if they do, decide which will end up
+# binding
+# TODO: test this function - design a experiment in which you kind of know what outcome you should get.
+def check_binding_conflicts(enzyme_list, rng):
+    enzyme_list.sort(key=lambda x: x.position)  # sort by position
+    checked_enzyme_list = []
+    s = 0
+    for i, my_enzyme in enumerate(enzyme_list):
+        if i == 0:  # We need enzymes after
+            continue
+        enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= my_enzyme.position][-1]
+
+        # Check if they overlap
+        if enzyme_before.position + enzyme_before.size >= my_enzyme.position:
+            # It overlaps, so decide which enzymes stays
+            urandom = rng.uniform()  # we need a random number for the decision
+            if urandom <= 0.5:  # If it is <= 0.5, then the enzyme before stays.
+                del enzyme_list[i-s-1]
+                s += 1
+                # checked_enzyme_list.append(enzyme_before)
+            else:               # And if >0.5, then we don't add the enzyme before (we lose it).
+                del enzyme_list[i-s]
+                s += 1
+                # continue
+        # else:
+            # checked_enzyme_list.append(enzyme_before)  # If nothing overlaps, then nothing happens
+
+
+    return enzyme_list  #checked_enzyme_list

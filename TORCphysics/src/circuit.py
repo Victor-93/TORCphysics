@@ -6,6 +6,7 @@ from TORCphysics import Site, SiteFactory, Enzyme, EnzymeFactory, Environment, E
 from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 
+# TODO: Check how you determine enzymes bind, do they bind where with the left end on the site.start?
 
 class Circuit:
 
