@@ -2,7 +2,8 @@ import numpy as np
 
 
 class Log:
-    def __init__(self, size, frames, time, dt, structure, name, seed, site_list, initial_twist, initial_superhelical):
+    def __init__(self, size, frames, time, dt, structure, name, seed, site_list, initial_twist, initial_superhelical,
+                 write_nonspecific_sites):
         self.metadata = []  # Will contain list of events
         self.size = size  # size of circuit
         self.frames = frames  # Total number of frames ran in simulation
@@ -15,6 +16,8 @@ class Log:
         self.initial_twist = initial_twist  # Global excess of twist
         self.site_list = site_list
         self.n_sites = len(site_list)  # number of sites
+        self.write_nonspecific_sites = write_nonspecific_sites  # Tells if you want to include non-specific
+        # DNA binding enzymes
 
         # We still don't know these two last quantities
         self.final_superhelical = 0  # Global superhelical density
@@ -104,8 +107,13 @@ class Log:
         #c5 = 'Elongation rates'
         f.write(f'{c1:20} {c2:20} {c3:20} {c4:20} {c5:20} \n ')  # {c5:20} \n')
         for i, site in enumerate(self.site_list):
-            f.write(f'{site.site_type:20} {site.name:20} {self.total_binding_events[i]:20} '
-                    f'{self.total_unbinding_events[i]:20}  {self.binding_rates[i]:20}')
+
+            # skip non-specific binding proteins
+            if not self.write_nonspecific_sites and site.name.isdigit() and 'DNA' in site.site_type:
+                continue
+            else:
+                f.write(f'{site.site_type:20} {site.name:20} {self.total_binding_events[i]:20} '
+                        f'{self.total_unbinding_events[i]:20}  {self.binding_rates[i]:20}')
             # {self.elongation_rates[i]:20}')
             f.write(" \n")
         f.write(" \n")

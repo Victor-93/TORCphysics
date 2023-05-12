@@ -39,6 +39,8 @@ class Circuit:
         # create a time-based seed and save it, and initialize our random generator with this seed
         self.seed = random.randrange(sys.maxsize)
         self.rng = np.random.default_rng(self.seed)
+        # This option indicates if you want to include the specific sites for non-specific DNA binding proteins
+        self.write_nonspecific_sites = False  # TODO: add this option as input
 
         # -----------------------------------------------
         # We add new DNA sites which is the ones that we will link topos binding
@@ -72,7 +74,7 @@ class Circuit:
         # Let's initialize the log
         self.log = Log(self.size, self.frames, self.frames * self.dt, self.dt, self.structure,
                        self.name + '_' + output_prefix, self.seed,
-                       self.site_list, self.twist, self.superhelical)
+                       self.site_list, self.twist, self.superhelical, self.write_nonspecific_sites)
 
         # Let's define the dictionaries that will become dataframes, in case the series option was selected
         self.enzymes_df = []
@@ -243,6 +245,9 @@ class Circuit:
         for site in self.site_list:
             if site.site_type == 'EXT':
                 continue
+            # skip non-specific binding proteins
+            if not self.write_nonspecific_sites and site.name.isdigit() and 'DNA' in site.site_type:
+                continue
             # This is for enzymes that bind bare DNA
             if 'DNA' in site.site_type and '_global' in site.name:
                 site_superhelical = self.superhelical
@@ -274,6 +279,9 @@ class Circuit:
         for site in self.site_list:
             if site.site_type == 'EXT':
                 continue
+            # skip non-specific binding proteins
+            if not self.write_nonspecific_sites and site.name.isdigit() and 'DNA' in site.site_type:
+                continue
             i = i + 1
 
             global_sum = False  # This variable is for enzymes that recognise bare DNA
@@ -304,6 +312,10 @@ class Circuit:
             # This is mostly applied to genes, and checks how many enzymes are currently bound to that site
             self.sites_dict_list_aux[i]['#enzymes'] = \
                 len([enzyme for enzyme in self.enzyme_list if enzyme.site.name == site.name])
+            # And for the case of non-specific binding DNA proteins
+            if global_sum:
+                self.sites_dict_list_aux[i]['#enzymes'] = \
+                    len([enzyme for enzyme in self.enzyme_list if enzyme.site.site_type == site.site_type])
 
             self.sites_dict_list.append(self.sites_dict_list_aux[i])  # And add it to the big true list of dictionaries
 
