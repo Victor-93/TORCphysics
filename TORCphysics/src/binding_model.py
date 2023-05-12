@@ -160,17 +160,18 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
             if not have_model:  # If I don't have a model, then we skip
                 continue
 
-            # Check if site is available
-            # -------------------------------------------------------------
-            site_available = check_site_availability(site, enzyme_list, environment.size)
-            if not site_available:
-                continue
-
             # Decide if the enzyme will bind
             # -------------------------------------------------------------
             urandom = rng.uniform()  # we need a random number
 
             if urandom <= binding_probability:  # and decide
+
+                # Check if site is available  - it is actually faster to first calculate the probability, so I move
+                # it here.
+                # -------------------------------------------------------------
+                site_available = check_site_availability(site, enzyme_list, environment.size)
+                if not site_available:
+                    continue
 
                 # Add enzyme
                 # --------------------------------------------------------
@@ -194,7 +195,7 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
 
                 new_enzymes.append(enzyme)
 
-    # TODO: Here you should see how to decide to enzymes are binding at the same time. This needs testing
+    # TODO: check_binding_conflicts() needs testing
     new_enzymes = check_binding_conflicts(new_enzymes, rng)
 
     return new_enzymes
