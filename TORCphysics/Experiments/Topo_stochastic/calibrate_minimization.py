@@ -19,11 +19,11 @@ environment_continuum_filename = 'environment_continuum.csv'
 environment_filename = 'environment.csv'
 tm = 'stochastic'
 output_prefix = 'continuum'
-nframes = 500
+nframes = 250
 series = True
 continuation = False
 mm = 'uniform'
-dt = 1.0
+dt = 2.0
 
 
 # Here, we want to focuse on k_cat
@@ -115,16 +115,6 @@ def objective_function_kcat(topo_kcat, gyra_kcat, dcat):
                                                         series, continuation, dt, mm)
             objective.append( np.sum(np.square(np.mean(supercoiling, axis=1) - sigma_continuum)) )
     return objective, kcat_list
-
-
-
-# TODO:
-#  1.- Make the code work with stochastic topo binding. DONE
-#  2.- Run experiment to test that it works. DONE
-#  3.- Calibrate it so it works with Sam Meyers model, for now...
-#  3.1.- I need to plot the global supercoiling response of the continuum case
-#  3.2.- Plot the response of my initial case
-#  3.3.- Run multiple experiments using the curve fit to find the optimal parameters of my stochastic topo binding
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
