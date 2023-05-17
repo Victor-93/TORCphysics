@@ -4,7 +4,6 @@ from TORCphysics import binding_model as bm
 from hyperopt import tpe, hp, fmin
 import numpy as np
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,12 +14,19 @@ import numpy as np
 # ----------------------------------------------------------------------------------------------------------------------
 
 # Optimization conditions
-nsim = 100  # number of simulations per test
-ntests = 50  # number of tests for parametrization
-coutput = 'gyra_k_cat.txt'
-k_cat_min = -30.0  # Ranges to vary k_cat
+nsim = 100 # number of simulations per test
+ntests = 100 # number of tests for parametrization
+# coutput = 'gyra_k_cat.txt'
+coutput = 'gyra_kcat-alpha_kon.txt'
+k_cat_min = -20.0  # Ranges to vary k_cat
 k_cat_max = -5.0
+alpha_min = 0.5
+alpha_max = 3.0
 my_var = 'gyra_k_cat'
+# my_vars = ['gyra_k_cat', 'alpha']
+my_vars = ['gyra_k_cat', 'alpha', 'k_on']
+k_on_min = 0.001
+k_on_max = 0.01
 
 # Some initial conditions
 topo_k_on_0 = .005  # 0.0075
@@ -41,17 +47,43 @@ output_prefix = 'output'
 frames = 2000
 series = True
 continuation = False
-mm  = 'uniform'
+mm = 'uniform'
 dt = .5
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # FUNCTIONS
 # ----------------------------------------------------------------------------------------------------------------------
 
-def objective_topoI_k_cat(params):
-    my_topo_k_cat = params[my_var]
-    supercoiling = run_many_stochastic(topo_concentration_0, topo_k_on_0, my_topo_k_cat,
-                                       gyra_concentration_0, gyra_k_on_0, gyra_k_cat_0,
+def objective_gyra_k_cat(params):
+    my_gyra_k_cat = params[my_var]
+    supercoiling = run_many_stochastic(topo_concentration_0, topo_k_on_0, topo_k_cat_0,
+                                       gyra_concentration_0, gyra_k_on_0, my_gyra_k_cat,
+                                       circuit_filename_0, sites_filename_0, enzymes_filename_0,
+                                       environment_stochastic_filename_0, output_prefix, frames, series, continuation,
+                                       dt, 'stochastic', mm)
+    my_objective = np.sum(np.square(np.mean(supercoiling, axis=1) - sigma_continuum))
+    return my_objective
+
+
+def objective_gyra_k_cat_alpha(params):
+    my_gyra_k_cat = params[my_vars[0]]
+    my_gyra_alpha = params[my_vars[1]]
+    supercoiling = run_many_stochastic(topo_concentration_0, topo_k_on_0, topo_k_cat_0,
+                                       my_gyra_alpha * gyra_concentration_0, gyra_k_on_0, my_gyra_k_cat,
+                                       circuit_filename_0, sites_filename_0, enzymes_filename_0,
+                                       environment_stochastic_filename_0, output_prefix, frames, series, continuation,
+                                       dt, 'stochastic', mm)
+    my_objective = np.sum(np.square(np.mean(supercoiling, axis=1) - sigma_continuum))
+    return my_objective
+
+
+def objective_gyra_k_cat_alpha_k_on(params):
+    my_gyra_k_cat = params[my_vars[0]]
+    my_gyra_alpha = params[my_vars[1]]
+    my_gyra_k_on = params[my_vars[2]]
+    supercoiling = run_many_stochastic(topo_concentration_0, topo_k_on_0, topo_k_cat_0,
+                                       my_gyra_alpha * gyra_concentration_0, my_gyra_k_on, my_gyra_k_cat,
                                        circuit_filename_0, sites_filename_0, enzymes_filename_0,
                                        environment_stochastic_filename_0, output_prefix, frames, series, continuation,
                                        dt, 'stochastic', mm)
@@ -134,16 +166,23 @@ sigma_continuum = continuum_circuit.sites_df[mask]['superhelical'].to_numpy()
 # Optimization case
 # ----------------------------------------------------------------------------------------------------------------------
 space = {
-    my_var: hp.uniform(my_var, k_cat_min, k_cat_max)
+#    my_var: hp.uniform(my_var, k_cat_min, k_cat_max)
+    my_vars[0]: hp.uniform(my_vars[0], k_cat_min, k_cat_max),
+    my_vars[1]: hp.uniform(my_vars[1], alpha_min, alpha_max),
+    my_vars[2]: hp.uniform(my_vars[2], k_on_min, k_on_max)
 }
 best = fmin(
-    fn=objective_topoI_k_cat, # Objective Function to optimize
+    #  fn=objective_gyra_k_cat, # Objective Function to optimize
+    fn=objective_gyra_k_cat_alpha_k_on,  # Objective Function to optimize
     space=space,  # Hyperparameter's Search Space
-    algo=tpe.suggest, # Optimization algorithm (representative TPE)
-    max_evals=ntests # Number of optimization attempts
+    algo=tpe.suggest,  # Optimization algorithm (representative TPE)
+    max_evals=ntests  # Number of optimization attempts
 )
 print(best)
 print(best.values())
-best_result = np.zeros(1)
-best_result[0] = best[my_var]  # Extract the best parameter
+best_result = np.zeros(3)
+#  best_result[0] = best[my_var]  # Extract the best parameter
+best_result[0] = best[my_vars[0]]  # Extract the best parameter
+best_result[1] = best[my_vars[1]]  # Extract the best parameter
+best_result[2] = best[my_vars[2]]  # Extract the best parameter
 np.savetxt(coutput, best_result)

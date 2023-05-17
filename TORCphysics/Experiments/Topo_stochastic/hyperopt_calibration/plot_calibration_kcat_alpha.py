@@ -20,7 +20,7 @@ gyra_concentration_0 = 0.0
 # Figure
 width = 8
 height = 4
-figure_output = 'calibration_kcats.png'
+figure_output = 'calibration_kcats-alpha.png'
 
 fig, axs = plt.subplots(4, figsize=(width, 4 * height), tight_layout=True)
 
@@ -37,10 +37,14 @@ series = True
 continuation = False
 dt = .5
 
-ctopo_k_cat = 'topoI_k_cat.txt'
-my_topo_k_cat = np.loadtxt(ctopo_k_cat)
-cgyra_k_cat = 'gyra_k_cat.txt'
-my_gyra_k_cat = np.loadtxt(cgyra_k_cat)
+ctopo_k_cat = 'topoI_kcat-alpha.txt'
+my_topo = np.loadtxt(ctopo_k_cat)
+my_topo_k_cat =my_topo[0]
+my_topo_alpha =my_topo[1]
+cgyra_k_cat = 'gyra_kcat-alpha.txt'
+my_gyra = np.loadtxt(cgyra_k_cat)
+my_gyra_k_cat =my_gyra[0]
+my_gyra_alpha =my_gyra[1]
 
 
 # Some functions
@@ -113,8 +117,14 @@ stochastic_circuit = Circuit(circuit_filename_0, sites_filename_0, enzymes_filen
                              output_prefix, frames, series, continuation, dt, 'stochastic', 'uniform')
 stochastic_circuit.environmental_list[0].k_cat = my_topo_k_cat
 stochastic_circuit.environmental_list[1].k_cat = my_gyra_k_cat
+stochastic_circuit.environmental_list[0].concentration = \
+    my_topo_alpha * stochastic_circuit.environmental_list[0].concentration
+stochastic_circuit.environmental_list[1].concentration = \
+    my_gyra_alpha * stochastic_circuit.environmental_list[1].concentration
 continuum_circuit.environmental_list[0].k_cat = my_topo_k_cat
 continuum_circuit.environmental_list[1].k_cat = my_gyra_k_cat
+topo_effective_concentration = stochastic_circuit.environmental_list[0].concentration
+gyra_effective_concentration = stochastic_circuit.environmental_list[1].concentration
 
 vs.plot_site_response_curves(stochastic_circuit, ax)
 ax.set_title('Topoisomerases response curves')
@@ -136,7 +146,7 @@ mask = continuum_circuit.sites_df['type'] == 'circuit'
 sigma_continuum = continuum_circuit.sites_df[mask]['superhelical'].to_numpy()
 
 # And run the stochastic case
-sigma_topoI = run_many_stochastic(topo_concentration_0, topo_k_on_0, my_topo_k_cat,
+sigma_topoI = run_many_stochastic(topo_effective_concentration, topo_k_on_0, my_topo_k_cat,
                                         gyra_concentration_0, gyra_k_on_0, gyra_k_cat_0,
                                         circuit_filename_0, sites_filename_0, enzymes_filename_0,
                                         environment_stochastic_filename_0, output_prefix, frames, series, continuation,
@@ -150,12 +160,24 @@ ax.set_xlabel(r'time ($s$)')
 ax.set_ylabel(r'$\sigma$')
 ax.set_title('Topoisomerase I calibration')
 ax.legend(loc='best')
+
+#k_cat
 text1 = r'$k_{cat}=$'
 text2 = f'{my_topo_k_cat:.2f}'
 text3 = r'$s^{-1}$'
 text = text1 + text2 + text3
 xs = 0.78 #500
 ys = 0.55 # -0.02
+props = dict(boxstyle='round', facecolor='gray', alpha=0.4)
+ax.text(xs, ys, text, transform=ax.transAxes, verticalalignment='top', bbox=props)
+
+#alpha
+text1 = r'$\alpha=$'
+text2 = f'{my_topo_alpha:.2f}'
+text3 = r'$\mu M^{-1}$'
+text = text1 + text2 + text3
+xs = 0.78 #500
+ys = 0.45 # -0.02
 props = dict(boxstyle='round', facecolor='gray', alpha=0.4)
 ax.text(xs, ys, text, transform=ax.transAxes, verticalalignment='top', bbox=props)
 
@@ -177,7 +199,7 @@ sigma_continuum = continuum_circuit.sites_df[mask]['superhelical'].to_numpy()
 
 # And run the stochastic case
 sigma_topoI = run_many_stochastic(topo_concentration_0, topo_k_on_0, my_topo_k_cat,
-                                        gyra_concentration_0, gyra_k_on_0, my_gyra_k_cat,
+                                        gyra_effective_concentration, gyra_k_on_0, my_gyra_k_cat,
                                         circuit_filename_0, sites_filename_0, enzymes_filename_0,
                                         environment_stochastic_filename_0, output_prefix, frames, series, continuation,
                                         dt, 'stochastic', 'uniform')
@@ -190,6 +212,8 @@ ax.set_xlabel(r'time ($s$)')
 ax.set_ylabel(r'$\sigma$')
 ax.set_title('Gyrase calibration')
 ax.legend(loc='best')
+
+#k_cat
 text1 = r'$k_{cat}=$'
 text2 = f'{my_gyra_k_cat:.2f}'
 text3 = r'$s^{-1}$'
@@ -199,6 +223,15 @@ ys = 0.95  # -0.02
 props = dict(boxstyle='round', facecolor='gray', alpha=0.4)
 ax.text(xs, ys, text, transform=ax.transAxes, verticalalignment='top', bbox=props)
 
+#alpha
+text1 = r'$\alpha=$'
+text2 = f'{my_gyra_alpha:.2f}'
+text3 = r'$\mu M^{-1}$'
+text = text1 + text2 + text3
+xs = 0.6 #500
+ys = 0.85 # -0.02
+props = dict(boxstyle='round', facecolor='gray', alpha=0.4)
+ax.text(xs, ys, text, transform=ax.transAxes, verticalalignment='top', bbox=props)
 
 # Plot global supercoiling responses - both enzymes active
 # ---------------------------------------------------------
@@ -216,8 +249,8 @@ mask = continuum_circuit.sites_df['type'] == 'circuit'
 sigma_continuum = continuum_circuit.sites_df[mask]['superhelical'].to_numpy()
 
 # And run the stochastic case
-sigma_topoI = run_many_stochastic(topo_concentration_0, topo_k_on_0, my_topo_k_cat,
-                                        gyra_concentration_0, gyra_k_on_0, my_gyra_k_cat,
+sigma_topoI = run_many_stochastic(topo_effective_concentration, topo_k_on_0, my_topo_k_cat,
+                                        gyra_effective_concentration, gyra_k_on_0, my_gyra_k_cat,
                                         circuit_filename_0, sites_filename_0, enzymes_filename_0,
                                         environment_stochastic_filename_0, output_prefix, frames, series, continuation,
                                         dt, 'stochastic', 'uniform')
