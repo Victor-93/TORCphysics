@@ -9,13 +9,13 @@ Number of sites: 1
 Number of frames: 2000
 Simulation time: 1000.0
 Simulation timestep: 0.5
-Seed: 8461143570893139288
+Seed: 714884688598595598
  
 Overall simulation information 
 ---------------------------------------------------------------------------------------
-Initial twist: -71.83177
-Final twist: -42.71178
-Initial superhelical density: -0.04001
+Initial twist: 71.83177
+Final twist: -42.70056
+Initial superhelical density: 0.04001
 Final superhelical density: -0.02379
  
 Overall rates 
