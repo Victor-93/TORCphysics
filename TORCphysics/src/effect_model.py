@@ -14,10 +14,6 @@ import sys
 v0 = params.v0
 w0 = params.w0
 gamma = params.gamma
-topo_w = params.topo_w
-topo_t = params.topo_t
-gyra_w = params.gyra_w
-gyra_t = params.gyra_t
 
 
 class Effect:
@@ -66,8 +62,8 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
         #            output_enzyme = Enzyme(e_type='mRNA', name=enzyme.site.name, site=None, position=None, size=size,
         #                                   twist=0, superhelical=0)
         elif enzyme.enzyme_type == 'topo':
-            topo = [environment for environment in environmental_list
-                    if environment.name == enzyme.name][0]  # Can select the model from here?
+            # topo = [environment for environment in environmental_list
+            #         if environment.name == enzyme.name][0]  # Can select the model from here?
             position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
         else:
             continue
@@ -92,10 +88,10 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
                     continue
 
                 if topo.name == 'topoI':
-                    sigma = topo1_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
+                    sigma = topo1_continuum(enzyme.superhelical, topo, dt)
                     twist_right = calculate_twist_from_sigma(enzyme, enzyme_list[i + 1], sigma)
                 elif topo.name == 'gyrase':
-                    sigma = gyrase_continuum(enzyme.superhelical, topo.concentration, topo.k_cat, dt)
+                    sigma = gyrase_continuum(enzyme.superhelical, topo, dt)
                     twist_right = calculate_twist_from_sigma(enzyme, enzyme_list[i + 1], sigma)
                 else:
                     twist_right = 0  # If it doesn't recognize the topo, then don't do anything
@@ -114,11 +110,11 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
 # Calculates the amount of coils removed by topoisomerase I
 # activity. This function only depends on the supercoiling density (sigma)
 # I took this function from Sam Meyer's paper (2019)
-def topo1_continuum(sigma, topo_c, topo_k, dt):
+def topo1_continuum(sigma, topo, dt):
     # the function has the form of (concentration*sigmoid)*rate*dt
-    a = topo_c * topo_k * dt
+    a = topo.concentration * topo.k_cat * dt
     try:
-        b = 1 + np.exp((sigma - topo_t) / topo_w)
+        b = 1 + np.exp((sigma - topo.oparams['threshold']) / topo.oparams['width'])
         sigma_removed = a / b
     except OverflowError as oe:
         sigma_removed = 0.0
@@ -129,11 +125,11 @@ def topo1_continuum(sigma, topo_c, topo_k, dt):
 # Calculates the amount of coils removed by gyrase
 # activity. This function only depends on the supercoiling density (sigma)
 # I took this function from Sam Meyer's paper (2019)
-def gyrase_continuum(sigma, gyra_c, gyra_k, dt):
+def gyrase_continuum(sigma, gyra, dt):
     # the function has the form of (concentration*sigmoid)*rate*dt
-    a = gyra_c * gyra_k * dt
+    a = gyra.concentration * gyra.k_cat * dt
     try:
-        b = 1 + np.exp(-(sigma - gyra_t) / gyra_w)
+        b = 1 + np.exp(-(sigma - gyra.oparams['threshold']) / gyra.oparams['width'])
         sigma_removed = -a / b
     except OverflowError as oe:
         sigma_removed = 0.0

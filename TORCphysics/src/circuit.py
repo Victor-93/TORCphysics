@@ -34,7 +34,8 @@ class Circuit:
         self.read_csv()  # Here, it gets the name,structure, etc
         self.site_list = SiteFactory(sites_filename).site_list
         self.enzyme_list = EnzymeFactory(enzymes_filename, self.site_list).enzyme_list
-        self.environmental_list = EnvironmentFactory(environment_filename, self.site_list).environment_list
+        self.environmental_list = EnvironmentFactory(environment_filename, self.site_list,
+                                                     self.topoisomerase_model).environment_list
         self.time = 0
         # create a time-based seed and save it, and initialize our random generator with this seed
         self.seed = random.randrange(sys.maxsize)
@@ -638,7 +639,9 @@ class Circuit:
 
         # Update fake boundaries positions if circular structure
         if self.enzyme_list[0].position > 0:
-            print(0)
+            # TODO: Check why EXT_L is changing its position
+            this_error = self.enzyme_list[0]
+            a = this_error
         if self.circle:
             if self.get_num_enzymes() > 2:
                 self.enzyme_list[0].position, self.enzyme_list[-1].position = \

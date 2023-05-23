@@ -13,8 +13,8 @@ height = 6
 
 # TODO: what if there are no colors?
 # colors
-enzyme_colors = {'RNAP': 'blue', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'black', 'ori': 'yellow', 'topoI': 'cyan',
-                 'gyrase': 'red'}
+enzyme_colors = {'RNAP': 'blue', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'black', 'ori': 'yellow', 'topoI': 'red',
+                 'gyrase': 'cyan'}
 gene_colour = 'green'
 DNA_colour = 'black'
 sigma_colour = 'red'

@@ -77,10 +77,10 @@ def select_binding_model(site, environment, site_superhelical, dt):
     elif site.site_model == 'none' or site.site_model == 'None' or site.site_model is None:
         have_model = False
     elif site.site_model == 'stochastic_topoI':
-        rate = topoI_binding(environment.k_on, environment.concentration, site_superhelical)
+        rate = topoI_binding(environment, site_superhelical)
         binding_probability = P_binding_Nonh_Poisson(rate, dt)
     elif site.site_model == 'stochastic_gyrase':
-        rate = gyrase_binding(environment.k_on, environment.concentration, site_superhelical)
+        rate = gyrase_binding(environment, site_superhelical)
         binding_probability = P_binding_Nonh_Poisson(rate, dt)
     else:  # If there's no model, there's no binding
         have_model = False
@@ -136,8 +136,6 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
             # And calculate binding probability and if it'll bind
             # Check if binding site is available
             # If there are multiple enzymes that want to bind but their ranges overlap, we must choose
-            # TODO: In the future, check how to decide between overlapping sites. - with a list of ranges,
-            #  probabilities and enzymes
 
             # For now, only genes!
             # -----------------------------------------------------------
@@ -355,9 +353,12 @@ def promoter_curve_opening_E_maxmin_I(k_min, k_max, sigma, *opening_p):
 
 
 # TODO: Check the curve doesn't overflow?
-def topoI_binding(basal_rate, concentration, sigma):
-    a = concentration * basal_rate
-    b = 1 + np.exp((sigma - topo_t) / topo_w)
+def topoI_binding(topo, sigma):
+    a = topo.concentration * topo.k_on
+    # TODO: Check why sometimes the len is bigger
+    b = 1 + np.exp((sigma - topo.oparams['threshold']) / topo.oparams['width']) # [0] because the dictionary
+#    b = 1 + np.exp((sigma - topo.oparams['threshold'][0]) / topo.oparams['width'][0]) # [0] because the dictionary
+    # gives me trouble
     rate = a / b  # * np.exp(1 / b)
     #    try:
     #        b = 1 + np.exp((sigma - topo_t) / topo_w)
@@ -367,9 +368,11 @@ def topoI_binding(basal_rate, concentration, sigma):
     return rate
 
 
-def gyrase_binding(basal_rate, concentration, sigma):
-    a = concentration * basal_rate
-    b = 1 + np.exp(-(sigma - gyra_t) / gyra_w)
+def gyrase_binding(gyra, sigma):
+    a = gyra.concentration * gyra.k_on
+    b = 1 + np.exp(-(sigma - gyra.oparams['threshold']) / gyra.oparams['width'])
+#    b = 1 + np.exp(-(sigma - gyra.oparams['threshold'][0]) / gyra.oparams['width'][0]) # [0] because the dictionary
+    # gives me trouble
     #    rate = a * np.exp(1 / b)
     rate = a / b
     return rate

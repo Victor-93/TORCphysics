@@ -1,9 +1,10 @@
 import pandas as pd
-
+from TORCphysics import params
 
 class Environment:
 
-    def __init__(self, e_type, name, site_list, concentration, k_on, k_off, k_cat, size, site_type):#, eff_model):
+    def __init__(self, e_type, name, site_list, concentration, k_on, k_off, k_cat, size, site_type, oparams):#, eff_model):
+        self.oparams = None
         self.enzyme_type = e_type
         self.name = name
         self.site_list = site_list  # It recognizes a list of sites, rather than a specific site
@@ -13,11 +14,24 @@ class Environment:
         self.k_off = k_off
         self.k_cat = k_cat
         self.size = size
-#        self.eff_model = eff_model
+        self.read_oparams(oparams)
 
+
+    def read_oparams(self, oparams):
+        if oparams is None or oparams == 'none':
+            # TODO: In the future would we need the topo model?
+            #  Maybe if we want calibrated both continuum and stochastic
+            if self.enzyme_type == 'topo' and ('topoI' in self.name):
+                self.oparams = {'width': params.topo_w, 'threshold': params.topo_t}
+            elif self.enzyme_type == 'topo' and ('gyrase' in self.name):
+                self.oparams = {'width': params.gyra_w, 'threshold': params.gyra_t}
+            else:
+                self.oparams = None
+        else:
+            self.oparams = pd.read_csv(oparams)
 
 class EnvironmentFactory:
-    def __init__(self, filename, site_list):
+    def __init__(self, filename, site_list, topoisomerase_model):
         self.filename = filename
         self.environment_list = []
         self.site_list = site_list
@@ -33,7 +47,8 @@ class EnvironmentFactory:
                                           site_list=self.site_match(row['site_type']),
                                           concentration=float(row['concentration']), k_on=float(row['k_on']),
                                           k_off=float(row['k_off']), k_cat=float(row['k_cat']),
-                                          size=float(row['size']), site_type=row['site_type'])  # eff_model=row['model'])
+                                          size=float(row['size']), site_type=row['site_type'],
+                                          oparams=row['oparams'])  # eff_model=row['model'])
             self.environment_list.append(new_environment)
 
 
