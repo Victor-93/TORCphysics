@@ -9,7 +9,7 @@ import numpy as np
 # ----------------------------------------------------------------------------------------------------------------------
 
 # Some initial conditions
-nsim = 100  # number of simulations per test
+nsim = 10  # number of simulations per test
 topo_k_on_0 = .005  # 0.0075
 topo_k_cat_0 = 10.0
 topo_concentration_0 = .25

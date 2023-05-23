@@ -3,6 +3,8 @@ from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 from hyperopt import tpe, hp, fmin
 import numpy as np
+import os
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -12,10 +14,17 @@ import numpy as np
 # ----------------------------------------------------------------------------------------------------------------------
 # INITIAL CONDITIONS
 # ----------------------------------------------------------------------------------------------------------------------
+#java_path = '/usr/lib/'#jvm'#/java-1.8.0-openjdk-1.8.0.352.b08-2.el8_6.x86_64/jre/bin/java'
+#os.environ['JAVA_HOME'] = '/usr/lib/jvm/java-11-openjdk-11.0.17.0.8-2.el8_6.x86_64'
+#os.environ['JAVA_HOME'] = '/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.352.b08-2.el8_6.x86_64/jre'
+#files = os.path.isfile( java_path)
+#exists = os.path.exists( java_path)
+#lists = os.listdir(java_path)
+#spark = SparkSession.builder.appName("MyApp").getOrCreate()
 
 # Optimization conditions
-nsim = 100 # number of simulations per test
-ntests = 100 # number of tests for parametrization
+nsim = 20# 0 # number of simulations per test
+ntests = 2 # number of tests for parametrization
 # coutput = 'gyra_k_cat.txt'
 coutput = 'gyra_kcat-alpha_kon.txt'
 k_cat_min = -20.0  # Ranges to vary k_cat
@@ -171,6 +180,11 @@ space = {
     my_vars[1]: hp.uniform(my_vars[1], alpha_min, alpha_max),
     my_vars[2]: hp.uniform(my_vars[2], k_on_min, k_on_max)
 }
+
+# We can distribute tuning across our Spark cluster
+# by calling `fmin` with a `SparkTrials` instance.
+# sparktrials = SparkTrials(parallelism=4)
+
 best = fmin(
     #  fn=objective_gyra_k_cat, # Objective Function to optimize
     fn=objective_gyra_k_cat_alpha_k_on,  # Objective Function to optimize

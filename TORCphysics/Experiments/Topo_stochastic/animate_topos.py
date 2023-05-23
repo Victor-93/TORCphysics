@@ -11,9 +11,9 @@ from TORCphysics import visualization as vs
 
 # Inputs
 # ---------------------------------------------------------
-csites_df = 'topos_0_sites_df.csv'
-cenzymes_df = 'topos_0_enzymes_df.csv'
-cenvironment_df = 'topos_0_environment_df.csv'
+csites_df = 'topos_stochastic_sites_df.csv'
+cenzymes_df = 'topos_stochastic_enzymes_df.csv'
+cenvironment_df = 'topos_stochastic_environment_df.csv'
 sites_df = pd.read_csv(csites_df, sep=',')
 enzymes_df = pd.read_csv(cenzymes_df, sep=',')
 
@@ -25,7 +25,7 @@ sites_filename = 'sites.csv'
 enzymes_filename = 'enzymes.csv'
 environment_filename = 'environment.csv'
 output_prefix = 'output'
-frames = 100
+frames = 1000
 series = True
 continuation = False
 tm = 'stochastic'
