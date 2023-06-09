@@ -1,0 +1,54 @@
+TORCphysics log file 
+
+General information: 
+---------------------------------------------------------------------------------------
+Circuit name: sys1_output
+Size: 6000
+Structure: circle
+Number of sites: 8
+Number of frames: 1500
+Simulation time: 750.0
+Simulation timestep: 0.5
+Seed: 2359646190687604521
+ 
+Overall simulation information 
+---------------------------------------------------------------------------------------
+Initial twist: -211.68949
+Final twist: -211.68949
+Initial superhelical density: -0.06037
+Final superhelical density: -0.06037
+ 
+Overall rates 
+---------------------------------------------------------------------------------------
+site type            site name            #binding events      #unbinding events    binding rates        
+ EXT                  EXT                                   0.0                  0.0                   0.0 
+gene                 tetA                                  0.0                  0.0                   0.0 
+gene                 CDS                                  10.0                 10.0  0.013333333333333334 
+origin               ori                                   0.0                  0.0                   0.0 
+lacOP                lac1                                  0.0                  0.0                   0.0 
+gene                 mKalama1                              0.0                  0.0                   0.0 
+lacOP                lac2                                  0.0                  0.0                   0.0 
+gene                 Raspberry                             0.0                  0.0                   0.0 
+ 
+Events
+---------------------------------------------------------------------------------------
+frame 237 time 118.5 binding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.06000 global twist -211.68949 global supercoiling -0.06037
+frame 251 time 125.5 unbinding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.06886 global twist -211.68949 global supercoiling -0.06070
+frame 548 time 274.0 binding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.06000 global twist -211.68949 global supercoiling -0.06037
+frame 562 time 281.0 unbinding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.06886 global twist -211.68949 global supercoiling -0.06070
+frame 599 time 299.5 binding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.06000 global twist -211.68949 global supercoiling -0.06037
+frame 613 time 306.5 unbinding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.06886 global twist -211.68949 global supercoiling -0.06070
+frame 694 time 347.0 binding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.06000 global twist -211.68949 global supercoiling -0.06037
+frame 708 time 354.0 binding_event at gene CDS enzyme RNAP with twist -151.33365 superhelical -0.06833 global twist -211.68949 global supercoiling -0.06070
+frame 708 time 354.0 unbinding_event at gene CDS enzyme RNAP with twist -22.74602 superhelical -0.06893 global twist -211.68949 global supercoiling -0.06070
+frame 722 time 361.0 unbinding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.07686 global twist -211.68949 global supercoiling -0.06070
+frame 962 time 481.0 binding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.06000 global twist -211.68949 global supercoiling -0.06037
+frame 976 time 488.0 unbinding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.06886 global twist -211.68949 global supercoiling -0.06070
+frame 1243 time 621.5 binding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.06000 global twist -211.68949 global supercoiling -0.06037
+frame 1249 time 624.5 binding_event at gene CDS enzyme RNAP with twist -136.97208 superhelical -0.06392 global twist -211.68949 global supercoiling -0.06070
+frame 1257 time 628.5 unbinding_event at gene CDS enzyme RNAP with twist -17.64262 superhelical -0.06450 global twist -211.68949 global supercoiling -0.06104
+frame 1263 time 631.5 unbinding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.07270 global twist -211.68949 global supercoiling -0.06070
+frame 1265 time 632.5 binding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.06000 global twist -211.68949 global supercoiling -0.06037
+frame 1267 time 633.5 binding_event at gene CDS enzyme RNAP with twist -129.79130 superhelical -0.06160 global twist -211.68949 global supercoiling -0.06070
+frame 1279 time 639.5 unbinding_event at gene CDS enzyme RNAP with twist -15.47845 superhelical -0.06209 global twist -211.68949 global supercoiling -0.06104
+frame 1281 time 640.5 unbinding_event at gene CDS enzyme RNAP with twist -168.53298 superhelical -0.07044 global twist -211.68949 global supercoiling -0.06070

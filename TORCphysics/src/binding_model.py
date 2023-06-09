@@ -99,7 +99,8 @@ def select_unbinding_model(enzyme, dt, rng):
         have_model = True
         unbind = Poisson_unbinding_model(enzyme, dt, rng)
     else:
-        print('Warning, we do not have the unbinding model for your enzyme type:', enzyme.enzyme_type)
+        # TODO: When you write the warnings, add this one. And do something similar for the effects model
+        # print('Warning, we do not have the unbinding model for your enzyme type:', enzyme.enzyme_type)
         have_model = False
     return unbind, have_model
 
@@ -161,6 +162,7 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
             # Decide if the enzyme will bind
             # -------------------------------------------------------------
             urandom = rng.uniform()  # we need a random number
+            # print(environment.name, urandom, binding_probability)
 
             if urandom <= binding_probability:  # and decide
 

@@ -19,16 +19,16 @@ import concurrent.futures
 num_workers = 12
 chunksize = 8
 nsim = 96  # in total
-ntests = 100  # number of tests for parametrization
+ntests = 500  # number of tests for parametrization
 coutput = 'gyra_calibration.txt'
 k_cat_min = -20.0  # Ranges to vary k_cat
 k_cat_max = -5.0
-alpha_min = 0.1
-alpha_max = 3.0
+alpha_min = 0.01
+alpha_max = 5.0
 width_min = 0.001
-width_max = 0.03
+width_max = 5.
 threshold_min = 0.001
-threshold_max = 0.02
+threshold_max = 5.
 
 k_off = 0.5
 k_on = 0.005

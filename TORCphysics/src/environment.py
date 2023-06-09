@@ -1,9 +1,12 @@
 import pandas as pd
+import sys
 from TORCphysics import params
+
 
 class Environment:
 
-    def __init__(self, e_type, name, site_list, concentration, k_on, k_off, k_cat, size, site_type, oparams):#, eff_model):
+    def __init__(self, e_type, name, site_list, concentration, k_on, k_off, k_cat, size, site_type,
+                 oparams):  # , eff_model):
         self.oparams = None
         self.enzyme_type = e_type
         self.name = name
@@ -16,7 +19,6 @@ class Environment:
         self.size = size
         self.read_oparams(oparams)
 
-
     def read_oparams(self, oparams):
         if oparams is None or oparams == 'none':
             # TODO: In the future would we need the topo model?
@@ -28,10 +30,18 @@ class Environment:
             else:
                 self.oparams = None
         else:
-            self.oparams = pd.read_csv(oparams)
+            # TODO: Why it looks different when I load from the csv and causes errors when doing operations?
+            #  Needs some testing! It certanly looks different than loading a dictionary. Maybe we need to make
+            #  it a dictionary here
+            self.oparams = pd.read_csv(oparams).to_dict()
+            if self.enzyme_type == 'topo':
+                if 'width' not in self.oparams or 'threshold' not in self.oparams:
+                    print('Please provide width and threshold for topoisomerase parameters')
+                    sys.exit()
+
 
 class EnvironmentFactory:
-    def __init__(self, filename, site_list, topoisomerase_model):
+    def __init__(self, filename, site_list):
         self.filename = filename
         self.environment_list = []
         self.site_list = site_list
@@ -51,9 +61,8 @@ class EnvironmentFactory:
                                           oparams=row['oparams'])  # eff_model=row['model'])
             self.environment_list.append(new_environment)
 
-
     def site_match(self, label):
-#        enzyme_before = [enzyme.position for enzyme in enzyme_list if enzyme.position <= site.start][-1]
+        #        enzyme_before = [enzyme.position for enzyme in enzyme_list if enzyme.position <= site.start][-1]
         site_list = [site for site in self.site_list if site.site_type == label]
         return site_list
 

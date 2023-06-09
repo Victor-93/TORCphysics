@@ -6,6 +6,7 @@ from TORCphysics import Site, SiteFactory, Enzyme, EnzymeFactory, Environment, E
 from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 
+
 # TODO: Check how you determine enzymes bind, do they bind where with the left end on the site.start?
 
 class Circuit:
@@ -34,14 +35,16 @@ class Circuit:
         self.read_csv()  # Here, it gets the name,structure, etc
         self.site_list = SiteFactory(sites_filename).site_list
         self.enzyme_list = EnzymeFactory(enzymes_filename, self.site_list).enzyme_list
-        self.environmental_list = EnvironmentFactory(environment_filename, self.site_list,
-                                                     self.topoisomerase_model).environment_list
+        self.environmental_list = EnvironmentFactory(environment_filename, self.site_list).environment_list  # ,
+        #  self.topoisomerase_model).environment_list
         self.time = 0
         # create a time-based seed and save it, and initialize our random generator with this seed
         self.seed = random.randrange(sys.maxsize)
         self.rng = np.random.default_rng(self.seed)
         # This option indicates if you want to include the specific sites for non-specific DNA binding proteins
         self.write_nonspecific_sites = False  # TODO: add this option as input
+        # TODO: Create list of warnings in the future, and remove duplicates to print at the end of simulation
+        # self.warnings = []  # List with warningss
 
         # -----------------------------------------------
         # We add new DNA sites which is the ones that we will link topos binding
@@ -706,7 +709,7 @@ class Circuit:
             if enzyme.name == 'RNAP':
                 size = abs(enzyme.site.start - enzyme.site.end + 1)
                 output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
-                                                 k_on=0, k_off=0, k_cat=0, size=size, site_type=None)
+                                                 k_on=0, k_off=0, k_cat=0, size=size, site_type=None, oparams=None)
             else:
                 continue
 
