@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import matplotlib.patches as mpatches
+import matplotlib.patheffects as pe
 
 # I created this module only so I can call these functions easily
 
@@ -14,11 +15,11 @@ width = 10
 height = 6
 
 # colours
-RNAP_colour = 'blue'
+RNAP_colour = 'white'
 IHF_colour = 'purple'
 FIS_colour = 'red'
-gene_colour = 'green'
-DNA_colour = 'black'
+gene_colour = '#4a86e8ff' #'blue'
+DNA_colour = '#999999ff' #'gray'
 sigma_colour = 'red'
 
 # Sizes
@@ -36,14 +37,14 @@ object_text = 10  # NAPs, genes, etc...
 
 def run_simulation_two_genes(my_circuit, add_time):
     RNAP1 = Enzyme(e_type=my_circuit.environmental_list[-1].enzyme_type,
-                   name=my_circuit.environmental_list[-1].name, site=my_circuit.site_list[2],
-                   position=my_circuit.site_list[2].start,
-                   size=my_circuit.environmental_list[-1].size, twist=0.0, superhelical=0.0)
+                   name=my_circuit.environmental_list[-1].name, site=my_circuit.site_list[1],
+                   position=my_circuit.site_list[1].start,
+                   size=my_circuit.environmental_list[-1].size, twist=0.0, superhelical=0.0, k_cat=0.0, k_off=0.0)
 
     RNAP2 = Enzyme(e_type=my_circuit.environmental_list[-1].enzyme_type,
-                   name=my_circuit.environmental_list[-1].name, site=my_circuit.site_list[3],
-                   position=my_circuit.site_list[3].start,
-                   size=my_circuit.environmental_list[-1].size, twist=0.0, superhelical=0.0)
+                   name=my_circuit.environmental_list[-1].name, site=my_circuit.site_list[2],
+                   position=my_circuit.site_list[2].start,
+                   size=my_circuit.environmental_list[-1].size, twist=0.0, superhelical=0.0, k_cat=0.0, k_off=0.0)
 
     # Let's turn off topoisomerase activity
     my_circuit.environmental_list[0].k_cat = 0.0
@@ -70,7 +71,7 @@ def run_simulation_two_genes(my_circuit, add_time):
         my_circuit.apply_effects(effects_list)
 
         # UNBINDING
-        drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list)
+        drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list, my_circuit.dt, my_circuit.rng)
         my_circuit.drop_enzymes(drop_list_index)
         my_circuit.add_to_environment(drop_list_enzyme)
 
@@ -123,16 +124,21 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, frames, output, ou
     # draw DNA
     # -----------------------------------
     ax[0].plot(gx, gy, lw=DNA_lw, color=DNA_colour, zorder=2)
+#    ax[0].plot(gx, gy, lw=DNA_lw, color=DNA_colour, zorder=2,
+ #              path_effects=[pe.Stroke(linewidth=10, foreground='black'), pe.Normal()])
     # -----------------------------------
     # Now draw genes
     # -----------------------------------
-    n_genes = len(my_circuit.site_list) - 2
+    n_genes = len(my_circuit.site_list) - 1
     for i in range(n_genes):
-        x1 = my_circuit.site_list[i + 2].end
-        x0 = my_circuit.site_list[i + 2].start
+        x1 = my_circuit.site_list[i + 1].end
+        x0 = my_circuit.site_list[i + 1].start
         dx = x1 - x0
-        name = my_circuit.site_list[i + 2].name
-        arrow = mpatches.FancyArrowPatch((x0, h), (x1, h), mutation_scale=25, color=gene_colour, zorder=3, lw=gene_lw)
+        name = my_circuit.site_list[i + 1].name
+        arrow = mpatches.FancyArrowPatch((x0, h), (x1, h), mutation_scale=25,
+                                         color=gene_colour, zorder=3, lw=gene_lw)
+#        arrow = mpatches.FancyArrowPatch((x0, h), (x1, h), mutation_scale=25,
+#                                         edgecolor='black', facecolor=gene_colour, zorder=3, lw=5)#gene_lw)
         ax[0].add_patch(arrow)
         if x0 < x1:
             a = x0 + abs(dx / 2)
@@ -193,7 +199,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, frames, output, ou
         ml.append(m)
         sigma.append(sig)
 
-    scat = ax[0].scatter(xl[0], yl[0], s=sl[0], c=cl[0], marker="o", zorder=4)  # This plots RNAPs and NAPs
+    scat = ax[0].scatter(xl[0], yl[0], s=sl[0], c=cl[0], marker="o", ec='black', zorder=4)  # This plots RNAPs and NAPs
 
     lines = [ax[1].plot([], [], c=sigma_colour, lw=sigma_lw)[0] for _ in range(10)]  # This plots supercoiling
 
@@ -213,6 +219,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, frames, output, ou
         scat.set_color(c)
         scat.set_sizes(s)
         scat.set_offsets(xy)
+        scat.set_edgecolor('black')
 
         n = len(x)
         for j in range(10):

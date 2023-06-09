@@ -3,16 +3,31 @@ TORCphysics log file
 General information: 
 ---------------------------------------------------------------------------------------
 Circuit name: two_genes_convergent_circular
-Size: 
-Structure: 
-Number of sites: 
-Number of frames: 
-Simulation time: 
-Seed:
+Size: 6000
+Structure: circular
+Number of sites: 3
+Number of frames: 100
+Simulation time: 50.0
+Simulation timestep: 0.5
+Seed: 3901813436147740083
+ 
+Overall simulation information 
+---------------------------------------------------------------------------------------
+Initial twist: 0.00000
+Final twist: 0.00000
+Initial superhelical density: 0.00000
+Final superhelical density: 0.00000
+ 
+Overall rates 
+---------------------------------------------------------------------------------------
+site type            site name            #binding events      #unbinding events    binding rates        
+ EXT                  EXT                                   0.0                  0.0                   0.0 
+gene                 left                                  1.0                  1.0                  0.02 
+gene                 right                                 1.0                  1.0                  0.02 
  
 Events
 ---------------------------------------------------------------------------------------
-frame 10 time 5.0 binding_event at gene left enzyme RNAP with twist 0.0 superhelical 0.0 global twist 0.0 global supercoiling 0.0
-frame 10 time 5.0 binding_event at gene right enzyme RNAP with twist 0.0 superhelical 0.0 global twist 0.0 global supercoiling 0.0
-frame 76 time 38.0 unbinding_event at gene left enzyme RNAP with twist 0.0 superhelical -0.08075532342306177 global twist 0.0 global supercoiling 0.0
-frame 76 time 38.0 unbinding_event at gene right enzyme RNAP with twist 0.0 superhelical -0.08075532342306177 global twist 0.0 global supercoiling 0.0
+frame 10 time 5.0 binding_event at gene left enzyme RNAP with twist 0.00000 superhelical 0.00000 global twist 0.00000 global supercoiling 0.00000
+frame 10 time 5.0 binding_event at gene right enzyme RNAP with twist 0.00000 superhelical 0.00000 global twist 0.00000 global supercoiling 0.00000
+frame 76 time 38.0 unbinding_event at gene left enzyme RNAP with twist 0.00000 superhelical -0.08076 global twist 0.00000 global supercoiling 0.00000
+frame 76 time 38.0 unbinding_event at gene right enzyme RNAP with twist 0.00000 superhelical -0.08076 global twist 0.00000 global supercoiling 0.00000

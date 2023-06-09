@@ -1,2 +1,2 @@
-type,name,site_type,concentration,k_on,k_off,k_cat,size
-RNAP,RNAP,gene,0.0,0.0,0.0,0.0,32
+type,name,site_type,concentration,k_on,k_off,k_cat,size,oparams
+RNAP,RNAP,gene,0.0,0.0,0.0,0.0,32,none

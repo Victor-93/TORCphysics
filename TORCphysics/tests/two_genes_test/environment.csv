@@ -1,4 +1,4 @@
-type,name,site_type,concentration,k_on,k_off,k_cat,size
-topo,topoI,DNA,0.25,0.0,0.0,0.02,120
-topo,gyrase,DNA,0.25,0.0,0.0,0.02,120
-RNAP,RNAP,gene,0.0,0.0,0.0,0.0,32
+type,name,site_type,concentration,k_on,k_off,k_cat,size,oparams
+topo,topoI,DNA,0.25,0.0,0.0,0.02,120,none
+topo,gyrase,DNA,0.25,0.0,0.0,0.02,120,none
+RNAP,RNAP,gene,0.0,0.0,0.0,0.0,32,none

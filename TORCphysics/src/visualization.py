@@ -13,7 +13,7 @@ height = 6
 
 # TODO: what if there are no colors?
 # colors
-enzyme_colors = {'RNAP': 'blue', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'black', 'ori': 'yellow', 'topoI': 'red',
+enzyme_colors = {'RNAP': 'gray', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'black', 'ori': 'yellow', 'topoI': 'red',
                  'gyrase': 'cyan'}
 gene_colour = 'green'
 DNA_colour = 'black'
@@ -28,7 +28,7 @@ gene_lw = 5
 sigma_lw = 5
 
 # Shapes
-enzyme_shapes = {'RNAP': 'o', 'IHF': 'o', 'FIS': 'o', 'lacI': 's', 'ori': 's', 'topoI': 'X', 'gyrase': 'X'}
+enzyme_shapes = {'RNAP': 'o', 'IHF': 'o', 'FIS': 'o', 'lacI': 's', 'ori': 's', 'topoI': 'v', 'gyrase': 'v'}
 
 # text size
 slabel = 15
