@@ -1,0 +1,328 @@
+TORCphysics log file 
+
+General information: 
+---------------------------------------------------------------------------------------
+Circuit name: Pleu500_59
+Size: 6000
+Structure: circle
+Number of sites: 110
+Number of frames: 10000
+Simulation time: 2500.0
+Simulation timestep: 0.25
+Seed: 2624142095607865938
+ 
+Overall simulation information 
+---------------------------------------------------------------------------------------
+Initial twist: -211.83310
+Final twist: -53.79212
+Initial superhelical density: -0.06000
+Final superhelical density: -0.01524
+ 
+Overall rates 
+---------------------------------------------------------------------------------------
+site type            site name            #binding events      #unbinding events    binding rates        
+ DNA_topoI            DNA_topoI_global                     37.0                 37.0                0.0148 
+DNA_gyrase           DNA_gyrase_global                    61.0                 61.0                0.0244 
+EXT                  EXT                                   0.0                  0.0                   0.0 
+gene                 tetA                                 39.0                 39.0                0.0156 
+gene                 CDS                                   0.0                  0.0                   0.0 
+origin               ori                                   0.0                  0.0                   0.0 
+lacOP                lac1                                  0.0                  0.0                   0.0 
+gene                 mKalama1                              6.0                  6.0                0.0024 
+lacOP                lac2                                  0.0                  0.0                   0.0 
+gene                 Raspberry                             3.0                  3.0                0.0012 
+ 
+Events
+---------------------------------------------------------------------------------------
+frame 59 time 14.75 binding_event at DNA_gyrase 35 enzyme gyrase with twist -211.83310 superhelical -0.06000 global twist -211.83310 global supercoiling -0.06000
+frame 77 time 19.25 unbinding_event at DNA_gyrase 35 enzyme gyrase with twist -237.41464 superhelical -0.08228 global twist -236.06825 global supercoiling -0.06825
+frame 254 time 63.5 binding_event at DNA_topoI 22 enzyme topoI with twist -237.41464 superhelical -0.06725 global twist -237.41464 global supercoiling -0.06725
+frame 256 time 64.0 unbinding_event at DNA_topoI 22 enzyme topoI with twist -231.58026 superhelical -0.06775 global twist -233.52505 global supercoiling -0.06752
+frame 336 time 84.0 binding_event at DNA_topoI 35 enzyme topoI with twist -231.58026 superhelical -0.06559 global twist -231.58026 global supercoiling -0.06559
+frame 348 time 87.0 binding_event at DNA_topoI 28 enzyme topoI with twist -29.03807 superhelical -0.04776 global twist -208.24271 global supercoiling -0.06021
+frame 351 time 87.75 unbinding_event at DNA_topoI 28 enzyme topoI with twist -17.36930 superhelical -0.01723 global twist -196.57394 global supercoiling -0.05804
+frame 354 time 88.5 binding_event at gene tetA enzyme RNAP with twist -173.37026 superhelical -0.06082 global twist -188.79476 global supercoiling -0.05458
+frame 376 time 94.0 unbinding_event at DNA_topoI 35 enzyme topoI with twist -54.79570 superhelical 0.01142 global twist -146.00926 global supercoiling -0.04245
+frame 517 time 129.25 unbinding_event at gene tetA enzyme RNAP with twist -144.06446 superhelical -0.07396 global twist -144.06446 global supercoiling -0.04103
+frame 557 time 139.25 binding_event at gene mKalama1 enzyme RNAP with twist -144.06446 superhelical -0.04081 global twist -144.06446 global supercoiling -0.04081
+frame 649 time 162.25 binding_event at DNA_topoI 39 enzyme topoI with twist -200.07944 superhelical -0.06106 global twist -144.06446 global supercoiling -0.04103
+frame 652 time 163.0 unbinding_event at DNA_topoI 39 enzyme topoI with twist -195.89065 superhelical -0.06027 global twist -138.23008 global supercoiling -0.04019
+frame 660 time 165.0 binding_event at gene tetA enzyme RNAP with twist -202.17383 superhelical -0.06078 global twist -136.28528 global supercoiling -0.03881
+frame 666 time 166.5 unbinding_event at gene mKalama1 enzyme RNAP with twist -32.82062 superhelical 0.46929 global twist -136.28528 global supercoiling -0.03903
+frame 805 time 201.25 binding_event at gene tetA enzyme RNAP with twist -156.68913 superhelical -0.06620 global twist -136.28528 global supercoiling -0.03881
+frame 823 time 205.75 unbinding_event at gene tetA enzyme RNAP with twist -4.69430 superhelical -0.06674 global twist -136.28528 global supercoiling -0.03903
+frame 873 time 218.25 binding_event at gene tetA enzyme RNAP with twist -175.57327 superhelical -0.08686 global twist -136.28528 global supercoiling -0.03881
+frame 888 time 222.0 binding_event at DNA_gyrase 25 enzyme gyrase with twist 52.75196 superhelical 0.03708 global twist -136.28528 global supercoiling -0.03903
+frame 888 time 222.0 unbinding_event at DNA_gyrase 25 enzyme gyrase with twist 52.30316 superhelical 0.03813 global twist -136.28528 global supercoiling -0.03903
+frame 902 time 225.5 binding_event at DNA_topoI 40 enzyme topoI with twist -176.52172 superhelical -0.09561 global twist -137.63168 global supercoiling -0.03941
+frame 919 time 229.75 unbinding_event at DNA_topoI 40 enzyme topoI with twist -157.67216 superhelical -0.08137 global twist -104.57016 global supercoiling -0.03057
+frame 951 time 237.75 binding_event at DNA_gyrase 17 enzyme gyrase with twist 107.95423 superhelical 0.09470 global twist -102.62536 global supercoiling -0.02939
+frame 957 time 239.25 unbinding_event at DNA_gyrase 17 enzyme gyrase with twist 104.81264 superhelical 0.11088 global twist -110.70374 global supercoiling -0.03237
+frame 968 time 242.0 unbinding_event at gene tetA enzyme RNAP with twist 89.60432 superhelical -0.08769 global twist -112.05014 global supercoiling -0.03209
+frame 979 time 244.75 binding_event at DNA_gyrase 14 enzyme gyrase with twist 98.58030 superhelical 0.07471 global twist -112.05014 global supercoiling -0.03191
+frame 983 time 245.75 unbinding_event at DNA_gyrase 14 enzyme gyrase with twist 96.33630 superhelical 0.08535 global twist -117.43573 global supercoiling -0.03414
+frame 1012 time 253.0 binding_event at DNA_gyrase 12 enzyme gyrase with twist 121.46905 superhelical 0.10370 global twist -118.78212 global supercoiling -0.03383
+frame 1013 time 253.25 unbinding_event at DNA_gyrase 12 enzyme gyrase with twist 120.57145 superhelical 0.11853 global twist -120.12852 global supercoiling -0.03493
+frame 1036 time 259.0 unbinding_event at gene tetA enzyme RNAP with twist -121.47492 superhelical -0.10712 global twist -121.47492 global supercoiling -0.03459
+frame 1064 time 266.0 binding_event at gene tetA enzyme RNAP with twist -121.47492 superhelical -0.03441 global twist -121.47492 global supercoiling -0.03441
+frame 1113 time 278.25 binding_event at DNA_topoI 38 enzyme topoI with twist -103.35347 superhelical -0.05338 global twist -121.47492 global supercoiling -0.03459
+frame 1113 time 278.25 unbinding_event at DNA_topoI 38 enzyme topoI with twist -102.30628 superhelical -0.05426 global twist -121.47492 global supercoiling -0.03459
+frame 1142 time 285.5 binding_event at DNA_topoI 44 enzyme topoI with twist -127.43902 superhelical -0.06168 global twist -119.53012 global supercoiling -0.03404
+frame 1147 time 286.75 binding_event at DNA_gyrase 17 enzyme gyrase with twist 12.39689 superhelical 0.00871 global twist -109.80614 global supercoiling -0.03192
+frame 1148 time 287.0 unbinding_event at DNA_topoI 44 enzyme topoI with twist -120.10863 superhelical -0.05847 global twist -109.20774 global supercoiling -0.03243
+frame 1154 time 288.5 unbinding_event at DNA_gyrase 17 enzyme gyrase with twist 8.80649 superhelical 0.01196 global twist -115.34133 global supercoiling -0.03353
+frame 1227 time 306.75 unbinding_event at gene tetA enzyme RNAP with twist -116.68773 superhelical -0.07790 global twist -116.68773 global supercoiling -0.03323
+frame 1455 time 363.75 binding_event at DNA_topoI 6 enzyme topoI with twist -116.68773 superhelical -0.03305 global twist -116.68773 global supercoiling -0.03305
+frame 1465 time 366.25 unbinding_event at DNA_topoI 6 enzyme topoI with twist -95.29498 superhelical -0.02868 global twist -97.23977 global supercoiling -0.02811
+frame 1565 time 391.25 binding_event at gene tetA enzyme RNAP with twist -95.29498 superhelical -0.02699 global twist -95.29498 global supercoiling -0.02699
+frame 1676 time 419.0 binding_event at DNA_topoI 6 enzyme topoI with twist -146.20903 superhelical -0.06603 global twist -95.29498 global supercoiling -0.02714
+frame 1703 time 425.75 unbinding_event at DNA_topoI 6 enzyme topoI with twist -116.88750 superhelical -0.05537 global twist -42.78550 global supercoiling -0.01244
+frame 1722 time 430.5 binding_event at gene tetA enzyme RNAP with twist -133.04426 superhelical -0.05496 global twist -40.84070 global supercoiling -0.01163
+frame 1728 time 432.0 unbinding_event at gene tetA enzyme RNAP with twist 60.51435 superhelical -0.05540 global twist -40.84070 global supercoiling -0.01169
+frame 1732 time 433.0 binding_event at gene mKalama1 enzyme RNAP with twist -104.04785 superhelical -0.05908 global twist -40.84070 global supercoiling -0.01163
+frame 1782 time 445.5 binding_event at DNA_gyrase 19 enzyme gyrase with twist 108.08704 superhelical 0.07083 global twist -40.84070 global supercoiling -0.01169
+frame 1787 time 446.75 unbinding_event at DNA_gyrase 19 enzyme gyrase with twist 105.39424 superhelical 0.07762 global twist -47.57269 global supercoiling -0.01391
+frame 1841 time 460.25 unbinding_event at gene mKalama1 enzyme RNAP with twist -202.78362 superhelical 0.39055 global twist -48.91909 global supercoiling -0.01401
+frame 1857 time 464.25 binding_event at DNA_topoI 48 enzyme topoI with twist -216.24758 superhelical -0.09313 global twist -48.91909 global supercoiling -0.01393
+frame 1859 time 464.75 unbinding_event at DNA_topoI 48 enzyme topoI with twist -213.10599 superhelical -0.09421 global twist -45.02949 global supercoiling -0.01309
+frame 1865 time 466.25 binding_event at gene tetA enzyme RNAP with twist -217.59398 superhelical -0.09228 global twist -43.08470 global supercoiling -0.01227
+frame 1879 time 469.75 binding_event at DNA_topoI 32 enzyme topoI with twist -172.23364 superhelical -0.09681 global twist -43.08470 global supercoiling -0.01234
+frame 1885 time 471.25 unbinding_event at gene tetA enzyme RNAP with twist 135.43213 superhelical -0.09303 global twist -31.41593 global supercoiling -0.00918
+frame 1891 time 472.75 unbinding_event at DNA_topoI 32 enzyme topoI with twist -158.62008 superhelical -0.06868 global twist -19.74715 global supercoiling -0.00574
+frame 1897 time 474.25 binding_event at DNA_topoI 2 enzyme topoI with twist -163.10807 superhelical -0.08770 global twist -17.80236 global supercoiling -0.00507
+frame 1898 time 474.5 unbinding_event at DNA_topoI 2 enzyme topoI with twist -161.01367 superhelical -0.08619 global twist -15.85756 global supercoiling -0.00461
+frame 1914 time 478.5 binding_event at DNA_gyrase 16 enzyme gyrase with twist 160.56487 superhelical 0.10193 global twist -13.91277 global supercoiling -0.00396
+frame 1918 time 479.5 unbinding_event at DNA_gyrase 16 enzyme gyrase with twist 158.32088 superhelical 0.11090 global twist -19.29835 global supercoiling -0.00561
+frame 1920 time 480.0 binding_event at DNA_topoI 49 enzyme topoI with twist -179.86323 superhelical -0.09162 global twist -20.64475 global supercoiling -0.00588
+frame 1940 time 485.0 unbinding_event at DNA_topoI 49 enzyme topoI with twist -157.87208 superhelical -0.08245 global twist 18.25116 global supercoiling 0.00531
+frame 2028 time 507.0 unbinding_event at gene tetA enzyme RNAP with twist 20.19595 superhelical -0.09659 global twist 20.19595 global supercoiling 0.00575
+frame 2040 time 510.0 binding_event at DNA_gyrase 13 enzyme gyrase with twist 20.19595 superhelical 0.00572 global twist 20.19595 global supercoiling 0.00572
+frame 2062 time 515.5 unbinding_event at DNA_gyrase 13 enzyme gyrase with twist -10.77117 superhelical -0.00007 global twist -9.42478 global supercoiling -0.00272
+frame 2163 time 540.75 binding_event at gene tetA enzyme RNAP with twist -10.77117 superhelical -0.00305 global twist -10.77117 global supercoiling -0.00305
+frame 2190 time 547.5 binding_event at DNA_topoI 33 enzyme topoI with twist -29.49958 superhelical -0.01606 global twist -10.77117 global supercoiling -0.00307
+frame 2192 time 548.0 unbinding_event at DNA_topoI 33 enzyme topoI with twist -26.35799 superhelical -0.01043 global twist -6.88158 global supercoiling -0.00200
+frame 2268 time 567.0 binding_event at DNA_topoI 33 enzyme topoI with twist -93.67783 superhelical -0.04283 global twist -4.93679 global supercoiling -0.00141
+frame 2281 time 570.25 unbinding_event at DNA_topoI 33 enzyme topoI with twist -79.01707 superhelical -0.01496 global twist 20.34555 global supercoiling 0.00592
+frame 2314 time 578.5 binding_event at DNA_topoI 8 enzyme topoI with twist -107.74020 superhelical -0.04501 global twist 22.29035 global supercoiling 0.00635
+frame 2318 time 579.5 unbinding_event at DNA_topoI 8 enzyme topoI with twist -102.50421 superhelical -0.04425 global twist 30.06953 global supercoiling 0.00874
+frame 2326 time 581.5 unbinding_event at gene tetA enzyme RNAP with twist 32.01433 superhelical -0.04473 global twist 32.01433 global supercoiling 0.00912
+frame 2370 time 592.5 binding_event at DNA_topoI 11 enzyme topoI with twist 32.01433 superhelical 0.00907 global twist 32.01433 global supercoiling 0.00907
+frame 2371 time 592.75 unbinding_event at DNA_topoI 11 enzyme topoI with twist 35.90392 superhelical 0.01004 global twist 33.95912 global supercoiling 0.00982
+frame 2755 time 688.75 binding_event at DNA_gyrase 34 enzyme gyrase with twist 35.90392 superhelical 0.01017 global twist 35.90392 global supercoiling 0.01017
+frame 2757 time 689.25 unbinding_event at DNA_gyrase 34 enzyme gyrase with twist 31.86473 superhelical 0.00661 global twist 33.21112 global supercoiling 0.00960
+frame 2788 time 697.0 binding_event at gene tetA enzyme RNAP with twist 31.86473 superhelical 0.00903 global twist 31.86473 global supercoiling 0.00903
+frame 2895 time 723.75 binding_event at gene tetA enzyme RNAP with twist -80.46901 superhelical -0.03664 global twist 31.86473 global supercoiling 0.00907
+frame 2931 time 732.75 binding_event at DNA_topoI 30 enzyme topoI with twist -95.74217 superhelical -0.05099 global twist 31.86473 global supercoiling 0.00912
+frame 2932 time 733.0 unbinding_event at DNA_topoI 30 enzyme topoI with twist -93.64777 superhelical -0.04520 global twist 33.80952 global supercoiling 0.00988
+frame 2939 time 734.75 binding_event at gene tetA enzyme RNAP with twist -99.03336 superhelical -0.05175 global twist 35.75432 global supercoiling 0.01024
+frame 2951 time 737.75 unbinding_event at gene tetA enzyme RNAP with twist 146.45645 superhelical -0.03696 global twist 35.75432 global supercoiling 0.01029
+frame 2993 time 748.25 binding_event at gene tetA enzyme RNAP with twist -138.18212 superhelical -0.07055 global twist 35.75432 global supercoiling 0.01024
+frame 3058 time 764.5 unbinding_event at gene tetA enzyme RNAP with twist 233.17790 superhelical -0.05227 global twist 35.75432 global supercoiling 0.01029
+frame 3065 time 766.25 binding_event at DNA_topoI 7 enzyme topoI with twist -15.90310 superhelical -0.07125 global twist 35.75432 global supercoiling 0.01024
+frame 3068 time 767.0 binding_event at DNA_topoI 41 enzyme topoI with twist -189.59887 superhelical -0.09236 global twist 41.58870 global supercoiling 0.01216
+frame 3069 time 767.25 unbinding_event at DNA_topoI 7 enzyme topoI with twist -6.17912 superhelical -0.03958 global twist 45.47829 global supercoiling 0.01358
+frame 3096 time 774.0 unbinding_event at DNA_topoI 41 enzyme topoI with twist -159.23014 superhelical -0.06856 global twist 99.93257 global supercoiling 0.02922
+frame 3102 time 775.5 unbinding_event at gene tetA enzyme RNAP with twist 266.49309 superhelical -0.02768 global twist 101.87736 global supercoiling 0.02917
+frame 3156 time 789.0 unbinding_event at gene tetA enzyme RNAP with twist 101.87736 superhelical -0.08689 global twist 101.87736 global supercoiling 0.02901
+frame 3235 time 808.75 binding_event at DNA_gyrase 35 enzyme gyrase with twist 101.87736 superhelical 0.02886 global twist 101.87736 global supercoiling 0.02886
+frame 3241 time 810.25 unbinding_event at DNA_gyrase 35 enzyme gyrase with twist 92.45258 superhelical 0.02170 global twist 93.79898 global supercoiling 0.02712
+frame 3327 time 831.75 binding_event at gene tetA enzyme RNAP with twist 92.45258 superhelical 0.02619 global twist 92.45258 global supercoiling 0.02619
+frame 3351 time 837.75 binding_event at DNA_gyrase 49 enzyme gyrase with twist 23.64409 superhelical 0.01296 global twist 92.45258 global supercoiling 0.02633
+frame 3368 time 842.0 unbinding_event at DNA_gyrase 49 enzyme gyrase with twist -16.74782 superhelical 0.00598 global twist 69.56384 global supercoiling 0.02022
+frame 3453 time 863.25 binding_event at DNA_gyrase 10 enzyme gyrase with twist 160.36348 superhelical 0.13041 global twist 68.21744 global supercoiling 0.01943
+frame 3454 time 863.5 unbinding_event at DNA_gyrase 10 enzyme gyrase with twist 159.46588 superhelical 0.15662 global twist 66.87104 global supercoiling 0.01944
+frame 3490 time 872.5 unbinding_event at gene tetA enzyme RNAP with twist 65.52465 superhelical -0.05149 global twist 65.52465 global supercoiling 0.01866
+frame 3491 time 872.75 binding_event at DNA_gyrase 0 enzyme gyrase with twist 65.52465 superhelical 0.01856 global twist 65.52465 global supercoiling 0.01856
+frame 3518 time 879.5 unbinding_event at DNA_gyrase 0 enzyme gyrase with twist 27.82553 superhelical 0.00776 global twist 29.17193 global supercoiling 0.00843
+frame 3647 time 911.75 binding_event at gene tetA enzyme RNAP with twist 27.82553 superhelical 0.00788 global twist 27.82553 global supercoiling 0.00788
+frame 3729 time 932.25 binding_event at DNA_topoI 42 enzyme topoI with twist -60.00323 superhelical -0.02879 global twist 27.82553 global supercoiling 0.00792
+frame 3734 time 933.5 binding_event at gene mKalama1 enzyme RNAP with twist -28.25308 superhelical -0.02544 global twist 37.54951 global supercoiling 0.01092
+frame 3751 time 937.75 unbinding_event at DNA_topoI 42 enzyme topoI with twist -35.31467 superhelical -0.01933 global twist 70.61103 global supercoiling 0.02064
+frame 3810 time 952.5 unbinding_event at gene tetA enzyme RNAP with twist 20.20057 superhelical -0.06627 global twist 72.55583 global supercoiling 0.02078
+frame 3823 time 955.75 binding_event at DNA_gyrase 34 enzyme gyrase with twist 9.42940 superhelical 0.00289 global twist 72.55583 global supercoiling 0.02066
+frame 3833 time 958.25 binding_event at DNA_gyrase 43 enzyme gyrase with twist 1.90272 superhelical 0.00065 global twist 59.09186 global supercoiling 0.01718
+frame 3835 time 958.75 unbinding_event at DNA_gyrase 43 enzyme gyrase with twist -4.15607 superhelical -0.00636 global twist 53.70627 global supercoiling 0.01595
+frame 3836 time 959.0 unbinding_event at DNA_gyrase 34 enzyme gyrase with twist -26.02572 superhelical -0.06388 global twist 51.01348 global supercoiling 0.01483
+frame 3843 time 960.75 unbinding_event at gene mKalama1 enzyme RNAP with twist 49.66708 superhelical 0.53304 global twist 49.66708 global supercoiling 0.01414
+frame 3867 time 966.75 binding_event at gene tetA enzyme RNAP with twist 49.66708 superhelical 0.01407 global twist 49.66708 global supercoiling 0.01407
+frame 3900 time 975.0 binding_event at gene mKalama1 enzyme RNAP with twist -5.34582 superhelical -0.00287 global twist 49.66708 global supercoiling 0.01414
+frame 3936 time 984.0 binding_event at gene tetA enzyme RNAP with twist -68.09702 superhelical -0.04478 global twist 49.66708 global supercoiling 0.01422
+frame 4009 time 1002.25 unbinding_event at gene mKalama1 enzyme RNAP with twist -90.90721 superhelical 0.62983 global twist 49.66708 global supercoiling 0.01430
+frame 4012 time 1003.0 binding_event at DNA_topoI 47 enzyme topoI with twist -92.70240 superhelical -0.04506 global twist 49.66708 global supercoiling 0.01422
+frame 4025 time 1006.25 unbinding_event at DNA_topoI 47 enzyme topoI with twist -78.04164 superhelical -0.03743 global twist 74.94942 global supercoiling 0.02191
+frame 4030 time 1007.5 unbinding_event at gene tetA enzyme RNAP with twist 159.42385 superhelical -0.04535 global twist 76.89422 global supercoiling 0.02202
+frame 4034 time 1008.5 binding_event at DNA_gyrase 13 enzyme gyrase with twist 162.11664 superhelical 0.11961 global twist 76.89422 global supercoiling 0.02190
+frame 4034 time 1008.5 unbinding_event at DNA_gyrase 13 enzyme gyrase with twist 161.66784 superhelical 0.12810 global twist 76.89422 global supercoiling 0.02190
+frame 4051 time 1012.75 binding_event at DNA_gyrase 24 enzyme gyrase with twist 176.02941 superhelical 0.13762 global twist 75.54782 global supercoiling 0.02151
+frame 4058 time 1014.5 unbinding_event at DNA_gyrase 24 enzyme gyrase with twist 172.43902 superhelical 0.15208 global twist 66.12305 global supercoiling 0.01922
+frame 4077 time 1019.25 binding_event at DNA_gyrase 24 enzyme gyrase with twist 188.59578 superhelical 0.16225 global twist 64.77665 global supercoiling 0.01845
+frame 4082 time 1020.5 unbinding_event at DNA_gyrase 24 enzyme gyrase with twist 185.90299 superhelical 0.17886 global twist 58.04466 global supercoiling 0.01688
+frame 4099 time 1024.75 unbinding_event at gene tetA enzyme RNAP with twist 56.69827 superhelical -0.05891 global twist 56.69827 global supercoiling 0.01615
+frame 4188 time 1047.0 binding_event at gene mKalama1 enzyme RNAP with twist 56.69827 superhelical 0.01606 global twist 56.69827 global supercoiling 0.01606
+frame 4266 time 1066.5 binding_event at DNA_gyrase 26 enzyme gyrase with twist 80.46722 superhelical 0.27057 global twist 56.69827 global supercoiling 0.01615
+frame 4269 time 1067.25 unbinding_event at DNA_gyrase 26 enzyme gyrase with twist 78.67203 superhelical 0.19597 global twist 52.65908 global supercoiling 0.01531
+frame 4292 time 1073.0 binding_event at gene tetA enzyme RNAP with twist -47.10650 superhelical -0.01414 global twist 51.31268 global supercoiling 0.01461
+frame 4297 time 1074.25 unbinding_event at gene mKalama1 enzyme RNAP with twist 71.46369 superhelical 0.67498 global twist 51.31268 global supercoiling 0.01469
+frame 4332 time 1083.0 binding_event at DNA_gyrase 21 enzyme gyrase with twist 10.36732 superhelical 0.00642 global twist 51.31268 global supercoiling 0.01461
+frame 4343 time 1085.75 unbinding_event at DNA_gyrase 21 enzyme gyrase with twist 4.98174 superhelical 0.00921 global twist 36.50231 global supercoiling 0.01061
+frame 4403 time 1100.75 binding_event at DNA_gyrase 9 enzyme gyrase with twist 57.94001 superhelical 0.04467 global twist 35.15592 global supercoiling 0.01001
+frame 4412 time 1103.0 unbinding_event at DNA_gyrase 9 enzyme gyrase with twist 53.45202 superhelical 0.12974 global twist 23.03835 global supercoiling 0.00670
+frame 4455 time 1113.75 unbinding_event at gene tetA enzyme RNAP with twist 21.69195 superhelical -0.02869 global twist 21.69195 global supercoiling 0.00618
+frame 4527 time 1131.75 binding_event at DNA_gyrase 5 enzyme gyrase with twist 21.69195 superhelical 0.00614 global twist 21.69195 global supercoiling 0.00614
+frame 4529 time 1132.25 unbinding_event at DNA_gyrase 5 enzyme gyrase with twist 17.65276 superhelical 0.00528 global twist 18.99916 global supercoiling 0.00549
+frame 4538 time 1134.5 binding_event at DNA_gyrase 26 enzyme gyrase with twist 17.65276 superhelical 0.00500 global twist 17.65276 global supercoiling 0.00500
+frame 4544 time 1136.0 unbinding_event at DNA_gyrase 26 enzyme gyrase with twist 8.22798 superhelical -0.11805 global twist 9.57438 global supercoiling 0.00277
+frame 4551 time 1137.75 binding_event at DNA_gyrase 21 enzyme gyrase with twist 8.22798 superhelical 0.00233 global twist 8.22798 global supercoiling 0.00233
+frame 4556 time 1139.0 unbinding_event at DNA_gyrase 21 enzyme gyrase with twist 0.14960 superhelical 0.00111 global twist 1.49600 global supercoiling 0.00043
+frame 4662 time 1165.5 binding_event at DNA_topoI 4 enzyme topoI with twist 0.14960 superhelical 0.00004 global twist 0.14960 global supercoiling 0.00004
+frame 4666 time 1166.5 unbinding_event at DNA_topoI 4 enzyme topoI with twist 9.87358 superhelical 0.00251 global twist 7.92878 global supercoiling 0.00229
+frame 4694 time 1173.5 binding_event at gene Raspberry enzyme RNAP with twist 9.87358 superhelical 0.00280 global twist 9.87358 global supercoiling 0.00280
+frame 4796 time 1199.0 binding_event at DNA_topoI 31 enzyme topoI with twist -89.41134 superhelical -0.07328 global twist 9.87358 global supercoiling 0.00281
+frame 4801 time 1200.25 unbinding_event at DNA_topoI 31 enzyme topoI with twist -83.12815 superhelical -0.05967 global twist 19.59755 global supercoiling 0.00570
+frame 4802 time 1200.5 unbinding_event at gene Raspberry enzyme RNAP with twist 21.54235 superhelical -0.06714 global twist 21.54235 global supercoiling 0.00613
+frame 4859 time 1214.75 binding_event at gene tetA enzyme RNAP with twist 21.54235 superhelical 0.00610 global twist 21.54235 global supercoiling 0.00610
+frame 4984 time 1246.0 binding_event at DNA_topoI 28 enzyme topoI with twist -101.67086 superhelical -0.04465 global twist 21.54235 global supercoiling 0.00613
+frame 5012 time 1253.0 unbinding_event at DNA_topoI 28 enzyme topoI with twist -71.30213 superhelical 0.22165 global twist 75.99662 global supercoiling 0.02209
+frame 5022 time 1255.5 unbinding_event at gene tetA enzyme RNAP with twist 77.94142 superhelical -0.03274 global twist 77.94142 global supercoiling 0.02220
+frame 5043 time 1260.75 binding_event at DNA_gyrase 21 enzyme gyrase with twist 77.94142 superhelical 0.02208 global twist 77.94142 global supercoiling 0.02208
+frame 5050 time 1262.5 unbinding_event at DNA_gyrase 21 enzyme gyrase with twist 67.17024 superhelical 0.02085 global twist 68.51664 global supercoiling 0.01981
+frame 5076 time 1269.0 binding_event at DNA_gyrase 23 enzyme gyrase with twist 67.17024 superhelical 0.01903 global twist 67.17024 global supercoiling 0.01903
+frame 5097 time 1274.25 unbinding_event at DNA_gyrase 23 enzyme gyrase with twist 37.54951 superhelical 0.01498 global twist 38.89591 global supercoiling 0.01125
+frame 5149 time 1287.25 binding_event at DNA_gyrase 37 enzyme gyrase with twist 37.54951 superhelical 0.01064 global twist 37.54951 global supercoiling 0.01064
+frame 5151 time 1287.75 unbinding_event at DNA_gyrase 37 enzyme gyrase with twist 33.51032 superhelical 0.00817 global twist 34.85672 global supercoiling 0.01008
+frame 5161 time 1290.25 binding_event at gene Raspberry enzyme RNAP with twist 33.51032 superhelical 0.00949 global twist 33.51032 global supercoiling 0.00949
+frame 5269 time 1317.25 unbinding_event at gene Raspberry enzyme RNAP with twist 33.51032 superhelical -0.07236 global twist 33.51032 global supercoiling 0.00954
+frame 5382 time 1345.5 binding_event at gene tetA enzyme RNAP with twist 33.51032 superhelical 0.00949 global twist 33.51032 global supercoiling 0.00949
+frame 5383 time 1345.75 binding_event at DNA_gyrase 32 enzyme gyrase with twist 15.48066 superhelical 0.00900 global twist 33.51032 global supercoiling 0.00954
+frame 5395 time 1348.75 unbinding_event at DNA_gyrase 32 enzyme gyrase with twist -13.69127 superhelical -0.01291 global twist 17.35356 global supercoiling 0.00505
+frame 5400 time 1350.0 binding_event at DNA_gyrase 39 enzyme gyrase with twist -17.28167 superhelical -0.00962 global twist 16.00716 global supercoiling 0.00456
+frame 5402 time 1350.5 unbinding_event at DNA_gyrase 39 enzyme gyrase with twist -24.01365 superhelical -0.01227 global twist 13.31437 global supercoiling 0.00387
+frame 5429 time 1357.25 binding_event at gene tetA enzyme RNAP with twist -47.35120 superhelical -0.02457 global twist 11.96797 global supercoiling 0.00341
+frame 5457 time 1364.25 binding_event at gene tetA enzyme RNAP with twist -67.72431 superhelical -0.03677 global twist 11.96797 global supercoiling 0.00343
+frame 5535 time 1383.75 binding_event at DNA_topoI 32 enzyme topoI with twist -133.77932 superhelical -0.06474 global twist 11.96797 global supercoiling 0.00345
+frame 5543 time 1385.75 unbinding_event at DNA_topoI 32 enzyme topoI with twist -124.35455 superhelical -0.04478 global twist 27.52634 global supercoiling 0.00809
+frame 5545 time 1386.25 unbinding_event at gene tetA enzyme RNAP with twist 159.57850 superhelical -0.02482 global twist 29.47113 global supercoiling 0.00849
+frame 5586 time 1396.5 binding_event at DNA_topoI 4 enzyme topoI with twist -162.05366 superhelical -0.07061 global twist 29.47113 global supercoiling 0.00844
+frame 5587 time 1396.75 binding_event at gene tetA enzyme RNAP with twist -142.78453 superhelical -0.07239 global twist 31.41593 global supercoiling 0.00918
+frame 5590 time 1397.5 unbinding_event at DNA_topoI 4 enzyme topoI with twist -27.76587 superhelical -0.04494 global twist 37.25031 global supercoiling 0.01095
+frame 5592 time 1398.0 unbinding_event at gene tetA enzyme RNAP with twist 197.80797 superhelical -0.03716 global twist 39.19511 global supercoiling 0.01129
+frame 5620 time 1405.0 binding_event at DNA_gyrase 14 enzyme gyrase with twist 222.04312 superhelical 0.20876 global twist 39.19511 global supercoiling 0.01122
+frame 5620 time 1405.0 unbinding_event at gene tetA enzyme RNAP with twist 22.49358 superhelical -0.04920 global twist 39.19511 global supercoiling 0.01122
+frame 5629 time 1407.25 unbinding_event at DNA_gyrase 14 enzyme gyrase with twist 189.78925 superhelical 0.03217 global twist 27.07754 global supercoiling 0.00787
+frame 5670 time 1417.5 binding_event at DNA_topoI 43 enzyme topoI with twist -199.96203 superhelical -0.09573 global twist 25.73114 global supercoiling 0.00733
+frame 5672 time 1418.0 unbinding_event at DNA_topoI 43 enzyme topoI with twist -196.82044 superhelical -0.09668 global twist 29.62073 global supercoiling 0.00861
+frame 5687 time 1421.75 binding_event at DNA_topoI 2 enzyme topoI with twist -209.38681 superhelical -0.09671 global twist 31.56553 global supercoiling 0.00899
+frame 5691 time 1422.75 unbinding_event at DNA_topoI 2 enzyme topoI with twist -204.15082 superhelical -0.09737 global twist 39.34471 global supercoiling 0.01144
+frame 5703 time 1425.75 binding_event at DNA_gyrase 8 enzyme gyrase with twist 255.31390 superhelical 0.20031 global twist 41.28950 global supercoiling 0.01176
+frame 5709 time 1427.25 unbinding_event at DNA_gyrase 8 enzyme gyrase with twist 250.37711 superhelical 0.02853 global twist 33.21112 global supercoiling 0.00966
+frame 5745 time 1436.25 binding_event at gene tetA enzyme RNAP with twist -249.92831 superhelical -0.10343 global twist 31.86473 global supercoiling 0.00907
+frame 5752 time 1438.0 unbinding_event at gene tetA enzyme RNAP with twist 217.97571 superhelical -0.10426 global twist 31.86473 global supercoiling 0.00912
+frame 5758 time 1439.5 binding_event at DNA_gyrase 18 enzyme gyrase with twist 222.46370 superhelical 0.12808 global twist 31.86473 global supercoiling 0.00907
+frame 5764 time 1441.0 binding_event at gene mKalama1 enzyme RNAP with twist -195.98457 superhelical -0.10879 global twist 23.78634 global supercoiling 0.00692
+frame 5764 time 1441.0 unbinding_event at DNA_gyrase 18 enzyme gyrase with twist 219.32211 superhelical 0.13861 global twist 23.78634 global supercoiling 0.00692
+frame 5822 time 1455.5 binding_event at DNA_topoI 5 enzyme topoI with twist -228.91059 superhelical -0.13828 global twist 22.43995 global supercoiling 0.00643
+frame 5832 time 1458.0 binding_event at gene Raspberry enzyme RNAP with twist -220.83583 superhelical -0.13124 global twist 41.88790 global supercoiling 0.01225
+frame 5837 time 1459.25 unbinding_event at DNA_topoI 5 enzyme topoI with twist -162.52280 superhelical -0.12656 global twist 51.61188 global supercoiling 0.01517
+frame 5873 time 1468.25 unbinding_event at gene mKalama1 enzyme RNAP with twist -101.08081 superhelical 0.17908 global twist 53.55667 global supercoiling 0.01542
+frame 5894 time 1473.5 binding_event at DNA_topoI 0 enzyme topoI with twist -162.52280 superhelical -0.12264 global twist 53.55667 global supercoiling 0.01534
+frame 5908 time 1477.0 unbinding_event at gene tetA enzyme RNAP with twist 268.26222 superhelical -0.11550 global twist 80.78381 global supercoiling 0.02362
+frame 5913 time 1478.25 unbinding_event at DNA_topoI 0 enzyme topoI with twist 229.43731 superhelical -0.08157 global twist 90.50779 global supercoiling 0.02631
+frame 5940 time 1485.0 unbinding_event at gene Raspberry enzyme RNAP with twist 92.45258 superhelical -0.12882 global twist 92.45258 global supercoiling 0.02633
+frame 6023 time 1505.75 binding_event at gene tetA enzyme RNAP with twist 92.45258 superhelical 0.02619 global twist 92.45258 global supercoiling 0.02619
+frame 6046 time 1511.5 binding_event at DNA_gyrase 49 enzyme gyrase with twist 24.54168 superhelical 0.01349 global twist 92.45258 global supercoiling 0.02633
+frame 6082 time 1520.5 unbinding_event at DNA_gyrase 49 enzyme gyrase with twist -58.48612 superhelical -0.00140 global twist 43.98230 global supercoiling 0.01279
+frame 6185 time 1546.25 binding_event at DNA_gyrase 11 enzyme gyrase with twist 192.67701 superhelical 0.18039 global twist 42.63590 global supercoiling 0.01214
+frame 6186 time 1546.5 unbinding_event at gene tetA enzyme RNAP with twist -148.95734 superhelical -0.06192 global twist 41.28950 global supercoiling 0.01200
+frame 6190 time 1547.5 unbinding_event at DNA_gyrase 11 enzyme gyrase with twist 34.55752 superhelical -0.06127 global twist 35.90392 global supercoiling 0.01038
+frame 6337 time 1584.25 binding_event at DNA_gyrase 8 enzyme gyrase with twist 34.55752 superhelical 0.00979 global twist 34.55752 global supercoiling 0.00979
+frame 6340 time 1585.0 unbinding_event at DNA_gyrase 8 enzyme gyrase with twist 29.17193 superhelical 0.00880 global twist 30.51833 global supercoiling 0.00882
+frame 6548 time 1637.0 binding_event at DNA_gyrase 2 enzyme gyrase with twist 29.17193 superhelical 0.00826 global twist 29.17193 global supercoiling 0.00826
+frame 6548 time 1637.0 unbinding_event at DNA_gyrase 2 enzyme gyrase with twist 27.82553 superhelical 0.00807 global twist 29.17193 global supercoiling 0.00826
+frame 6563 time 1640.75 binding_event at DNA_gyrase 27 enzyme gyrase with twist 27.82553 superhelical 0.00788 global twist 27.82553 global supercoiling 0.00788
+frame 6568 time 1642.0 unbinding_event at DNA_gyrase 27 enzyme gyrase with twist 19.74715 superhelical -0.11249 global twist 21.09355 global supercoiling 0.00610
+frame 6706 time 1676.5 binding_event at gene tetA enzyme RNAP with twist 19.74715 superhelical 0.00559 global twist 19.74715 global supercoiling 0.00559
+frame 6816 time 1704.0 binding_event at DNA_gyrase 26 enzyme gyrase with twist -89.08430 superhelical -0.04031 global twist 19.74715 global supercoiling 0.00562
+frame 6830 time 1707.5 unbinding_event at DNA_gyrase 26 enzyme gyrase with twist -122.74422 superhelical -0.30390 global twist 0.89760 global supercoiling 0.00026
+frame 6834 time 1708.5 binding_event at DNA_topoI 2 enzyme topoI with twist -125.43701 superhelical -0.05476 global twist -0.44880 global supercoiling -0.00013
+frame 6841 time 1710.25 unbinding_event at DNA_topoI 2 enzyme topoI with twist -117.05943 superhelical -0.05228 global twist 13.16477 global supercoiling 0.00383
+frame 6846 time 1711.5 binding_event at gene tetA enzyme RNAP with twist -120.64982 superhelical -0.05146 global twist 15.10956 global supercoiling 0.00430
+frame 6869 time 1717.25 unbinding_event at gene tetA enzyme RNAP with twist 125.69558 superhelical -0.05188 global twist 15.10956 global supercoiling 0.00433
+frame 6870 time 1717.5 binding_event at gene tetA enzyme RNAP with twist 125.69558 superhelical 0.06892 global twist 15.10956 global supercoiling 0.00430
+frame 6877 time 1719.25 binding_event at DNA_gyrase 33 enzyme gyrase with twist 113.24431 superhelical 0.06480 global twist 251.39116 global supercoiling 0.07199
+frame 6892 time 1723.0 binding_event at DNA_gyrase 20 enzyme gyrase with twist 145.44274 superhelical 0.09155 global twist 231.19521 global supercoiling 0.06759
+frame 6894 time 1723.5 unbinding_event at DNA_gyrase 33 enzyme gyrase with twist 72.85241 superhelical 0.04148 global twist 225.80962 global supercoiling 0.06743
+frame 6897 time 1724.25 unbinding_event at DNA_gyrase 20 enzyme gyrase with twist 142.74994 superhelical 0.09929 global twist 220.42404 global supercoiling 0.06444
+frame 6917 time 1729.25 binding_event at DNA_gyrase 11 enzyme gyrase with twist 159.80430 superhelical 0.10823 global twist 219.07764 global supercoiling 0.06273
+frame 6956 time 1739.0 unbinding_event at DNA_gyrase 11 enzyme gyrase with twist 141.85234 superhelical 0.23552 global twist 166.56816 global supercoiling 0.04870
+frame 6994 time 1748.5 binding_event at DNA_gyrase 2 enzyme gyrase with twist -16.00979 superhelical -0.00704 global twist 165.22177 global supercoiling 0.04731
+frame 6996 time 1749.0 binding_event at DNA_gyrase 35 enzyme gyrase with twist -14.64871 superhelical -0.00801 global twist 162.52897 global supercoiling 0.04752
+frame 6997 time 1749.25 unbinding_event at DNA_gyrase 2 enzyme gyrase with twist -21.26299 superhelical -0.01068 global twist 159.83618 global supercoiling 0.04773
+frame 7008 time 1752.0 unbinding_event at DNA_gyrase 35 enzyme gyrase with twist -52.36250 superhelical -0.02273 global twist 143.67942 global supercoiling 0.04201
+frame 7009 time 1752.25 unbinding_event at gene tetA enzyme RNAP with twist 195.59312 superhelical 0.06965 global twist 142.33302 global supercoiling 0.04076
+frame 7012 time 1753.0 binding_event at DNA_gyrase 14 enzyme gyrase with twist 197.38831 superhelical 0.17047 global twist 142.33302 global supercoiling 0.04053
+frame 7016 time 1754.0 unbinding_event at DNA_gyrase 14 enzyme gyrase with twist 195.14432 superhelical 0.19935 global twist 136.94743 global supercoiling 0.03981
+frame 7033 time 1758.25 unbinding_event at gene tetA enzyme RNAP with twist 135.60104 superhelical -0.03050 global twist 135.60104 global supercoiling 0.03862
+frame 7057 time 1764.25 binding_event at gene tetA enzyme RNAP with twist 135.60104 superhelical 0.03841 global twist 135.60104 global supercoiling 0.03841
+frame 7116 time 1779.0 binding_event at gene tetA enzyme RNAP with twist 13.31708 superhelical 0.00672 global twist 135.60104 global supercoiling 0.03862
+frame 7141 time 1785.25 binding_event at DNA_gyrase 21 enzyme gyrase with twist 144.72391 superhelical 0.10205 global twist 135.60104 global supercoiling 0.03883
+frame 7141 time 1785.25 unbinding_event at DNA_gyrase 21 enzyme gyrase with twist 144.27511 superhelical 0.10815 global twist 135.60104 global supercoiling 0.03883
+frame 7220 time 1805.0 unbinding_event at gene tetA enzyme RNAP with twist 216.85277 superhelical 0.00679 global twist 134.25464 global supercoiling 0.03844
+frame 7279 time 1819.75 unbinding_event at gene tetA enzyme RNAP with twist 134.25464 superhelical -0.05528 global twist 134.25464 global supercoiling 0.03823
+frame 7287 time 1821.75 binding_event at DNA_gyrase 7 enzyme gyrase with twist 134.25464 superhelical 0.03803 global twist 134.25464 global supercoiling 0.03803
+frame 7313 time 1828.25 unbinding_event at DNA_gyrase 7 enzyme gyrase with twist 97.90192 superhelical 0.03051 global twist 99.24832 global supercoiling 0.02869
+frame 7372 time 1843.0 binding_event at DNA_gyrase 26 enzyme gyrase with twist 97.90192 superhelical 0.02773 global twist 97.90192 global supercoiling 0.02773
+frame 7373 time 1843.25 unbinding_event at DNA_gyrase 26 enzyme gyrase with twist 95.20913 superhelical -0.00746 global twist 96.55553 global supercoiling 0.02792
+frame 7392 time 1848.0 binding_event at gene tetA enzyme RNAP with twist 95.20913 superhelical 0.02697 global twist 95.20913 global supercoiling 0.02697
+frame 7457 time 1864.25 binding_event at gene tetA enzyme RNAP with twist -11.81016 superhelical -0.00588 global twist 95.20913 global supercoiling 0.02711
+frame 7511 time 1877.75 binding_event at DNA_gyrase 20 enzyme gyrase with twist 155.48957 superhelical 0.12329 global twist 95.20913 global supercoiling 0.02726
+frame 7522 time 1880.5 unbinding_event at DNA_gyrase 20 enzyme gyrase with twist 150.10399 superhelical 0.14294 global twist 80.39876 global supercoiling 0.02351
+frame 7555 time 1888.75 unbinding_event at gene tetA enzyme RNAP with twist 178.10608 superhelical -0.00594 global twist 79.05237 global supercoiling 0.02264
+frame 7557 time 1889.25 binding_event at DNA_topoI 3 enzyme topoI with twist -99.95132 superhelical -0.04617 global twist 79.05237 global supercoiling 0.02251
+frame 7558 time 1889.5 unbinding_event at DNA_topoI 3 enzyme topoI with twist -97.85692 superhelical -0.04673 global twist 80.99716 global supercoiling 0.02355
+frame 7620 time 1905.0 unbinding_event at gene tetA enzyme RNAP with twist 82.94196 superhelical -0.06260 global twist 82.94196 global supercoiling 0.02362
+frame 7698 time 1924.5 binding_event at gene tetA enzyme RNAP with twist 82.94196 superhelical 0.02349 global twist 82.94196 global supercoiling 0.02349
+frame 7792 time 1948.0 binding_event at DNA_gyrase 11 enzyme gyrase with twist 126.77807 superhelical 0.09231 global twist 82.94196 global supercoiling 0.02362
+frame 7802 time 1950.5 binding_event at DNA_gyrase 21 enzyme gyrase with twist 89.09475 superhelical 0.09056 global twist 69.47799 global supercoiling 0.02020
+frame 7803 time 1950.75 unbinding_event at DNA_gyrase 21 enzyme gyrase with twist 85.05556 superhelical 0.09353 global twist 66.78520 global supercoiling 0.01983
+frame 7812 time 1953.0 unbinding_event at DNA_gyrase 11 enzyme gyrase with twist 114.66050 superhelical 0.15957 global twist 53.32123 global supercoiling 0.01550
+frame 7815 time 1953.75 binding_event at DNA_gyrase 25 enzyme gyrase with twist 116.45569 superhelical 0.09169 global twist 51.97483 global supercoiling 0.01480
+frame 7822 time 1955.5 unbinding_event at DNA_gyrase 25 enzyme gyrase with twist 112.86530 superhelical 0.09817 global twist 42.55005 global supercoiling 0.01237
+frame 7861 time 1965.25 unbinding_event at gene tetA enzyme RNAP with twist 41.20366 superhelical -0.04350 global twist 41.20366 global supercoiling 0.01173
+frame 7938 time 1984.5 binding_event at gene tetA enzyme RNAP with twist 41.20366 superhelical 0.01167 global twist 41.20366 global supercoiling 0.01167
+frame 7984 time 1996.0 binding_event at DNA_gyrase 15 enzyme gyrase with twist 62.35477 superhelical 0.03925 global twist 41.20366 global supercoiling 0.01173
+frame 7987 time 1996.75 unbinding_event at DNA_gyrase 15 enzyme gyrase with twist 60.55957 superhelical 0.04314 global twist 37.16447 global supercoiling 0.01080
+frame 8020 time 2005.0 binding_event at gene tetA enzyme RNAP with twist -53.46464 superhelical -0.02565 global twist 35.81807 global supercoiling 0.01020
+frame 8036 time 2009.0 binding_event at gene tetA enzyme RNAP with twist -58.79407 superhelical -0.03288 global twist 35.81807 global supercoiling 0.01026
+frame 8069 time 2017.25 binding_event at DNA_gyrase 19 enzyme gyrase with twist 133.26500 superhelical 0.11039 global twist 35.81807 global supercoiling 0.01031
+frame 8081 time 2020.25 unbinding_event at DNA_gyrase 19 enzyme gyrase with twist 127.43062 superhelical 0.13199 global twist 19.66131 global supercoiling 0.00578
+frame 8101 time 2025.25 unbinding_event at gene tetA enzyme RNAP with twist 136.35044 superhelical -0.02589 global twist 18.31491 global supercoiling 0.00527
+frame 8110 time 2027.5 binding_event at DNA_gyrase 16 enzyme gyrase with twist 143.53123 superhelical 0.10317 global twist 18.31491 global supercoiling 0.00524
+frame 8121 time 2030.25 binding_event at DNA_topoI 26 enzyme topoI with twist -133.33960 superhelical -0.06357 global twist 3.50454 global supercoiling 0.00102
+frame 8126 time 2031.5 unbinding_event at DNA_gyrase 16 enzyme gyrase with twist 135.90164 superhelical 0.12837 global twist 6.49654 global supercoiling 0.00194
+frame 8133 time 2033.25 unbinding_event at DNA_topoI 26 enzyme topoI with twist -119.72603 superhelical 0.26666 global twist 18.76371 global supercoiling 0.00549
+frame 8183 time 2045.75 unbinding_event at gene tetA enzyme RNAP with twist 185.31443 superhelical -0.03324 global twist 20.70850 global supercoiling 0.00593
+frame 8199 time 2049.75 unbinding_event at gene tetA enzyme RNAP with twist 20.70850 superhelical -0.07298 global twist 20.70850 global supercoiling 0.00590
+frame 8482 time 2120.5 binding_event at DNA_gyrase 4 enzyme gyrase with twist 20.70850 superhelical 0.00587 global twist 20.70850 global supercoiling 0.00587
+frame 8503 time 2125.75 unbinding_event at DNA_gyrase 4 enzyme gyrase with twist -8.91223 superhelical -0.00152 global twist -7.56583 global supercoiling -0.00219
+frame 8626 time 2156.5 binding_event at DNA_gyrase 41 enzyme gyrase with twist -8.91223 superhelical -0.00252 global twist -8.91223 global supercoiling -0.00252
+frame 8642 time 2160.5 unbinding_event at DNA_gyrase 41 enzyme gyrase with twist -31.80097 superhelical -0.01359 global twist -30.45458 global supercoiling -0.00881
+frame 8713 time 2178.25 binding_event at gene tetA enzyme RNAP with twist -31.80097 superhelical -0.00901 global twist -31.80097 global supercoiling -0.00901
+frame 8754 time 2188.5 binding_event at DNA_topoI 49 enzyme topoI with twist -52.34432 superhelical -0.02755 global twist -31.80097 global supercoiling -0.00906
+frame 8754 time 2188.5 unbinding_event at DNA_topoI 49 enzyme topoI with twist -51.29712 superhelical -0.02803 global twist -31.80097 global supercoiling -0.00906
+frame 8876 time 2219.0 unbinding_event at gene tetA enzyme RNAP with twist -29.85618 superhelical -0.06557 global twist -29.85618 global supercoiling -0.00850
+frame 9128 time 2282.0 binding_event at DNA_gyrase 5 enzyme gyrase with twist -29.85618 superhelical -0.00846 global twist -29.85618 global supercoiling -0.00846
+frame 9142 time 2285.5 unbinding_event at DNA_gyrase 5 enzyme gyrase with twist -50.05213 superhelical -0.01357 global twist -48.70573 global supercoiling -0.01408
+frame 9169 time 2292.25 binding_event at DNA_gyrase 38 enzyme gyrase with twist -50.05213 superhelical -0.01418 global twist -50.05213 global supercoiling -0.01418
+frame 9173 time 2293.25 unbinding_event at DNA_gyrase 38 enzyme gyrase with twist -56.78411 superhelical -0.01856 global twist -55.43772 global supercoiling -0.01603
+frame 9446 time 2361.5 binding_event at gene tetA enzyme RNAP with twist -56.78411 superhelical -0.01608 global twist -56.78411 global supercoiling -0.01608
+frame 9455 time 2363.75 binding_event at gene tetA enzyme RNAP with twist -35.83176 superhelical -0.02040 global twist -56.78411 global supercoiling -0.01617
+frame 9554 time 2388.5 binding_event at DNA_topoI 6 enzyme topoI with twist -124.25585 superhelical -0.05751 global twist -56.78411 global supercoiling -0.01626
+frame 9559 time 2389.75 unbinding_event at DNA_topoI 6 enzyme topoI with twist -117.97267 superhelical -0.05522 global twist -47.06014 global supercoiling -0.01376
+frame 9568 time 2392.0 binding_event at DNA_gyrase 23 enzyme gyrase with twist 80.47621 superhelical 0.06450 global twist -45.11534 global supercoiling -0.01292
+frame 9582 time 2395.5 unbinding_event at DNA_gyrase 23 enzyme gyrase with twist 73.74423 superhelical 0.07652 global twist -63.96490 global supercoiling -0.01870
+frame 9595 time 2398.75 binding_event at DNA_topoI 40 enzyme topoI with twist -149.38859 superhelical -0.06372 global twist -65.31130 global supercoiling -0.01870
+frame 9602 time 2400.5 unbinding_event at DNA_topoI 40 enzyme topoI with twist -141.01101 superhelical -0.05769 global twist -51.69773 global supercoiling -0.01511
+frame 9609 time 2402.25 unbinding_event at gene tetA enzyme RNAP with twist 97.54127 superhelical -0.02062 global twist -49.75293 global supercoiling -0.01425
+frame 9618 time 2404.5 unbinding_event at gene tetA enzyme RNAP with twist -49.75293 superhelical -0.06336 global twist -49.75293 global supercoiling -0.01417
+frame 9797 time 2449.25 binding_event at DNA_gyrase 32 enzyme gyrase with twist -49.75293 superhelical -0.01409 global twist -49.75293 global supercoiling -0.01409
+frame 9799 time 2449.75 unbinding_event at DNA_gyrase 32 enzyme gyrase with twist -53.79212 superhelical -0.01953 global twist -52.44573 global supercoiling -0.01516

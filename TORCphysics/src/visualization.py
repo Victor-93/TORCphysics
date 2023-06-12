@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
+from matplotlib.markers import MarkerStyle
 import matplotlib.animation as animation
 import numpy as np
 import matplotlib.patches as mpatches
 from TORCphysics import analysis as an
+from datetime import datetime
 
 # This module is produced to make one's life easier and be able to quickly process results.
 # With this module you can create animations,
@@ -11,12 +13,12 @@ from TORCphysics import analysis as an
 width = 10
 height = 6
 
-# TODO: what if there are no colors?
 # colors
-enzyme_colors = {'RNAP': 'gray', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'black', 'ori': 'yellow', 'topoI': 'red',
+enzyme_colors = {'RNAP': 'white', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'black', 'ori': 'silver', 'topoI': 'red',
                  'gyrase': 'cyan'}
-gene_colour = 'green'
-DNA_colour = 'black'
+
+gene_colour = '#4a86e8ff'  # 'blue'
+DNA_colour = 'black'  # '#999999ff' #'gray'
 sigma_colour = 'red'
 topoI_colour = 'red'
 gyrase_colour = 'cyan'
@@ -28,7 +30,7 @@ gene_lw = 5
 sigma_lw = 5
 
 # Shapes
-enzyme_shapes = {'RNAP': 'o', 'IHF': 'o', 'FIS': 'o', 'lacI': 's', 'ori': 's', 'topoI': 'v', 'gyrase': 'v'}
+enzyme_shapes = {'RNAP': 'o', 'IHF': 'o', 'FIS': 'o', 'lacI': 's', 'ori': 'h', 'topoI': 'X', 'gyrase': 'X'}
 
 # text size
 slabel = 15
@@ -325,6 +327,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
     cl = []  # colour
     ml = []  # marker
     sigma = []  # superhelical
+    my_time = []
     mask = sites_df['type'] == 'circuit'
     n_enzymes_df = sites_df[mask]
 
@@ -346,21 +349,28 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
             if name == 'EXT_L' or name == 'EXT_R':
                 s.append(0)
                 c.append('white')
-                m.append('o')
+                m.append(MarkerStyle('o').get_path().transformed(MarkerStyle('o').get_transform()))
+            #                m.append('o')
             else:
                 s.append(enzyme_sizes[name])
                 c.append(enzyme_colors[name])
-                m.append(enzyme_shapes[name])
+                m.append(MarkerStyle(enzyme_shapes[name]).get_path().transformed(
+                    MarkerStyle(enzyme_shapes[name]).get_transform()))
+        #                m.append(enzyme_shapes[name])
         xl.append(x)
         yl.append(y)
         sl.append(s)
         cl.append(c)
         ml.append(m)
         sigma.append(sig)
+        ttt = datetime.fromtimestamp(k * my_circuit.dt - 3600).strftime('%H:%M:%S')
+        my_time.append('time=' + ttt)
 
-    scat = ax[0].scatter(xl[0], yl[0], s=sl[0], c=cl[0], marker="o", zorder=4)  # This plots RNAPs and NAPs
+    scat = ax[0].scatter(xl[0], yl[0], s=sl[0], c=cl[0], marker="o", ec='black', zorder=4)  # This plots RNAPs and NAPs
 
     lines = [ax[1].plot([], [], c=sigma_colour, lw=sigma_lw)[0] for _ in range(100)]  # This plots supercoiling
+
+    time_text = ax[0].text(0.0, 1.1, '', transform=ax[0].transAxes)
 
     # ------------------------------------------------------------
     # ANIMATION
@@ -378,6 +388,11 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
         scat.set_color(c)
         scat.set_sizes(s)
         scat.set_offsets(xy)
+        scat.set_edgecolor('black')
+        scat.set_paths(m)
+        #        scat.set_paths([plt.Path.unit_regular_polygon(m)])  # Change marker shape to a square ('4')
+
+        # scat.set_marker('o')
 
         n = len(x)
         for j in range(10):
@@ -392,7 +407,9 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
 
             lines[j].set_linewidth(sigma_lw)
 
-        return lines, scat
+        time_text.set_text( my_time[i])
+
+        return lines, scat, time_text
 
     # ANIMATE
     # -----------------------------------
@@ -403,10 +420,10 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
     # -----------------------------------
 
     # writervideo = animation.FFMpegWriter(fps=60)
-    #writervideo = animation.FFMpegWriter()
+    # writervideo = animation.FFMpegWriter()
     writervideo = animation.PillowWriter(fps=60)
     ani.save(output_file, writer=writervideo)
-    #ani.save(output, writer=writervideo)
+    # ani.save(output, writer=writervideo)
     # ani.save(output_file, writer='ImageMagick', fps=30)
     # ani.save(output_file, writer='FFMpeg', fps=30)
     # ani.save(output_file, writer='HTMLwriter', fps=30)

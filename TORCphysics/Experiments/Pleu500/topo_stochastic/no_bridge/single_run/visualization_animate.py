@@ -16,14 +16,14 @@ enzymes_df = pd.read_csv(cenzymes_df, sep=',')
 
 log_file = 'Pleu500_out.log'
 
-colors_dict = {'tetA': 'yellow', 'CDS': 'green', 'mKalama1': 'blue', 'Raspberry': 'red'}
+colors_dict = {'tetA': '#d8b41a', 'CDS': 'silver', 'mKalama1': '#0051ff', 'Raspberry': '#e30000'}
 
 circuit_filename = '../../../circuit.csv'
 sites_filename = 'sites_maxmin.csv'
 enzymes_filename = '../../../enzymes.csv'
 environment_filename = 'environment_stochastic.csv'
 output_prefix = 'out'
-frames = 2000
+frames = 3000
 series = True
 continuation = False
 tm = 'stochastic'
