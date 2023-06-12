@@ -52,7 +52,7 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
             #  torques and not uniform motion
             if mechanical_model == 'uniform':
                 # Calculates change in position and the twist that it injected on the left and right
-                position, twist_left, twist_right = rnap_uniform_motion(enzyme, dt)
+                position, twist_left, twist_right = rnap_uniform_motion(enzyme, enzyme_list, dt)
             else:
                 print('Sorry, cannot recognise mechanistic model')
                 sys.exit()
@@ -147,16 +147,39 @@ def topoisomerase_supercoiling_injection(topo, dt):
     return position, twist_left, twist_right
 
 
-# TODO: Add stoping mechanism. If there's an enzyme ahead, it might stay in place...
 # TODO: Because you have a k_cat now, this indicates how much twist RNAPs inject on each side.
 # Returns new RNAP position, and the twist it injected on the left and right
-def rnap_uniform_motion(z, dt):
+def rnap_uniform_motion(z, z_list, dt):
+
+    # Get neighbour enzyme
+    if z.direction > 0:
+        z_n = [e for e in z_list if e.position > z.position][0]  # after - On the right
+    if z.direction < 0:
+        z_n = [e for e in z_list if e.position < z.position][-1]  # before - On the left
+    if z.direction == 0:
+        print('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
+        sys.exit()
+
     # Object moves: simple uniform motion
     # position = Z.position + Z.direction * v0 * dt
     position = z.direction * v0 * dt
+
     # Injects twist: denatures w=gamma*v0*dt base-pairs
     twist_left = -z.direction * gamma * v0 * dt
     twist_right = z.direction * gamma * v0 * dt
+
+    # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid clashing
+    if z.direction > 0:  # Moving to the right
+        if z_n.position - (z.position + position) <= 0:
+            position = 0.0
+            twist_left = 0.0
+            twist_right = 0.0
+    else:  # Moves to the left
+        if z_n.position - (z.position + position) >= 0:
+            position = 0.0
+            twist_left = 0.0
+            twist_right = 0.0
+
     return position, twist_left, twist_right
 
 

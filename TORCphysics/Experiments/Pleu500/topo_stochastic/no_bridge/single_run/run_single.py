@@ -1,7 +1,4 @@
-from TORCphysics import Circuit, Enzyme
-from TORCphysics import effect_model as em
-from TORCphysics import binding_model as bm
-import pandas as pd
+from TORCphysics import Circuit
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -16,7 +13,7 @@ sites_filename = 'sites_maxmin.csv'
 enzymes_filename = '../../../enzymes.csv'
 environment_filename = 'environment_stochastic.csv'
 output_prefix = 'out'
-frames = 2000
+frames = 3000
 series = True
 continuation = False
 tm = 'stochastic'

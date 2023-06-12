@@ -1,0 +1,4 @@
+type,name,site,position,direction,size,twist,superhelical
+EXT,EXT_L,EXT,-2815.0,0,0.0,-118.18372363504372,-0.03347457627118619
+origin,ori,ori,3085.0,0,100.0,-118.18372363504372,-0.03347457627118619
+EXT,EXT_R,EXT,9085.0,0,0.0,0.0,-0.06
