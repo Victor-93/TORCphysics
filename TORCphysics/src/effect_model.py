@@ -53,6 +53,8 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
             if mechanical_model == 'uniform':
                 # Calculates change in position and the twist that it injected on the left and right
                 position, twist_left, twist_right = rnap_uniform_motion(enzyme, enzyme_list, dt)
+            elif mechanical_model == 'torque_stall_Geng':
+                position, twist_left, twist_right = rnap_torque_stall_Geng(enzyme, enzyme_list, dt)
             else:
                 print('Sorry, cannot recognise mechanistic model')
                 sys.exit()
@@ -147,10 +149,29 @@ def topoisomerase_supercoiling_injection(topo, dt):
     return position, twist_left, twist_right
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# RNAP FUNCTIONS
+# ---------------------------------------------------------------------------------------------------------------------
+
+# We will use more than once this calculation, so let's store it as function
+def uniform_motion(z, dt):
+    # Object moves: simple uniform motion
+    # position = Z.position + Z.direction * v0 * dt
+    position = z.direction * v0 * dt
+
+    # Injects twist: denatures w=gamma*v0*dt base-pairs
+    twist_left = -z.direction * gamma * v0 * dt
+    twist_right = z.direction * gamma * v0 * dt
+    return position, twist_left, twist_right
+
+
 # TODO: Because you have a k_cat now, this indicates how much twist RNAPs inject on each side.
 # Returns new RNAP position, and the twist it injected on the left and right
 def rnap_uniform_motion(z, z_list, dt):
-
+    # Everything 0 for now
+    position = 0.0
+    twist_left = 0.0
+    twist_right = 0.0
     # Get neighbour enzyme
     if z.direction > 0:
         z_n = [e for e in z_list if e.position > z.position][0]  # after - On the right
@@ -160,7 +181,57 @@ def rnap_uniform_motion(z, z_list, dt):
         print('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
         sys.exit()
 
-    # Object moves: simple uniform motion
+    # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid clashing
+    if z.direction > 0:  # Moving to the right
+        if z_n.position - (z.position + position) <= 0:
+            return position, twist_left, twist_right
+    else:  # Moves to the left
+        if z_n.position - (z.position + position) >= 0:
+            return position, twist_left, twist_right
+
+    # Nothing is next, so the object moves: simple uniform motion
+    position, twist_left, twist_right = uniform_motion(z, dt)
+
+    return position, twist_left, twist_right
+
+
+# Returns new RNAP position, and the twist it injected on the left and right - It can stall according the Geng
+# model of RNAP elongation. In this model, either the RNAP moves with constant velocity or it stalls. It relies on a
+# low stretching force params.f_stretching, which here we assume that all molecules interacting exert on the DNA, which
+# might not be true... Additionally, if the DNA becomes hyper supercoiled, the RNAP would also stall
+def rnap_torque_stall_Geng(z, z_list, dt):
+    # For now, nothing happens
+    position = 0.0
+    twist_left = 0.0
+    twist_right = 0.0
+    # Get enzymes on the right and left
+    z_right = [e for e in z_list if e.position > z.position][0]  # after - On the right
+    z_left = [e for e in z_list if e.position < z.position][-1]  # before - On the left
+    # Calculate torques and determine if the RNAP will stall
+    torque_right = Marko_torque(z.superhelical)  # Torque on the right
+    torque_left = Marko_torque(z_left)  # Torque on the left
+    torque = abs(torque_left - torque_right)
+    if torque >= params.stall_torque:  # If torque higher than the stall torque, the RNAP stalls and doesn't move
+        return position, twist_left, twist_right
+
+    # Ok, it didn't stall, now we need the neighbours
+    if z.direction > 0:
+        z_n = z_right  # after - On the right
+    if z.direction < 0:
+        z_n = z_left   # before - On the left
+    if z.direction == 0:
+        print('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
+        sys.exit()
+
+    # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid clashing
+    if z.direction > 0:  # Moving to the right
+        if z_n.position - (z.position + position) <= 0:
+            return position, twist_left, twist_right
+    else:  # Moves to the left
+        if z_n.position - (z.position + position) >= 0:
+            return position, twist_left, twist_right
+
+    # It passed all the filters and didn't stall, now, the object moves with simple uniform motion
     # position = Z.position + Z.direction * v0 * dt
     position = z.direction * v0 * dt
 
@@ -168,20 +239,27 @@ def rnap_uniform_motion(z, z_list, dt):
     twist_left = -z.direction * gamma * v0 * dt
     twist_right = z.direction * gamma * v0 * dt
 
-    # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid clashing
-    if z.direction > 0:  # Moving to the right
-        if z_n.position - (z.position + position) <= 0:
-            position = 0.0
-            twist_left = 0.0
-            twist_right = 0.0
-    else:  # Moves to the left
-        if z_n.position - (z.position + position) >= 0:
-            position = 0.0
-            twist_left = 0.0
-            twist_right = 0.0
-
     return position, twist_left, twist_right
 
+
+# Torque calculated using Marko's elasticity model
+def Marko_torque(sigma):
+    if abs(sigma) <= abs(params.sigma_s):
+        torque = sigma * params.cs_energy / params.w0
+    elif abs(params.sigma_s) < abs(sigma) < abs(params.sigma_p):
+        torque = np.sqrt(
+            2 * params.p_stiffness * params.g_energy / (1 - params.p_stiffness / params.cs_energy)) / params.w0_nm
+    elif abs(sigma) > abs(params.sigma_p):
+        torque = sigma * params.p_stiffness / params.w0
+    else:
+        print('Error in Marko_torque function')
+        sys.exit()
+    return torque
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# USEFUL FUNCTIONS
+# ---------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------
 # This function calculates the length between two objects (proteins) considering their sizes

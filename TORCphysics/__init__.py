@@ -8,4 +8,4 @@ from .src.log import Event, Log
 from .src import analysis
 from .src import visualization
 from .src.circuit import Circuit
-from .src.parallelization_tools import parallelization_tools
+from .src.extra_tools import parallelization_tools
