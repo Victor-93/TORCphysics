@@ -20,12 +20,12 @@ sites_filename = 'sites_maxmin.csv'
 enzymes_filename = '../../../enzymes.csv'
 environment_filename = 'environment_stochastic.csv'
 output_prefix = 'out'
-frames = 10000
+frames = 8000
 series = True
 continuation = False
 tm = 'stochastic'
 mm = 'uniform'
-dt = .25
+dt = .5
 
 # Create a ProcessPoolExecutor
 with concurrent.futures.ProcessPoolExecutor() as executor:

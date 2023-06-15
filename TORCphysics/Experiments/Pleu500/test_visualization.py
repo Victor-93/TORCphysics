@@ -19,11 +19,11 @@ cenvironment_df = 'Pleu500_0_environment_df.csv'
 log_file = 'Pleu500_0.log'
 
 circuit_filename = 'circuit.csv'
-sites_filename = 'sites.csv'
+sites_filename = 'sites_sam.csv'
 enzymes_filename = 'enzymes.csv'
 environment_filename = 'environment.csv'
 output_prefix = 'output'
-frames = 10000
+frames = 3000
 series = True
 continuation = False
 tm = 'continuum'
@@ -74,7 +74,7 @@ vs.plot_supercoiling_profiles(my_circuit, sites_df, ax, colors=colors_dict, site
 # Plot cross-correlations
 # ---------------------------------------------------------
 ax = axs[4]
-vs.plot_cross_correlation_with_site(my_circuit, sites_df, 'tetA', ax, fa=6000, fb=-1,
+vs.plot_cross_correlation_with_site(my_circuit, sites_df, 'tetA', ax, fa=1000, fb=-1,
                                     ignore=['CDS'], site_type='gene', colors=colors_dict)
 
 # Plot steady state initiation curve

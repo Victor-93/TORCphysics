@@ -209,7 +209,7 @@ def rnap_torque_stall_Geng(z, z_list, dt):
     z_left = [e for e in z_list if e.position < z.position][-1]  # before - On the left
     # Calculate torques and determine if the RNAP will stall
     torque_right = Marko_torque(z.superhelical)  # Torque on the right
-    torque_left = Marko_torque(z_left)  # Torque on the left
+    torque_left = Marko_torque(z_left.superhelical)  # Torque on the left
     torque = abs(torque_left - torque_right)
     if torque >= params.stall_torque:  # If torque higher than the stall torque, the RNAP stalls and doesn't move
         return position, twist_left, twist_right
@@ -244,7 +244,7 @@ def rnap_torque_stall_Geng(z, z_list, dt):
 
 # Torque calculated using Marko's elasticity model
 def Marko_torque(sigma):
-    if abs(sigma) <= abs(params.sigma_s):
+    if np.abs(sigma) <= np.abs(params.sigma_s):
         torque = sigma * params.cs_energy / params.w0
     elif abs(params.sigma_s) < abs(sigma) < abs(params.sigma_p):
         torque = np.sqrt(

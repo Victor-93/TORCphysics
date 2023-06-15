@@ -19,6 +19,7 @@ colors_dict = {'tetA': 'yellow', 'CDS': 'green', 'mKalama1': 'blue', 'Raspberry'
 
 circuit_filename = '../../../circuit.csv'
 sites_filename = 'sites_maxmin.csv'
+#sites_filename = 'sites_sam.csv'
 enzymes_filename = '../../../enzymes.csv'
 environment_filename = 'environment_stochastic.csv'
 output_prefix = 'out'
@@ -34,7 +35,7 @@ my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environ
 # Figure initial conditions
 # ---------------------------------------------------------
 width = 8
-height = 3
+height = 4
 
 # Better use these for the colors of genes...
 # Sort them according the input file...
@@ -66,7 +67,7 @@ sites_df = pd.read_csv(csites_df, sep=',')
 dt = 1.0  # This should be extracted from the log file
 # Create Figure
 # ---------------------------------------------------------
-fig, axs = plt.subplots(1, figsize=(width, 2 * height), tight_layout=True)
+fig, axs = plt.subplots(1, figsize=(width,  height), tight_layout=True)
 
 # Sites rate curves - Let's plot the rates modulated by supercoiling
 # ---------------------------------------------------------
@@ -81,7 +82,13 @@ ax.set_title('Response curves')
 #        ax.plot(x, rate, color=colors[i], label=site.name)
 
 #ax_params(axis=ax, xl=r'\sigma', yl=r'Initiation rate ($s^{-1}$)', grid=True, legend=True)
-plt.show()
-
-
+#plt.show()
 plt.savefig('responses.png')
+
+# Plot cross-correlations
+# ---------------------------------------------------------
+fig, axs = plt.subplots(1, figsize=(width,  height), tight_layout=True)
+ax = axs
+vs.plot_signal_profiles(my_circuit, sites_df, ax, site_type='gene', colors=colors_dict)
+ax.set_title('Signal profiles - ON')
+plt.savefig('signals.png')

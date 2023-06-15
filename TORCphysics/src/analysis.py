@@ -86,9 +86,9 @@ def site_activity_curves(site, environment, dt=1, sigma_min=-.2, sigma_max=.1, d
 def topoisomerase_activity_curves_continuum(topo, sigma_min=-.2, sigma_max=.1, delta_sigma=.001, dt=1):
     sigma = np.arange(sigma_min, sigma_max, delta_sigma)
     if topo.name == 'topoI':
-        topo_curve = em.topo1_continuum(sigma, topo.concentration, topo.k_cat, dt)
+        topo_curve = em.topo1_continuum(sigma, topo, dt)
     elif topo.name == 'gyrase':
-        topo_curve = em.gyrase_continuum(sigma, topo.concentration, topo.k_cat, dt)
+        topo_curve = em.gyrase_continuum(sigma, topo, dt)
     else:
         print('Could not recognize name of topoisomerase')
         topo_curve = np.zeros_like(sigma)
