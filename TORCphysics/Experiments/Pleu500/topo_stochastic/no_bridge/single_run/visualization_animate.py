@@ -28,7 +28,7 @@ series = True
 continuation = False
 tm = 'stochastic'
 mm = 'uniform'
-dt = .25
+dt = .5
 
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation, dt, tm, mm)

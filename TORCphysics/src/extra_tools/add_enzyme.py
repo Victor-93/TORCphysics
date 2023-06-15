@@ -4,7 +4,7 @@ from TORCphysics import binding_model as bm
 import pandas as pd
 
 
-class CustomEnzyme:
+class AddEnzyme:
     # I thought it'll be easier to describe the effects as an object.
     # Because the current effects are taken place at the current enzyme i=index, I use the index to locate the enzyme
     # in the enzyme_list which is applying the effect.
@@ -16,14 +16,13 @@ class CustomEnzyme:
         self.enzyme = Enzyme(e_type=e_type, name=name, site=site, position=position, size=size,
                              twist=0.0, superhelical=0.0, k_cat=0.0, k_off=0.0)
 
-
 # Run normal simulation but adding custom enzymes.
 # custom enzymes is a list of CustomEnzyme objects...
 def run_simulation(my_circuit, custom_enzymes):
-    custom_enzymes.sort(key=lambda x: x.time)  # Sort custom enzymes by time
+    custom_enzymes.sort(key=lambda x: x.frame)  # Sort custom enzymes by time
 
     for frame in range(1, my_circuit.frames + 1):
-        custom_enzymes_frame = [enzyme for enzyme in custom_enzymes if enzyme.time == frame]
+        custom_enzymes_frame = [enzyme for enzyme in custom_enzymes if enzyme.frame == frame]
 
         my_circuit.frame += 1
         my_circuit.time = frame * my_circuit.dt

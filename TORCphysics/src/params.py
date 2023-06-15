@@ -23,7 +23,7 @@ w0 = 2.0 * np.pi / T_bp  # Relaxed twist density per bp
 w0_nm = 2.0 * np.pi / (T_bp * bp_nm)  # nm^{-1} - Now in distance units
 gamma = 0.2 * w0  # How much supercoiling is inyected per bp
 # sigma0 = -0.06          #Initial supercoiling density
-stall_torque = 10.5  # pN * nm - from Gleng's papers which cited another paper
+stall_torque = 10.5 * 17 # pN * nm - from Gleng's papers which cited another paper
 sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall
 
 # Elasticity parameters - from Marko's elasticity model
@@ -34,14 +34,14 @@ A_length = 50.0  # nm - persistence length
 f_stretching = 0.15  # pN - stretching force of enzymes in vivo - this might not be correct, but it is in the range of
 # low forces in the Marko's elasticity model
 Temperature = 300  # K - temperature
-p_stiffness = kBT_pN_nm * Temperature * P_length * w0_nm * w0_nm  # pN - stiffness related to P
-c_stiffness = kBT_pN_nm * Temperature * C_length * w0_nm * w0_nm  # pN - stiffness related to C
+p_stiffness = kBT_pN_nm * P_length * w0_nm * w0_nm  # pN - stiffness related to P
+c_stiffness = kBT_pN_nm * C_length * w0_nm * w0_nm  # pN - stiffness related to C
 # related to free energy of twist stiffness of extended state
 cs_energy = c_stiffness * (
         1 - ((C_length / 4 * A_length) *
-             np.sqrt(kBT_pN_nm * Temperature / (A_length * f_stretching))))
+             np.sqrt(kBT_pN_nm / (A_length * f_stretching))))
 # related to free energy of stretched state
-g_energy = f_stretching - np.sqrt(kBT_pN_nm * Temperature * f_stretching / A_length)
+g_energy = f_stretching - np.sqrt(kBT_pN_nm * f_stretching / A_length)
 # |sigma| <= |sigma_s| - > only twist exists
 sigma_s = (1 / cs_energy) * np.sqrt(2 * p_stiffness * g_energy / (1 - p_stiffness / cs_energy))
 # |sigma| > |sigma_p| - > only writhe exists

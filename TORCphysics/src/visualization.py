@@ -14,7 +14,7 @@ width = 10
 height = 6
 
 # colors
-enzyme_colors = {'RNAP': 'white', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'black', 'ori': 'silver', 'topoI': 'red',
+enzyme_colors = {'RNAP': 'white', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'green', 'ori': 'silver', 'topoI': 'red',
                  'gyrase': 'cyan'}
 
 gene_colour = '#4a86e8ff'  # 'blue'
@@ -24,7 +24,7 @@ topoI_colour = 'red'
 gyrase_colour = 'cyan'
 
 # Sizes
-enzyme_sizes = {'RNAP': 300, 'IHF': 500, 'FIS': 500, 'lacI': 500, 'ori': 500, 'topoI': 500, 'gyrase': 500}
+enzyme_sizes = {'RNAP': 300, 'IHF': 500, 'FIS': 500, 'lacI': 250, 'ori': 500, 'topoI': 500, 'gyrase': 500}
 DNA_lw = 12
 gene_lw = 5
 sigma_lw = 5
@@ -35,6 +35,10 @@ enzyme_shapes = {'RNAP': 'o', 'IHF': 'o', 'FIS': 'o', 'lacI': 's', 'ori': 'h', '
 # text size
 slabel = 15
 object_text = 10  # NAPs, genes, etc...
+
+# Ranges
+sigma_a = -.4
+sigma_b = .4
 
 
 # TODO:
@@ -274,7 +278,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
     ax[0].set_xlim(- 100, my_circuit.size + 100)
     ax[0].set_ylim(0, 2)
     ax[1].set_xlim(- 100, my_circuit.size + 100)
-    ax[1].set_ylim(-0.25, .25)
+    ax[1].set_ylim(sigma_a, sigma_b)
 
     # labels and all that
     # -----------------------------------
@@ -298,6 +302,10 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
             continue
         if site_type is not None and site.site_type != site_type:  # Only site types
             continue
+        if 'DNA_' in site.site_type:  # I'm trying to avoid bare DNA binding sites
+            continue
+        # print(site.name)
+        # sitess = [site for site in my_circuit.site_list if site.site_type == 'gene']
         x1 = site.end
         x0 = site.start
         dx = x1 - x0

@@ -11,11 +11,11 @@ import pandas as pd
 
 # Initial conditions
 circuit_filename = 'circuit.csv'
-sites_filename = 'sites.csv'
+sites_filename = 'sites_sam.csv'
 enzymes_filename = 'enzymes.csv'
 environment_filename = 'environment.csv'
 output_prefix = 'output'
-frames = 100
+frames = 3000
 series = True
 continuation = False
 tm = 'continuum'
