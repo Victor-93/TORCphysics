@@ -1,0 +1,62 @@
+TORCphysics log file 
+
+General information: 
+---------------------------------------------------------------------------------------
+Circuit name: Pleu500_74
+Size: 6000
+Structure: circle
+Number of sites: 110
+Number of frames: 1000
+Simulation time: 250.0
+Simulation timestep: 0.25
+Seed: 8811289420828290494
+ 
+Overall simulation information 
+---------------------------------------------------------------------------------------
+Initial twist: -211.83310
+Final twist: -174.43319
+Initial superhelical density: -0.06000
+Final superhelical density: -0.04941
+ 
+Overall rates 
+---------------------------------------------------------------------------------------
+site type            site name            #binding events      #unbinding events    binding rates        
+ DNA_topoI            DNA_topoI_global                      6.0                  6.0                 0.024 
+DNA_gyrase           DNA_gyrase_global                     1.0                  1.0                 0.004 
+EXT                  EXT                                   0.0                  0.0                   0.0 
+gene                 tetA                                  4.0                  4.0                 0.016 
+gene                 CDS                                   0.0                  0.0                   0.0 
+origin               ori                                   0.0                  0.0                   0.0 
+lacOP                lac1                                  0.0                  0.0                   0.0 
+gene                 mKalama1                              1.0                  1.0                 0.004 
+lacOP                lac2                                  0.0                  0.0                   0.0 
+gene                 Raspberry                             1.0                  1.0                 0.004 
+ 
+Events
+---------------------------------------------------------------------------------------
+frame 194 time 48.5 binding_event at gene tetA enzyme RNAP with twist -211.83310 superhelical -0.06000 global twist -211.83310 global supercoiling -0.06000
+frame 258 time 64.5 binding_event at gene mKalama1 enzyme RNAP with twist -218.42650 superhelical -0.09535 global twist -211.83310 global supercoiling -0.06033
+frame 271 time 67.75 binding_event at DNA_gyrase 21 enzyme gyrase with twist 29.93094 superhelical 0.02711 global twist -211.83310 global supercoiling -0.06066
+frame 275 time 68.75 unbinding_event at gene tetA enzyme RNAP with twist -192.95698 superhelical -0.11339 global twist -217.21869 global supercoiling -0.06351
+frame 287 time 71.75 unbinding_event at DNA_gyrase 21 enzyme gyrase with twist -226.31812 superhelical -0.07961 global twist -233.37545 global supercoiling -0.06785
+frame 309 time 77.25 binding_event at gene tetA enzyme RNAP with twist -264.01723 superhelical -0.07948 global twist -234.72185 global supercoiling -0.06685
+frame 312 time 78.0 unbinding_event at gene mKalama1 enzyme RNAP with twist -98.38901 superhelical 0.23718 global twist -234.72185 global supercoiling -0.06721
+frame 390 time 97.5 unbinding_event at gene tetA enzyme RNAP with twist -234.72185 superhelical -0.09722 global twist -234.72185 global supercoiling -0.06685
+frame 414 time 103.5 binding_event at DNA_topoI 18 enzyme topoI with twist -234.72185 superhelical -0.06648 global twist -234.72185 global supercoiling -0.06648
+frame 416 time 104.0 binding_event at gene tetA enzyme RNAP with twist -200.12716 superhelical -0.06721 global twist -230.83226 global supercoiling -0.06674
+frame 416 time 104.0 unbinding_event at DNA_topoI 18 enzyme topoI with twist -110.99908 superhelical -0.06589 global twist -230.83226 global supercoiling -0.06674
+frame 439 time 109.75 binding_event at DNA_topoI 18 enzyme topoI with twist -71.50478 superhelical -0.04501 global twist -228.88746 global supercoiling -0.06518
+frame 454 time 113.5 unbinding_event at DNA_topoI 18 enzyme topoI with twist -11.66492 superhelical -0.00509 global twist -199.71553 global supercoiling -0.05806
+frame 497 time 124.25 unbinding_event at gene tetA enzyme RNAP with twist -197.77074 superhelical -0.10737 global twist -197.77074 global supercoiling -0.05632
+frame 509 time 127.25 binding_event at DNA_topoI 46 enzyme topoI with twist -197.77074 superhelical -0.05602 global twist -197.77074 global supercoiling -0.05602
+frame 510 time 127.5 unbinding_event at DNA_topoI 46 enzyme topoI with twist -193.88115 superhelical -0.05579 global twist -195.82594 global supercoiling -0.05662
+frame 516 time 129.0 binding_event at DNA_topoI 43 enzyme topoI with twist -193.88115 superhelical -0.05492 global twist -193.88115 global supercoiling -0.05492
+frame 521 time 130.25 unbinding_event at DNA_topoI 43 enzyme topoI with twist -182.21237 superhelical -0.05112 global twist -184.15717 global supercoiling -0.05324
+frame 855 time 213.75 binding_event at gene Raspberry enzyme RNAP with twist -182.21237 superhelical -0.05161 global twist -182.21237 global supercoiling -0.05161
+frame 898 time 224.5 binding_event at gene tetA enzyme RNAP with twist -65.45887 superhelical -0.02770 global twist -182.21237 global supercoiling -0.05189
+frame 909 time 227.25 unbinding_event at gene Raspberry enzyme RNAP with twist -153.62028 superhelical -0.11010 global twist -182.21237 global supercoiling -0.05218
+frame 959 time 239.75 binding_event at DNA_topoI 2 enzyme topoI with twist -241.58487 superhelical -0.10672 global twist -182.21237 global supercoiling -0.05189
+frame 959 time 239.75 unbinding_event at DNA_topoI 2 enzyme topoI with twist -241.43527 superhelical -0.10968 global twist -182.21237 global supercoiling -0.05189
+frame 971 time 242.75 binding_event at DNA_topoI 48 enzyme topoI with twist -261.18243 superhelical -0.11014 global twist -180.26758 global supercoiling -0.05134
+frame 973 time 243.25 unbinding_event at DNA_topoI 48 enzyme topoI with twist -260.73363 superhelical -0.11168 global twist -176.37799 global supercoiling -0.05128
+frame 979 time 244.75 unbinding_event at gene tetA enzyme RNAP with twist -174.43319 superhelical -0.11072 global twist -174.43319 global supercoiling -0.04968

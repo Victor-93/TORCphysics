@@ -80,6 +80,8 @@ plt.savefig('responses.png')
 # ---------------------------------------------------------
 fig, axs = plt.subplots(1, figsize=(width,  height), tight_layout=True)
 ax = axs
-vs.plot_signal_profiles(my_circuit, sites_df, ax, site_type='gene', colors=colors_dict)
-ax.set_title('Signal profiles - OFF')
+vs.plot_signal_profiles(my_circuit, sites_df, ax, site_type='gene', ignore='CDS', colors=colors_dict)
+ax.set_ylabel('Transcription signal', fontsize=15)
+ax.set_xlabel('Time (seconds)', fontsize=15)
+ax.set_title('Signal profiles - OFF', fontsize=20)
 plt.savefig('signals.png')

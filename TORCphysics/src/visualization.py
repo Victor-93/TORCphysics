@@ -33,8 +33,8 @@ sigma_lw = 5
 enzyme_shapes = {'RNAP': 'o', 'IHF': 'o', 'FIS': 'o', 'lacI': 's', 'ori': 'h', 'topoI': 'X', 'gyrase': 'X'}
 
 # text size
-slabel = 15
-object_text = 10  # NAPs, genes, etc...
+slabel = 20
+object_text = 15  # NAPs, genes, etc...
 
 # Ranges
 sigma_a = -.4
@@ -378,7 +378,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
 
     lines = [ax[1].plot([], [], c=sigma_colour, lw=sigma_lw)[0] for _ in range(100)]  # This plots supercoiling
 
-    time_text = ax[0].text(0.0, 1.1, '', transform=ax[0].transAxes)
+    time_text = ax[0].text(0.0, 1.1, '', transform=ax[0].transAxes, fontsize=slabel)
 
     # ------------------------------------------------------------
     # ANIMATION
@@ -415,7 +415,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
 
             lines[j].set_linewidth(sigma_lw)
 
-        time_text.set_text( my_time[i])
+        time_text.set_text(my_time[i])
 
         return lines, scat, time_text
 

@@ -13,13 +13,13 @@ sites_filename = 'sites_maxmin.csv'
 #sites_filename = 'sites_sam.csv'
 enzymes_filename = '../../../enzymes.csv'
 environment_filename = 'environment_stochastic.csv'
-output_prefix = 'out'
-frames = 8000
+output_prefix = 'visual'
+frames = 1000
 series = True
 continuation = False
 tm = 'stochastic'
 mm = 'uniform'
-dt = .5
+dt = .25
 
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation, dt, tm, mm)
