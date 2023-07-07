@@ -11,7 +11,7 @@ from TORCphysics import parallelization_tools as pt
 
 # Paralelization conditions
 n_workers = 12
-n_simulations = 96  # in total
+n_simulations = 96   # in total
 simulations_per_worker = n_simulations // n_workers
 
 # Circuit conditions

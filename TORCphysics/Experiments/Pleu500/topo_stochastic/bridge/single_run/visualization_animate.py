@@ -8,9 +8,9 @@ from TORCphysics import visualization as vs
 
 # Inputs
 # ---------------------------------------------------------
-csites_df = 'Pleu500_out_sites_df.csv'
-cenzymes_df = 'Pleu500_out_enzymes_df.csv'
-cenvironment_df = 'Pleu500_out_environment_df.csv'
+csites_df = 'Pleu500_visual_sites_df.csv'
+cenzymes_df = 'Pleu500_visual_enzymes_df.csv'
+cenvironment_df = 'Pleu500_visual_environment_df.csv'
 sites_df = pd.read_csv(csites_df, sep=',')
 enzymes_df = pd.read_csv(cenzymes_df, sep=',')
 
@@ -23,12 +23,12 @@ sites_filename = 'sites_maxmin.csv'
 enzymes_filename = '../../../enzymes.csv'
 environment_filename = 'environment_stochastic.csv'
 output_prefix = 'out'
-frames = 30
+frames = 1000
 series = True
 continuation = False
 tm = 'stochastic'
 mm = 'uniform'
-dt = .5
+dt = .25#1.
 
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation, dt, tm, mm)

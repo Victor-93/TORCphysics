@@ -73,7 +73,7 @@ fig, axs = plt.subplots(1, figsize=(width,  height), tight_layout=True)
 # ---------------------------------------------------------
 ax = axs
 i = -1
-vs.plot_site_response_curves(my_circuit, ax)
+vs.plot_site_response_curves(my_circuit, ax, ignore='CDS')
 ax.set_title('Response curves')
 #for site in my_circuit.site_list:
 #    if site.site_type == 'gene':
@@ -89,6 +89,8 @@ plt.savefig('responses.png')
 # ---------------------------------------------------------
 fig, axs = plt.subplots(1, figsize=(width,  height), tight_layout=True)
 ax = axs
-vs.plot_signal_profiles(my_circuit, sites_df, ax, site_type='gene', colors=colors_dict)
-ax.set_title('Signal profiles - ON')
+vs.plot_signal_profiles(my_circuit, sites_df, ax, site_type='gene', ignore='CDS', colors=colors_dict)
+ax.set_ylabel('Transcription signal', fontsize=15)
+ax.set_xlabel('Time (seconds)', fontsize=15)
+ax.set_title('Signal profiles - ON', fontsize=20)
 plt.savefig('signals.png')
