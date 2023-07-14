@@ -23,7 +23,7 @@ w0 = 2.0 * np.pi / T_bp  # Relaxed twist density per bp
 w0_nm = 2.0 * np.pi / (T_bp * bp_nm)  # nm^{-1} - Now in distance units
 gamma = 0.2 * w0  # How much supercoiling is inyected per bp
 # sigma0 = -0.06          #Initial supercoiling density
-stall_torque = 10.5 * 17 # pN * nm - from Gleng's papers which cited another paper
+stall_torque = 10.5 * 5 #* 17 # pN * nm - from Gleng's papers which cited another paper
 sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall
 
 # Elasticity parameters - from Marko's elasticity model
