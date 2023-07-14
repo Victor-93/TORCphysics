@@ -4,6 +4,7 @@ import matplotlib.animation as animation
 import numpy as np
 import matplotlib.patches as mpatches
 from TORCphysics import analysis as an
+from TORCphysics import effect_model as em
 from datetime import datetime
 
 # This module is produced to make one's life easier and be able to quickly process results.
@@ -20,6 +21,7 @@ enzyme_colors = {'RNAP': 'white', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'green'
 gene_colour = '#4a86e8ff'  # 'blue'
 DNA_colour = 'black'  # '#999999ff' #'gray'
 sigma_colour = 'red'
+torque_colour = 'purple'
 topoI_colour = 'red'
 gyrase_colour = 'cyan'
 
@@ -262,7 +264,7 @@ def plot_topoisomerase_activity_curves_continuum(my_circuit, axs=None, ignore=No
 # ----------------------------------------------------------------------------------------------------------------------
 
 def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format,
-                            site_type=None, site_colours=None):
+                            site_type=None, site_colours=None, torque=False):
     # plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 
     output_file = output + out_format
@@ -271,7 +273,14 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
     gx = np.array([0, my_circuit.size])
     gy = np.array([h, h])
 
-    fig, ax = plt.subplots(2, figsize=(width, height), gridspec_kw={'height_ratios': [1, 2], 'hspace': 0.2})
+    torque_a = -200
+    torque_b = 200
+
+    if torque:
+        fig, ax = plt.subplots(3, figsize=(width, height * 1.5),
+                               gridspec_kw={'height_ratios': [1, 1.5, 1.5], 'hspace': 0.325})
+    else:
+        fig, ax = plt.subplots(2, figsize=(width, height), gridspec_kw={'height_ratios': [1, 2], 'hspace': 0.2})
 
     # Sizes
     # -----------------------------------
@@ -279,15 +288,22 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
     ax[0].set_ylim(0, 2)
     ax[1].set_xlim(- 100, my_circuit.size + 100)
     ax[1].set_ylim(sigma_a, sigma_b)
+    if torque:
+        ax[2].set_xlim(- 100, my_circuit.size + 100)
+        ax[2].set_ylim(torque_a, torque_b)
 
     # labels and all that
     # -----------------------------------
     ax[0].grid(axis='x', zorder=1)
+    ax[0].tick_params(labelleft=False, bottom=False, top=False)
     ax[1].grid(True, zorder=1)
-    # ax[0].set_xlabel("DNA (bp)", fontsize=slabel)
     ax[1].set_xlabel("DNA (bp)", fontsize=slabel)
     ax[1].set_ylabel(r"$\sigma$", fontsize=slabel)
-    ax[0].tick_params(labelleft=False, bottom=False, top=False)
+
+    if torque:
+        ax[2].grid(True, zorder=1)
+        ax[2].set_xlabel("DNA (bp)", fontsize=slabel)
+        ax[2].set_ylabel(r"Torque (pN nm)", fontsize=slabel)
 
     # -----------------------------------
     # draw DNA
@@ -335,6 +351,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
     cl = []  # colour
     ml = []  # marker
     sigma = []  # superhelical
+    torque = []  # torque
     my_time = []
     mask = sites_df['type'] == 'circuit'
     n_enzymes_df = sites_df[mask]
@@ -348,12 +365,14 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
         c = []
         m = []
         sig = []
+        tor = []
         for i in range(n_enz):
             l = l + 1
             name = enzymes_df.iloc[l]['name']
             x.append(enzymes_df.iloc[l]['position'])
             y.append(h)
             sig.append(enzymes_df.iloc[l]['superhelical'])
+            tor.append(em.Marko_torque(enzymes_df.iloc[l]['superhelical']))
             if name == 'EXT_L' or name == 'EXT_R':
                 s.append(0)
                 c.append('white')
@@ -371,12 +390,16 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
         cl.append(c)
         ml.append(m)
         sigma.append(sig)
+        torque.append(tor)
         ttt = datetime.fromtimestamp(k * my_circuit.dt - 3600).strftime('%H:%M:%S')
         my_time.append('time=' + ttt)
 
     scat = ax[0].scatter(xl[0], yl[0], s=sl[0], c=cl[0], marker="o", ec='black', zorder=4)  # This plots RNAPs and NAPs
 
     lines = [ax[1].plot([], [], c=sigma_colour, lw=sigma_lw)[0] for _ in range(100)]  # This plots supercoiling
+
+    if torque:
+        lines2 = [ax[2].plot([], [], c=torque_colour, lw=sigma_lw)[0] for _ in range(100)]  # This plots torque
 
     time_text = ax[0].text(0.0, 1.1, '', transform=ax[0].transAxes, fontsize=slabel)
 
@@ -390,6 +413,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
         c = cl[i]
         m = ml[i]
         sig = sigma[i]
+        tor = torque[i]
         xy = np.zeros((len(x), 2))
         xy[:, 0] = x
         xy[:, 1] = y
@@ -402,6 +426,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
 
         # scat.set_marker('o')
 
+        # supercoiling stuff
         n = len(x)
         for j in range(10):
             lines[j].set_data([1, 1.02], [-.75, -.75])
@@ -415,9 +440,26 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
 
             lines[j].set_linewidth(sigma_lw)
 
+        # torque stuff
+        if torque:
+            for j in range(10):
+                lines2[j].set_data([1, 1.02], [-.75, -.75])
+                lines2[j].set_linewidth(.2)
+
+            for j in range(n):
+                if j < n - 1:
+                    lines2[j].set_data([x[j], x[j + 1]], [tor[j], tor[j]])  # , color=heat, lw=15 )
+                if j == n - 1:
+                    lines2[j].set_data([x[j], my_circuit.size], [tor[j], tor[j]])  # , color=heat, lw=15 )
+
+                lines2[j].set_linewidth(sigma_lw)
+
         time_text.set_text(my_time[i])
 
-        return lines, scat, time_text
+        if torque:
+            return lines, lines2, scat, time_text
+        else:
+            return lines, scat, time_text
 
     # ANIMATE
     # -----------------------------------
