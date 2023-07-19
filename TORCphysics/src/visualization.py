@@ -264,7 +264,7 @@ def plot_topoisomerase_activity_curves_continuum(my_circuit, axs=None, ignore=No
 # ----------------------------------------------------------------------------------------------------------------------
 
 def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format,
-                            site_type=None, site_colours=None, torque=False):
+                            site_type=None, site_colours=None, plot_torques=False):
     # plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 
     output_file = output + out_format
@@ -276,7 +276,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
     torque_a = -200
     torque_b = 200
 
-    if torque:
+    if plot_torques:
         fig, ax = plt.subplots(3, figsize=(width, height * 1.5),
                                gridspec_kw={'height_ratios': [1, 1.5, 1.5], 'hspace': 0.325})
     else:
@@ -288,7 +288,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
     ax[0].set_ylim(0, 2)
     ax[1].set_xlim(- 100, my_circuit.size + 100)
     ax[1].set_ylim(sigma_a, sigma_b)
-    if torque:
+    if plot_torques:
         ax[2].set_xlim(- 100, my_circuit.size + 100)
         ax[2].set_ylim(torque_a, torque_b)
 
@@ -300,7 +300,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
     ax[1].set_xlabel("DNA (bp)", fontsize=slabel)
     ax[1].set_ylabel(r"$\sigma$", fontsize=slabel)
 
-    if torque:
+    if plot_torques:
         ax[2].grid(True, zorder=1)
         ax[2].set_xlabel("DNA (bp)", fontsize=slabel)
         ax[2].set_ylabel(r"Torque (pN nm)", fontsize=slabel)
@@ -398,7 +398,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
 
     lines = [ax[1].plot([], [], c=sigma_colour, lw=sigma_lw)[0] for _ in range(100)]  # This plots supercoiling
 
-    if torque:
+    if plot_torques:
         lines2 = [ax[2].plot([], [], c=torque_colour, lw=sigma_lw)[0] for _ in range(100)]  # This plots torque
 
     time_text = ax[0].text(0.0, 1.1, '', transform=ax[0].transAxes, fontsize=slabel)
@@ -441,7 +441,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
             lines[j].set_linewidth(sigma_lw)
 
         # torque stuff
-        if torque:
+        if plot_torques:
             for j in range(10):
                 lines2[j].set_data([1, 1.02], [-.75, -.75])
                 lines2[j].set_linewidth(.2)
@@ -456,7 +456,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
 
         time_text.set_text(my_time[i])
 
-        if torque:
+        if plot_torques:
             return lines, lines2, scat, time_text
         else:
             return lines, scat, time_text

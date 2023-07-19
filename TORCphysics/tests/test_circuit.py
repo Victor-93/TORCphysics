@@ -421,18 +421,18 @@ class TestCircuit(TestCase):
             if abs(t0-my_circuit.twist) > err:
                 print('error initial, frame', frame)
 
-            if frame == 100:
-                my_circuit.site_list[2].k_min = .1
+            #if frame == 100:
+            #    my_circuit.site_list[2].k_min = .1
 
-            if frame == 400:
-                my_circuit.site_list[2].k_min = 0.0
+            #if frame == 400:
+            #    my_circuit.site_list[2].k_min = 0.0
 
             # Apply binding model and get list of new enzymes
             new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
                                                my_circuit.rng)
 
-            if len(new_enzyme_list) > 0:
-                my_circuit.site_list[2].k_min = 0.0
+            #if len(new_enzyme_list) > 0:
+            #    my_circuit.site_list[2].k_min = 0.0
             my_circuit.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
 
             my_circuit.update_global_twist()
@@ -446,7 +446,8 @@ class TestCircuit(TestCase):
             my_circuit.apply_effects(effects_list)
 
             # UNBINDING
-            drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list)
+            drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list,
+                                                                   my_circuit.dt, my_circuit.rng)
             my_circuit.drop_enzymes(drop_list_index)
             my_circuit.add_to_environment(drop_list_enzyme)
 
@@ -490,7 +491,7 @@ class TestCircuit(TestCase):
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation, dt, tm, mm)
-        my_circuit.site_list[2].k_min = 0.0
+        #my_circuit.site_list[2].k_min = 0.0
         s0 = my_circuit.superhelical
         t0 = my_circuit.twist
         err = 0.1
@@ -509,10 +510,10 @@ class TestCircuit(TestCase):
             if abs(my_circuit.enzyme_list[0].twist-my_circuit.enzyme_list[-2].twist) > err:
                 print('issue initial, frame', frame)
 
-            if frame == 100:
-                my_circuit.site_list[2].k_min = .05
-            elif frame == 900:
-                my_circuit.site_list[2].k_min = 0.0
+            #if frame == 100:
+            #    my_circuit.site_list[2].k_min = .05
+            #elif frame == 900:
+            #    my_circuit.site_list[2].k_min = 0.0
 
             # Apply binding model and get list of new enzymes
             new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
@@ -545,7 +546,8 @@ class TestCircuit(TestCase):
                 print('issue effects, frame', frame)
 
             # UNBINDING
-            drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list)
+            drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list,
+                                                                   my_circuit.dt, my_circuit.rng)
             my_circuit.drop_enzymes(drop_list_index)
 
             my_circuit.update_global_twist()
@@ -595,7 +597,7 @@ class TestCircuit(TestCase):
         dt = 10
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation, dt, tm, mm)
-        my_circuit.site_list[2].k_min = 0.0
+        #my_circuit.site_list[2].k_min = 0.0
         # This is similar to the Run function... but the idea is that we will control the rate
         for frame in range(1, frames + 1):
             my_circuit.frame = frame
@@ -616,7 +618,8 @@ class TestCircuit(TestCase):
             my_circuit.apply_effects(effects_list)
 
             # UNBINDING
-            drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list)
+            drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list,
+                                                                   my_circuit.dt, my_circuit.rng)
             my_circuit.drop_enzymes(drop_list_index)
 
             # UPDATE GLOBALS
@@ -654,7 +657,7 @@ class TestCircuit(TestCase):
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation, dt, tm, mm)
-        my_circuit.site_list[2].k_min = 0.0
+        my_circuit.site_list[1].k_min = 0.0
         for site in my_circuit.site_list:  # I'll increase the rates
             site.k_min = site.k_min * 0
         # Let's make the rates
@@ -662,14 +665,14 @@ class TestCircuit(TestCase):
         t0 = my_circuit.twist
         err = 0.00001
         enzyme1 = Enzyme(e_type=my_circuit.environmental_list[0].enzyme_type,
-                         name=my_circuit.environmental_list[0].name, site=my_circuit.site_list[2],
-                         position=my_circuit.site_list[2].start,
-                        size=my_circuit.environmental_list[0].size, twist=0.0, superhelical=0.0)
+                         name=my_circuit.environmental_list[0].name, site=my_circuit.site_list[1],
+                         position=my_circuit.site_list[1].start,
+                        size=my_circuit.environmental_list[0].size, twist=0.0, superhelical=0.0, k_cat=0, k_off=0)
 
         enzyme2 = Enzyme(e_type=my_circuit.environmental_list[0].enzyme_type,
-                         name=my_circuit.environmental_list[0].name, site=my_circuit.site_list[2],
-                         position=my_circuit.site_list[2].start+500,
-                        size=my_circuit.environmental_list[0].size, twist=0.0, superhelical=0.0)
+                         name=my_circuit.environmental_list[0].name, site=my_circuit.site_list[1],
+                         position=my_circuit.site_list[1].start+500,
+                        size=my_circuit.environmental_list[0].size, twist=0.0, superhelical=0.0, k_cat=0, k_off=0)
 
         # This is similar to the Run function... but the idea is that we will control the rate
         for frame in range(1, frames + 1):
@@ -721,7 +724,8 @@ class TestCircuit(TestCase):
                 print('issue effects, frame', frame)
 
             # UNBINDING
-            drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list)
+            drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list,
+                                                                   my_circuit.dt, my_circuit.rng)
             my_circuit.drop_enzymes(drop_list_index)
 
             my_circuit.update_global_twist()

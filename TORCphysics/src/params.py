@@ -16,7 +16,7 @@ kBT_pN_nm = 4.1  # pN nm at T=300K
 kB_kcalmolK = 1.987204259 * .001  # 10**(-3) #Boltzman constant in kcal/(mol*K) units...
 # kB_kcalmolK = .593 #10**(-3) #Boltzman constant in kcal/(mol*K) units...
 dt = 1.0  # timestep (seconds)
-v0 = 60.0  # Velocity (bp/sec) of RNAPs
+v0 = 30.0#60.0  # Velocity (bp/sec) of RNAPs
 bp_nm = .34  # nm - base-pair rise
 T_bp = 10.5  # Number of bp per helical turn
 w0 = 2.0 * np.pi / T_bp  # Relaxed twist density per bp

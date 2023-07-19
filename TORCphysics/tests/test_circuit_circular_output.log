@@ -6,16 +6,16 @@ Circuit name: test_circuit_circular_output
 Size: 6000
 Structure: circle
 Number of sites: 2
-Number of frames: 500
-Simulation time: 500
-Simulation timestep: 1
-Seed: 8456900816852514339
+Number of frames: 5000
+Simulation time: 50000
+Simulation timestep: 10
+Seed: 3199820780989509621
  
 Overall simulation information 
 ---------------------------------------------------------------------------------------
-Initial twist: -211.83310
+Initial twist: -215.45940
 Final twist: 0.00000
-Initial superhelical density: -0.06000
+Initial superhelical density: -0.06001
 Final superhelical density: 0.00000
  
 Overall rates 
