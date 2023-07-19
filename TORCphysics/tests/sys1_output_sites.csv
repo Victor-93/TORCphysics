@@ -1,9 +1,9 @@
 type,name,start,end,k_min,k_max,model,oparams
 EXT,EXT,1.0,6000.0,0.0,0.0,,
-gene,tetA,85.0,1276.0,0.0,0.016,poisson,
-gene,CDS,1914.0,2106.0,0.01,0.001,poisson,
+gene,tetA,85.0,1276.0,0.016,0.016,poisson,
+gene,CDS,1914.0,2106.0,0.001,0.001,poisson,
 origin,ori,3085.0,0.0,0.0,0.0,none,
 lacOP,lac1,3167.0,0.0,0.0,0.0,none,
-gene,mKalama1,4267.0,3449.0,0.0,0.0244,sam,
+gene,mKalama1,4267.0,3449.0,0.002,0.0244,sam,
 lacOP,lac2,4371.0,0.0,0.0,0.0,none,
-gene,Raspberry,4491.0,5273.0,0.0,0.0244,sam,
+gene,Raspberry,4491.0,5273.0,0.002,0.0244,sam,

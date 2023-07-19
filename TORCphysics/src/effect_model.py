@@ -160,8 +160,8 @@ def uniform_motion(z, dt):
     position = z.direction * v0 * dt
 
     # Injects twist: denatures w=gamma*v0*dt base-pairs
-    twist_left = -z.direction * gamma * v0 * dt
-    twist_right = z.direction * gamma * v0 * dt
+    twist_left = -z.direction * z.k_cat * v0 * dt
+    twist_right = z.direction * z.k_cat * v0 * dt
     return position, twist_left, twist_right
 
 
@@ -236,8 +236,8 @@ def rnap_torque_stall_Geng(z, z_list, dt):
     position = z.direction * v0 * dt
 
     # Injects twist: denatures w=gamma*v0*dt base-pairs
-    twist_left = -z.direction * gamma * v0 * dt
-    twist_right = z.direction * gamma * v0 * dt
+    twist_left = -z.direction * z.k_cat * v0 * dt
+    twist_right = z.direction * z.k_cat * v0 * dt
 
     return position, twist_left, twist_right
 
