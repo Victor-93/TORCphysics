@@ -56,7 +56,7 @@ topo_t = -0.04  # thresholds
 # GYRASE
 gyra_w = 0.025  # width
 gyra_t = 0.01  # threshold
-# gyra_c = 0.25#.01 #concentration micromolarb 0.25 in meyer
+# gyra_c = 0.25#.01 #concentration micromolarb 0.25 in meyer - I'll use concentration in nM better
 # gyra_k = 0.001 #minus because it removes negative supercoils
 # I think it makes more sense to put the negative in the equation rather than in
 # the parameter
