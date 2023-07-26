@@ -179,6 +179,43 @@ class Circuit:
         self.environmental_list_to_df().to_csv(self.name + '_' + self.output_prefix + '_environment' + '.csv',
                                                index=False, sep=',')
 
+    # Sometimes we might be interested in the supercoiling global response, and not care about the specific interactions
+    # This function performs a simulation where we do not save the bound/unbound enzymes, hence we do not produce
+    # log, df or csv files. Only a numpy array -> my_supercoiling is returned.
+    # This function is particularly useful when calibrating models with experiments, where it might be needed to run
+    # hundreds of simulations and the calibration is performed according the global supercoiling responses to enzymes
+    # such as topoisomerases.
+    def run_return_global_supercoiling(self):
+        my_supercoiling = np.zeros(self.frames + 1)
+        my_supercoiling[0] = self.superhelical
+
+        # run simulation
+        for frame in range(1, self.frames + 1):
+            # BINDING
+            # --------------------------------------------------------------
+            new_enzyme_list = bm.binding_model(self.enzyme_list, self.environmental_list, self.dt,
+                                               self.rng)
+            self.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
+
+            # EFFECT
+            # --------------------------------------------------------------
+            effects_list = em.effect_model(self.enzyme_list, self.environmental_list, self.dt,
+                                           self.topoisomerase_model, self.mechanical_model)
+            self.apply_effects(effects_list)
+
+            # UNBINDING
+            # --------------------------------------------------------------
+            drop_list_index, drop_list_enzyme = bm.unbinding_model(self.enzyme_list, self.dt,
+                                                                   self.rng)
+            self.drop_enzymes(drop_list_index)
+            self.add_to_environment(drop_list_enzyme)
+            # UPDATE GLOBALS
+            # --------------------------------------------------------------
+            self.update_global_twist()
+            self.update_global_superhelical()
+            my_supercoiling[frame] = self.superhelical
+        return my_supercoiling
+
     # Returns list of enzymes in the form of dataframe. This function is with the intention of outputting the system
     def enzyme_list_to_df(self):
         enzyme_aux = []  # This will be a list of dicts
