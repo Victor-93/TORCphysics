@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from TORCphysics import Circuit
+from hyperopt import tpe, hp, fmin
+import multiprocessing
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -18,6 +20,7 @@ from TORCphysics import Circuit
 #  2.- MY initial thought was that according K_M & k_cat, I could determine k_on and k_off, but probably
 #  I'll need to determine these parameters. I think I can consider a rapid disassociation, and slow binding.
 #  3.- So in general, the parameters I need to optimize are k_on, k_off, k_cat, width and threshold.
+# TODO: Remember that you need to add the substrate concentration
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -41,6 +44,13 @@ output_prefix = 'test0'
 series = True
 continuation = False
 mm = 'uniform'
+dt_sim = 0.5
+
+# For parallelization and calibration
+n_simulations = 5
+tests = 3 #00  # number of tests for parametrization
+
+my_vars = ['k_cat', 'k_on', 'k_off', 'width', 'threshold']
 
 # Meyer topos curve parameters:
 topo_w = 0.012  # width
@@ -49,6 +59,20 @@ topo_k = 0.001  # k_cat
 gyra_w = 0.025  # width
 gyra_t = 0.01  # threshold
 gyra_k = 0.001  # k_cat
+
+# Gyrase range
+coutput = 'gyrase_calibration.test'
+k_cat_min = -20.0  # Ranges to vary k_cat
+k_cat_max = -5.0
+width_min = 0.001
+width_max = 5.
+threshold_min = 0.001
+threshold_max = 5.
+
+k_off = 0.5
+k_on = 0.005
+concentration = 0.25
+
 
 # Figure
 width = 6
