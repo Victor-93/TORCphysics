@@ -1,4 +1,5 @@
 from TORCphysics import Circuit
+import multiprocessing
 
 
 # TODO: Maybe later it can accept specific conditions
@@ -48,17 +49,16 @@ def set_item(circuit_filename, sites_filename, enzymes_filename, environment_fil
 
 # This next functions are used for calibrating the stochastic topoisomerase model
 # ----------------------------------------------------------------------------------------------------------------------
-# TODO: Initial supercoiling is missing
 def set_items_topo_calibration(circuit_filename, sites_filename, enzymes_filename, environment_filename, output_prefix,
                                frames, series, continuation, dt, tm, mm, n_simulations, initial_supercoiling,
                                list_names, list_k_cat, list_k_on, list_k_off, list_width, list_threshold,
-                               list_concentration):
+                               list_concentration, DNA_concentration):
     items = []
     for simulation_number in range(n_simulations):
         item = set_item_topo_calibration(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                                          output_prefix, frames, series, continuation, dt, tm, mm, simulation_number,
                                          initial_supercoiling, list_names, list_k_cat, list_k_on, list_k_off,
-                                         list_width, list_threshold, list_concentration)
+                                         list_width, list_threshold, list_concentration, DNA_concentration)
         items.append(item)
     return items
 
@@ -69,7 +69,7 @@ def set_items_topo_calibration(circuit_filename, sites_filename, enzymes_filenam
 def set_item_topo_calibration(circuit_filename, sites_filename, enzymes_filename, environment_filename, output_prefix,
                               frames, series, continuation, dt, tm, mm, simulation_number, initial_supercoiling,
                               list_names, list_k_cat, list_k_on, list_k_off, list_width, list_threshold,
-                              list_concentration):
+                              list_concentration, DNA_concentration):
     item = {
         'circuit_filename': circuit_filename,
         'sites_filename': sites_filename,
@@ -90,9 +90,17 @@ def set_item_topo_calibration(circuit_filename, sites_filename, enzymes_filename
         'list_k_off': list_k_off,
         'list_width': list_width,
         'list_threshold': list_threshold,
-        'list_concentration': list_concentration
+        'list_concentration': list_concentration,
+        'DNA_concentration': DNA_concentration
     }
     return item
+
+
+# This function runs another a case/system/circuit, given a set of conditions 'items'.
+#def run_simulations_parallel(items, my_funciton):
+#    # Create a multiprocessing pool
+#    pool = multiprocessing.Pool()
+#    pool_results = pool.map(my_function, items)
 
 
 def run_single_simulation_topo_calibration(item):
@@ -116,17 +124,27 @@ def run_single_simulation_topo_calibration(item):
     list_width = item['list_width']
     list_threshold = item['list_threshold']
     list_concentration = item['list_concentration']
+    DNA_concentration = item['DNA_concentration']
     my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                          output_prefix, frames, series, continuation, dt, tm, mm)
     my_circuit.name = my_circuit.name + '_' + str(simulation_number)
     my_circuit.sites_dict_list[0]['name'] = my_circuit.name
     my_circuit.log.name = my_circuit.name
-    my_circuit.superhelical = initial_supercoiling
+#    my_circuit.superhelical = initial_supercoiling
+    for enzyme in my_circuit.enzyme_list:
+        enzyme.superhelical = initial_supercoiling
+    my_circuit.update_twist()
+    my_circuit.update_supercoiling()
+    my_circuit.update_global_twist()
+    my_circuit.update_global_superhelical()
     # Change topoisomerase parametrization
     for count, name in enumerate(list_names):
         for environmental in my_circuit.environmental_list:
             if environmental.name == name:
-                environmental.concentration = list_concentration[count]
+                environmental.concentration = list_concentration[count] * DNA_concentration  # Here, we are multiplying
+                # [E] * [S], so the rate would be something like k = k_on * [E] * [S] * f(sigma),
+                # where [E] is the enzyme concentration, [S] the substrate concentration which in this case is the
+                # DNA, and f(sigma) the recognition curve.
                 environmental.k_on = list_k_on[count]
                 environmental.k_off = list_k_off[count]
                 environmental.k_cat = list_k_cat[count]
