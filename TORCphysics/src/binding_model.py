@@ -82,6 +82,9 @@ def select_binding_model(site, environment, site_superhelical, dt):
     elif site.site_model == 'stochastic_gyrase':
         rate = gyrase_binding(environment, site_superhelical)
         binding_probability = P_binding_Nonh_Poisson(rate, dt)
+    elif 'poisson_lineal' in site.site_model:
+        rate = environment.k_on * np.ones_like(site_superhelical)
+        binding_probability = P_binding_Poisson(rate, dt)
     else:  # If there's no model, there's no binding
         have_model = False
     return rate, binding_probability, have_model
