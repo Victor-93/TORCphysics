@@ -1,0 +1,4 @@
+type,name,site,position,direction,size,k_off,twist,superhelical,effect_model,effect_oparams
+origin,ori,ori,3085,0,100,0.0,0.0,0.0,none,none
+NAP,lacI,lac1,3167,0,20,0.0,0.0,0.0,none,none
+NAP,lacI,lac2,4371,0,20,0.0,0.0,0.0,none,none

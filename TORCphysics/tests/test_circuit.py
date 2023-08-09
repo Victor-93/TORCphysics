@@ -4,21 +4,22 @@ from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 import pandas as pd
 
+
 # TODO: Sort output names of tests
 class TestCircuit(TestCase):
 
     # For this test, Circuit should be able to process these non-empty input files (which hopefully are correct).
     # Then, it performs three tests: it counts the number of enzymes, sites and environmentals.
     def test_Circuit_init(self):
-        circuit_filename = '../circuit.csv'
-        sites_filename = '../sites.csv'
-        enzymes_filename = '../enzymes.csv'
-        environment_filename = '../environment.csv'
+        circuit_filename = 'circuit.csv'
+        sites_filename = 'sites.csv'
+        enzymes_filename = 'enzymes.csv'
+        environment_filename = 'environment.csv'
         output_prefix = 'output'
         frames = 5
         series = True
         continuation = False
-        tm = 'continuum'
+        tm = 'stochastic'
         mm = 'uniform'
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
@@ -30,10 +31,10 @@ class TestCircuit(TestCase):
     # TODO: This can be several tests in one? 1.- Prove that statistical binding works, 2.- That the effects take place
     #  3.- And that the proteins unbind at the end?
     def test_run(self):
-        circuit_filename = '../circuit.csv'
-        sites_filename = '../sites.csv'
-        enzymes_filename = '../enzymes.csv'
-        environment_filename = '../environment.csv'
+        circuit_filename = 'circuit.csv'
+        sites_filename = 'sites.csv'
+        enzymes_filename = 'enzymes.csv'
+        environment_filename = 'environment.csv'
         output_prefix = 'output'
         frames = 1500
         series = True
@@ -50,10 +51,10 @@ class TestCircuit(TestCase):
         my_circuit.run()
 
     def test_run2(self):
-        circuit_filename = '../circuit.csv'
-        sites_filename = '../sites.csv'
-        enzymes_filename = '../enzymes.csv'
-        environment_filename = '../environment.csv'
+        circuit_filename = 'circuit.csv'
+        sites_filename = 'sites.csv'
+        enzymes_filename = 'enzymes.csv'
+        environment_filename = 'environment.csv'
         output_prefix = 'output'
         frames = 1500
         series = True
@@ -103,9 +104,9 @@ class TestCircuit(TestCase):
         my_circuit_1 = Circuit(circuit_filename, sites_filename, enzymes1_filename, environment_filename,
                                output_prefix, frames, series, continuation, dt, tm, mm)
         enzyme1 = my_circuit_1.enzyme_list[1]
-#        self.assertEqual(my_circuit_1.enzyme_list[0].position, 1 + enzyme1.position + enzyme1.size - my_circuit_1.size,
-#                         "Wrong position of left fake enzyme")
-        self.assertEqual(my_circuit_1.enzyme_list[0].position,  enzyme1.position + enzyme1.size - my_circuit_1.size,
+        #        self.assertEqual(my_circuit_1.enzyme_list[0].position, 1 + enzyme1.position + enzyme1.size - my_circuit_1.size,
+        #                         "Wrong position of left fake enzyme")
+        self.assertEqual(my_circuit_1.enzyme_list[0].position, enzyme1.position + enzyme1.size - my_circuit_1.size,
                          "Wrong position of left fake enzyme")
         self.assertEqual(my_circuit_1.enzyme_list[-1].position, enzyme1.position + my_circuit_1.size,
                          "Wrong position of right fake enzyme")
@@ -116,8 +117,8 @@ class TestCircuit(TestCase):
                                output_prefix, frames, series, continuation, dt, tm, mm)
         enzyme1 = my_circuit_2.enzyme_list[1]
         enzyme2 = my_circuit_2.enzyme_list[2]
-#        self.assertEqual(my_circuit_2.enzyme_list[0].position, 1 + enzyme2.position + enzyme2.size - my_circuit_2.size,
-#                         "Wrong position of left fake enzyme")
+        #        self.assertEqual(my_circuit_2.enzyme_list[0].position, 1 + enzyme2.position + enzyme2.size - my_circuit_2.size,
+        #                         "Wrong position of left fake enzyme")
         self.assertEqual(my_circuit_2.enzyme_list[0].position, enzyme2.position + enzyme2.size - my_circuit_2.size,
                          "Wrong position of left fake enzyme")
         self.assertEqual(my_circuit_2.enzyme_list[-1].position, enzyme1.position + my_circuit_2.size,
@@ -170,7 +171,7 @@ class TestCircuit(TestCase):
                 my_circuit.append_sites_to_dict_step1()
 
             # if frame == 100:
-                #my_circuit.site_list[2].k_min = .1
+            # my_circuit.site_list[2].k_min = .1
 
             # Apply binding model and get list of new enzymes
             new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
@@ -211,7 +212,7 @@ class TestCircuit(TestCase):
         # Output the log of events
         my_circuit.log.log_out()
         sf = my_circuit.superhelical  # final superhelical
-        self.assertEqual(abs(s0-sf), 0, "Superhelical changed")
+        self.assertEqual(abs(s0 - sf), 0, "Superhelical changed")
 
     # Bind unbind with 1 NAP on the right
     def test_bind_unbind_1_RNAP_1_gene_1_NAP_right(self):
@@ -242,26 +243,26 @@ class TestCircuit(TestCase):
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error initial, frame', frame)
 
             # if frame == 10:
             #    my_circuit.site_list[2].k_min = .01
 
-            #if frame == 950:
+            # if frame == 950:
             #    my_circuit.site_list[2].k_min = .0
 
             # Apply binding model and get list of new enzymes
             new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
                                                my_circuit.rng)
 
-#            if len(new_enzyme_list) > 0:
-#                my_circuit.site_list[2].k_min = 0.0
+            #            if len(new_enzyme_list) > 0:
+            #                my_circuit.site_list[2].k_min = 0.0
             my_circuit.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error new_enzymes frame', frame)
             # EFFECT
             # --------------------------------------------------------------
@@ -271,7 +272,7 @@ class TestCircuit(TestCase):
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error effects frame', frame)
 
             # UNBINDING
@@ -284,9 +285,8 @@ class TestCircuit(TestCase):
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
 
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error drop_enzymes, frame', frame)
-
 
             # Add to series df if the series option was selected (default=True)
             if series:
@@ -303,7 +303,7 @@ class TestCircuit(TestCase):
         # Output the log of events
         my_circuit.log.log_out()
         sf = my_circuit.superhelical  # final superhelical
-        self.assertLessEqual(abs(s0-sf), err, "Superhelical changed")
+        self.assertLessEqual(abs(s0 - sf), err, "Superhelical changed")
 
     # Bind unbind with 1 NAP on the left
     def test_bind_unbind_1_RNAP_1_gene_1_NAP_left(self):
@@ -334,10 +334,10 @@ class TestCircuit(TestCase):
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error initial, frame', frame)
 
-            #if frame == 100:
+            # if frame == 100:
             #    my_circuit.site_list[2].k_min = .1
 
             # Apply binding model and get list of new enzymes
@@ -350,7 +350,7 @@ class TestCircuit(TestCase):
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error new_enzymes frame', frame)
             # EFFECT
             # --------------------------------------------------------------
@@ -368,9 +368,8 @@ class TestCircuit(TestCase):
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
 
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error drop_enzymes, frame', frame)
-
 
             # Add to series df if the series option was selected (default=True)
             if series:
@@ -387,7 +386,7 @@ class TestCircuit(TestCase):
         # Output the log of events
         my_circuit.log.log_out()
         sf = my_circuit.superhelical  # final superhelical
-        self.assertLessEqual(abs(s0-sf), err, "Superhelical changed")
+        self.assertLessEqual(abs(s0 - sf), err, "Superhelical changed")
 
     # Bind unbind with 1 NAP on the left and right
     def test_bind_unbind_1_RNAP_1_gene_1_NAP_left_right(self):
@@ -418,26 +417,26 @@ class TestCircuit(TestCase):
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error initial, frame', frame)
 
-            #if frame == 100:
+            # if frame == 100:
             #    my_circuit.site_list[2].k_min = .1
 
-            #if frame == 400:
+            # if frame == 400:
             #    my_circuit.site_list[2].k_min = 0.0
 
             # Apply binding model and get list of new enzymes
             new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt,
                                                my_circuit.rng)
 
-            #if len(new_enzyme_list) > 0:
+            # if len(new_enzyme_list) > 0:
             #    my_circuit.site_list[2].k_min = 0.0
             my_circuit.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error new_enzymes frame', frame)
             # EFFECT
             # --------------------------------------------------------------
@@ -455,9 +454,8 @@ class TestCircuit(TestCase):
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
 
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error drop_enzymes, frame', frame)
-
 
             # Add to series df if the series option was selected (default=True)
             if series:
@@ -474,8 +472,7 @@ class TestCircuit(TestCase):
         # Output the log of events
         my_circuit.log.log_out()
         sf = my_circuit.superhelical  # final superhelical
-        self.assertLessEqual(abs(s0-sf), err, "Superhelical changed")
-
+        self.assertLessEqual(abs(s0 - sf), err, "Superhelical changed")
 
     def test_bind_unbind_many_RNAPs_1_gene(self):
         circuit_filename = 'test_inputs/test_circuit_circular.csv'
@@ -491,13 +488,13 @@ class TestCircuit(TestCase):
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation, dt, tm, mm)
-        #my_circuit.site_list[2].k_min = 0.0
+        # my_circuit.site_list[2].k_min = 0.0
         s0 = my_circuit.superhelical
         t0 = my_circuit.twist
         err = 0.1
         # This is similar to the Run function... but the idea is that we will control the rate
         for frame in range(1, frames + 1):
-            #print(frame)
+            # print(frame)
             my_circuit.frame = frame
             my_circuit.time = frame * dt
             if my_circuit.series:
@@ -505,14 +502,14 @@ class TestCircuit(TestCase):
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error initial, frame', frame)
-            if abs(my_circuit.enzyme_list[0].twist-my_circuit.enzyme_list[-2].twist) > err:
+            if abs(my_circuit.enzyme_list[0].twist - my_circuit.enzyme_list[-2].twist) > err:
                 print('issue initial, frame', frame)
 
-            #if frame == 100:
+            # if frame == 100:
             #    my_circuit.site_list[2].k_min = .05
-            #elif frame == 900:
+            # elif frame == 900:
             #    my_circuit.site_list[2].k_min = 0.0
 
             # Apply binding model and get list of new enzymes
@@ -521,15 +518,15 @@ class TestCircuit(TestCase):
 
             my_circuit.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
 
-            t2 = my_circuit.twist+2
+            t2 = my_circuit.twist + 2
             ss = my_circuit.enzyme_list[0].twist
             s1 = sum(enzyme.twist for enzyme in my_circuit.enzyme_list)
             my_circuit.update_global_twist()
-            t3 = my_circuit.twist+3
+            t3 = my_circuit.twist + 3
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('new enzyme, frame', frame)
-            if abs(my_circuit.enzyme_list[0].twist-my_circuit.enzyme_list[-2].twist) > err:
+            if abs(my_circuit.enzyme_list[0].twist - my_circuit.enzyme_list[-2].twist) > err:
                 print('issue new enzyme, frame', frame)
 
             # EFFECT
@@ -540,9 +537,9 @@ class TestCircuit(TestCase):
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('effects, frame', frame)
-            if abs(my_circuit.enzyme_list[0].twist-my_circuit.enzyme_list[-2].twist) > err:
+            if abs(my_circuit.enzyme_list[0].twist - my_circuit.enzyme_list[-2].twist) > err:
                 print('issue effects, frame', frame)
 
             # UNBINDING
@@ -552,18 +549,18 @@ class TestCircuit(TestCase):
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error initial, frame', frame)
-            if abs(my_circuit.enzyme_list[0].twist-my_circuit.enzyme_list[-2].twist) > err:
+            if abs(my_circuit.enzyme_list[0].twist - my_circuit.enzyme_list[-2].twist) > err:
                 print('issue initial, drop', frame)
             my_circuit.add_to_environment(drop_list_enzyme)
 
             # UPDATE GLOBALS
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('Adding to the environment, frame', frame)
-            if abs(my_circuit.enzyme_list[0].twist-my_circuit.enzyme_list[-2].twist) > err:
+            if abs(my_circuit.enzyme_list[0].twist - my_circuit.enzyme_list[-2].twist) > err:
                 print('issue environment, frame', frame)
 
             # Add to series df if the series option was selected (default=True)
@@ -581,7 +578,7 @@ class TestCircuit(TestCase):
         # Output the log of events
         my_circuit.log.log_out()
         sf = my_circuit.superhelical  # final superhelical
-        self.assertLessEqual(abs(s0-sf), err, "Superhelical changed")
+        self.assertLessEqual(abs(s0 - sf), err, "Superhelical changed")
 
     def test_topo_gyra_0_enzymes(self):
         circuit_filename = 'test_inputs/test_circuit_circular.csv'
@@ -597,7 +594,7 @@ class TestCircuit(TestCase):
         dt = 10
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation, dt, tm, mm)
-        #my_circuit.site_list[2].k_min = 0.0
+        # my_circuit.site_list[2].k_min = 0.0
         # This is similar to the Run function... but the idea is that we will control the rate
         for frame in range(1, frames + 1):
             my_circuit.frame = frame
@@ -641,7 +638,8 @@ class TestCircuit(TestCase):
         # Output the log of events
         my_circuit.log.log_out()
         sf = my_circuit.superhelical  # final superhelical
-#        self.assertLessEqual(abs(s0-sf), err, "Superhelical changed")
+
+    #        self.assertLessEqual(abs(s0-sf), err, "Superhelical changed")
 
     def test_bind_unbind_same_time(self):
         circuit_filename = 'test_inputs/test_circuit_circular.csv'
@@ -667,16 +665,16 @@ class TestCircuit(TestCase):
         enzyme1 = Enzyme(e_type=my_circuit.environmental_list[0].enzyme_type,
                          name=my_circuit.environmental_list[0].name, site=my_circuit.site_list[1],
                          position=my_circuit.site_list[1].start,
-                        size=my_circuit.environmental_list[0].size, twist=0.0, superhelical=0.0, k_cat=0, k_off=0)
+                         size=my_circuit.environmental_list[0].size, twist=0.0, superhelical=0.0, k_cat=0, k_off=0)
 
         enzyme2 = Enzyme(e_type=my_circuit.environmental_list[0].enzyme_type,
                          name=my_circuit.environmental_list[0].name, site=my_circuit.site_list[1],
-                         position=my_circuit.site_list[1].start+500,
-                        size=my_circuit.environmental_list[0].size, twist=0.0, superhelical=0.0, k_cat=0, k_off=0)
+                         position=my_circuit.site_list[1].start + 500,
+                         size=my_circuit.environmental_list[0].size, twist=0.0, superhelical=0.0, k_cat=0, k_off=0)
 
         # This is similar to the Run function... but the idea is that we will control the rate
         for frame in range(1, frames + 1):
-            #print(frame)
+            # print(frame)
             my_circuit.frame = frame
             my_circuit.time = frame * dt
             if my_circuit.series:
@@ -684,30 +682,30 @@ class TestCircuit(TestCase):
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error initial, frame', frame)
-            if abs(my_circuit.enzyme_list[0].twist-my_circuit.enzyme_list[-2].twist) > err:
+            if abs(my_circuit.enzyme_list[0].twist - my_circuit.enzyme_list[-2].twist) > err:
                 print('issue initial, frame', frame)
 
             if frame == 5:
                 new_enzyme_list = [enzyme1, enzyme2]
             else:
-                new_enzyme_list=[]
+                new_enzyme_list = []
 
             # Apply binding model and get list of new enzymes
-            #new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt)
+            # new_enzyme_list = bm.binding_model(my_circuit.enzyme_list, my_circuit.environmental_list, dt)
 
             my_circuit.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
 
-            t2 = my_circuit.twist+2
+            t2 = my_circuit.twist + 2
             ss = my_circuit.enzyme_list[0].twist
             s1 = sum(enzyme.twist for enzyme in my_circuit.enzyme_list)
             my_circuit.update_global_twist()
-            t3 = my_circuit.twist+3
+            t3 = my_circuit.twist + 3
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('new enzyme, frame', frame)
-            if abs(my_circuit.enzyme_list[0].twist-my_circuit.enzyme_list[-2].twist) > err:
+            if abs(my_circuit.enzyme_list[0].twist - my_circuit.enzyme_list[-2].twist) > err:
                 print('issue new enzyme, frame', frame)
 
             # EFFECT
@@ -718,9 +716,9 @@ class TestCircuit(TestCase):
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('effects, frame', frame)
-            if abs(my_circuit.enzyme_list[0].twist-my_circuit.enzyme_list[-2].twist) > err:
+            if abs(my_circuit.enzyme_list[0].twist - my_circuit.enzyme_list[-2].twist) > err:
                 print('issue effects, frame', frame)
 
             # UNBINDING
@@ -730,18 +728,18 @@ class TestCircuit(TestCase):
 
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('error initial, frame', frame)
-            if abs(my_circuit.enzyme_list[0].twist-my_circuit.enzyme_list[-2].twist) > err:
+            if abs(my_circuit.enzyme_list[0].twist - my_circuit.enzyme_list[-2].twist) > err:
                 print('issue initial, drop', frame)
             my_circuit.add_to_environment(drop_list_enzyme)
 
             # UPDATE GLOBALS
             my_circuit.update_global_twist()
             my_circuit.update_global_superhelical()
-            if abs(t0-my_circuit.twist) > err:
+            if abs(t0 - my_circuit.twist) > err:
                 print('Adding to the environment, frame', frame)
-            if abs(my_circuit.enzyme_list[0].twist-my_circuit.enzyme_list[-2].twist) > err:
+            if abs(my_circuit.enzyme_list[0].twist - my_circuit.enzyme_list[-2].twist) > err:
                 print('issue environment, frame', frame)
 
             # Add to series df if the series option was selected (default=True)
@@ -759,4 +757,4 @@ class TestCircuit(TestCase):
         # Output the log of events
         my_circuit.log.log_out()
         sf = my_circuit.superhelical  # final superhelical
-        self.assertLessEqual(abs(s0-sf), err, "Superhelical changed")
+        self.assertLessEqual(abs(s0 - sf), err, "Superhelical changed")

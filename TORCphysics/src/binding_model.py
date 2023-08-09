@@ -28,10 +28,10 @@ SM_m = params.SM_m
 EE_alpha = params.EE_alpha
 
 # Topoisomerase activity parameters
-topo_w = params.topo_w
-topo_t = params.topo_t
-gyra_w = params.gyra_w
-gyra_t = params.gyra_t
+topo_w = params.topo_b_w
+topo_t = params.topo_b_t
+gyra_w = params.gyra_b_w
+gyra_t = params.gyra_b_t
 
 
 # TODO: needs a unbinding model selector.
