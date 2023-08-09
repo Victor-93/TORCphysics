@@ -67,6 +67,12 @@ def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mecha
             # topo = [environment for environment in environmental_list
             #         if environment.name == enzyme.name][0]  # Can select the model from here?
             position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
+            # TODO: It would probably be better if we have sub-models for effects?
+            #  So we would have a binding model and a effect model.
+        #           if topoisomerase_model == 'stochastic':
+        #                position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
+        #            if topoisomerase_model == 'random_lineal':
+        #                position, twist_left, twist_right = topoisomerase_lineal_supercoiling_injection(enzyme, dt)
         else:
             continue
 
@@ -149,6 +155,10 @@ def topoisomerase_supercoiling_injection(topo, dt):
     return position, twist_left, twist_right
 
 
+#  def topoisomerase_lineal_supercoiling_injection(topo, dt):
+#    position = 0.0
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 # RNAP FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
@@ -218,7 +228,7 @@ def rnap_torque_stall_Geng(z, z_list, dt):
     if z.direction > 0:
         z_n = z_right  # after - On the right
     if z.direction < 0:
-        z_n = z_left   # before - On the left
+        z_n = z_left  # before - On the left
     if z.direction == 0:
         print('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
         sys.exit()

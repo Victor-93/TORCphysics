@@ -50,7 +50,7 @@ class Circuit:
         # We add new DNA sites which is the ones that we will link topos binding
         # Note: In the future there might be cases in which new enzymes will be added to the environment, so maybe,
         # these new sites will need to be created
-        if topoisomerase_model == 'stochastic' or 'random_lineal':
+        if topoisomerase_model == 'stochastic' or topoisomerase_model == 'random_lineal':
             topo_list = [environment for environment in self.environmental_list
                          if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
             for topo in topo_list:
@@ -59,11 +59,13 @@ class Circuit:
                 # I will have to ignore this first site in specific, because this one will be the overall, and is the
                 # one that is output in the sites_df.csv
                 if topoisomerase_model == 'stochastic':
-                    t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global', start=1, end=self.size,
-                         k_min=0, k_max=0, s_model='stochastic_' + topo.name, oparams=None)
+                    t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global', start=1,
+                                  end=self.size,
+                                  k_min=0, k_max=0, s_model='stochastic_' + topo.name, oparams=None)
                 if topoisomerase_model == 'random_lineal':
-                    t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global', start=1, end=self.size,
-                         k_min=0, k_max=0, s_model='poisson_lineal_' + topo.name, oparams=None)
+                    t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global', start=1,
+                                  end=self.size,
+                                  k_min=0, k_max=0, s_model='poisson_lineal_' + topo.name, oparams=None)
 
                 self.site_list.append(t_site)
                 # topo.site_type = 'DNA_' + topo.name
