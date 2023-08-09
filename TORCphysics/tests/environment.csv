@@ -1,0 +1,6 @@
+type,name,site_type,concentration,k_on,k_off,size,binding_model,binding_oparams,effect_model,effect_oparams
+topo,topoI,DNA,0.25,0.005,0.5,120,recognition,recognition_topoI.csv,constant,none
+topo,gyrase,DNA,0.25,0.005,0.5,20,recognition,none,constant,none
+ATP,ATP,none,0.0,0.0,0.0,0.0,none,none,none,none
+NAP,lacI,lacOP,0.0,0.0,0.0,0.0,none,none,none,none
+RNAP,RNAP,gene,1.0,0.0,0.0,32,none,none,uniform,none

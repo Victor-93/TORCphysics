@@ -3,7 +3,8 @@ import pandas as pd
 
 class Enzyme:
 
-    def __init__(self, e_type, name, site, position, size, k_cat, k_off, twist, superhelical):
+    def __init__(self, e_type, name, site, position, size, k_off, twist, superhelical, effect_model, effect_oparams):
+        self.effect_oparams = None
         self.enzyme_type = e_type
         self.name = name
         self.site = site
@@ -14,13 +15,20 @@ class Enzyme:
         self.direction = self.site.get_direction()
         self.twist = twist
         self.superhelical = superhelical
-        self.k_cat = k_cat
         self.k_off = k_off
-        #I'm not sure if defining twist_front/behind was a good idea
-        #self.twist_front = 0.0
-        #self.twist_behind = 0.0
-        #self.superhelical_front = 0.0
-        #self.superhelical_behind = 0.0
+        self.effect_model = effect_model
+        self.read_oparams(effect_oparams)
+        self.effect_oparams_file = effect_oparams
+
+    def read_oparams(self, oparams):
+        """
+        Reads oparams that are related to the site_model
+        """
+
+        if oparams is None or oparams == 'none':
+            self.effect_oparams = None
+        else:
+            self.effect_oparams = pd.read_csv(oparams).to_dict()
 
 
 class EnzymeFactory:
@@ -39,9 +47,9 @@ class EnzymeFactory:
         df = pd.read_csv(self.filename)
         for index, row in df.iterrows():
             new_enzyme = Enzyme(e_type=row['type'], name=row['name'], site=self.site_match(row['site']),
-                                position=float(row['position']), size=float(row['size']), k_cat=float(row['k_cat']),
-                                k_off=float(row['k_off']),
-                                twist=float(row['twist']), superhelical=float(row['superhelical']))
+                                position=float(row['position']), size=float(row['size']), k_off=float(row['k_off']),
+                                twist=float(row['twist']), superhelical=float(row['superhelical']),
+                                effect_model=row['effect_model'], effect_oparams=row['effect_oparams'])
 
             self.enzyme_list.append(new_enzyme)
 

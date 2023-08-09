@@ -8,7 +8,6 @@ from TORCphysics import binding_model as bm
 
 
 # TODO: Check how you determine enzymes bind, do they bind where with the left end on the site.start?
-
 class Circuit:
 
     def __init__(self, circuit_filename, sites_filename, enzymes_filename, environment_filename,
@@ -35,8 +34,8 @@ class Circuit:
         self.read_csv()  # Here, it gets the name,structure, etc
         self.site_list = SiteFactory(sites_filename).site_list
         self.enzyme_list = EnzymeFactory(enzymes_filename, self.site_list).enzyme_list
-        self.environmental_list = EnvironmentFactory(environment_filename, self.site_list).environment_list  # ,
-        #  self.topoisomerase_model).environment_list
+        self.environmental_list = EnvironmentFactory(environment_filename, self.site_list).environment_list
+        self.check_object_inputs()  # Checks that the site, environmental and enzyme lists are correct
         self.time = 0
         # create a time-based seed and save it, and initialize our random generator with this seed
         self.seed = random.randrange(sys.maxsize)
@@ -50,7 +49,7 @@ class Circuit:
         # We add new DNA sites which is the ones that we will link topos binding
         # Note: In the future there might be cases in which new enzymes will be added to the environment, so maybe,
         # these new sites will need to be created
-        if topoisomerase_model == 'stochastic' or topoisomerase_model == 'random_lineal':
+        if topoisomerase_model == 'stochastic':
             topo_list = [environment for environment in self.environmental_list
                          if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
             for topo in topo_list:
@@ -58,17 +57,10 @@ class Circuit:
                 # These sites will be created dynamically, and will have different names :0,1,2,3,...
                 # I will have to ignore this first site in specific, because this one will be the overall, and is the
                 # one that is output in the sites_df.csv
-                if topoisomerase_model == 'stochastic':
-                    t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global', start=1,
-                                  end=self.size,
-                                  k_min=0, k_max=0, s_model='stochastic_' + topo.name, oparams=None)
-                if topoisomerase_model == 'random_lineal':
-                    t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global', start=1,
-                                  end=self.size,
-                                  k_min=0, k_max=0, s_model='poisson_lineal_' + topo.name, oparams=None)
-
+                t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global',
+                              start=1, end=self.size, k_min=0, k_max=0,
+                              s_model=topo.binding_model + '_' + topo.name, oparams=topo.binding_oparams)
                 self.site_list.append(t_site)
-                # topo.site_type = 'DNA_' + topo.name
 
         # Define bare DNA binding sites for bare DNA binding enzymes
         self.define_bare_DNA_binding_sites()
@@ -445,10 +437,12 @@ class Circuit:
             # Notice that we don't specify the end
             # TODO: the site needs to be defined first
             extra_left = Enzyme(e_type='EXT', name='EXT_L', site=self.site_match('EXT', 'EXT'), position=position_left,
-                                size=0, k_cat=0, k_off=0, twist=0, superhelical=self.superhelical)
+                                size=0, k_off=0, twist=0, superhelical=self.superhelical,
+                                effect_model=None, effect_oparams=None)
             extra_right = Enzyme(e_type='EXT', name='EXT_R', site=self.site_match('EXT', 'EXT'),
                                  position=position_right,
-                                 size=0, k_cat=0, k_off=0, twist=0, superhelical=self.superhelical)
+                                 size=0, k_off=0, twist=0, superhelical=self.superhelical,
+                                 effect_model=None, effect_oparams=None)
 
             self.enzyme_list.append(extra_left)
             self.enzyme_list.append(extra_right)
@@ -809,10 +803,10 @@ class Circuit:
                 if end > self.size:  # Little break to avoid making it bigger than the actual plasmid
                     continue
                 environment_site = Site(s_type='DNA_' + environment.name,
-                                        # name='DNA_' + environment.name + '_' + str(s),
                                         name=str(s),
                                         start=start, end=end, k_min=0, k_max=0,
-                                        s_model='stochastic_' + environment.name, oparams=None)
+                                        s_model=environment.binding_model + '_' + environment.name,
+                                        oparams=environment.binding_oparams)
                 self.site_list.append(environment_site)
 
                 s = s + 1
@@ -823,3 +817,74 @@ class Circuit:
 
         self.sort_site_list()
         return
+
+    def check_object_inputs(self):
+
+        """
+         Checks that the input objects (sites, environments, enzymes) have the correct parameters or if they were not
+         provided, it assigns them to the default models if necessary
+         """
+
+        # TODO: Define list of available and supported models in params.
+        #  If the model that is specified is not supported, then remove the model by model = None, and oparams=None
+        # Sites
+        # ================================
+        for site in self.site_list:
+            if site.site_model == 'maxmin' and site.oparams is None:
+                site.site_model = 'sam'
+                print('For site ', site.name, 'maxmin model selected but no parameters provided. '
+                                              'Switching to sam model')
+
+        # Environment
+        # ================================
+        for environment in self.environmental_list:
+
+            # For the binding model
+            # -------------------------------------------------------------------
+            if environment.binding_oparams is None:
+
+                # In case of topoisomerase enzyme and stochastic model
+                if self.topoisomerase_model == 'stochastic' and 'topo' in environment.enzyme_type:
+                    environment.binding_model = 'recognition'  # The default recognition model in case of stochastic
+                    if 'topoI' in environment.name:
+                        environment.binding_oparams = {'width': params.topo_b_w, 'threshold': params.topo_b_t}
+                    elif 'gyrase' in environment.name:
+                        environment.binding_oparams = {'width': params.gyra_b_w, 'threshold': params.gyra_b_t}
+
+            # In case it is a continuum model, then there's no binding
+            if self.topoisomerase_model == 'continuum' and 'topo' in environment.enzyme_type:
+                environment.binding_model = None
+                environment.binding_oparams = None
+
+            # For the effect model
+            # -------------------------------------------------------------------
+            if environment.effect_oparams is None:
+                # In case of topo
+                if 'topo' in environment.enzyme_type:
+                    if 'topoI' in environment.name:
+                        environment.effect_oparams = {'k_cat': params.topo_k, 'width': params.topo_e_w,
+                                                      'threshold': params.topo_e_t}
+                    elif 'gyrase' in environment.name:
+                        environment.effect_oparams = {'k_cat': params.gyra_k, 'width': params.gyra_e_w,
+                                                      'threshold': params.gyra_e_t}
+                # In case of RNAP
+                elif 'RNAP' in environment.enzyme_type:
+                    environment.effect_oparams = {'velocity': params.v0, 'gamma': params.gamma}
+
+        # Enzyme
+        # ================================
+        for enzyme in self.enzyme_list:
+            if enzyme.effect_oparams is None:
+                # In case of topo
+                if 'topo' in environment.enzyme_type:
+                    if self.topoisomerase_model == 'continuum':
+                        enzyme.effect_model = 'continuum'
+                    if 'topoI' in environment.name:
+                        environment.effect_oparams = {'k_cat': params.topo_k, 'width': params.topo_e_w,
+                                                      'threshold': params.topo_e_t}
+                    elif 'gyrase' in environment.name:
+                        environment.effect_oparams = {'k_cat': params.gyra_k, 'width': params.gyra_e_w,
+                                                      'threshold': params.gyra_e_t}
+                # In case of RNAP
+                elif 'RNAP' in environment.enzyme_type:
+                    environment.effect_oparams = {'velocity': params.v0, 'gamma': params.gamma}
