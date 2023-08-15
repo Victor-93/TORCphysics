@@ -59,7 +59,7 @@ class Circuit:
                 # one that is output in the sites_df.csv
                 t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global',
                               start=1, end=self.size, k_min=0, k_max=0,
-                              s_model=topo.binding_model + '_' + topo.name, oparams=topo.binding_oparams)
+                              s_model_name=topo.binding_model + '_' + topo.name, oparams=topo.binding_oparams)
                 self.site_list.append(t_site)
 
         # Define bare DNA binding sites for bare DNA binding enzymes
@@ -397,7 +397,7 @@ class Circuit:
 
     def add_fake_boundaries(self):
         # I  need to add a fake site, so I can link the fake boundaries
-        self.site_list.append(Site(s_type='EXT', name='EXT', start=1, end=self.size, k_min=0, k_max=0, s_model=None,
+        self.site_list.append(Site(s_type='EXT', name='EXT', start=1, end=self.size, k_min=0, k_max=0, s_model_name=None,
                                    oparams=None))  # twist=self.twist, superhelical=self.superhelical) )
 
         # TODO: So the way you define continuations is with the fake boundaries? I should also include the local
@@ -777,7 +777,7 @@ class Circuit:
                     if end > next_enzyme.position:  # Little break to avoid the overlapping of enzymes
                         continue
                     topo_site = Site(s_type='DNA_' + topo.name, name=str(s), start=start, end=end, k_min=0, k_max=0,
-                                     s_model='stochastic_' + topo.name, oparams=None)
+                                     s_model_name='stochastic_' + topo.name, oparams=None)
                     self.site_list.append(topo_site)
 
                     s = s + 1
@@ -805,7 +805,7 @@ class Circuit:
                 environment_site = Site(s_type='DNA_' + environment.name,
                                         name=str(s),
                                         start=start, end=end, k_min=0, k_max=0,
-                                        s_model=environment.binding_model + '_' + environment.name,
+                                        s_model_name=environment.binding_model + '_' + environment.name,
                                         oparams=environment.binding_oparams)
                 self.site_list.append(environment_site)
 

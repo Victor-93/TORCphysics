@@ -50,6 +50,8 @@ sigma_p = (1 / p_stiffness) * np.sqrt(2 * p_stiffness * g_energy / (1 - p_stiffn
 # TOPOISOMERASE I
 topo_b_w = 0.012  # binding width
 topo_b_t = -0.04  # binding threshold
+topo_b_k_on = 0.005
+topo_b_k_off = 0.5
 topo_e_w = 0.012  # effect width
 topo_e_t = -0.04  # effect threshold
 # topo_c = 0.25#0.1#concentration micromolar 0.025 in meyer -> this is too negative...
@@ -58,6 +60,8 @@ topo_k = 0.001 #basal rate # k_cat
 # GYRASE
 gyra_b_w = 0.025  # binding width
 gyra_b_t = 0.01  # binding threshold
+gyra_b_k_on = 0.005
+gyra_b_k_off = 0.5
 gyra_e_w = 0.025  # effect width
 gyra_e_t = 0.01  # effect threshold
 # gyra_c = 0.25#.01 #concentration micromolarb 0.25 in meyer - I'll use concentration in nM better

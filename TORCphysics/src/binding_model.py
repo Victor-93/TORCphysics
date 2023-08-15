@@ -1,7 +1,8 @@
 import sys
-
 import numpy as np
 from TORCphysics import params, Enzyme
+import pandas as pd
+from abc import ABC, abstractmethod
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -39,6 +40,10 @@ gyra_t = params.gyra_b_t
 # TODO: We still need to check if the new enzymes are not overlapping. If more than 1 enzyme
 #  passed the probability test and are binding the same overlapping region, we need to flip a coin to
 #  check which one will be binding
+
+# TODO: UPDATE BINDING MODEL. The idea is that now, each site has its BindingModel class, so, on it's own it must be
+#  able to decide which model to use.
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # BINDING/UNBINDING MODEL SELECTION FUNCTIONS
@@ -251,30 +256,118 @@ def RNAP_unbinding_model(enzyme):
 
 # Unbinding model for enzymes that unbind spontaneously
 # ---------------------------------------------------------------------------------------------------------------------
-def Poisson_unbinding_model(enzyme, dt, rng):
-    unbinding_probability = P_binding_Poisson(enzyme.k_off, dt)
-    urandom = rng.uniform()  # we need a random number
-    if urandom <= unbinding_probability:  # and decide
-        unbind = True
-    else:
-        unbind = False
-    return unbind
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 # BINDING MODELS
 # ---------------------------------------------------------------------------------------------------------------------
+# Add your models into this function so it the code can recognise it
+def assign_binding_model(model_name, oparams_file, enzyme_name):
+    if model_name == 'PoissonBinding':
+        my_model = PoissonBinding(model_name)
+    elif model_name == 'TopoisomeraseRecognition':
+        my_model = TopoisomeraseRecognition(model_name, oparams_file, enzyme_name)
+    else:
+        print('Could not recognise binding model ', model_name)
+        sys.exit()
+    return my_model
+
+
 # These functions are for the particular binding model.
 # If you need a new one, define it here.
+class BindingModel(ABC):
+    def __init__(self, name):
+        self.name = name
 
-# ----------------------------------------------------------
-# This equation calculates the probability of binding according
-# the Poisson process
-def P_binding_Poisson(rate, dt):
-    rdt = rate * dt  # it is what is in the exponent (is that how you call it?)
-    probability = rdt * np.exp(-rdt)
+    @abstractmethod
+    def binding_probability(self):
+        pass
 
-    return probability
+
+# Model for binding probability according Poisson process
+class PoissonBinding(BindingModel):
+    def __init__(self, name):
+        super().__init__(name)  # Call the base class constructor
+
+    def binding_probability(self, on_rate, dt):
+        return Poisson_process(on_rate, dt)
+
+
+class TopoisomeraseRecognition(BindingModel):
+    def __init__(self, name, filename, enzyme_name):
+        super().__init__(name)  # Call the base class constructor
+        if filename is None or filename == 'none':
+            if 'topo' in enzyme_name:
+                self.width = params.topo_b_w
+                self.threshold = params.topo_b_t
+                self.k_on = params.topo_b_k_on
+            elif 'gyra' in enzyme_name:
+                self.width = params.gyra_b_w
+                self.threshold = params.gyra_b_t
+                self.k_on = params.gyra_b_k_on
+            else:
+                print('Could not recognize binding model for environment ', enzyme_name)
+                sys.exit()
+        else:
+            oparams = read_csv_to_dict(filename)
+            self.width = oparams['width']
+            self.threshold = oparams['threshold']
+            self.k_on = oparams['k_on']
+
+    # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
+    def binding_probability(self, enzyme, sigma):
+
+        a = enzyme.concentration * self.k_on
+        if 'topo' in enzyme.name:
+            b = 1 + np.exp((sigma - self.threshold) / self.width)
+        elif 'gyra' in enzyme.name:
+            b = 1 + np.exp(-(sigma - self.threshold) / self.width)
+        else:
+            print('Could not recognize enzyme name in TopoisomeraseRecognition BindingModel ', enzyme.name)
+            sys.exit()
+        rate = a / b
+        return rate
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# UNBINDING MODELS
+# ---------------------------------------------------------------------------------------------------------------------
+# Add your models into this function so it the code can recognise it
+def assign_unbinding_model(model_name, oparams_file, enzyme_name):
+    if model_name == 'PoissonUnBinding':
+        my_model = PoissonUnBinding(model_name)
+    else:
+        print('Could not recognise binding model ', model_name)
+        sys.exit()
+
+    return my_model
+
+class UnBindingModel:
+    def __init__(self, name):
+        self.name = name
+
+    @abstractmethod
+    def unbinding_probability(self):
+        pass
+
+
+class PoissonUnBinding(UnBindingModel):
+    def __init__(self, name):
+        super().__init__(name)  # Call the base class constructor
+
+    def unbinding_probability(self, off_rate, dt):
+        return Poisson_process(off_rate, dt)
+
+
+# class lacI_binding(binding_model):
+#    def __init__(self, name, bridging, unbridging):
+#        super().__init__(name)  # Call the base class constructor
+#        self.bridging = bridging
+#        self.unbridging = unbridging
+
+# Creating instances of the subclasses
+# topoI_instance = topoI_binding(name="TopoI Binding", width=10, threshold=5)
+# lacI_instance = lacI_binding(name="lacI Binding", bridging=True, unbridging=False)
 
 
 # ----------------------------------------------------------
@@ -361,8 +454,8 @@ def promoter_curve_opening_E_maxmin_I(k_min, k_max, sigma, *opening_p):
 def topoI_binding(topo, sigma):
     a = topo.concentration * topo.k_on
     # TODO: Check why sometimes the len is bigger
-    b = 1 + np.exp((sigma - topo.oparams['threshold']) / topo.oparams['width']) # [0] because the dictionary
-#    b = 1 + np.exp((sigma - topo.oparams['threshold'][0]) / topo.oparams['width'][0]) # [0] because the dictionary
+    b = 1 + np.exp((sigma - topo.oparams['threshold']) / topo.oparams['width'])  # [0] because the dictionary
+    #    b = 1 + np.exp((sigma - topo.oparams['threshold'][0]) / topo.oparams['width'][0]) # [0] because the dictionary
     # gives me trouble
     rate = a / b  # * np.exp(1 / b)
     #    try:
@@ -376,7 +469,7 @@ def topoI_binding(topo, sigma):
 def gyrase_binding(gyra, sigma):
     a = gyra.concentration * gyra.k_on
     b = 1 + np.exp(-(sigma - gyra.oparams['threshold']) / gyra.oparams['width'])
-#    b = 1 + np.exp(-(sigma - gyra.oparams['threshold'][0]) / gyra.oparams['width'][0]) # [0] because the dictionary
+    #    b = 1 + np.exp(-(sigma - gyra.oparams['threshold'][0]) / gyra.oparams['width'][0]) # [0] because the dictionary
     # gives me trouble
     #    rate = a * np.exp(1 / b)
     rate = a / b
@@ -391,6 +484,18 @@ def gyrase_binding(gyra, sigma):
 # will bind, etc...
 
 # ----------------------------------------------------------
+
+
+def Poisson_process(rate, dt):
+    rdt = rate * dt  # it is what is in the exponent (is that how you call it?)
+    probability = rdt * np.exp(-rdt)
+    return probability
+
+
+def read_csv_to_dict(filename):
+    return pd.read_csv(filename).to_dict()
+
+
 # This function checks if a site is not blocked by other enzymes
 def check_site_availability(site, enzyme_list, size):
     # Check if the site is available for binding.
@@ -444,15 +549,14 @@ def check_binding_conflicts(enzyme_list, rng):
             # It overlaps, so decide which enzymes stays
             urandom = rng.uniform()  # we need a random number for the decision
             if urandom <= 0.5:  # If it is <= 0.5, then the enzyme before stays.
-                del enzyme_list[i-s-1]
+                del enzyme_list[i - s - 1]
                 s += 1
                 # checked_enzyme_list.append(enzyme_before)
-            else:               # And if >0.5, then we don't add the enzyme before (we lose it).
-                del enzyme_list[i-s]
+            else:  # And if >0.5, then we don't add the enzyme before (we lose it).
+                del enzyme_list[i - s]
                 s += 1
                 # continue
         # else:
-            # checked_enzyme_list.append(enzyme_before)  # If nothing overlaps, then nothing happens
+        # checked_enzyme_list.append(enzyme_before)  # If nothing overlaps, then nothing happens
 
-
-    return enzyme_list  #checked_enzyme_list
+    return enzyme_list  # checked_enzyme_list

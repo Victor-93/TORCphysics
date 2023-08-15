@@ -1,2 +1,2 @@
-width,threshold
-0.012,-0.04
+width,threshold,k_on
+0.012,-0.04,0.005
