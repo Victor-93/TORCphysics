@@ -1,5 +1,5 @@
 import pandas as pd
-import numpy as np
+from TORCphysics import binding_model as bm
 import sys
 
 
@@ -8,7 +8,7 @@ class Site:
     Site class.
     """
 
-    def __init__(self, s_type, name, start, end, k_min, k_max, s_model, oparams):
+    def __init__(self, s_type, name, start, end, k_min, k_max, s_model_name, oparams_file, binding_model=None):
         """
         Initialize an instance of Site clase.
 
@@ -20,7 +20,7 @@ class Site:
             end (int): The ending position of the site.
             k_min (float): The minimum binding rate.
             k_max (float): The maximum binding rate.
-            s_model (str): The site model or binding model.
+            s_model_name (str): The name of the site model or binding model.
             oparams (str): Path to a dictionary of additional parameters relevant to the site_model s_model.
 
         Example:
@@ -35,15 +35,16 @@ class Site:
                 oparams=None
             )
         """
-        self.oparams_file = oparams
+        self.oparams_file = oparams_file
         self.site_type = s_type
         self.name = name
         self.start = start
         self.end = end
         self.k_min = k_min
         self.k_max = k_max
-        self.site_model = s_model
+        self.site_model = s_model_name
         self.direction = self.get_direction()
+        self.
         self.oparams = oparams
         if isinstance(oparams, dict):
             self.oparams = oparams
@@ -102,6 +103,6 @@ class SiteFactory:
         df = pd.read_csv(self.filename)
         for index, row in df.iterrows():
             new_site = Site(s_type=row['type'], name=row['name'], start=float(row['start']), end=float(row['end']),
-                            k_min=float(row['k_min']), k_max=float(row['k_max']), s_model=row['model'],
+                            k_min=float(row['k_min']), k_max=float(row['k_max']), s_model_name=row['model'],
                             oparams=row['oparams'])  # , twist=row['twist'], superhelical=['superhelical'])
             self.site_list.append(new_site)
