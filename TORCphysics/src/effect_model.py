@@ -1,6 +1,8 @@
 import numpy as np
 from TORCphysics import params
 import sys
+import pandas as pd
+from abc import ABC, abstractmethod
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -358,4 +360,108 @@ def get_start_end_c(z0, zn, nbp):
 
     return position_left, position_right
 
+
 # -----------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------------------------------------------
+# EFFECT MODELS
+# ---------------------------------------------------------------------------------------------------------------------
+# Add your models into this function so it the code can recognise it
+def assign_effect_model(model_name, oparams_file, enzyme_name):
+    if model_name == 'RNAPUniform':
+        my_model = RNAPUniform()
+    else:
+        sys.exit()
+    return my_model
+
+
+class EffectModel(ABC):
+    """
+     The EffectModel class for defining effect models.
+     If you need a new one, define it here.
+    """
+
+    #   def __init__(self, name):
+    #        """
+    #        Args:
+    #            name (str): EffectModels should have a name as a minimum.
+    #        """
+    #        self.name = self.__class__.__name__
+
+    def __init__(self):
+
+
+    @abstractmethod
+    def calculate_effect(self) -> Effect:
+        """
+        Effects models need a "calculate_effect" function. This function must return an Effect object
+        """
+        pass
+
+
+class RNAPUniform(EffectModel):
+    """
+     Effect model for the RNAP uniform motion. RNAP moves with constant speed and injects +-supercoils on each site
+    """
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename):
+
+#            """
+#        Args:
+#            name (str): Name
+#        Optional:
+#            filename (str): Path to parametrization of the model. If not specified, default values will be used.
+#        """
+        super().__init__()  # Call the base class constructor
+
+        if filename is None or filename == 'none':
+            self.velocity = params.v0
+            self.gamma = params.gamma
+        else:
+            oparams = read_csv_to_dict(filename)
+            self.velocity = oparams['velocity']
+            self.gamma = oparams['gamma']
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+        """
+        Effects models need a "calculate_effect" function. This function must return an Effect object
+        Args:
+            index (int): Index of the current enzyme
+            z (Enzyme): Current enzyme
+            z_list (list):
+            dt (float):
+        """
+        # Everything 0 for now
+        position = 0.0
+        twist_left = 0.0
+        twist_right = 0.0
+        # Get neighbour enzyme
+        if z.direction > 0:
+            z_n = [e for e in z_list if e.position > z.position][0]  # after - On the right
+        if z.direction < 0:
+            z_n = [e for e in z_list if e.position < z.position][-1]  # before - On the left
+        if z.direction == 0:
+            print('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
+            sys.exit()
+
+        # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid
+        # clashing
+        if z.direction > 0:  # Moving to the right
+            if z_n.position - (z.position + position) <= 0:
+                return position, twist_left, twist_right
+        else:  # Moves to the left
+            if z_n.position - (z.position + position) >= 0:
+                return position, twist_left, twist_right
+
+        # Nothing is next, so the object moves: simple uniform motion
+        position, twist_left, twist_right = uniform_motion(z, dt)
+
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+
+def read_csv_to_dict(filename):
+    """
+    Reads csv file and puts it in a dictionary
+    """
+    return pd.read_csv(filename).to_dict()

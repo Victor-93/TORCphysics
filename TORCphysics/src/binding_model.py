@@ -36,7 +36,6 @@ gyra_t = params.gyra_b_t
 
 
 # TODO: needs a unbinding model selector.
-# TODO: I need to find a way to set a method so it is easy to define binding models
 # TODO: We still need to check if the new enzymes are not overlapping. If more than 1 enzyme
 #  passed the probability test and are binding the same overlapping region, we need to flip a coin to
 #  check which one will be binding
@@ -280,7 +279,7 @@ class BindingModel(ABC):
         self.name = name
 
     @abstractmethod
-    def binding_probability(self):
+    def binding_probability(self) -> float:
         pass
 
 
@@ -289,7 +288,7 @@ class PoissonBinding(BindingModel):
     def __init__(self, name):
         super().__init__(name)  # Call the base class constructor
 
-    def binding_probability(self, on_rate, dt):
+    def binding_probability(self, on_rate, dt) -> float:
         return Poisson_process(on_rate, dt)
 
 
@@ -315,7 +314,7 @@ class TopoisomeraseRecognition(BindingModel):
             self.k_on = oparams['k_on']
 
     # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
-    def binding_probability(self, enzyme, sigma):
+    def binding_probability(self, enzyme, sigma) -> float:
 
         a = enzyme.concentration * self.k_on
         if 'topo' in enzyme.name:
@@ -493,6 +492,9 @@ def Poisson_process(rate, dt):
 
 
 def read_csv_to_dict(filename):
+    """
+    Reads csv file and puts it in a dictionary
+    """
     return pd.read_csv(filename).to_dict()
 
 

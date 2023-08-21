@@ -4,14 +4,105 @@ import sys
 from TORCphysics import params
 
 
-class Environment:
+# TODO: Keep adding Effect models, then fix site, then enzyme. Remember, environment has binding, unbinding and enzyme
+#  models. Enzymes have effect and unbinding. Sites only have binding models.
+# TODO: If enviromentals are given, and no models are specified, the code should recommend/use default models
+#  according the enzyme type
 
-    def __init__(self, e_type, name, site_list, concentration, size, site_type,
-                 binding_model_name, binding_oparams_file, effect_model_name, effect_oparams_file,
-                 unbinding_model_name, unbinding_oparams_file,
+class Environment:
+    """
+    A class used to represent molecules/enzymes in the environment.
+
+    Attributes
+    ----------
+    e_type : str
+        The enzyme/molecule type, e.g. topo.
+    name : str
+        The name of the environmental/enzyme, e.g. gyrase
+    site_list :
+        list of sites that the enzyme can recognise and bind.
+    concentration : float
+        The concentration of the enzyme in nM.
+    size : float
+        The size of the enzyme in bp
+    eff_size : float
+        The effective size in bp. This size is assumed to be the size in which the enzyme makes contact with the DNA.
+        So ef_size < size.
+    site_type : str
+        The type of site that this environmental can recognize to bind.
+    binding_model_name : str, optional
+        The name of the binding model to use
+    binding_oparams_file : str, optional
+        The path to the parameters for the binding model.
+    effect_model_name : str, optional
+        The name of the effect model to use
+    effect_oparams_file : str, optional
+        The path to the parameters for the effect model.
+    unbinding_model_name : str, optional
+        The name of the unbinding m odel to use
+    unbinding_oparams_file : str, optional
+        The path to the parameters for the ubinding model.
+    binding_model : optional
+        The binding model to use. This is a subclass of the BindingModel
+    effect_model : optional
+        The effect model to use. This is a subclass of the EffectModel
+    unbinding_model :optional
+        The unbinding model to use. This is a subclass of the UnBindingModel
+
+    Methods
+    -------
+    says(sound=None)
+        Prints the animals name and what sound it makes
+    """
+    def __init__(self, e_type, name, site_list, concentration, size, eff_size, site_type,
+                 binding_model_name=None, binding_oparams_file=None,
+                 effect_model_name=None, effect_oparams_file=None,
+                 unbinding_model_name=None, unbinding_oparams_file=None,
                  binding_model=None, effect_model=None, unbinding_model=None):
+        """
+         A class used to represent molecules/enzymes in the environment.
+
+         Attributes
+         ----------
+         e_type : str
+             The enzyme/molecule type, e.g. topo.
+         name : str
+             The name of the environmental/enzyme, e.g. gyrase
+         site_list :
+             list of sites that the enzyme can recognise and bind.
+         concentration : float
+             The concentration of the enzyme in nM.
+         size : float
+             The size of the enzyme in bp
+         eff_size : float
+             The effective size in bp. This size is assumed to be the size in which the enzyme makes contact with the DNA.
+             So ef_size < size.
+         site_type : str
+             The type of site that this environmental can recognize to bind.
+         binding_model_name : str, optional
+             The name of the binding model to use
+         binding_oparams_file : str, optional
+             The path to the parameters for the binding model.
+         effect_model_name : str, optional
+             The name of the effect model to use
+         effect_oparams_file : str, optional
+             The path to the parameters for the effect model.
+         unbinding_model_name : str, optional
+             The name of the unbinding m odel to use
+         unbinding_oparams_file : str, optional
+             The path to the parameters for the ubinding model.
+         binding_model : optional
+             The binding model to use. This is a subclass of the BindingModel
+         effect_model : optional
+             The effect model to use. This is a subclass of the EffectModel
+         unbinding_model :optional
+             The unbinding model to use. This is a subclass of the UnBindingModel
+         """
+
         #        self.binding_oparams = None
         #        self.effect_oparams = None
+        # TODO: Finish this class, then test it! YOU NEED TO COMPLETELY CHECK IT
+        # TODO: Add the option where you select default models? Or noup? Maybe no for the moment.
         self.binding_model = None
         self.effect_model = None
         self.unbinding_model = None
