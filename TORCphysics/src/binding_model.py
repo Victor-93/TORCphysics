@@ -261,11 +261,13 @@ def RNAP_unbinding_model(enzyme):
 # BINDING MODELS
 # ---------------------------------------------------------------------------------------------------------------------
 # Add your models into this function so it the code can recognise it
-def assign_binding_model(model_name, oparams_file, enzyme_name):
+def assign_binding_model(model_name, oparams_file):
     if model_name == 'PoissonBinding':
         my_model = PoissonBinding(model_name)
-    elif model_name == 'TopoisomeraseRecognition':
-        my_model = TopoisomeraseRecognition(model_name, oparams_file, enzyme_name)
+    elif model_name == 'TopoIRecognition':
+        my_model = TopoIRecognition(model_name, oparams_file)
+    elif model_name == 'GyraseRecognition':
+        my_model = GyraseRecognition(model_name, oparams_file)
     else:
         print('Could not recognise binding model ', model_name)
         sys.exit()
@@ -275,8 +277,9 @@ def assign_binding_model(model_name, oparams_file, enzyme_name):
 # These functions are for the particular binding model.
 # If you need a new one, define it here.
 class BindingModel(ABC):
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
+        pass
+#        self.name = name
 
     @abstractmethod
     def binding_probability(self) -> float:
@@ -285,28 +288,20 @@ class BindingModel(ABC):
 
 # Model for binding probability according Poisson process
 class PoissonBinding(BindingModel):
-    def __init__(self, name):
-        super().__init__(name)  # Call the base class constructor
+    def __init__(self):
+       super().__init__()  # Call the base class constructor
 
     def binding_probability(self, on_rate, dt) -> float:
         return Poisson_process(on_rate, dt)
 
 
-class TopoisomeraseRecognition(BindingModel):
-    def __init__(self, name, filename, enzyme_name):
-        super().__init__(name)  # Call the base class constructor
+class TopoIRecognition(BindingModel):
+    def __init__(self, filename):
+        super().__init__()  #  name)  # Call the base class constructor
         if filename is None or filename == 'none':
-            if 'topo' in enzyme_name:
-                self.width = params.topo_b_w
-                self.threshold = params.topo_b_t
-                self.k_on = params.topo_b_k_on
-            elif 'gyra' in enzyme_name:
-                self.width = params.gyra_b_w
-                self.threshold = params.gyra_b_t
-                self.k_on = params.gyra_b_k_on
-            else:
-                print('Could not recognize binding model for environment ', enzyme_name)
-                sys.exit()
+            self.width = params.topo_b_w
+            self.threshold = params.topo_b_t
+            self.k_on = params.topo_b_k_on
         else:
             oparams = read_csv_to_dict(filename)
             self.width = oparams['width']
@@ -317,16 +312,30 @@ class TopoisomeraseRecognition(BindingModel):
     def binding_probability(self, enzyme, sigma) -> float:
 
         a = enzyme.concentration * self.k_on
-        if 'topo' in enzyme.name:
-            b = 1 + np.exp((sigma - self.threshold) / self.width)
-        elif 'gyra' in enzyme.name:
-            b = 1 + np.exp(-(sigma - self.threshold) / self.width)
-        else:
-            print('Could not recognize enzyme name in TopoisomeraseRecognition BindingModel ', enzyme.name)
-            sys.exit()
+        b = 1 + np.exp((sigma - self.threshold) / self.width)
         rate = a / b
         return rate
 
+class GyraseRecognition(BindingModel):
+    def __init__(self, filename):
+        super().__init__()  # Call the base class constructor
+        if filename is None or filename == 'none':
+            self.width = params.gyra_b_w
+            self.threshold = params.gyra_b_t
+            self.k_on = params.gyra_b_k_on
+        else:
+            oparams = read_csv_to_dict(filename)
+            self.width = oparams['width']
+            self.threshold = oparams['threshold']
+            self.k_on = oparams['k_on']
+
+    # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
+    def binding_probability(self, enzyme, sigma) -> float:
+
+        a = enzyme.concentration * self.k_on
+        b = 1 + np.exp(-(sigma - self.threshold) / self.width)
+        rate = a / b
+        return rate
 
 # ---------------------------------------------------------------------------------------------------------------------
 # UNBINDING MODELS

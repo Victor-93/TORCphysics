@@ -44,7 +44,6 @@ class Site:
         self.k_max = k_max
         self.site_model = s_model_name
         self.direction = self.get_direction()
-        self.
         self.oparams = oparams
         if isinstance(oparams, dict):
             self.oparams = oparams

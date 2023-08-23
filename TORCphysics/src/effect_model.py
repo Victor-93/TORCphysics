@@ -389,7 +389,7 @@ class EffectModel(ABC):
     #        self.name = self.__class__.__name__
 
     def __init__(self):
-
+        pass
 
     @abstractmethod
     def calculate_effect(self) -> Effect:
