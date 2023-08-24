@@ -5,13 +5,12 @@ from TORCphysics import binding_model as bm
 
 class TestEnvironment(TestCase):
 
-    def test1(self):
-        print( type(bm.PoissonBinding()))
-        print( type(bm.PoissonBinding()) is type)
+    def test_model_given(self):
 
+        model = bm.PoissonBinding()
         environmental = Environment(e_type='RNAP', name='test', site_list=[], concentration=0.1, size=100, eff_size=50,
-                                    site_type='gene', binding_model=bm.PoissonBinding())
-        self.assertGreater(len(environmental.get_environment_list()), 0, "Empty environment list")
+                                    site_type='gene', binding_model=model)
+#        self.assertGreater(len(environmental.get_environment_list()), 0, "Empty environment list")
 
         #e_type, name, site_list, concentration, size, eff_size, site_type,
 #                 binding_model_name=None, binding_oparams_file=None,

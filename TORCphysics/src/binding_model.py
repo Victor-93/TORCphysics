@@ -261,13 +261,13 @@ def RNAP_unbinding_model(enzyme):
 # BINDING MODELS
 # ---------------------------------------------------------------------------------------------------------------------
 # Add your models into this function so it the code can recognise it
-def assign_binding_model(model_name, oparams_file):
+def assign_binding_model(model_name, oparams_file=None, **oparams):
     if model_name == 'PoissonBinding':
-        my_model = PoissonBinding(model_name)
+        my_model = PoissonBinding(oparams)
     elif model_name == 'TopoIRecognition':
-        my_model = TopoIRecognition(model_name, oparams_file)
-    elif model_name == 'GyraseRecognition':
-        my_model = GyraseRecognition(model_name, oparams_file)
+        my_model = TopoIRecognition(filename=oparams_file, **oparams)
+#    elif model_name == 'GyraseRecognition':
+#        my_model = GyraseRecognition(filename=oparams_file)
     else:
         print('Could not recognise binding model ', model_name)
         sys.exit()
@@ -277,9 +277,10 @@ def assign_binding_model(model_name, oparams_file):
 # These functions are for the particular binding model.
 # If you need a new one, define it here.
 class BindingModel(ABC):
-    def __init__(self):
-        pass
-#        self.name = name
+    def __init__(self, **oparams):
+        self.oparams = oparams
+
+    #        self.name = name
 
     @abstractmethod
     def binding_probability(self) -> float:
@@ -288,17 +289,17 @@ class BindingModel(ABC):
 
 # Model for binding probability according Poisson process
 class PoissonBinding(BindingModel):
-    def __init__(self):
-       super().__init__()  # Call the base class constructor
+    def __init__(self, **oparams):
+        super().__init__(**oparams)  # Call the base class constructor
 
     def binding_probability(self, on_rate, dt) -> float:
         return Poisson_process(on_rate, dt)
 
 
 class TopoIRecognition(BindingModel):
-    def __init__(self, filename):
-        super().__init__()  #  name)  # Call the base class constructor
-        if filename is None or filename == 'none':
+    def __init__(self, filename=None, **oparams):
+        super().__init__(oparams)  # name  # Call the base class constructor
+        if filename is None or filename.lower() == 'none' or filename == 'None':
             self.width = params.topo_b_w
             self.threshold = params.topo_b_t
             self.k_on = params.topo_b_k_on
@@ -315,6 +316,7 @@ class TopoIRecognition(BindingModel):
         b = 1 + np.exp((sigma - self.threshold) / self.width)
         rate = a / b
         return rate
+
 
 class GyraseRecognition(BindingModel):
     def __init__(self, filename):
@@ -337,6 +339,7 @@ class GyraseRecognition(BindingModel):
         rate = a / b
         return rate
 
+
 # ---------------------------------------------------------------------------------------------------------------------
 # UNBINDING MODELS
 # ---------------------------------------------------------------------------------------------------------------------
@@ -349,6 +352,7 @@ def assign_unbinding_model(model_name, oparams_file, enzyme_name):
         sys.exit()
 
     return my_model
+
 
 class UnBindingModel:
     def __init__(self, name):
