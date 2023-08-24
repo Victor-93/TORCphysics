@@ -45,23 +45,25 @@ class Environment:
          The path to the parameters for the ubinding model.
      binding_model : optional
          The binding model to use. This is a subclass of the BindingModel
+     binding_model_oparams : dict, optional
+         The actual dictionary with the parameters for the binding model
      effect_model : optional
          The effect model to use. This is a subclass of the EffectModel
+     effect_model_oparams : dict, optional
+         The actual dictionary with the parameters for the Effect model
      unbinding_model :optional
          The unbinding model to use. This is a subclass of the UnBindingModel
+     unbinding_model_oparams : dict, optional
+         The actual dictionary with the parameters for the unbinding model
 
-
-    Methods
-    -------
-    says(sound=None)
-        Prints the animals name and what sound it makes
     """
 
     def __init__(self, e_type, name, site_list, concentration, size, eff_size, site_type,
                  binding_model_name=None, binding_oparams_file=None,
                  effect_model_name=None, effect_oparams_file=None,
                  unbinding_model_name=None, unbinding_oparams_file=None,
-                 binding_model=None, effect_model=None, unbinding_model=None):
+                 binding_model=None, effect_model=None, unbinding_model=None,
+                 binding_model_oparams=None, effect_model_oparams=None, unbinding_model_oparams=None):
         """
          A class used to represent molecules/enzymes in the environment.
 
@@ -96,10 +98,16 @@ class Environment:
              The path to the parameters for the ubinding model.
          binding_model : optional
              The binding model to use. This is a subclass of the BindingModel
+         binding_model_oparams : dict, optional
+             The actual dictionary with the parameters for the binding model
          effect_model : optional
              The effect model to use. This is a subclass of the EffectModel
+         effect_model_oparams : dict, optional
+             The actual dictionary with the parameters for the Effect model
          unbinding_model :optional
              The unbinding model to use. This is a subclass of the UnBindingModel
+         unbinding_model_oparams : dict, optional
+             The actual dictionary with the parameters for the unbinding model
          """
 
         #        self.binding_oparams = None
@@ -125,12 +133,17 @@ class Environment:
         self.binding_model_name = binding_model_name
         self.binding_oparams_file = binding_oparams_file
         self.binding_model = binding_model
+        self.binding_model_oparams = binding_model_oparams
+
         self.effect_model_name = effect_model_name
         self.effect_oparams_file = effect_oparams_file
         self.effect_model = effect_model
+        self.effect_model_oparams = effect_model_oparams
+
         self.unbinding_model_name = unbinding_model_name
         self.unbinding_oparams_file = unbinding_oparams_file
         self.unbinding_model = unbinding_model
+        self.unbinding_model_oparams = unbinding_model_oparams
 
         self.get_models()
 
@@ -140,56 +153,97 @@ class Environment:
     def get_models(self):
 
         # Binding model
-        if type(self.binding_model) is type:  # Check if class
-            print(0)
-            if issubclass(self.binding_model, bm.BindingModel):  # Check if an actual model is given, then
-                print(1)
-                self.binding_model_name = self.binding_model.__class__.__name__  # Just to double-check the name
+        if self.binding_model is None:  # No model was given
+
+            # Model indicated by name
+            if (self.binding_model_name is not None) or (self.binding_model_name.lower() != 'none'):
+                # Loads binding model.
+                # If oparams_file is given, parameters will be read from file.
+                # If oparams dict is given, those will be assigned to the model
+                # If no oparams file/dict are given, default values will be used.
+                self.binding_model = bm.assign_binding_model(self.binding_model_name,
+                                                             oparams_file=self.binding_oparams_file,
+                                                             **self.binding_model_oparams)
+
+            # No model was given, not even a name
             else:
-                print(2)
-                self.binding_model = None
-        else:  # No model class was given
-            print(3)
-            # If it was indicated a model by name, it needs to be loaded
-            if (self.binding_model_name is not None) or (self.binding_model_name != 'None') or \
-                    (self.binding_model_name != "none"):
-                # Loads binding model
-                print(4)
-                self.binding_model = bm.assign_binding_model(self.binding_model_name, self.binding_oparams_file)
-            # If there was no model given, then these environmentals don't have binding model (they don't bind)
-            else:
-                print(5)
                 self.binding_model = None
                 self.binding_model_name = None
                 self.binding_oparams_file = None
+                self.binding_model_oparams = None
+
+        # An actual model was given
+        else:
+
+            #  Let's check if it's actually a binding model - The model should already have the oparams
+            if isinstance(self.binding_model, bm.BindingModel):
+                #  Then, some variables are fixed.
+                self.binding_model_name = self.binding_model.__class__.__name__
+                self.binding_model_oparams = self.binding_model.oparams
+                self.binding_oparams_file = None
+
+            else:
+                print('Warning, binding model given is not a class for environmental ', self.name)
+                self.binding_model = None
+                self.binding_model_name = None
+                self.binding_oparams_file = None
+                self.binding_model_oparams = None
+
+        #elif isinstance(self.binding_model, type):  # If a class was given
+        #    self.binding_model = bm.assign_binding_model(self.binding_model_name, self.binding_oparams_file)
+
+        #            if issubclass(bm.PoissonBinding, bm.BindingModel):  # If subclass of binding model
+
+#        if type(self.binding_model) is type:  # Check if class
+#            print(0)
+#            if issubclass(self.binding_model, bm.BindingModel):  # Check if an actual model is given, then
+#                print(1)
+#                self.binding_model_name = self.binding_model.__class__.__name__  # Just to double-check the name
+#            else:
+#                print(2)
+#                self.binding_model = None
+#        else:  # No model class was given
+#            print(3)
+#            # If it was indicated a model by name, it needs to be loaded
+#            if (self.binding_model_name is not None) or (self.binding_model_name != 'None') or \
+#                    (self.binding_model_name != "none"):
+#                # Loads binding model
+#                print(4)
+#                self.binding_model = bm.assign_binding_model(self.binding_model_name, self.binding_oparams_file)
+#            # If there was no model given, then these environmentals don't have binding model (they don't bind)
+#            else:
+#                print(5)
+#                self.binding_model = None
+#                self.binding_model_name = None
+#                self.binding_oparams_file = None
 
         # Effect model
-        if issubclass(self.effect_model, em.EffectModel):  # If an actual model is given, then
-            self.effect_model_name = self.effect_model.__class__.__name__  # Just to double-check the name
-        else:  # No model
-            # If it was indicated a model by name, it needs to be loaded
-            if (self.effect_model_name is not None) or (self.effect_model_name != 'None') or \
-                    (self.effect_model_name != "none"):
-                self.effect_model = em.assign_effect_model(self.effect_model_name)  # Loads model
-            # If there was no model given, then these environmentals don't have effect model (just block supercoils)
-            else:
-                self.effect_model = None
-                self.effect_model_name = None
-                self.effect_oparams_file = None
-
-        # Unbinding model
-        if issubclass(self.unbinding_model, bm.UnBindingModel):  # If an actual model is given, then
-            self.unbinding_model_name = self.unbinding_model.__class__.__name__  # Just to double-check the name
-        else:  # No model
-            # If it was indicated a model by name, it needs to be loaded
-            if (self.unbinding_model_name is not None) or (self.unbinding_model_name != 'None') or \
-                    (self.unbinding_model_name != "none"):
-                self.unbinding_model = bm.assign_binding_model(self.unbinding_model_name)  # Loads model
-            # If there was no model given, then these environmentals don't have unbinding model (they don't unbind)
-            else:
-                self.unbinding_model = None
-                self.unbinding_model_name = None
-                self.unbinding_oparams_file = None
+#        if issubclass(self.effect_model, em.EffectModel):  # If an actual model is given, then
+#            self.effect_model_name = self.effect_model.__class__.__name__  # Just to double-check the name
+#        else:  # No model
+#            # If it was indicated a model by name, it needs to be loaded
+#            if (self.effect_model_name is not None) or (self.effect_model_name != 'None') or \
+#                    (self.effect_model_name != "none"):
+#                self.effect_model = em.assign_effect_model(self.effect_model_name)  # Loads model
+#            # If there was no model given, then these environmentals don't have effect model (just block supercoils)
+#            else:
+#                self.effect_model = None
+#                self.effect_model_name = None
+#                self.effect_oparams_file = None#
+#
+#        # Unbinding model
+#        if issubclass(self.unbinding_model, bm.UnBindingModel):  # If an actual model is given, then
+#            self.unbinding_model_name = self.unbinding_model.__class__.__name__  # Just to double-check the name
+#        else:  # No model
+#            # If it was indicated a model by name, it needs to be loaded
+#            if (self.unbinding_model_name is not None) or (self.unbinding_model_name != 'None') or \
+#                    (self.unbinding_model_name != "none"):
+#                self.unbinding_model = bm.assign_binding_model(self.unbinding_model_name)  # Loads model
+#            # If there was no model given, then these environmentals don't have unbinding model (they don't unbind)
+#            else:
+#                self.unbinding_model = None
+#                self.unbinding_model_name = None
+#                self.unbinding_oparams_file = None
 
 
 #    def read_oparams(self, binding_oparams, effect_oparams):#
