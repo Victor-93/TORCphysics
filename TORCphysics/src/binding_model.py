@@ -291,6 +291,10 @@ class BindingModel(ABC):
 class PoissonBinding(BindingModel):
     def __init__(self, **oparams):
         super().__init__(**oparams)  # Call the base class constructor
+        if not oparams:
+            self.k_on = params.k_on
+        else:
+            self.k_on = oparams['k_on']
 
     def binding_probability(self, on_rate, dt) -> float:
         return Poisson_process(on_rate, dt)
@@ -298,13 +302,18 @@ class PoissonBinding(BindingModel):
 
 class TopoIRecognition(BindingModel):
     def __init__(self, filename=None, **oparams):
-        super().__init__(oparams)  # name  # Call the base class constructor
-        if filename is None or filename.lower() == 'none' or filename == 'None':
-            self.width = params.topo_b_w
-            self.threshold = params.topo_b_t
-            self.k_on = params.topo_b_k_on
+        super().__init__(**oparams)  # name  # Call the base class constructor
+        if not oparams:
+            if filename is None:
+                self.width = params.topo_b_w
+                self.threshold = params.topo_b_t
+                self.k_on = params.topo_b_k_on
+            else:
+                rows = read_csv_to_dict(filename)
+                self.width = rows['width']
+                self.threshold = rows['threshold']
+                self.k_on = rows['k_on']
         else:
-            oparams = read_csv_to_dict(filename)
             self.width = oparams['width']
             self.threshold = oparams['threshold']
             self.k_on = oparams['k_on']
