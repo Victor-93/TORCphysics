@@ -123,11 +123,6 @@ class Environment:
         self.concentration = concentration
         self.size = size
         self.eff_size = eff_size
-        if eff_size > size:
-            print('Error, effective size eff_size cannot be larger than size')
-            print('eff_size:', eff_size)
-            print('size', size)
-            sys.exit()
 
         # Models
         self.binding_model_name = binding_model_name
@@ -145,32 +140,83 @@ class Environment:
         self.unbinding_model = unbinding_model
         self.unbinding_model_oparams = unbinding_model_oparams
 
+        self.check_inputs()
+
         self.get_models()
 
     #    def get_models(self, binding_model, effect_model, unbinding_model):
+
+    def check_inputs(self):
+
+        if not isinstance(self.enzyme_type, str) or self.enzyme_type == '':
+            raise ValueError('Error, environmentals must have a type')
+        if not isinstance(self.name, str) or self.name == '':
+            raise ValueError('Error, environmentals must have a name')
+        if not isinstance(self.site_list, list):
+            raise ValueError('Error, environmentals site_list must be a list')
+        if not isinstance(self.site_type, str) or self.site_type == '':
+            raise ValueError('Error, environmentals need to recognise a site_type')
+        if not isinstance(self.concentration, float) and not isinstance(self.concentration, int):
+            raise ValueError('Error, environmentals need a number for concentration')
+        if not isinstance(self.size, float) and not isinstance(self.size, int):
+            raise ValueError('Error, environmentals need a number for size')
+        if not isinstance(self.eff_size, float) and not isinstance(self.eff_size, int):
+            raise ValueError('Error, environmentals need a number for effective size')
+        if self.eff_size > self.size:
+            raise ValueError('Effective size eff_size must be smaller than size')
+
+        if self.eff_size > self.size:
+            print('Error, effective size eff_size cannot be larger than size')
+            print('eff_size:', self.eff_size)
+            print('size', self.size)
+            sys.exit()
+
+        if self.binding_model_name == '' or self.binding_model_name == 'None' or self.binding_model_name == 'none':
+            self.binding_model_name = None
+        if self.binding_model == '' or self.binding_model == 'None' or self.binding_model == 'none':
+            self.binding_model = None
+        if self.binding_oparams_file == '' or self.binding_oparams_file == 'None' or self.binding_oparams_file == 'none':
+            self.binding_oparams_file = None
+        if (self.binding_model_oparams == '' or self.binding_model_oparams == 'None' or
+                self.binding_model_oparams == 'none'):
+            self.binding_model_oparams = None
 
     # This function sorts the models
     def get_models(self):
 
         # Binding model
-        if self.binding_model is None:  # No model was given
+        # -------------------------------------------------------------
+        # If no model is given
+        if self.binding_model is None:
 
-            # Model indicated by name
-            if (self.binding_model_name is not None) or (self.binding_model_name.lower() != 'none'):
-                # Loads binding model.
-                # If oparams_file is given, parameters will be read from file.
-                # If oparams dict is given, those will be assigned to the model
-                # If no oparams file/dict are given, default values will be used.
-                self.binding_model = bm.assign_binding_model(self.binding_model_name,
-                                                             oparams_file=self.binding_oparams_file,
-                                                             **self.binding_model_oparams)
-
-            # No model was given, not even a name
-            else:
+            # No model is given, not even a name, so there's NO binding model
+            if self.binding_model_name is None:
                 self.binding_model = None
                 self.binding_model_name = None
                 self.binding_oparams_file = None
                 self.binding_model_oparams = None
+
+            # Model indicated by name
+            else:
+                # Loads binding model.
+                # If oparams dict is given, those will be assigned to the model -> This is priority over oparams_file
+                # If oparams_file is given, parameters will be read from file, in case of no oparams dict
+                # If no oparams file/dict are given, default values will be used.
+
+                # A dictionary of parameters is given so that's priority
+                if isinstance(self.binding_model_oparams, dict):
+                    self.binding_model = bm.assign_binding_model(self.binding_model_name,
+                                                                 **self.binding_model_oparams)
+                # No dictionary was given
+                else:
+                    # If no oparams_file is given, then DEFAULT values are used.
+                    if self.binding_oparams_file is None:
+                        self.binding_model = bm.assign_binding_model(self.binding_model_name)
+                    # If an oparams_file is given, then those are loaded
+                    else:
+                        self.binding_model = bm.assign_binding_model(self.binding_model_name,
+                                                                     oparams_file=self.binding_oparams_file)
+
 
         # An actual model was given
         else:
@@ -189,10 +235,11 @@ class Environment:
                 self.binding_oparams_file = None
                 self.binding_model_oparams = None
 
-        #elif isinstance(self.binding_model, type):  # If a class was given
+        # elif isinstance(self.binding_model, type):  # If a class was given
         #    self.binding_model = bm.assign_binding_model(self.binding_model_name, self.binding_oparams_file)
 
         #            if issubclass(bm.PoissonBinding, bm.BindingModel):  # If subclass of binding model
+
 
 #        if type(self.binding_model) is type:  # Check if class
 #            print(0)
@@ -217,7 +264,7 @@ class Environment:
 #                self.binding_model_name = None
 #                self.binding_oparams_file = None
 
-        # Effect model
+# Effect model
 #        if issubclass(self.effect_model, em.EffectModel):  # If an actual model is given, then
 #            self.effect_model_name = self.effect_model.__class__.__name__  # Just to double-check the name
 #        else:  # No model
