@@ -1,0 +1,2 @@
+type,name,site_type,concentration,size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams,effective_size
+test,wrong_name,DNA,0.2,120,None,None,RNAP,none,none,none,100

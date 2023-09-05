@@ -367,11 +367,11 @@ def get_start_end_c(z0, zn, nbp):
 # EFFECT MODELS
 # ---------------------------------------------------------------------------------------------------------------------
 # Add your models into this function so it the code can recognise it
-def assign_effect_model(model_name, oparams_file, enzyme_name):
+def assign_effect_model(model_name, oparams_file=None, **oparams):
     if model_name == 'RNAPUniform':
-        my_model = RNAPUniform()
+        my_model = RNAPUniform(filename=oparams_file, **oparams)
     else:
-        sys.exit()
+        raise ValueError('Could not recognise effect model ' + model_name)
     return my_model
 
 
@@ -381,15 +381,9 @@ class EffectModel(ABC):
      If you need a new one, define it here.
     """
 
-    #   def __init__(self, name):
-    #        """
-    #        Args:
-    #            name (str): EffectModels should have a name as a minimum.
-    #        """
-    #        self.name = self.__class__.__name__
-
-    def __init__(self):
-        pass
+    def __init__(self, filename=None, **oparams):
+        self.filename = filename
+        self.oparams = oparams
 
     @abstractmethod
     def calculate_effect(self) -> Effect:
@@ -405,23 +399,22 @@ class RNAPUniform(EffectModel):
     """
 
     # def __init__(self, name, filename):
-    def __init__(self, filename):
+    def __init__(self, filename=None, **oparams):
+        super().__init__(filename, **oparams)  # name  # Call the base class constructor
 
-#            """
-#        Args:
-#            name (str): Name
-#        Optional:
-#            filename (str): Path to parametrization of the model. If not specified, default values will be used.
-#        """
-        super().__init__()  # Call the base class constructor
-
-        if filename is None or filename == 'none':
-            self.velocity = params.v0
-            self.gamma = params.gamma
+        if not oparams:
+            if filename is None:
+                self.velocity = params.v0
+                self.gamma = params.gamma
+            else:
+                rows = pd.read_csv(filename)
+                self.velocity = float(rows['velocity'])
+                self.gamma = float(rows['gamma'])
         else:
-            oparams = read_csv_to_dict(filename)
-            self.velocity = oparams['velocity']
-            self.gamma = oparams['gamma']
+            self.velocity = float(oparams['velocity'])
+            self.gamma = float(oparams['gamma'])
+
+        self.oparams = {'velocity': self.velocity, 'gamma': self.gamma}  # Just in case
 
     def calculate_effect(self, index, z, z_list, dt) -> Effect:
         """
@@ -442,8 +435,7 @@ class RNAPUniform(EffectModel):
         if z.direction < 0:
             z_n = [e for e in z_list if e.position < z.position][-1]  # before - On the left
         if z.direction == 0:
-            print('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
-            sys.exit()
+            raise ValueError('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
 
         # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid
         # clashing
