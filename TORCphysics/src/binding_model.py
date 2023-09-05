@@ -263,24 +263,22 @@ def RNAP_unbinding_model(enzyme):
 # Add your models into this function so it the code can recognise it
 def assign_binding_model(model_name, oparams_file=None, **oparams):
     if model_name == 'PoissonBinding':
-        my_model = PoissonBinding(oparams)
+        my_model = PoissonBinding(filename=oparams_file, **oparams)
     elif model_name == 'TopoIRecognition':
         my_model = TopoIRecognition(filename=oparams_file, **oparams)
 #    elif model_name == 'GyraseRecognition':
 #        my_model = GyraseRecognition(filename=oparams_file)
     else:
-        print('Could not recognise binding model ', model_name)
-        sys.exit()
+        raise ValueError('Could not recognise binding model ' + model_name)
     return my_model
 
 
 # These functions are for the particular binding model.
 # If you need a new one, define it here.
 class BindingModel(ABC):
-    def __init__(self, **oparams):
+    def __init__(self, filename=None, **oparams):
+        self.filename = filename
         self.oparams = oparams
-
-    #        self.name = name
 
     @abstractmethod
     def binding_probability(self) -> float:
@@ -289,12 +287,14 @@ class BindingModel(ABC):
 
 # Model for binding probability according Poisson process
 class PoissonBinding(BindingModel):
-    def __init__(self, **oparams):
-        super().__init__(**oparams)  # Call the base class constructor
+    def __init__(self, filename=None, **oparams):
+        super().__init__(filename, **oparams)  # Call the base class constructor
         if not oparams:
             self.k_on = params.k_on
         else:
             self.k_on = oparams['k_on']
+
+        self.oparams = {'k_on': self.k_on}  # Just in case
 
     def binding_probability(self, on_rate, dt) -> float:
         return Poisson_process(on_rate, dt)
@@ -302,21 +302,23 @@ class PoissonBinding(BindingModel):
 
 class TopoIRecognition(BindingModel):
     def __init__(self, filename=None, **oparams):
-        super().__init__(**oparams)  # name  # Call the base class constructor
+        super().__init__(filename, **oparams)  # name  # Call the base class constructor
         if not oparams:
             if filename is None:
                 self.width = params.topo_b_w
                 self.threshold = params.topo_b_t
                 self.k_on = params.topo_b_k_on
             else:
-                rows = read_csv_to_dict(filename)
-                self.width = rows['width']
-                self.threshold = rows['threshold']
-                self.k_on = rows['k_on']
+                rows = pd.read_csv(filename)
+                self.width = float(rows['width'])
+                self.threshold = float(rows['threshold'])
+                self.k_on = float(rows['k_on'])
         else:
-            self.width = oparams['width']
-            self.threshold = oparams['threshold']
-            self.k_on = oparams['k_on']
+            self.width = float(oparams['width'])
+            self.threshold = float(oparams['threshold'])
+            self.k_on = float(oparams['k_on'])
+
+        self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
 
     # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
     def binding_probability(self, enzyme, sigma) -> float:
@@ -328,17 +330,25 @@ class TopoIRecognition(BindingModel):
 
 
 class GyraseRecognition(BindingModel):
-    def __init__(self, filename):
-        super().__init__()  # Call the base class constructor
-        if filename is None or filename == 'none':
-            self.width = params.gyra_b_w
-            self.threshold = params.gyra_b_t
-            self.k_on = params.gyra_b_k_on
+
+    def __init__(self, filename=None, **oparams):
+        super().__init__(filename, **oparams)  # name  # Call the base class constructor
+        if not oparams:
+            if filename is None:
+                self.width = params.gyra_b_w
+                self.threshold = params.gyra_b_t
+                self.k_on = params.gyra_b_k_on
+            else:
+                rows = pd.read_csv(filename)
+                self.width = float(rows['width'])
+                self.threshold = float(rows['threshold'])
+                self.k_on = float(rows['k_on'])
         else:
-            oparams = read_csv_to_dict(filename)
-            self.width = oparams['width']
-            self.threshold = oparams['threshold']
-            self.k_on = oparams['k_on']
+            self.width = float(oparams['width'])
+            self.threshold = float(oparams['threshold'])
+            self.k_on = float(oparams['k_on'])
+
+        self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
 
     # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
     def binding_probability(self, enzyme, sigma) -> float:

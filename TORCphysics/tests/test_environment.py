@@ -1,42 +1,154 @@
 from unittest import TestCase
 from TORCphysics import Environment, EnvironmentFactory, SiteFactory
 from TORCphysics import binding_model as bm
+from TORCphysics import effect_model as em
 
 
+# TODO: We need to add tests for the unbinding Model.
 class TestEnvironment(TestCase):
 
-    def test_model_given(self):
-        # TODO: Test cases when you give model with different conditions
-        #  Test the environment with the binding model.
-        #  After that, add the effect and unbinding models.
-        #  Then test sites, effect and circuit.
-        #  Lastly, make the code accept the changes
+    # Reads environment csv with different conditions for binding models.
+    def test_environment_binding_csv(self):
+        # FROM CSV
+        # Cases to test csv:
+        #  1. Name = None; no model.
+        #  2. Name + oparams=None; Binding model with default params.
+        #  3. Name + oparams; Model with params.
+        #  4. Wrong model name; should handle the situation?
+        site_list = []
+        environment_file = 'test_inputs/test_environment/environment_binding.csv'
+        csv_environment = EnvironmentFactory(filename=environment_file, site_list=site_list)
+        self.assertGreater(len(csv_environment.get_environment_list()), 0, "Empty environment list")
 
-        model = bm.PoissonBinding()
-        enzyme1 = Environment(e_type='RNAP', name='test1', site_list=[], concentration=0.1, size=100, eff_size=50,
-                              site_type='gene', binding_model=model)
-        enzyme2 = Environment(e_type='RNAP', name='test2', site_list=[], concentration=0.1, size=100, eff_size=50,
-                              site_type='gene')
-        topo_model = bm.TopoIRecognition()
+    # Reads environment csv with an incorrect model name. It tests that the error is raised
+    def test_environment_binding_csv_wrong_name(self):
+        site_list = []
 
-        print(2)
-    #        self.assertGreater(len(environmental.get_environment_list()), 0, "Empty environment list")
+        # Check wrong model name
+        environment_file2 = 'test_inputs/test_environment/environment_binding_wrong_name.csv'
+        with self.assertRaises(ValueError) as context:
+            EnvironmentFactory(filename=environment_file2, site_list=site_list)
+        self.assertEqual(str(context.exception), 'Could not recognise binding model Poisson')
 
-    # e_type, name, site_list, concentration, size, eff_size, site_type,
-    #                 binding_model_name=None, binding_oparams_file=None,
-    #                 effect_model_name=None, effect_oparams_file=None,
-    #                 unbinding_model_name=None, unbinding_oparams_file=None,
-    #                 binding_model=None, effect_model=None, unbinding_model=None):
+    # Loads manually defined environmentals.
+    def test_environment_binding_manual(self):
+        site_list = []
 
+        # MANUALLY DEFINED
+        # Test cases for manual environmentals: #
+        #  1. Model = B class.
+        #  2. Model = B class + defaults
+        #  3. Model = B Class + oparams
+        #  4. Name + oparams dict.
+        #  5. Model = No B class.
+
+        Poisson_model = bm.PoissonBinding()
+
+        topoI_model_default = bm.TopoIRecognition()
+        oparams = {'width': 0.01, 'threshold': 0.2, 'k_on': 2.0}
+        topoI_model_params = bm.TopoIRecognition(**oparams)
+        NoBClass = type
+        # 1. B class
+        e_Poisson = Environment(e_type='RNAP', name='test1', site_list=[], concentration=0.1, size=100,
+                                effective_size=50, site_type='gene', binding_model=Poisson_model)
+        # 2. B class + defaults
+        e_topoI_default = Environment(e_type='RNAP', name='test2', site_list=[], concentration=0.1, size=100,
+                                      effective_size=50, site_type='gene', binding_model=topoI_model_default)
+        # 3. B class + oparams
+        e_topoI_oparams = Environment(e_type='RNAP', name='test3', site_list=[], concentration=0.1, size=100,
+                                      effective_size=50, site_type='gene', binding_model=topoI_model_params)
+        # 4. Name + oparams
+        e_Name_oparams = Environment(e_type='RNAP', name='test4', site_list=[], concentration=0.1, size=100,
+                                     effective_size=50, site_type='gene', binding_model_name='TopoIRecognition',
+                                     binding_model_oparams=oparams)
+        # 5. Wrong Name
+        e_wrong = Environment(e_type='RNAP', name='test5', site_list=[], concentration=0.1, size=100,
+                              effective_size=50, site_type='gene', binding_model=NoBClass)
+        manual_environment = EnvironmentFactory(site_list=site_list)
+        manual_environment.environment_list.append(e_Poisson)
+        manual_environment.environment_list.append(e_topoI_default)
+        manual_environment.environment_list.append(e_topoI_oparams)
+        manual_environment.environment_list.append(e_Name_oparams)
+        manual_environment.environment_list.append(e_wrong)
+        self.assertGreater(len(manual_environment.get_environment_list()), 0, "Empty environment list")
+
+    # Reads environment csv with different conditions for effect models.
+    def test_environment_effect_csv(self):
+        # FROM CSV
+        # Cases to test csv:
+        #  1. Name = None; no model.
+        #  2. Name + oparams=None; Effect model with default params.
+        #  3. Name + oparams; Model with params.
+        #  4. Wrong model name; should handle the situation?
+        site_list = []
+        environment_file = 'test_inputs/test_environment/environment_effect.csv'
+        csv_environment = EnvironmentFactory(filename=environment_file, site_list=site_list)
+        self.assertGreater(len(csv_environment.get_environment_list()), 0, "Empty environment list")
+
+    # Reads environment csv with an incorrect model name. It tests that the error is raised. This for effect model
+    def test_environment_effect_csv_wrong_name(self):
+        site_list = []
+
+        # Check wrong model name
+        environment_file2 = 'test_inputs/test_environment/environment_effect_wrong_name.csv'
+        with self.assertRaises(ValueError) as context:
+            EnvironmentFactory(filename=environment_file2, site_list=site_list)
+        self.assertEqual(str(context.exception), 'Could not recognise effect model RNAP')
+
+    # Loads manually defined environmentals with effect models
+    def test_environment_effect_manual(self):
+        site_list = []
+
+        # MANUALLY DEFINED
+        # Test cases for manual environmentals: #
+        #  1. Model = E class + defaults
+        #  2. Model = E Class + oparams
+        #  3. Name + oparams dict.
+        #  4. Model = No E class.
+
+        RNAPUniform_default = em.RNAPUniform()
+        oparams = {'velocity': 0.01, 'gamma': 0.2}
+        RNAPUniform_params = em.RNAPUniform(**oparams)
+        NoEClass = type
+        # 1. E Model + defaults
+        environment1 = Environment(e_type='RNAP', name='test1', site_list=[], concentration=0.1, size=100,
+                                   effective_size=50, site_type='gene', effect_model=RNAPUniform_default)
+        # 2. E class + oparams
+        environment2 = Environment(e_type='RNAP', name='test2', site_list=[], concentration=0.1, size=100,
+                                   effective_size=50, site_type='gene', effect_model=RNAPUniform_params)
+        # 3. Name + oparams
+        environment3 = Environment(e_type='RNAP', name='test3', site_list=[], concentration=0.1, size=100,
+                                   effective_size=50, site_type='gene', effect_model_name='RNAPUniform',
+                                   effect_model_oparams=oparams)
+        # 4. Wrong class
+        environment4 = Environment(e_type='RNAP', name='test5', site_list=[], concentration=0.1, size=100,
+                                   effective_size=50, site_type='gene', effect_model=NoEClass)
+
+        manual_environment = EnvironmentFactory(site_list=site_list)
+        manual_environment.environment_list.append(environment1)
+        manual_environment.environment_list.append(environment2)
+        manual_environment.environment_list.append(environment3)
+        manual_environment.environment_list.append(environment4)
+
+        self.assertGreater(len(manual_environment.get_environment_list()), 0, "Empty environment list")
+
+    # Test the incorrect case in which effective_size > size
+    def test_effective_size_gt_size(self):
+        with self.assertRaises(ValueError) as context:
+            Environment(e_type='RNAP', name='test_effective_size', site_list=[], concentration=0.1, size=100,
+                        effective_size=150, site_type='gene')
+        self.assertEqual(str(context.exception), 'Error: effective_size > size')
+
+    # TODO: You need to fix these two tests because you modified your code!
     # Test the environment is not empty and that it loaded topoI correctly
     def test_EnvironmentFactory(self):
         site_list = SiteFactory("test_inputs/sites_1_gene.csv").get_site_list()
-        sf = EnvironmentFactory("test_inputs/environment.csv", site_list)
+        sf = EnvironmentFactory(filename="test_inputs/environment.csv", site_list=site_list)
         self.assertGreater(len(sf.get_environment_list()), 0, "Empty environment list")
         sf_list = sf.get_environment_list()
         self.assertEqual("topoI", sf_list[0].name, "Did not load topoI correctly")
 
     def test_empty_environment(self):
         site_list = SiteFactory("test_inputs/sites_1_gene.csv").get_site_list()
-        sf = EnvironmentFactory("test_inputs/empty_environment.csv", site_list)
+        sf = EnvironmentFactory(filename="test_inputs/empty_environment.csv", site_list=site_list)
         self.assertEqual(len(sf.get_environment_list()), 0, "Environment not empty")

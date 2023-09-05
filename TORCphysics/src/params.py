@@ -16,14 +16,14 @@ kBT_pN_nm = 4.1  # pN nm at T=300K
 kB_kcalmolK = 1.987204259 * .001  # 10**(-3) #Boltzman constant in kcal/(mol*K) units...
 # kB_kcalmolK = .593 #10**(-3) #Boltzman constant in kcal/(mol*K) units...
 dt = 1.0  # timestep (seconds)
-v0 = 30.0#60.0  # Velocity (bp/sec) of RNAPs
+v0 = 30.0  # 60.0  # Velocity (bp/sec) of RNAPs
 bp_nm = .34  # nm - base-pair rise
 T_bp = 10.5  # Number of bp per helical turn
 w0 = 2.0 * np.pi / T_bp  # Relaxed twist density per bp
 w0_nm = 2.0 * np.pi / (T_bp * bp_nm)  # nm^{-1} - Now in distance units
-gamma = 0.2 * w0  # How much supercoiling is inyected per bp
+gamma = 0.2 * w0  # How much supercoiling is injected per bp
 # sigma0 = -0.06          #Initial supercoiling density
-stall_torque = 10.5 * 5 #* 17 # pN * nm - from Gleng's papers which cited another paper
+stall_torque = 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper
 sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall
 
 # Elasticity parameters - from Marko's elasticity model
@@ -57,7 +57,7 @@ topo_b_k_off = 0.5
 topo_e_w = 0.012  # effect width
 topo_e_t = -0.04  # effect threshold
 # topo_c = 0.25#0.1#concentration micromolar 0.025 in meyer -> this is too negative...
-topo_k = 0.001 #basal rate # k_cat
+topo_k = 0.001  # basal rate # k_cat
 
 # GYRASE
 gyra_b_w = 0.025  # binding width
@@ -67,7 +67,7 @@ gyra_b_k_off = 0.5
 gyra_e_w = 0.025  # effect width
 gyra_e_t = 0.01  # effect threshold
 # gyra_c = 0.25#.01 #concentration micromolarb 0.25 in meyer - I'll use concentration in nM better
-gyra_k = 0.001 #minus because it removes negative supercoils
+gyra_k = 0.001  # minus because it removes negative supercoils
 # I think it makes more sense to put the negative in the equation rather than in
 # the parameter
 
