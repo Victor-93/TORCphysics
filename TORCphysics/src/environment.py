@@ -356,8 +356,6 @@ class Environment:
                 self.unbinding_model_name = None
                 self.unbinding_oparams_file = None
                 self.unbinding_model_oparams = None
-    # TODO: Just do it for the unununbinding model, then this is ready.
-    # TODO: The next step would be to fix sites and then enzymes.
 
 
 class EnvironmentFactory:
@@ -394,7 +392,6 @@ class EnvironmentFactory:
         return site_list
 
 #        if label in [site.name for site in self.site_list]:
-#            # TODO check if this works!
 #            for site in self.site_list:
 #                if site.name == label:
 #                    return site  # the first one?
