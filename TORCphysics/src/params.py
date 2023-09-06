@@ -48,6 +48,7 @@ sigma_s = (1 / cs_energy) * np.sqrt(2 * p_stiffness * g_energy / (1 - p_stiffnes
 sigma_p = (1 / p_stiffness) * np.sqrt(2 * p_stiffness * g_energy / (1 - p_stiffness / cs_energy))
 
 k_on = 0.01  # default binding rate for any enzyme
+k_off = 0.001  # default unbinding rate for any enzyme
 
 # TOPOISOMERASE I
 topo_b_w = 0.012  # binding width

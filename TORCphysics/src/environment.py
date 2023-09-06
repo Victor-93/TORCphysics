@@ -236,6 +236,23 @@ class Environment:
 
                     self.binding_model_oparams = self.binding_model.oparams  # To make them match
 
+        # An actual model was given
+        else:
+
+            #  Let's check if it's actually a binding model - The model should already have the oparams
+            if isinstance(self.binding_model, bm.BindingModel):
+                #  Then, some variables are fixed.
+                self.binding_model_name = self.binding_model.__class__.__name__
+                self.binding_model_oparams = self.binding_model.oparams
+                self.binding_oparams_file = None
+
+            else:
+                print('Warning, binding model given is not a class for environmental ', self.name)
+                self.binding_model = None
+                self.binding_model_name = None
+                self.binding_oparams_file = None
+                self.binding_model_oparams = None
+
         # Effect model
         # -------------------------------------------------------------
         # If no model is given
@@ -288,8 +305,60 @@ class Environment:
                 self.effect_oparams_file = None
                 self.effect_model_oparams = None
 
-    # TODO: Just do it for the unbinding model, then this is ready.
+        # Unbinding model
+        # -------------------------------------------------------------
+        # If no model is given
+        if self.unbinding_model is None:
+
+            # No model is given, not even a name, so there's NO unbinding model
+            if self.unbinding_model_name is None:
+                self.unbinding_model = None
+                self.unbinding_model_name = None
+                self.unbinding_oparams_file = None
+                self.unbinding_model_oparams = None
+
+            # Model indicated by name
+            else:
+                # Loads unbinding model.
+                # If oparams dict is given, those will be assigned to the model -> This is priority over oparams_file
+                # If oparams_file is given, parameters will be read from file, in case of no oparams dict
+                # If no oparams file/dict are given, default values will be used.
+
+                # A dictionary of parameters is given so that's priority
+                if isinstance(self.unbinding_model_oparams, dict):
+                    self.unbinding_model = bm.assign_unbinding_model(self.unbinding_model_name,
+                                                                     **self.unbinding_model_oparams)
+                # No dictionary was given
+                else:
+                    # If no oparams_file is given, then DEFAULT values are used.
+                    if self.unbinding_oparams_file is None:
+                        self.unbinding_model = bm.assign_unbinding_model(self.unbinding_model_name)
+                    # If an oparams_file is given, then those are loaded
+                    else:
+                        self.unbinding_model = bm.assign_unbinding_model(self.unbinding_model_name,
+                                                                         oparams_file=self.unbinding_oparams_file)
+
+                    self.unbinding_model_oparams = self.unbinding_model.oparams  # To make them match
+
+        # An actual model was given
+        else:
+
+            #  Let's check if it's actually a unbinding model - The model should already have the oparams
+            if isinstance(self.unbinding_model, bm.UnBindingModel):
+                #  Then, some variables are fixed.
+                self.unbinding_model_name = self.unbinding_model.__class__.__name__
+                self.unbinding_model_oparams = self.unbinding_model.oparams
+                self.unbinding_oparams_file = None
+
+            else:
+                print('Warning, unbinding model given is not a class for environmental ', self.name)
+                self.unbinding_model = None
+                self.unbinding_model_name = None
+                self.unbinding_oparams_file = None
+                self.unbinding_model_oparams = None
+    # TODO: Just do it for the unununbinding model, then this is ready.
     # TODO: The next step would be to fix sites and then enzymes.
+
 
 class EnvironmentFactory:
     def __init__(self, site_list, filename=None):
