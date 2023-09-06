@@ -4,7 +4,7 @@ from TORCphysics import binding_model as bm
 from TORCphysics import effect_model as em
 
 
-# TODO: We need to add tests for the unbinding Model.
+# TODO: Once sites is fixed, test the last functions
 class TestEnvironment(TestCase):
 
     # Reads environment csv with different conditions for binding models.
@@ -130,6 +130,64 @@ class TestEnvironment(TestCase):
         manual_environment.environment_list.append(environment3)
         manual_environment.environment_list.append(environment4)
 
+        self.assertGreater(len(manual_environment.get_environment_list()), 0, "Empty environment list")
+
+    # Reads environment csv with different conditions for unbinding models.
+    def test_environment_unbinding_csv(self):
+        # FROM CSV
+        # Cases to test csv:
+        #  1. Name = None; no model.
+        #  2. Name + oparams=None; Binding model with default params.
+        #  3. Name + oparams; Model with params.
+        #  4. Wrong model name; should handle the situation?
+        site_list = []
+        environment_file = 'test_inputs/test_environment/environment_unbinding.csv'
+        csv_environment = EnvironmentFactory(filename=environment_file, site_list=site_list)
+        self.assertGreater(len(csv_environment.get_environment_list()), 0, "Empty environment list")
+
+    # Reads environment csv with an incorrect model name. It tests that the error is raised
+    def test_environment_unbinding_csv_wrong_name(self):
+        site_list = []
+
+        # Check wrong model name
+        environment_file = 'test_inputs/test_environment/environment_unbinding_wrong_name.csv'
+        with self.assertRaises(ValueError) as context:
+            EnvironmentFactory(filename=environment_file, site_list=site_list)
+        self.assertEqual(str(context.exception), 'Could not recognise unbinding model Poisson')
+
+    # Loads manually defined environmentals.
+    def test_environment_unbinding_manual(self):
+        site_list = []
+
+        # MANUALLY DEFINED
+        # Test cases for manual environmentals: #
+        #  1. Model = UB class + defaults
+        #  2. Model = UB Class + oparams
+        #  3. Name + oparams dict.
+        #  4. Model = No UB class.
+
+        model_default = bm.PoissonUnBinding()
+        oparams = {'k_off': 10.0}
+        model_params = bm.PoissonUnBinding(**oparams)
+        NoUBClass = type
+        # 1. B class + defaults
+        e_default = Environment(e_type='RNAP', name='test1', site_list=[], concentration=0.1, size=100,
+                                effective_size=50, site_type='gene', unbinding_model=model_default)
+        # 2. B class + oparams
+        e_oparams = Environment(e_type='RNAP', name='test2', site_list=[], concentration=0.1, size=100,
+                                effective_size=50, site_type='gene', unbinding_model=model_params)
+        # 3. Name + oparams
+        e_Name_oparams = Environment(e_type='RNAP', name='test3', site_list=[], concentration=0.1, size=100,
+                                     effective_size=50, site_type='gene', unbinding_model_name='PoissonUnBinding',
+                                     unbinding_model_oparams=oparams)
+        # 4. Wrong Name
+        e_wrong = Environment(e_type='RNAP', name='test4', site_list=[], concentration=0.1, size=100,
+                              effective_size=50, site_type='gene', unbinding_model=NoUBClass)
+        manual_environment = EnvironmentFactory(site_list=site_list)
+        manual_environment.environment_list.append(e_default)
+        manual_environment.environment_list.append(e_oparams)
+        manual_environment.environment_list.append(e_Name_oparams)
+        manual_environment.environment_list.append(e_wrong)
         self.assertGreater(len(manual_environment.get_environment_list()), 0, "Empty environment list")
 
     # Test the incorrect case in which effective_size > size

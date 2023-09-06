@@ -363,30 +363,35 @@ class GyraseRecognition(BindingModel):
 # UNBINDING MODELS
 # ---------------------------------------------------------------------------------------------------------------------
 # Add your models into this function so it the code can recognise it
-def assign_unbinding_model(model_name, oparams_file, enzyme_name):
+def assign_unbinding_model(model_name, oparams_file=None, **oparams):
     if model_name == 'PoissonUnBinding':
-        my_model = PoissonUnBinding(model_name)
+        my_model = PoissonUnBinding(filename=None, **oparams)
     else:
-        print('Could not recognise binding model ', model_name)
-        sys.exit()
-
+        raise ValueError('Could not recognise unbinding model ' + model_name)
     return my_model
 
 
-class UnBindingModel:
-    def __init__(self, name):
-        self.name = name
+class UnBindingModel(ABC):
+    def __init__(self, filename=None, **oparams):
+        self.filename = filename
+        self.oparams = oparams
 
     @abstractmethod
-    def unbinding_probability(self):
+    def unbinding_probability(self) -> float:
         pass
 
 
 class PoissonUnBinding(UnBindingModel):
-    def __init__(self, name):
-        super().__init__(name)  # Call the base class constructor
+    def __init__(self, filename=None, **oparams):
+        super().__init__(filename, **oparams)  # Call the base class constructor
+        if not oparams:
+            self.k_off = params.k_off
+        else:
+            self.k_off = oparams['k_off']
 
-    def unbinding_probability(self, off_rate, dt):
+        self.oparams = {'k_off': self.k_off}  # Just in case
+
+    def unbinding_probability(self, off_rate, dt) -> float:
         return Poisson_process(off_rate, dt)
 
 
