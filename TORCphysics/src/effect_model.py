@@ -366,6 +366,60 @@ def get_start_end_c(z0, zn, nbp):
 # ---------------------------------------------------------------------------------------------------------------------
 # EFFECT MODELS
 # ---------------------------------------------------------------------------------------------------------------------
+# According inputs, loads the binding model, name and its params. This function is used in environment and enzyme.
+# This function calls assign_effect_model
+def get_effect_model(name, e_model, model_name, oparams_file, oparams):
+    # If no model is given
+    if e_model is None:
+
+        # No model is given, not even a name, so there's NO effect model
+        if model_name is None:
+            e_model = None
+            model_name = None
+            oparams_file = None
+            oparams = None
+
+        # Model indicated by name
+        else:
+            # Loads effect model.
+            # If oparams dict is given, those will be assigned to the model -> This is priority over oparams_file
+            # If oparams_file is given, parameters will be read from file, in case of no oparams dict
+            # If no oparams file/dict are given, default values will be used.
+
+            # A dictionary of parameters is given so that's priority
+            if isinstance(oparams, dict):
+                e_model = assign_effect_model(model_name, **oparams)
+            # No dictionary was given
+            else:
+                # If no oparams_file is given, then DEFAULT values are used.
+                if oparams_file is None:
+                    e_model = assign_effect_model(model_name)
+                # If an oparams_file is given, then those are loaded
+                else:
+                    e_model = assign_effect_model(model_name, oparams_file=oparams_file)
+
+                oparams = e_model.oparams  # To make them match
+
+    # An actual model was given
+    else:
+
+        #  Let's check if it's actually an effect model - The model should already have the oparams
+        if isinstance(e_model, EffectModel):
+            #  Then, some variables are fixed.
+            model_name = e_model.__class__.__name__
+            oparams = e_model.oparams
+            oparams_file = None
+
+        else:
+            print('Warning, effect model given is not a class for environmental ', name)
+            e_model = None
+            model_name = None
+            oparams_file = None
+            oparams = None
+
+    return e_model, model_name, oparams_file, oparams
+
+
 # Add your models into this function so it the code can recognise it
 def assign_effect_model(model_name, oparams_file=None, **oparams):
     if model_name == 'RNAPUniform':
