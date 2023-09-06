@@ -1,0 +1,4 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+test,no_model,10,50,0.2,none,none
+test,model_default,100,150,100,PoissonBinding,none
+test,model_params,200,250,0.0,TopoIRecognition,test_inputs/test_environment/topoI_params.csv

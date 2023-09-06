@@ -14,11 +14,15 @@ class TestEnvironment(TestCase):
         #  1. Name = None; no model.
         #  2. Name + oparams=None; Binding model with default params.
         #  3. Name + oparams; Model with params.
-        #  4. Wrong model name; should handle the situation?
+        #  4. Name = Model with defaults
         site_list = []
         environment_file = 'test_inputs/test_environment/environment_binding.csv'
         csv_environment = EnvironmentFactory(filename=environment_file, site_list=site_list)
-        self.assertGreater(len(csv_environment.get_environment_list()), 0, "Empty environment list")
+        self.assertEqual(len(csv_environment.get_environment_list()), 4)  # All loaded correctly
+        self.assertEqual(csv_environment.environment_list[0].binding_model, None)  # Check specifics...
+        self.assertEqual(csv_environment.environment_list[1].binding_model.k_on, 0.01)
+        self.assertEqual(csv_environment.environment_list[2].binding_model.width, 0.12)
+        self.assertEqual(csv_environment.environment_list[3].binding_model.width, 0.012)
 
     # Reads environment csv with an incorrect model name. It tests that the error is raised
     def test_environment_binding_csv_wrong_name(self):
@@ -70,7 +74,12 @@ class TestEnvironment(TestCase):
         manual_environment.environment_list.append(e_topoI_oparams)
         manual_environment.environment_list.append(e_Name_oparams)
         manual_environment.environment_list.append(e_wrong)
-        self.assertGreater(len(manual_environment.get_environment_list()), 0, "Empty environment list")
+        self.assertEqual(len(manual_environment.get_environment_list()), 5)
+        self.assertEqual(manual_environment.environment_list[0].binding_model_name, 'PoissonBinding')
+        self.assertEqual(manual_environment.environment_list[1].binding_model.width, 0.012)
+        self.assertEqual(manual_environment.environment_list[2].binding_model.width, 0.01)
+        self.assertEqual(manual_environment.environment_list[3].binding_model.width, 0.01)
+        self.assertEqual(manual_environment.environment_list[4].binding_model, None)
 
     # Reads environment csv with different conditions for effect models.
     def test_environment_effect_csv(self):
@@ -79,11 +88,13 @@ class TestEnvironment(TestCase):
         #  1. Name = None; no model.
         #  2. Name + oparams=None; Effect model with default params.
         #  3. Name + oparams; Model with params.
-        #  4. Wrong model name; should handle the situation?
         site_list = []
         environment_file = 'test_inputs/test_environment/environment_effect.csv'
         csv_environment = EnvironmentFactory(filename=environment_file, site_list=site_list)
-        self.assertGreater(len(csv_environment.get_environment_list()), 0, "Empty environment list")
+        self.assertEqual(len(csv_environment.get_environment_list()), 3)  # All loaded correctly
+        self.assertEqual(csv_environment.environment_list[0].effect_model, None)  # Check specifics...
+        self.assertEqual(csv_environment.environment_list[1].effect_model.velocity, 30)
+        self.assertEqual(csv_environment.environment_list[2].effect_model.velocity, 20)
 
     # Reads environment csv with an incorrect model name. It tests that the error is raised. This for effect model
     def test_environment_effect_csv_wrong_name(self):
@@ -130,7 +141,11 @@ class TestEnvironment(TestCase):
         manual_environment.environment_list.append(environment3)
         manual_environment.environment_list.append(environment4)
 
-        self.assertGreater(len(manual_environment.get_environment_list()), 0, "Empty environment list")
+        self.assertEqual(len(manual_environment.get_environment_list()), 4)  # All loaded correctly
+        self.assertEqual(manual_environment.environment_list[0].effect_model.velocity, 30)
+        self.assertEqual(manual_environment.environment_list[1].effect_model.velocity, 0.01)
+        self.assertEqual(manual_environment.environment_list[2].effect_model.velocity, 0.01)
+        self.assertEqual(manual_environment.environment_list[3].effect_model, None)
 
     # Reads environment csv with different conditions for unbinding models.
     def test_environment_unbinding_csv(self):
@@ -143,7 +158,10 @@ class TestEnvironment(TestCase):
         site_list = []
         environment_file = 'test_inputs/test_environment/environment_unbinding.csv'
         csv_environment = EnvironmentFactory(filename=environment_file, site_list=site_list)
-        self.assertGreater(len(csv_environment.get_environment_list()), 0, "Empty environment list")
+        self.assertEqual(len(csv_environment.get_environment_list()), 3)  # All loaded correctly
+        self.assertEqual(csv_environment.environment_list[0].unbinding_model, None)  # Check specifics...
+        self.assertEqual(csv_environment.environment_list[1].unbinding_model.k_off, 0.001)
+        self.assertEqual(csv_environment.environment_list[2].unbinding_model.k_off, 2.5)
 
     # Reads environment csv with an incorrect model name. It tests that the error is raised
     def test_environment_unbinding_csv_wrong_name(self):
@@ -188,7 +206,11 @@ class TestEnvironment(TestCase):
         manual_environment.environment_list.append(e_oparams)
         manual_environment.environment_list.append(e_Name_oparams)
         manual_environment.environment_list.append(e_wrong)
-        self.assertGreater(len(manual_environment.get_environment_list()), 0, "Empty environment list")
+        self.assertEqual(len(manual_environment.get_environment_list()), 4)
+        self.assertEqual(manual_environment.environment_list[0].unbinding_model.k_off, 0.001)
+        self.assertEqual(manual_environment.environment_list[1].unbinding_model.k_off, 10.0)
+        self.assertEqual(manual_environment.environment_list[2].unbinding_model.k_off, 10.0)
+        self.assertEqual(manual_environment.environment_list[3].unbinding_model, None)
 
     # Test the incorrect case in which effective_size > size
     def test_effective_size_gt_size(self):

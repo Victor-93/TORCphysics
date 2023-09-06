@@ -1,14 +1,7 @@
 import pandas as pd
 from TORCphysics import binding_model as bm
 from TORCphysics import effect_model as em
-import sys
-from TORCphysics import params
 
-
-# TODO: Keep adding Effect models, then fix site, then enzyme. Remember, environment has binding, unbinding and enzyme
-#  models. Enzymes have effect and unbinding. Sites only have binding models.
-# TODO: If enviromentals are given, and no models are specified, the code should recommend/use default models
-#  according the enzyme type
 
 class Environment:
     """
@@ -16,7 +9,7 @@ class Environment:
 
     Attributes
     ----------
-    e_type : str
+    enzyme_type : str
         The enzyme/molecule type, e.g. topo.
     name : str
         The name of the environmental/enzyme, e.g. gyrase
@@ -40,9 +33,9 @@ class Environment:
      effect_oparams_file : str, optional
          The path to the parameters for the effect model.
      unbinding_model_name : str, optional
-         The name of the unbinding m odel to use
+         The name of the unbinding model to use
      unbinding_oparams_file : str, optional
-         The path to the parameters for the ubinding model.
+         The path to the parameters for the unbinding model.
      binding_model : optional
          The binding model to use. This is a subclass of the BindingModel
      binding_model_oparams : dict, optional
@@ -80,7 +73,8 @@ class Environment:
          size : float
              The size of the enzyme in bp
          effective_size : float
-             The effective size in bp. This size is assumed to be the size in which the enzyme makes contact with the DNA.
+             The effective size in bp.
+             This size is assumed to be the size in which the enzyme makes contact with the DNA.
              So ef_size < size.
          site_type : str
              The type of site that this environmental can recognise to bind.
@@ -93,9 +87,9 @@ class Environment:
          effect_oparams_file : str, optional
              The path to the parameters for the effect model.
          unbinding_model_name : str, optional
-             The name of the unbinding m odel to use
+             The name of the unbinding model to use
          unbinding_oparams_file : str, optional
-             The path to the parameters for the ubinding model.
+             The path to the parameters for the unbinding model.
          binding_model : optional
              The binding model to use. This is a subclass of the BindingModel
          binding_model_oparams : dict, optional
@@ -111,7 +105,6 @@ class Environment:
          """
 
         # Assign parameters
-        print(name, binding_model_name, binding_oparams_file)
         self.enzyme_type = e_type
         self.name = name
         self.site_list = site_list  # It recognizes a list of sites, rather than a specific site
@@ -170,7 +163,8 @@ class Environment:
             self.binding_model_name = None
         if self.binding_model == '' or self.binding_model == 'None' or self.binding_model == 'none':
             self.binding_model = None
-        if self.binding_oparams_file == '' or self.binding_oparams_file == 'None' or self.binding_oparams_file == 'none':
+        if (self.binding_oparams_file == '' or self.binding_oparams_file == 'None'
+                or self.binding_oparams_file == 'none'):
             self.binding_oparams_file = None
         if (self.binding_model_oparams == '' or self.binding_model_oparams == 'None' or
                 self.binding_model_oparams == 'none'):
@@ -188,18 +182,36 @@ class Environment:
             self.effect_model_oparams = None
 
         # Unbinding model
-        if self.unbinding_model_name == '' or self.unbinding_model_name == 'None' or self.unbinding_model_name == 'none':
+        if (self.unbinding_model_name == '' or self.unbinding_model_name == 'None'
+                or self.unbinding_model_name == 'none'):
             self.unbinding_model_name = None
         if self.unbinding_model == '' or self.unbinding_model == 'None' or self.unbinding_model == 'none':
             self.unbinding_model = None
-        if self.unbinding_oparams_file == '' or self.unbinding_oparams_file == 'None' or self.unbinding_oparams_file == 'none':
+        if (self.unbinding_oparams_file == '' or self.unbinding_oparams_file == 'None'
+                or self.unbinding_oparams_file == 'none'):
             self.unbinding_oparams_file = None
         if (self.unbinding_model_oparams == '' or self.unbinding_model_oparams == 'None' or
                 self.unbinding_model_oparams == 'none'):
             self.unbinding_model_oparams = None
 
-    # This function sorts the models
     def get_models(self):
+        # Binding Model
+        self.binding_model, self.binding_model_name, self.binding_oparams_file, self.binding_model_oparams = (
+            bm.get_binding_model(self.name, self.binding_model, self.binding_model_name,
+                                 self.binding_oparams_file, self.binding_model_oparams))
+        # Effect Model
+        self.effect_model, self.effect_model_name, self.effect_oparams_file, self.effect_model_oparams = (
+            em.get_effect_model(self.name, self.effect_model, self.effect_model_name,
+                                self.effect_oparams_file, self.effect_model_oparams))
+
+        # Unbinding Model
+        self.unbinding_model, self.unbinding_model_name, self.unbinding_oparams_file, self.unbinding_model_oparams = (
+            bm.get_unbinding_model(self.name, self.unbinding_model, self.unbinding_model_name,
+                                   self.unbinding_oparams_file, self.unbinding_model_oparams))
+
+    # PREVIOUS VERSION. IT IS OBSOLETE NOW, SO PLEASE REMOVE IT
+    # This function sorts the models
+    def get_models2(self):
 
         # Binding model
         # -------------------------------------------------------------
@@ -291,7 +303,7 @@ class Environment:
         # An actual model was given
         else:
 
-            #  Let's check if it's actually a effect model - The model should already have the oparams
+            #  Let's check if it's actually an effect model - The model should already have the oparams
             if isinstance(self.effect_model, em.EffectModel):
                 #  Then, some variables are fixed.
                 self.effect_model_name = self.effect_model.__class__.__name__
@@ -343,7 +355,7 @@ class Environment:
         # An actual model was given
         else:
 
-            #  Let's check if it's actually a unbinding model - The model should already have the oparams
+            #  Let's check if it's actually an unbinding model - The model should already have the oparams
             if isinstance(self.unbinding_model, bm.UnBindingModel):
                 #  Then, some variables are fixed.
                 self.unbinding_model_name = self.unbinding_model.__class__.__name__
