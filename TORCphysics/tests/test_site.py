@@ -5,6 +5,14 @@ from TORCphysics import binding_model as bm
 
 class TestSite(TestCase):
 
+    def test_Site_doc(self):
+        print("Using __doc__:")
+        print(Site.__doc__)
+        print(Site.get_models.__doc__)
+
+        print("Using help:")
+        help(Site)
+
     # Reads site csv with different conditions for binding models.
     def test_Site_csv(self):
         # FROM CSV

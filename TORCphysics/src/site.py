@@ -4,7 +4,7 @@ import sys
 
 
 # TODO: It seems that the Site is working now! The next steps are as follows:
-#  1.- Document Site and Environment.
+#  1.- Document Site and Environment. -
 #  2.- Fix Enzyme.
 #  3.- Document Enzyme. 3.1- Test Enzyme. 3.2- Test Binding models. 3.3- Test Effect models
 #  4.- Make the code works with the new changes, and don't forget to add the effective_size.
@@ -13,65 +13,70 @@ import sys
 
 class Site:
     """    A class used to represent functioning sites (sequence) on the DNA.
+
     Attributes
     ----------
     site_type : str
-     The syte type, e.g. gene. You can define overlapping sites, such as gene_TF, which would
-     be a gene recognized by transcription factors TF. This particular site would have different functionality.
+        The syte type, e.g. gene. You can define overlapping sites, such as gene_TF, which would
+        be a gene recognized by transcription factors TF. This particular site would have different functionality.
     name : str
-     The name of the site, e.g. tetA
+        The name of the site, e.g. tetA
     start : float
-     The starting position of the site.
+        The starting position of the site.
     end : float
-     The ending position of the site.
+        The ending position of the site.
     k_on : float
-     The minimum binding rate.
+        The minimum binding rate.
+    direction : int
+        The direction of sites: -1 = left; 0 = no direction; 1 = right
     binding_model_name : str, optional
-     The name of the site model or binding model. It indicates how environmentals
-     (enzymes on the environment) will bind the site
+        The name of the site model or binding model. It indicates how environmentals
+        (enzymes on the environment) will bind the site
     binding_oparams_file : str, optional
-     Path to a csv file with additional parameters relevant to the binding_model.
+        Path to a csv file with additional parameters relevant to the binding_model.
     binding_model : BindingModel class (from binding_model.py), optional
-     The preloaded binding model to use. This binding model already contains any additional oparams parameters.
+        The preloaded binding model to use. This binding model already contains any additional oparams parameters.
     binding_model_oparams : dict, optional
-     Dictionary with parameters to include in the binding model.
+        Dictionary with parameters to include in the binding model.
 
     Notes
     ----------------
-    Additional parameters (oparams) must be compatible with the given binding model, so do not create parameters that
-    the model won't consider.
-    When these oparams are not given, the code will load default parameters according the binding model used.
+    Additional parameters (oparams) must be compatible with the given binding, so please,
+    do not create parameters that the models won't consider.
+    When these oparams are not given, the code will load default parameters according the model indicated.
+    These default parameters are saved in params.py
     """
 
     def __init__(self, site_type, name, start, end, k_on,
                  binding_model_name=None, binding_oparams_file=None,
                  binding_model=None, binding_model_oparams=None):
-        """
-        Initialize an instance of Site class.
+        """ The constructor of  Site class.
 
-        Args:
+        Parameters
+        ----------
         site_type : str
-         The syte type, e.g. gene. You can define overlapping sites, such as gene_TF, which would
-         be a gene recognized by transcription factors TF. This particular site would have different functionality.
+            The syte type, e.g. gene. You can define overlapping sites, such as gene_TF, which would
+            be a gene recognized by transcription factors TF. This particular site would have different functionality.
         name : str
-         The name of the site, e.g. tetA
+            The name of the site, e.g. tetA
         start : float
-         The starting position of the site.
+            The starting position of the site.
         end : float
-         The ending position of the site.
+            The ending position of the site.
         k_on : float
-         The minimum binding rate.
+            The minimum binding rate.
         binding_model_name : str, optional
-         The name of the site model or binding model. It indicates how environmentals
-         (enzymes on the environment) will bind the site
+            The name of the site model or binding model. It indicates how environmentals
+            (enzymes on the environment) will bind the site
         binding_oparams_file : str, optional
-         Path to a csv file with additional parameters relevant to the binding_model.
+            Path to a csv file with additional parameters relevant to the binding_model.
         binding_model : BindingModel class (from binding_model.py), optional
-         The preloaded binding model to use. This binding model already contains any additional oparams parameters.
+            The preloaded binding model to use. This binding model already contains any additional oparams parameters.
         binding_model_oparams : dict, optional
-         Dictionary with parameters to include in the binding model.
+            Dictionary with parameters to include in the binding model.
 
-        Example:
+        Example
+        ----------
             tetA_site = Site(
                 site_type='gene',
                 name='tetA',
@@ -89,19 +94,24 @@ class Site:
         self.end = end
         self.k_on = k_on
 
-        # Models
+        # Assign models
         self.binding_model_name = binding_model_name
         self.binding_oparams_file = binding_oparams_file
         self.binding_model = binding_model
         self.binding_model_oparams = binding_model_oparams
 
+        # Verify inputs
         self.check_inputs()
 
+        # Get the direction
         self.direction = self.get_direction()
 
-        self.get_models()  # Loads the binding model
+        # Loads the binding model
+        self.get_models()
 
     def check_inputs(self):
+        """ Checks that Site parameters are of the correct type.
+        """
 
         if not isinstance(self.site_type, str) or self.site_type == '':
             raise ValueError('Error, sites must have a site type')
@@ -135,12 +145,15 @@ class Site:
             if self.binding_oparams_file is None:  # No path
                 self.binding_model_oparams = {'k_on', self.k_on}  # Then add k_on
         else:  # With dict
-            if 'k_on' not in self.binding_model_oparams:  # But no k_on
-                self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case
-            else:  # There is k_on, but the site also has a k_on. Let's prioritise the one on the site.
-                self.binding_model_oparams['k_on'] = self.k_on
+            self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case
+            #  if 'k_on' not in self.binding_model_oparams:  # But no k_on
+            #    self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case
+            #  else:  # There is k_on, but the site also has a k_on. Let's prioritise the one on the site.
+            #    self.binding_model_oparams['k_on'] = self.k_on
 
     def get_models(self):
+        """ Loads the Site's binding model (if given).
+        """
 
         # Binding Model
         self.binding_model, self.binding_model_name, self.binding_oparams_file, self.binding_model_oparams = (
@@ -158,16 +171,6 @@ class Site:
     #            else:  # There is k_on, but the site also has a k_on. Let's prioritise the one on the site.
     #                self.binding_model_oparams['k_on'] = self.k_on
     #                self.binding_model.k_on = self.k_on
-
-    #    def read_oparams(self, oparams):
-    #        """
-    #        reads oparams that are related to the site_model
-    #        """##
-
-    #        if oparams is None or oparams == 'none':
-    #            self.oparams = None
-    #        else:
-    #            self.oparams = pd.read_csv(oparams).to_dict()
 
     def get_direction(self):
         """
@@ -192,20 +195,42 @@ class Site:
 
 
 class SiteFactory:
-    """
-    SiteFactory class. It is used to read csv input files and according to each entry, create a Site object
+    """ A class used to represent a list of available sites (Site) on a DNA.
+
+    Attributes
+    ----------
+    filename : str, optional
+        Path to the site csv file.
+    site_list : list
+        A list containing Sites.
     """
 
     def __init__(self, filename=None):
+        """ A class used to represent a list of available sites (Site) on a DNA.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file.
+        """
+
         self.filename = filename
         self.site_list = []
         if filename:
             self.read_csv()
 
     def get_site_list(self):
+        """ Gets the site_list
+
+        Returns
+        ----------
+        list : A list of Sites.
+        """
         return self.site_list
 
     def read_csv(self):
+        """ Reads the SiteFactory csv filename and adds the sites to site_list.
+        """
         df = pd.read_csv(self.filename)
         for index, row in df.iterrows():
             new_site = Site(site_type=row['type'], name=row['name'], start=float(row['start']), end=float(row['end']),
