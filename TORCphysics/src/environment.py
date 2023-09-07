@@ -13,42 +13,49 @@ class Environment:
         The enzyme/molecule type, e.g. topo.
     name : str
         The name of the environmental/enzyme, e.g. gyrase
-    site_list :
-        list of sites that the enzyme can recognise and bind.
+    site_list : list
+        A list of sites that the enzyme can recognise and bind.
     concentration : float
-        The concentration of the enzyme in nM.
+        The concentration of the enzyme in nano Molars (nM).
     size : float
-        The size of the enzyme in bp
+        The size of the enzyme in base-pairs (bp)
     effective_size : float
-        The effective size in bp. This size is assumed to be the size in which the enzyme makes contact with the DNA.
-        So ef_size < size.
+        The effective size in base-pairs (bp).
+        This size is assumed to be the size in which the enzyme makes contact with the DNA.
+        So, effective_size < size.
     site_type : str
-    The type of site that this environmental can recognise to bind.
+        The type of site that this environmental can recognise and bind.
     binding_model_name : str, optional
-         The name of the binding model to use
-     binding_oparams_file : str, optional
-         The path to the parameters for the binding model.
-     effect_model_name : str, optional
-         The name of the effect model to use
-     effect_oparams_file : str, optional
-         The path to the parameters for the effect model.
-     unbinding_model_name : str, optional
-         The name of the unbinding model to use
-     unbinding_oparams_file : str, optional
-         The path to the parameters for the unbinding model.
-     binding_model : optional
-         The binding model to use. This is a subclass of the BindingModel
-     binding_model_oparams : dict, optional
-         The actual dictionary with the parameters for the binding model
-     effect_model : optional
-         The effect model to use. This is a subclass of the EffectModel
-     effect_model_oparams : dict, optional
-         The actual dictionary with the parameters for the Effect model
-     unbinding_model :optional
-         The unbinding model to use. This is a subclass of the UnBindingModel
-     unbinding_model_oparams : dict, optional
-         The actual dictionary with the parameters for the unbinding model
+        The name of the binding model to use, e.g., 'PoissonBinding'.
+    binding_oparams_file : str, optional
+        The path to the csv file containing the parameters for the binding model.
+    binding_model : class, optional
+        This is a subclass of the BindingModel to implement, e.g., PoissonBinding.
+    binding_model_oparams : dict, optional
+        A dictionary with the parameters for the binding model.
+    effect_model_name : str, optional
+        The name of the effect model to use, e.g., 'RNAPUniform'.
+    effect_oparams_file : str, optional
+        The path to the csv file containing the parameters for the effect model.
+    effect_model : class, optional
+        This is a subclass of EffectModel to implement, e.g., RNAPUniform.
+    effect_model_oparams : dict, optional
+        A dictionary with the parameters for the Effect model.
+    unbinding_model_name : str, optional
+        The name of the unbinding model to use, e.g., 'PoissonUnBinding'
+    unbinding_oparams_file : str, optional
+        The path to the csv file containing the parameters for the unbinding model.
+    unbinding_model : class, optional
+        This is a subclass of the UnBindingModel to use, e.g., PoissonUnBinding
+    unbinding_model_oparams : dict, optional
+        A actual dictionary with the parameters for the unbinding model.
 
+    Notes
+    ----------------
+    Additional parameters (oparams) must be compatible with the given binding, effect or unbinding model, so please,
+    do not create parameters that the models won't consider.
+    When these oparams are not given, the code will load default parameters according the model indicated.
+    These default parameters are saved in params.py
     """
 
     def __init__(self, e_type, name, site_list, concentration, size, effective_size, site_type,
@@ -58,50 +65,50 @@ class Environment:
                  binding_model=None, effect_model=None, unbinding_model=None,
                  binding_model_oparams=None, effect_model_oparams=None, unbinding_model_oparams=None):
         """
-         A class used to represent molecules/enzymes in the environment.
+        Constructor of the class Environment, used to represent the enzymes/molecules in the environment.
 
-         Attributes
-         ----------
-         e_type : str
-             The enzyme/molecule type, e.g. topo.
-         name : str
-             The name of the environmental/enzyme, e.g. gyrase
-         site_list :
-             list of sites that the enzyme can recognise and bind.
-         concentration : float
-             The concentration of the enzyme in nM.
-         size : float
-             The size of the enzyme in bp
-         effective_size : float
-             The effective size in bp.
-             This size is assumed to be the size in which the enzyme makes contact with the DNA.
-             So ef_size < size.
-         site_type : str
-             The type of site that this environmental can recognise to bind.
-         binding_model_name : str, optional
-             The name of the binding model to use
-         binding_oparams_file : str, optional
-             The path to the parameters for the binding model.
-         effect_model_name : str, optional
-             The name of the effect model to use
-         effect_oparams_file : str, optional
-             The path to the parameters for the effect model.
-         unbinding_model_name : str, optional
-             The name of the unbinding model to use
-         unbinding_oparams_file : str, optional
-             The path to the parameters for the unbinding model.
-         binding_model : optional
-             The binding model to use. This is a subclass of the BindingModel
-         binding_model_oparams : dict, optional
-             The actual dictionary with the parameters for the binding model
-         effect_model : optional
-             The effect model to use. This is a subclass of the EffectModel
-         effect_model_oparams : dict, optional
-             The actual dictionary with the parameters for the Effect model
-         unbinding_model :optional
-             The unbinding model to use. This is a subclass of the UnBindingModel
-         unbinding_model_oparams : dict, optional
-             The actual dictionary with the parameters for the unbinding model
+        Parameters
+        ----------
+        e_type : str
+            The enzyme/molecule type, e.g. topo.
+        name : str
+            The name of the environmental/enzyme, e.g. gyrase
+        site_list : list
+            A list of sites that the enzyme can recognise and bind.
+        concentration : float
+            The concentration of the enzyme in nano Molars (nM).
+        size : float
+            The size of the enzyme in base-pairs (bp)
+        effective_size : float
+            The effective size in base-pairs (bp).
+            This size is assumed to be the size in which the enzyme makes contact with the DNA.
+            So, effective_size < size.
+        site_type : str
+            The type of site that this environmental can recognise and bind.
+        binding_model_name : str, optional
+            The name of the binding model to use, e.g., 'PoissonBinding'.
+        binding_oparams_file : str, optional
+            The path to the csv file containing the parameters for the binding model.
+        binding_model : class, optional
+            This is a subclass of the BindingModel to implement, e.g., PoissonBinding.
+        binding_model_oparams : dict, optional
+            A dictionary with the parameters for the binding model.
+        effect_model_name : str, optional
+            The name of the effect model to use, e.g., 'RNAPUniform'.
+        effect_oparams_file : str, optional
+            The path to the csv file containing the parameters for the effect model.
+        effect_model : class, optional
+            This is a subclass of EffectModel to implement, e.g., RNAPUniform.
+        effect_model_oparams : dict, optional
+            A dictionary with the parameters for the Effect model.
+        unbinding_model_name : str, optional
+            The name of the unbinding model to use, e.g., 'PoissonUnBinding'
+        unbinding_oparams_file : str, optional
+            The path to the csv file containing the parameters for the unbinding model.
+        unbinding_model : class, optional
+            This is a subclass of the UnBindingModel to use, e.g., PoissonUnBinding
+        unbinding_model_oparams : dict, optional
+            A actual dictionary with the parameters for the unbinding model.
          """
 
         # Assign parameters
@@ -113,7 +120,7 @@ class Environment:
         self.size = size
         self.effective_size = effective_size
 
-        # Models
+        # Assign models
         self.binding_model_name = binding_model_name
         self.binding_oparams_file = binding_oparams_file
         self.binding_model = binding_model
@@ -129,13 +136,17 @@ class Environment:
         self.unbinding_model = unbinding_model
         self.unbinding_model_oparams = unbinding_model_oparams
 
+        # Verify inputs
         self.check_inputs()
 
+        # Loads the binding, effect and unbinding models if given.
         self.get_models()
 
     #    def get_models(self, binding_model, effect_model, unbinding_model):
 
     def check_inputs(self):
+        """ Checks that Environment parameters are of the correct type.
+        """
 
         if not isinstance(self.enzyme_type, str) or self.enzyme_type == '':
             raise ValueError('Error, environmentals must have a type')
@@ -195,6 +206,9 @@ class Environment:
             self.unbinding_model_oparams = None
 
     def get_models(self):
+        """ Loads the Environment's binding, effect and unbinding models (if given).
+        """
+
         # Binding Model
         self.binding_model, self.binding_model_name, self.binding_oparams_file, self.binding_model_oparams = (
             bm.get_binding_model(self.name, self.binding_model, self.binding_model_name,
@@ -371,7 +385,27 @@ class Environment:
 
 
 class EnvironmentFactory:
+    """ A class used to represent a list of environmentals (enzymes/molecules) in the environment.
+
+    Attributes
+    ----------
+    site_list : list
+        A list containing Sites on the DNA.
+    environment_list : list
+        A list containing Environmentals, or in other words, the molecules/enzymes on the environment.
+    filename : str, optional
+        Path to the environment csv file.
+    """
     def __init__(self, site_list, filename=None):
+        """ Constructor of the class EnvironmentFactory.
+
+        Parameters
+        ----------
+        site_list : list
+            A list containing Sites on the DNA.
+        filename : str, optional
+            Path to the environment csv file.
+        """
         self.filename = filename
         self.environment_list = []
         self.site_list = site_list
@@ -379,9 +413,18 @@ class EnvironmentFactory:
             self.read_csv()
 
     def get_environment_list(self):
+        """ Gets the environment_list
+
+        Returns
+        ----------
+        list : A list of environmentals (enzymes/molecules) in the environment.
+        """
+
         return self.environment_list
 
     def read_csv(self):
+        """ Reads the EnvironmentFactory csv filename and adds the environmentals to environment_list.
+        """
         df = pd.read_csv(self.filename)
         for index, row in df.iterrows():
             new_environment = Environment(e_type=row['type'], name=row['name'],
@@ -399,6 +442,18 @@ class EnvironmentFactory:
             self.environment_list.append(new_environment)
 
     def site_match(self, label):
+        """ Given the site_list, filters sites by site_type 'label'.
+
+        Parameters
+        ----------
+        label : str
+            Type of site.
+
+        Returns
+        ----------
+        list : A list of sites of the type 'label'.
+
+        """
         #        enzyme_before = [enzyme.position for enzyme in enzyme_list if enzyme.position <= site.start][-1]
         site_list = [site for site in self.site_list if site.site_type == label]
         return site_list
