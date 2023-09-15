@@ -1,8 +1,9 @@
 import numpy as np
 from TORCphysics import params
-import sys
 import pandas as pd
 from abc import ABC, abstractmethod
+import sys
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -17,7 +18,9 @@ v0 = params.v0
 w0 = params.w0
 gamma = params.gamma
 
-
+# ---------------------------------------------------------------------------------------------------------------------
+# EFFECT
+# ---------------------------------------------------------------------------------------------------------------------
 class Effect:
     # I thought it'll be easier to describe the effects as an object.
     # Because the current effects are taken place at the current enzyme i=index, I use the index to locate the enzyme
@@ -31,85 +34,162 @@ class Effect:
         self.twist_right = twist_right
 
 
-# Runs through each bound enzyme (in enzyme_list) and creates an effect.
-# It an effects_list which contains indications on how to update the current position and how the twist on the local
-# neighbouring domains are effected
-def effect_model(enzyme_list, environmental_list, dt, topoisomerase_model, mechanical_model):
-    # list of effects: effect = [index, position, twist_left, twist_right]
-    # I use an effect list because it's easier because there are multiple changes in the local twists
-    effect_list = []
-    for i, enzyme in enumerate(enzyme_list):
+# ---------------------------------------------------------------------------------------------------------------------
+# EFFECT MODELS
+# ---------------------------------------------------------------------------------------------------------------------
+class EffectModel(ABC):
+    """
+     The EffectModel class for defining effect models.
+     If you need a new one, define it here.
+    """
 
-        if enzyme.enzyme_type == 'EXT':  # We can speed up things a bit by ignoring the fake boundaries
-            continue
+    def __init__(self, filename=None, **oparams):
+        self.filename = filename
+        self.oparams = oparams
 
-        # TODO: add effect for other type of enzymes, like NAPs? Maybe their effect is to do nothing. And definitely
-        #  an effect for topos
-        # Administer the effect model to use.
-        # -------------------------------------------------------------------------------------------------------------
-        # From these models, they can update the position of the current enzyme and affect the local twist on the right
-        # and left
-        if enzyme.enzyme_type == 'RNAP':  # For now, only RNAPs have an effect
-            # TODO: in the future, according the input we may choose between different motion models, maybe one with
-            #  torques and not uniform motion
-            if mechanical_model == 'uniform':
-                # Calculates change in position and the twist that it injected on the left and right
-                position, twist_left, twist_right = rnap_uniform_motion(enzyme, enzyme_list, dt)
-            elif mechanical_model == 'torque_stall_Geng':
-                position, twist_left, twist_right = rnap_torque_stall_Geng(enzyme, enzyme_list, dt)
+    @abstractmethod
+    def calculate_effect(self) -> Effect:
+        """
+        Effects models need a "calculate_effect" function. This function must return an Effect object
+        """
+        pass
+
+
+# ----------------------
+# YOU can define your own models here!
+# ----------------------
+
+class RNAPUniform(EffectModel):
+    """
+     Effect model for the RNAP uniform motion. RNAP moves with constant speed and injects +-supercoils on each site
+    """
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, **oparams):
+        super().__init__(filename, **oparams)  # name  # Call the base class constructor
+
+        if not oparams:
+            if filename is None:
+                self.velocity = params.v0
+                self.gamma = params.gamma
             else:
-                print('Sorry, cannot recognise mechanistic model')
-                sys.exit()
-            # size = abs(enzyme.site.start - enzyme.site.end + 1)
-            # output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
-            #                                 k_on=0, k_off=0, k_cat=0, size=size)
-        #            output_enzyme = Enzyme(e_type='mRNA', name=enzyme.site.name, site=None, position=None, size=size,
-        #                                   twist=0, superhelical=0)
-        elif enzyme.enzyme_type == 'topo':
-            # topo = [environment for environment in environmental_list
-            #         if environment.name == enzyme.name][0]  # Can select the model from here?
-            position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
-            # TODO: It would probably be better if we have sub-models for effects?
-            #  So we would have a binding model and a effect model.
-        #           if topoisomerase_model == 'stochastic':
-        #                position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
-        #            if topoisomerase_model == 'random_lineal':
-        #                position, twist_left, twist_right = topoisomerase_lineal_supercoiling_injection(enzyme, dt)
+                rows = pd.read_csv(filename)
+                self.velocity = float(rows['velocity'])
+                self.gamma = float(rows['gamma'])
         else:
-            continue
+            self.velocity = float(oparams['velocity'])
+            self.gamma = float(oparams['gamma'])
 
-        # Now create the effect taken place at the enzyme i
-        effect_list.append(Effect(index=i, position=position, twist_left=twist_left, twist_right=twist_right))
+        self.oparams = {'velocity': self.velocity, 'gamma': self.gamma}  # Just in case
 
-    # Topoisomerase continuum model - If we are using a continuum model, then we need to add the topos effects
-    # --------------------------------------------------------------
-    if topoisomerase_model == 'continuum':
-        # Gets list of topoisomerase enzymes in the environment
-        topo_list = [environment for environment in environmental_list
-                     if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
-        position = 0  # topoisomerases cannot change enzymes positions and only affect each local site (twist_right)
-        twist_left = 0
-        for topo in topo_list:
-            for i, enzyme in enumerate(enzyme_list):
-                # We can speed up things a bit by ignoring the fake boundaries
-                if enzyme.name == 'EXT_L' and len(enzyme_list) > 2:
-                    continue
-                elif enzyme.name == 'EXT_R':
-                    continue
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+        """
+        Effects models need a "calculate_effect" function. This function must return an Effect object
+        Args:
+            index (int): Index of the current enzyme
+            z (Enzyme): Current enzyme
+            z_list (list):
+            dt (float):
+        """
+        # Everything 0 for now
+        position = 0.0
+        twist_left = 0.0
+        twist_right = 0.0
+        # Get neighbour enzyme
+        if z.direction > 0:
+            z_n = [e for e in z_list if e.position > z.position][0]  # after - On the right
+        if z.direction < 0:
+            z_n = [e for e in z_list if e.position < z.position][-1]  # before - On the left
+        if z.direction == 0:
+            raise ValueError('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
 
-                if topo.name == 'topoI':
-                    sigma = topo1_continuum(enzyme.superhelical, topo, dt)
-                    twist_right = calculate_twist_from_sigma(enzyme, enzyme_list[i + 1], sigma)
-                elif topo.name == 'gyrase':
-                    sigma = gyrase_continuum(enzyme.superhelical, topo, dt)
-                    twist_right = calculate_twist_from_sigma(enzyme, enzyme_list[i + 1], sigma)
+        # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid
+        # clashing
+        if z.direction > 0:  # Moving to the right
+            if z_n.position - (z.position + position) <= 0:
+                return position, twist_left, twist_right
+        else:  # Moves to the left
+            if z_n.position - (z.position + position) >= 0:
+                return position, twist_left, twist_right
+
+        # Nothing is next, so the object moves: simple uniform motion
+        position, twist_left, twist_right = uniform_motion(z, dt)
+
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# UTILITY FUNCTIONS
+# ---------------------------------------------------------------------------------------------------------------------
+
+# According inputs, loads the binding model, name and its params. This function is used in environment and enzyme.
+# This function calls assign_effect_model
+def get_effect_model(name, e_model, model_name, oparams_file, oparams):
+    # If no model is given
+    if e_model is None:
+
+        # No model is given, not even a name, so there's NO effect model
+        if model_name is None:
+            e_model = None
+            model_name = None
+            oparams_file = None
+            oparams = None
+
+        # Model indicated by name
+        else:
+            # Loads effect model.
+            # If oparams dict is given, those will be assigned to the model -> This is priority over oparams_file
+            # If oparams_file is given, parameters will be read from file, in case of no oparams dict
+            # If no oparams file/dict are given, default values will be used.
+
+            # A dictionary of parameters is given so that's priority
+            if isinstance(oparams, dict):
+                e_model = assign_effect_model(model_name, **oparams)
+            # No dictionary was given
+            else:
+                # If no oparams_file is given, then DEFAULT values are used.
+                if oparams_file is None:
+                    e_model = assign_effect_model(model_name)
+                # If an oparams_file is given, then those are loaded
                 else:
-                    twist_right = 0  # If it doesn't recognize the topo, then don't do anything
+                    e_model = assign_effect_model(model_name, oparams_file=oparams_file)
 
-                # Now create the effect taken place at the enzyme i
-                effect_list.append(Effect(index=i, position=position, twist_left=twist_left, twist_right=twist_right))
+                oparams = e_model.oparams  # To make them match
 
-    return effect_list
+    # An actual model was given
+    else:
+
+        #  Let's check if it's actually an effect model - The model should already have the oparams
+        if isinstance(e_model, EffectModel):
+            #  Then, some variables are fixed.
+            model_name = e_model.__class__.__name__
+            oparams = e_model.oparams
+            oparams_file = None
+
+        else:
+            print('Warning, effect model given is not a class for environmental ', name)
+            e_model = None
+            model_name = None
+            oparams_file = None
+            oparams = None
+
+    return e_model, model_name, oparams_file, oparams
+
+
+# Add your models into this function so it the code can recognise it
+def assign_effect_model(model_name, oparams_file=None, **oparams):
+    if model_name == 'RNAPUniform':
+        my_model = RNAPUniform(filename=oparams_file, **oparams)
+    else:
+        raise ValueError('Could not recognise effect model ' + model_name)
+    return my_model
+
+
+def read_csv_to_dict(filename):
+    """
+    Reads csv file and puts it in a dictionary
+    """
+    return pd.read_csv(filename).to_dict()
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -360,154 +440,4 @@ def get_start_end_c(z0, zn, nbp):
 
     return position_left, position_right
 
-
 # -----------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------------------------------------------------
-# EFFECT MODELS
-# ---------------------------------------------------------------------------------------------------------------------
-# According inputs, loads the binding model, name and its params. This function is used in environment and enzyme.
-# This function calls assign_effect_model
-def get_effect_model(name, e_model, model_name, oparams_file, oparams):
-    # If no model is given
-    if e_model is None:
-
-        # No model is given, not even a name, so there's NO effect model
-        if model_name is None:
-            e_model = None
-            model_name = None
-            oparams_file = None
-            oparams = None
-
-        # Model indicated by name
-        else:
-            # Loads effect model.
-            # If oparams dict is given, those will be assigned to the model -> This is priority over oparams_file
-            # If oparams_file is given, parameters will be read from file, in case of no oparams dict
-            # If no oparams file/dict are given, default values will be used.
-
-            # A dictionary of parameters is given so that's priority
-            if isinstance(oparams, dict):
-                e_model = assign_effect_model(model_name, **oparams)
-            # No dictionary was given
-            else:
-                # If no oparams_file is given, then DEFAULT values are used.
-                if oparams_file is None:
-                    e_model = assign_effect_model(model_name)
-                # If an oparams_file is given, then those are loaded
-                else:
-                    e_model = assign_effect_model(model_name, oparams_file=oparams_file)
-
-                oparams = e_model.oparams  # To make them match
-
-    # An actual model was given
-    else:
-
-        #  Let's check if it's actually an effect model - The model should already have the oparams
-        if isinstance(e_model, EffectModel):
-            #  Then, some variables are fixed.
-            model_name = e_model.__class__.__name__
-            oparams = e_model.oparams
-            oparams_file = None
-
-        else:
-            print('Warning, effect model given is not a class for environmental ', name)
-            e_model = None
-            model_name = None
-            oparams_file = None
-            oparams = None
-
-    return e_model, model_name, oparams_file, oparams
-
-
-# Add your models into this function so it the code can recognise it
-def assign_effect_model(model_name, oparams_file=None, **oparams):
-    if model_name == 'RNAPUniform':
-        my_model = RNAPUniform(filename=oparams_file, **oparams)
-    else:
-        raise ValueError('Could not recognise effect model ' + model_name)
-    return my_model
-
-
-class EffectModel(ABC):
-    """
-     The EffectModel class for defining effect models.
-     If you need a new one, define it here.
-    """
-
-    def __init__(self, filename=None, **oparams):
-        self.filename = filename
-        self.oparams = oparams
-
-    @abstractmethod
-    def calculate_effect(self) -> Effect:
-        """
-        Effects models need a "calculate_effect" function. This function must return an Effect object
-        """
-        pass
-
-
-class RNAPUniform(EffectModel):
-    """
-     Effect model for the RNAP uniform motion. RNAP moves with constant speed and injects +-supercoils on each site
-    """
-
-    # def __init__(self, name, filename):
-    def __init__(self, filename=None, **oparams):
-        super().__init__(filename, **oparams)  # name  # Call the base class constructor
-
-        if not oparams:
-            if filename is None:
-                self.velocity = params.v0
-                self.gamma = params.gamma
-            else:
-                rows = pd.read_csv(filename)
-                self.velocity = float(rows['velocity'])
-                self.gamma = float(rows['gamma'])
-        else:
-            self.velocity = float(oparams['velocity'])
-            self.gamma = float(oparams['gamma'])
-
-        self.oparams = {'velocity': self.velocity, 'gamma': self.gamma}  # Just in case
-
-    def calculate_effect(self, index, z, z_list, dt) -> Effect:
-        """
-        Effects models need a "calculate_effect" function. This function must return an Effect object
-        Args:
-            index (int): Index of the current enzyme
-            z (Enzyme): Current enzyme
-            z_list (list):
-            dt (float):
-        """
-        # Everything 0 for now
-        position = 0.0
-        twist_left = 0.0
-        twist_right = 0.0
-        # Get neighbour enzyme
-        if z.direction > 0:
-            z_n = [e for e in z_list if e.position > z.position][0]  # after - On the right
-        if z.direction < 0:
-            z_n = [e for e in z_list if e.position < z.position][-1]  # before - On the left
-        if z.direction == 0:
-            raise ValueError('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
-
-        # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid
-        # clashing
-        if z.direction > 0:  # Moving to the right
-            if z_n.position - (z.position + position) <= 0:
-                return position, twist_left, twist_right
-        else:  # Moves to the left
-            if z_n.position - (z.position + position) >= 0:
-                return position, twist_left, twist_right
-
-        # Nothing is next, so the object moves: simple uniform motion
-        position, twist_left, twist_right = uniform_motion(z, dt)
-
-        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
-
-
-def read_csv_to_dict(filename):
-    """
-    Reads csv file and puts it in a dictionary
-    """
-    return pd.read_csv(filename).to_dict()

@@ -1,10 +1,9 @@
 import pandas as pd
 from TORCphysics import binding_model as bm
-import sys
 
 
 # TODO: It seems that the Site is working now! The next steps are as follows:
-#  1.- Document Site and Environment. -
+#  1.- Rearrenge effect_model, binding_model and unbinding_model, so the sites and environment can use them.
 #  2.- Fix Enzyme.
 #  3.- Document Enzyme. 3.1- Test Enzyme. 3.2- Test Binding models. 3.3- Test Effect models
 #  4.- Make the code works with the new changes, and don't forget to add the effective_size.
@@ -190,8 +189,7 @@ class Site:
                 direction = -1
                 return direction
             else:
-                print("Cannot work out gene's direction")
-                sys.exit()
+                raise ValueError("Error, cannot work out gene's direction")
 
 
 class SiteFactory:
