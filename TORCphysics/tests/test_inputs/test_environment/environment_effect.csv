@@ -1,4 +1,4 @@
-type,name,site_type,concentration,size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams,effective_size
-test,No_model,DNA,0.2,120,None,None,none,none,none,none,100
-test,RNAP_noparams,DNA,0.2,120,None,None,RNAPUniform,None,none,none,100
-test,RNAP_params,DNA,0.2,120,None,None,RNAPUniform,test_inputs/test_environment/RNAP_params.csv,none,none,100
+type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+test,No_model,DNA,0.2,120,100,None,None,none,none,none,none
+test,RNAP_noparams,DNA,0.2,120,100,None,None,RNAPUniform,None,none,none
+test,RNAP_params,DNA,0.2,120,100,None,None,RNAPUniform,test_inputs/test_environment/RNAP_params.csv,none,none
