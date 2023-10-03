@@ -4,7 +4,6 @@ from TORCphysics import Enzyme, EnzymeFactory, SiteFactory
 from TORCphysics import effect_model as em
 from TORCphysics import unbinding_model as ubm
 
-# TODO: We still need to do the other effect tests and the unbinding tests
 site_gene1 = Site(site_type='gene', name='test_gene1', start=100, end=500, k_on=3.00)
 site_gene2 = Site(site_type='gene', name='test_gene2', start=600, end=800, k_on=3.00)
 site_gene3 = Site(site_type='gene', name='test_gene3', start=1200, end=1000, k_on=3.00)
