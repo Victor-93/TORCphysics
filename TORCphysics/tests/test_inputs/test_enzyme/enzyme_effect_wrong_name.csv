@@ -1,0 +1,2 @@
+type,name,site,position,size,effective_size,twist,superhelical,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+test_e,RNAP_noparams,test_gene2,1000,50,30,0.0,0.0,RNAP,none,none,none
