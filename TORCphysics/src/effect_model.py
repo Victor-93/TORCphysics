@@ -167,7 +167,7 @@ def get_effect_model(name, e_model, model_name, oparams_file, oparams):
             oparams_file = None
 
         else:
-            print('Warning, effect model given is not a class for environmental ', name)
+            print('Warning, effect model given is not a class for environmental/enzyme ', name)
             e_model = None
             model_name = None
             oparams_file = None
