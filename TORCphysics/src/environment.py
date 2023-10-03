@@ -1,5 +1,6 @@
 import pandas as pd
 from TORCphysics import binding_model as bm
+from TORCphysics import unbinding_model as ubm
 from TORCphysics import effect_model as em
 
 
@@ -220,8 +221,8 @@ class Environment:
 
         # Unbinding Model
         self.unbinding_model, self.unbinding_model_name, self.unbinding_oparams_file, self.unbinding_model_oparams = (
-            bm.get_unbinding_model(self.name, self.unbinding_model, self.unbinding_model_name,
-                                   self.unbinding_oparams_file, self.unbinding_model_oparams))
+            ubm.get_unbinding_model(self.name, self.unbinding_model, self.unbinding_model_name,
+                                    self.unbinding_oparams_file, self.unbinding_model_oparams))
 
     # PREVIOUS VERSION. IT IS OBSOLETE NOW, SO PLEASE REMOVE IT
     # This function sorts the models
@@ -352,17 +353,17 @@ class Environment:
 
                 # A dictionary of parameters is given so that's priority
                 if isinstance(self.unbinding_model_oparams, dict):
-                    self.unbinding_model = bm.assign_unbinding_model(self.unbinding_model_name,
-                                                                     **self.unbinding_model_oparams)
+                    self.unbinding_model = ubm.assign_unbinding_model(self.unbinding_model_name,
+                                                                      **self.unbinding_model_oparams)
                 # No dictionary was given
                 else:
                     # If no oparams_file is given, then DEFAULT values are used.
                     if self.unbinding_oparams_file is None:
-                        self.unbinding_model = bm.assign_unbinding_model(self.unbinding_model_name)
+                        self.unbinding_model = ubm.assign_unbinding_model(self.unbinding_model_name)
                     # If an oparams_file is given, then those are loaded
                     else:
-                        self.unbinding_model = bm.assign_unbinding_model(self.unbinding_model_name,
-                                                                         oparams_file=self.unbinding_oparams_file)
+                        self.unbinding_model = ubm.assign_unbinding_model(self.unbinding_model_name,
+                                                                          oparams_file=self.unbinding_oparams_file)
 
                     self.unbinding_model_oparams = self.unbinding_model.oparams  # To make them match
 
@@ -370,7 +371,7 @@ class Environment:
         else:
 
             #  Let's check if it's actually an unbinding model - The model should already have the oparams
-            if isinstance(self.unbinding_model, bm.UnBindingModel):
+            if isinstance(self.unbinding_model, ubm.UnBindingModel):
                 #  Then, some variables are fixed.
                 self.unbinding_model_name = self.unbinding_model.__class__.__name__
                 self.unbinding_model_oparams = self.unbinding_model.oparams
@@ -396,6 +397,7 @@ class EnvironmentFactory:
     filename : str, optional
         Path to the environment csv file.
     """
+
     def __init__(self, site_list, filename=None):
         """ Constructor of the class EnvironmentFactory.
 

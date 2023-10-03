@@ -1,6 +1,7 @@
 from unittest import TestCase
 from TORCphysics import Site, SiteFactory
 from TORCphysics import binding_model as bm
+from TORCphysics import unbinding_model as ubm
 
 
 class TestSite(TestCase):
@@ -30,7 +31,7 @@ class TestSite(TestCase):
         self.assertEqual(csv_site.site_list[2].binding_model.k_on, 0.0)
 
     # Reads site csv with an incorrect model name. It tests that the error is raised
-    def test_environment_binding_csv_wrong_name(self):
+    def test_sites_binding_csv_wrong_name(self):
         # Check wrong model name
         site_file = 'test_inputs/test_site/site_model_wrong_name.csv'
         with self.assertRaises(ValueError) as context:
@@ -52,7 +53,7 @@ class TestSite(TestCase):
         topoI_model_default = bm.TopoIRecognition()
         oparams = {'width': 0.01, 'threshold': 0.2, 'k_on': 2.0}
         topoI_model_params = bm.TopoIRecognition(**oparams)
-        NoBClass = bm.PoissonUnBinding
+        NoBClass = ubm.PoissonUnBinding
         # 1. B class
         s_Poisson = Site(site_type='gene', name='Poisson_default',
                          start=10, end=20, k_on=3.0, binding_model=Poisson_model)
