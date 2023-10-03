@@ -1,0 +1,2 @@
+type,name,site,position,size,effective_size,twist,superhelical,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+test_e,bad_site,gene_fake,100,50,30,2,0.2,none,none,none,none
