@@ -1,10 +1,11 @@
 from unittest import TestCase
 from TORCphysics import Environment, EnvironmentFactory, SiteFactory
 from TORCphysics import binding_model as bm
+from TORCphysics import unbinding_model as ubm
 from TORCphysics import effect_model as em
 
 
-# TODO: Once sites is fixed, test the last functions
+# TODO: test the last functions
 class TestEnvironment(TestCase):
 
     # Reads environment csv with different conditions for binding models.
@@ -184,9 +185,9 @@ class TestEnvironment(TestCase):
         #  3. Name + oparams dict.
         #  4. Model = No UB class.
 
-        model_default = bm.PoissonUnBinding()
+        model_default = ubm.PoissonUnBinding()
         oparams = {'k_off': 10.0}
-        model_params = bm.PoissonUnBinding(**oparams)
+        model_params = ubm.PoissonUnBinding(**oparams)
         NoUBClass = type
         # 1. B class + defaults
         e_default = Environment(e_type='RNAP', name='test1', site_list=[], concentration=0.1, size=100,

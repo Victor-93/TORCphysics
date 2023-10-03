@@ -40,7 +40,6 @@ gyra_t = params.gyra_b_t
 #  check which one will be binding
 
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # UNBINDING MODELS
 # ---------------------------------------------------------------------------------------------------------------------
@@ -227,8 +226,6 @@ class GyraseRecognition(BindingModel):
         b = 1 + np.exp(-(sigma - self.threshold) / self.width)
         rate = a / b
         return rate
-
-
 
 
 # class lacI_binding(binding_model):

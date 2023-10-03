@@ -1,4 +1,3 @@
-import sys
 import numpy as np
 from TORCphysics import params
 import pandas as pd
@@ -102,3 +101,20 @@ class PoissonUnBinding(UnBindingModel):
 
     def unbinding_probability(self, off_rate, dt) -> float:
         return Poisson_process(off_rate, dt)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# HELPFUL FUNCTIONS
+# ---------------------------------------------------------------------------------------------------------------------
+
+def Poisson_process(rate, dt):
+    rdt = rate * dt  # it is what is in the exponent (is that how you call it?)
+    probability = rdt * np.exp(-rdt)
+    return probability
+
+
+def read_csv_to_dict(filename):
+    """
+    Reads csv file and puts it in a dictionary
+    """
+    return pd.read_csv(filename).to_dict()
