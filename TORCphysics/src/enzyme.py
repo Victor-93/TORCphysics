@@ -117,8 +117,6 @@ class Enzyme:
                                     self.unbinding_oparams_file, self.unbinding_model_oparams))
 
 
-
-
 class EnzymeFactory:
 
     def __init__(self, filename=None, site_list=None):
