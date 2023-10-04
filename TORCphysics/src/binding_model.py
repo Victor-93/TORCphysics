@@ -62,82 +62,9 @@ def RNAP_unbinding_model(enzyme):
 # Unbinding model for enzymes that unbind spontaneously
 # ---------------------------------------------------------------------------------------------------------------------
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # BINDING MODELS
 # ---------------------------------------------------------------------------------------------------------------------
-# According inputs, loads the binding model, name and its params. This function is used in environment and sites.
-# This function calls assign_binding_model
-def get_binding_model(name, b_model, model_name, oparams_file, oparams):
-    # If no model is given
-    if b_model is None:
-
-        # No model is given, not even a name, so there's NO binding model
-        if model_name is None:
-            b_model = None
-            model_name = None
-            oparams_file = None
-            oparams = None
-
-        # Model indicated by name
-        else:
-            # Loads binding model.
-            # If oparams dict is given, those will be assigned to the model -> This is priority over oparams_file
-            # If oparams_file is given, parameters will be read from file, in case of no oparams dict
-            # If no oparams file/dict are given, default values will be used.
-
-            # A dictionary of parameters is given so that's priority
-            if isinstance(oparams, dict):
-                b_model = assign_binding_model(model_name, **oparams)
-            # No dictionary was given
-            else:
-                # If no oparams_file is given, then DEFAULT values are used.
-                if oparams_file is None:
-                    b_model = assign_binding_model(model_name)
-                # If an oparams_file is given, then those are loaded
-                else:
-                    b_model = assign_binding_model(model_name, oparams_file=oparams_file)
-
-                oparams = b_model.oparams  # To make them match
-
-    # An actual model was given
-    else:
-
-        #  Let's check if it's actually a binding model - The model should already have the oparams
-        if isinstance(b_model, BindingModel):
-            #  Then, some variables are fixed.
-            model_name = b_model.__class__.__name__
-            oparams = b_model.oparams
-            oparams_file = None
-
-        else:
-            print('Warning, binding model given is not a class for environmental ', name)
-            b_model = None
-            model_name = None
-            oparams_file = None
-            oparams = None
-
-    binding_model = b_model
-    binding_model_name = model_name
-    binding_oparams_file = oparams_file
-    binding_model_oparams = oparams
-
-    return binding_model, binding_model_name, binding_oparams_file, binding_model_oparams
-
-
-# Add your models into this function so it the code can recognise it
-def assign_binding_model(model_name, oparams_file=None, **oparams):
-    if model_name == 'PoissonBinding':
-        my_model = PoissonBinding(filename=oparams_file, **oparams)
-    elif model_name == 'TopoIRecognition':
-        my_model = TopoIRecognition(filename=oparams_file, **oparams)
-    #    elif model_name == 'GyraseRecognition':
-    #        my_model = GyraseRecognition(filename=oparams_file)
-    else:
-        raise ValueError('Could not recognise binding model ' + model_name)
-    return my_model
-
-
 # These functions are for the particular binding model.
 # If you need a new one, define it here.
 class BindingModel(ABC):
@@ -286,6 +213,121 @@ class GyraseRecognition(BindingModel):
 # Creating instances of the subclasses
 # topoI_instance = topoI_binding(name="TopoI Binding", width=10, threshold=5)
 # lacI_instance = lacI_binding(name="lacI Binding", bridging=True, unbridging=False)
+
+# ---------------------------------------------------------------------------------------------------------------------
+# UTILITY FUNCTIONS
+# ---------------------------------------------------------------------------------------------------------------------
+# According inputs, loads the binding model, name and its params. This function is used in environment and sites.
+# This function calls assign_binding_model
+def get_binding_model(name, b_model, model_name, oparams_file, oparams):
+    # TODO: Aqui me quede.
+    """ This function loads the BindingModel to implement according the provided inputs.
+    This function is used for environment and sites.
+
+    Parameters
+    ----------
+    name : str
+        Name of the environmental or site.
+    b_model : BindingModel
+        A BindingModel.
+    model_name : str
+    name : str
+    oparams_file : str, optional
+        Path to the csv file containing the parametrisation of the BindingModel to use.
+    oparams : dict, optional
+        A dictionary containing the parameters used for the binding model. In this case, it would be k_on.
+
+    Returns
+    ----------
+    my_model : BindingModel
+        A BindingModel object that describes the binding mechanism of the given site.
+    """
+
+    # If no model is given
+    if b_model is None:
+
+        # No model is given, not even a name, so there's NO binding model
+        if model_name is None:
+            b_model = None
+            model_name = None
+            oparams_file = None
+            oparams = None
+
+        # Model indicated by name
+        else:
+            # Loads binding model.
+            # If oparams dict is given, those will be assigned to the model -> This is priority over oparams_file
+            # If oparams_file is given, parameters will be read from file, in case of no oparams dict
+            # If no oparams file/dict are given, default values will be used.
+
+            # A dictionary of parameters is given so that's priority
+            if isinstance(oparams, dict):
+                b_model = assign_binding_model(model_name, **oparams)
+            # No dictionary was given
+            else:
+                # If no oparams_file is given, then DEFAULT values are used.
+                if oparams_file is None:
+                    b_model = assign_binding_model(model_name)
+                # If an oparams_file is given, then those are loaded
+                else:
+                    b_model = assign_binding_model(model_name, oparams_file=oparams_file)
+
+                oparams = b_model.oparams  # To make them match
+
+    # An actual model was given
+    else:
+
+        #  Let's check if it's actually a binding model - The model should already have the oparams
+        if isinstance(b_model, BindingModel):
+            #  Then, some variables are fixed.
+            model_name = b_model.__class__.__name__
+            oparams = b_model.oparams
+            oparams_file = None
+
+        else:
+            print('Warning, binding model given is not a class for environmental or site ', name)
+            b_model = None
+            model_name = None
+            oparams_file = None
+            oparams = None
+
+    binding_model = b_model
+    binding_model_name = model_name
+    binding_oparams_file = oparams_file
+    binding_model_oparams = oparams
+
+    return binding_model, binding_model_name, binding_oparams_file, binding_model_oparams
+
+
+# Add your models into this function so it the code can recognise it
+def assign_binding_model(model_name, oparams_file=None, **oparams):
+    """ This function decides the BindingModel to use according the provided inputs.
+
+    Parameters
+    ----------
+
+    model_name : str
+        Name of the BindingModel to use. e,g, PoissonBinding.
+    oparams_file : str, optional
+        Path to the csv file containing the parametrisation of the BindingModel to use.
+    oparams : dict, optional
+        A dictionary containing the parameters used for the binding model. In this case, it would be k_on.
+
+    Returns
+    ----------
+    my_model : BindingModel
+        A BindingModel object that describes the binding mechanism of the given site.
+    """
+
+    if model_name == 'PoissonBinding':
+        my_model = PoissonBinding(filename=oparams_file, **oparams)
+    elif model_name == 'TopoIRecognition':
+        my_model = TopoIRecognition(filename=oparams_file, **oparams)
+    #    elif model_name == 'GyraseRecognition':
+    #        my_model = GyraseRecognition(filename=oparams_file)
+    else:
+        raise ValueError('Could not recognise binding model ' + model_name)
+    return my_model
 
 
 # ----------------------------------------------------------
