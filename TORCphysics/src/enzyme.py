@@ -4,8 +4,6 @@ from TORCphysics import effect_model as em
 from TORCphysics import unbinding_model as ubm
 
 
-# TODO: We need to document this file.
-
 class Enzyme:
 
     """

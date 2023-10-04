@@ -141,22 +141,63 @@ def assign_binding_model(model_name, oparams_file=None, **oparams):
 # These functions are for the particular binding model.
 # If you need a new one, define it here.
 class BindingModel(ABC):
+    """
+     The BindingModel abstract class used for defining binding models (subclasses).
+     If you need a new model, define it below.
+     See how some of the models are defined from this class, so you can make your own and implement it.
+    """
+
     def __init__(self, filename=None, **oparams):
+        """ The constructor of BindingModel.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the binding model.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the binding model.
+        """
+
         self.filename = filename
         self.oparams = oparams
 
     @abstractmethod
     def binding_probability(self) -> float:
+        """ Abstract method for calculating the probability of binding.
+        This is an essential function for BindingModels as they must be able to calculate the probability of binding of
+        a given enzyme.
+
+        Returns
+        ----------
+        probability : float
+            It should return a probability (number), which indicates the probability of binding at the given timestep.
+            Other functions/protocols should then interpret and implement this number.
+        """
         pass
 
 
 # Model for binding probability according Poisson process
 class PoissonBinding(BindingModel):
+    """
+     A binding model subclass that calculates binding probabilities according a Poisson process.
+     This is one of the simplest binding models, where enzymes bind at a constant rate.
+    """
+
     def __init__(self, filename=None, **oparams):
+        """ The constructor of the PoissonBinding subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the binding model; this file should have a k_on parameter
+        oparams : dict, optional
+            A dictionary containing the parameters used for the binding model. In this case, it would be k_on.
+        """
         super().__init__(filename, **oparams)  # Call the base class constructor
         if not oparams:
             if filename is None:
-                self.k_on = params.k_on
+                self.k_on = params.k_on  # If no filename was given, then it uses default k_on.
+                # Note that the value used also depends on the input site.csv file.
             else:
                 rows = pd.read_csv(filename)
                 self.k_on = float(rows['k_on'])
@@ -166,6 +207,14 @@ class PoissonBinding(BindingModel):
         self.oparams = {'k_on': self.k_on}  # Just in case
 
     def binding_probability(self, on_rate, dt) -> float:
+        """ Method for calculating the probability of binding according a Poisson Process.
+
+        Returns
+        ----------
+        probability : float
+            A number that indicates the probability of binding in the current timestep.
+        """
+
         return Poisson_process(on_rate, dt)
 
 
