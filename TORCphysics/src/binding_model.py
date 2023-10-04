@@ -220,18 +220,17 @@ class GyraseRecognition(BindingModel):
 # According inputs, loads the binding model, name and its params. This function is used in environment and sites.
 # This function calls assign_binding_model
 def get_binding_model(name, b_model, model_name, oparams_file, oparams):
-    # TODO: Aqui me quede.
     """ This function loads the BindingModel to implement according the provided inputs.
-    This function is used for environment and sites.
+    This function is used for environment and sites. So this function is implemented by those two classes.
 
     Parameters
     ----------
     name : str
         Name of the environmental or site.
-    b_model : BindingModel
-        A BindingModel.
+    b_model : BindingModel or None
+        A BindingModel or None.
     model_name : str
-    name : str
+        Name of the model to use, e.g. 'PoissonBinding'
     oparams_file : str, optional
         Path to the csv file containing the parametrisation of the BindingModel to use.
     oparams : dict, optional
@@ -239,8 +238,17 @@ def get_binding_model(name, b_model, model_name, oparams_file, oparams):
 
     Returns
     ----------
-    my_model : BindingModel
-        A BindingModel object that describes the binding mechanism of the given site.
+    binding_model : BindingModel or None
+        The BindingModel to implement for the Site/Environment. If no BindingModel could be determined, this variable
+        will be None.
+    binding_model_name: str or None
+        Name of the BindingModel to use. It is the same as binding_model.__class__.__name__
+        If the BindingModel was not determined, then this variable is None.
+    binding_oparams_file: str or None
+        Path to the csv file containing the parametrisation of the BindingModel. None if file was not given.
+    binding_model_oparams : dict or None
+        Dictionary with the parametrisation of the BindingModel. None will be returned if the BindingModel could not
+        be determined.
     """
 
     # If no model is given
