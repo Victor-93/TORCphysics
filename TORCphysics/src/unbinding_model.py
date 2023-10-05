@@ -12,6 +12,13 @@ class UnBindingModel(ABC):
      The UnBindingModel abstract class used for defining unbinding models (subclasses).
      If you need a new model, define it below.
      See how some of the models are defined from this class, so you can make your own and implement it.
+
+     Attributes
+     ----------
+     filename : str, optional
+         Path to the site csv file that parametrises the unbinding model.
+     oparams : dict, optional
+         A dictionary containing the parameters used for the unbinding model.
     """
 
     def __init__(self, filename=None, **oparams):
@@ -44,8 +51,17 @@ class UnBindingModel(ABC):
 
 class PoissonUnBinding(UnBindingModel):
     """
-     An unbinding model subclass that calculates unbinding probabilities according a Poisson process.
+     An UnbindingModel subclass that calculates unbinding probabilities according a Poisson process.
      This is one of the simplest unbinding models, where bound enzymes unbind at a constant rate.
+
+     Attributes
+     ----------
+     k_off : float
+        Rate (1/s) at which the enzymes unbind.
+     filename : str, optional
+         Path to the site csv file that parametrises the unbinding model.
+     oparams : dict, optional
+         A dictionary containing the parameters used for the unbinding model.
     """
 
     def __init__(self, filename=None, **oparams):

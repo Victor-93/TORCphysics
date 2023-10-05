@@ -72,6 +72,13 @@ class BindingModel(ABC):
      The BindingModel abstract class used for defining binding models (subclasses).
      If you need a new model, define it below.
      See how some of the models are defined from this class, so you can make your own and implement it.
+
+     Attributes
+     ----------
+     filename : str, optional
+         Path to the site csv file that parametrises the binding model.
+     oparams : dict, optional
+         A dictionary containing the parameters used for the binding model.
     """
 
     def __init__(self, filename=None, **oparams):
@@ -106,8 +113,17 @@ class BindingModel(ABC):
 # Model for binding probability according Poisson process
 class PoissonBinding(BindingModel):
     """
-     A binding model subclass that calculates binding probabilities according a Poisson process.
+     A BindingModel subclass that calculates binding probabilities according a Poisson process.
      This is one of the simplest binding models, where enzymes bind at a constant rate.
+
+     Attributes
+     ----------
+     k_on : float
+        Rate (1/s) at which the enzymes bind.
+     filename : str, optional
+        Path to the site csv file that parametrises the binding model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the binding model.
     """
 
     def __init__(self, filename=None, **oparams):
