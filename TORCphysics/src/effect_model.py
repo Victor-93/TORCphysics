@@ -21,12 +21,49 @@ gamma = params.gamma
 # ---------------------------------------------------------------------------------------------------------------------
 # EFFECT
 # ---------------------------------------------------------------------------------------------------------------------
+# I thought it'll be easier to describe the effects as an object.
+# Because the current effects are taken place at the current enzyme i=index, I use the index to locate the enzyme
+# in the enzyme_list which is applying the effect.
+# These effects act locally, so they can modify the enzyme's position, and the twist at the neighbouring domains.
 class Effect:
-    # I thought it'll be easier to describe the effects as an object.
-    # Because the current effects are taken place at the current enzyme i=index, I use the index to locate the enzyme
-    # in the enzyme_list which is applying the effect.
-    # These effects act locally, so they can modify the enzyme's position, and the twist at the neighbouring domains.
+    """
+    A class used to represent the Effects of bound Enzymes on the DNA molecule.
+    These Effects describe local changes on the DNA. These changes include the change in the Enzyme's position,
+    and the change in twist on the left/right of the given Enzyme.
+
+    Attributes
+    ----------
+    index : int
+        This is the index that locate the current Enzyme in the list of enzymes 'enzyme_list'.
+    position : float
+        Parameter that indicates the change in position of the given Enzyme in base-pairs (bp).
+        The position of the enzyme after the takes place would be Enzyme.position + position
+    twist_left : float
+        Parameter that indicates the amount of twist generated on the domain at the left of the given
+        Enzyme in radians (rad).
+    twist_right : float
+        Parameter that indicates the amount of twist generated on the domain at the right of the given
+        Enzyme in radians (rad).
+    """
+
     def __init__(self, index, position, twist_left, twist_right):
+        """ The constructor of Effect class.
+
+        Parameters
+        ----------
+        index : int
+            This is the index that locate the current Enzyme in the list of enzymes 'enzyme_list'.
+        position : float
+            Parameter that indicates the change in position of the given Enzyme in base-pairs (bp).
+            The position of the enzyme after the takes place would be Enzyme.position + position
+        twist_left : float
+            Parameter that indicates the amount of twist generated on the domain at the left of the given
+            Enzyme in radians (rad).
+        twist_right : float
+            Parameter that indicates the amount of twist generated on the domain at the right of the given
+            Enzyme in radians (rad).
+        """
+
         # I'll save the input filenames just in case
         self.index = index
         self.position = position
@@ -39,18 +76,43 @@ class Effect:
 # ---------------------------------------------------------------------------------------------------------------------
 class EffectModel(ABC):
     """
-     The EffectModel class for defining effect models.
-     If you need a new one, define it here.
+     The EffectModel abstract class used for defining effect models (subclasses).
+     If you need a new model, define it below.
+     See how some of the models are defined from this class, so you can make your own and implement it.
+
+     Attributes
+     ----------
+     filename : str, optional
+         Path to the site csv file that parametrises the effect model.
+     oparams : dict, optional
+         A dictionary containing the parameters used for the effect model.
     """
 
     def __init__(self, filename=None, **oparams):
+        """ The constructor of EffectModel.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the effect model.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the effect model.
+        """
         self.filename = filename
         self.oparams = oparams
 
     @abstractmethod
     def calculate_effect(self) -> Effect:
-        """
-        Effects models need a "calculate_effect" function. This function must return an Effect object
+        """ Abstract method for calculating the effect of the Enzyme/molecule.
+        This is an essential function for EffectModels as they must be able to calculate the "effect" a given
+        Enzyme has on the DNA.
+
+        Returns
+        ----------
+        effect : Effect
+            These functions return an Effect object. This object indicates the enzyme's change in position, and how
+            it twists/untwists the DNA on each side for a given timestep.
+            Other functions/protocols should then interpret and implement this result.
         """
         pass
 
@@ -61,21 +123,50 @@ class EffectModel(ABC):
 
 class RNAPUniform(EffectModel):
     """
-     Effect model for the RNAP uniform motion. RNAP moves with constant speed and injects +-supercoils on each site
-    """
+     An EffectModel subclass that calculates represents the uniform motion of an RNA Polymerase, while
+     injecting positive and negative supercoils (twin domain model).
+     This is one of the simplest effect models, where RNAPs can move along the DNA at constant velocity.
 
+     Attributes
+     ----------
+     velocity : float
+        Absolute velocity at which the RNAP moves along the DNA in base-pairs per second (bp/s).
+     gamma : float
+        Parameter that quantifies the amount of twist generated per base-pair transcribed (rad/bp).
+     filename : str, optional
+        Path to the site csv file that parametrises the effect model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the effect model.
+    """
     # def __init__(self, name, filename):
     def __init__(self, filename=None, **oparams):
+        """ The constructor of the RNAPUniform subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the RNAPUniform effect model; this file should have
+            the velocity and gamma parameters
+        oparams : dict, optional
+            A dictionary containing the parameters used for the binding model. In this case, it would be k_on.
+        """
+
         super().__init__(filename, **oparams)  # name  # Call the base class constructor
 
         if not oparams:
             if filename is None:
                 self.velocity = params.v0
                 self.gamma = params.gamma
-            else:
-                rows = pd.read_csv(filename)
-                self.velocity = float(rows['velocity'])
-                self.gamma = float(rows['gamma'])
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'velocity' in mydata.columns:
+                    self.velocity = float(mydata['velocity'])
+                else:
+                    raise ValueError('Error, velocity parameter missing in csv file for RNAPUniform')  # ', filename)
+                if 'gamma' in mydata.columns:
+                    self.gamma = float(mydata['gamma'])
+                else:
+                    raise ValueError('Error, gamma parameter missing in csv file for RNAPUniform')  #: ', filename)
         else:
             self.velocity = float(oparams['velocity'])
             self.gamma = float(oparams['gamma'])
@@ -83,13 +174,24 @@ class RNAPUniform(EffectModel):
         self.oparams = {'velocity': self.velocity, 'gamma': self.gamma}  # Just in case
 
     def calculate_effect(self, index, z, z_list, dt) -> Effect:
-        """
-        Effects models need a "calculate_effect" function. This function must return an Effect object
-        Args:
-            index (int): Index of the current enzyme
-            z (Enzyme): Current enzyme
-            z_list (list):
-            dt (float):
+        """ Method for calculating the Effect that the bound RNAP causes on the DNA.
+
+        Parameters
+        ----------
+        index : int
+            Enzyme's index in the list of enzymes "enzyme_list".
+        z : Enzyme
+            This is the object of the current Enzyme (RNAP) that is moving along the DNA.
+        z_list : list
+            This is a list of Enzyme objects.
+        dt : float
+            Timestep in seconds (s).
+
+        Returns
+        ----------
+        effect : Effect
+            This function returns an Effect object, which indicates the changes in position and local twist that
+            the current RNAP caused on the DNA.
         """
         # Everything 0 for now
         position = 0.0
@@ -248,12 +350,18 @@ def topoisomerase_supercoiling_injection(topo, dt):
 # We will use more than once this calculation, so let's store it as function
 def uniform_motion(z, dt):
     # Object moves: simple uniform motion
-    # position = Z.position + Z.direction * v0 * dt
-    position = z.direction * v0 * dt
 
-    # Injects twist: denatures w=gamma*v0*dt base-pairs
-    twist_left = -z.direction * z.k_cat * v0 * dt
-    twist_right = z.direction * z.k_cat * v0 * dt
+    # Let's get parameters needed
+    velocity = z.effect_model.velocity
+    gamma = z.effect_model.gamma
+    direction = z.direction
+
+    # Calculate change in position.
+    position = direction * velocity * dt
+
+    # Injects twist: denatures w = gamma*velocity*dt base-pairs
+    twist_left = -direction * gamma * velocity * dt
+    twist_right = direction * gamma * velocity * dt
     return position, twist_left, twist_right
 
 
