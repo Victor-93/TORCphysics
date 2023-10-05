@@ -109,4 +109,48 @@ class TestBindingModel(TestCase):
             my_model = bm.assign_binding_model(model_name=model_name)
         self.assertEqual(str(context.exception), 'Could not recognise binding model ' + model_name)
 
-# TODO: Test PoissonBinding.
+    def test_PoissonBinding(self):
+        # For each test case, we should have the PoissonBinding Model with params, and 0 <= probability <=1.
+        #  The test cases should work for a various timesteps.
+        #  Test cases:
+        #  1.- filename=None, no oparams -> Model & 0 <= probability <=1
+        #  2.- filename=file, no oparams
+        #  3.- filename=None, oparams
+        #  4.- filename=file, oparams
+
+        for dt in [0.01, 0.1, 0.5, 1.0, 1.5, 2.0]:
+
+            # Test 1
+            my_model = bm.PoissonBinding()
+            probability = my_model.binding_probability(dt)
+            self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
+            self.assertEqual(my_model.k_on, params.k_on)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+            # Test 2
+            my_model = bm.PoissonBinding(filename='test_inputs/test_binding/PoissonBinding_params1.csv')
+            probability = my_model.binding_probability(dt)
+            self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
+            self.assertEqual(my_model.k_on, 0.888)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+            # Test 3
+            my_model = bm.PoissonBinding(**{'k_on': 1.0})
+            probability = my_model.binding_probability(dt)
+            self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
+            self.assertEqual(my_model.k_on, 1.0)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+            # Test 4
+            my_model = bm.PoissonBinding(filename='test_inputs/test_binding/PoissonBinding_params1.csv',
+                                         **{'k_on': 1.0})  # oparams is priority!
+            probability = my_model.binding_probability(dt)
+            self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
+            self.assertEqual(my_model.k_on, 1.0)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+

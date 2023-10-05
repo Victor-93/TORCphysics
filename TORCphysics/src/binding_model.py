@@ -133,16 +133,22 @@ class PoissonBinding(BindingModel):
 
         self.oparams = {'k_on': self.k_on}  # Just in case
 
-    def binding_probability(self, on_rate, dt) -> float:
+#    def binding_probability(self, on_rate, dt) -> float:
+    # NOTE: Shouldn't on_rate be the same that k_on? It should be a property of the Site on it's own, right?
+    def binding_probability(self, dt) -> float:
         """ Method for calculating the probability of binding according a Poisson Process.
+
+        Parameters
+        ----------
+        dt : float
+            Timestep in seconds (s).
 
         Returns
         ----------
         probability : float
             A number that indicates the probability of binding in the current timestep.
         """
-
-        return Poisson_process(on_rate, dt)
+        return Poisson_process(self.k_on, dt)
 
 
 class TopoIRecognition(BindingModel):
