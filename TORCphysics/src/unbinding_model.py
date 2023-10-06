@@ -79,8 +79,12 @@ class PoissonUnBinding(UnBindingModel):
             if filename is None:
                 self.k_off = params.k_off
             else:
-                rows = pd.read_csv(filename)
-                self.k_off = float(rows['k_off'])
+                mydata = pd.read_csv(filename)
+                if 'k_off' in mydata.columns:
+                    #  self.k_on = float(rows['k_on'])
+                    self.k_off = mydata['k_off'][0]
+                else:
+                    raise ValueError('Error, k_off parameter missing in csv file for PoissonUnBinding')
         else:
             self.k_off = oparams['k_off']
 

@@ -142,8 +142,12 @@ class PoissonBinding(BindingModel):
                 self.k_on = params.k_on  # If no filename was given, then it uses default k_on.
                 # Note that the value used also depends on the input site.csv file.
             else:
-                rows = pd.read_csv(filename)
-                self.k_on = float(rows['k_on'])
+                mydata = pd.read_csv(filename)
+                if 'k_on' in mydata.columns:
+                    #  self.k_on = float(rows['k_on'])
+                    self.k_on = mydata['k_on'][0]
+                else:
+                    raise ValueError('Error, k_on parameter missing in csv file for PoissonBinding')
         else:
             self.k_on = oparams['k_on']
 
@@ -177,9 +181,13 @@ class TopoIRecognition(BindingModel):
                 self.k_on = params.topo_b_k_on
             else:
                 rows = pd.read_csv(filename)
-                self.width = float(rows['width'])
-                self.threshold = float(rows['threshold'])
-                self.k_on = float(rows['k_on'])
+                #  self.width = float(rows['width'])
+                #  self.threshold = float(rows['threshold'])
+                #  self.k_on = float(rows['k_on'])
+                self.width = rows['width'][0]
+                self.threshold = rows['threshold'][0]
+                self.k_on = rows['k_on'][0]
+
         else:
             self.width = float(oparams['width'])
             self.threshold = float(oparams['threshold'])

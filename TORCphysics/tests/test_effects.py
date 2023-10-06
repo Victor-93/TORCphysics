@@ -23,7 +23,6 @@ enzyme_list1 = [enzyme1, enzyme2, enzyme3, enzyme4]
 
 
 class TestEffectModel(TestCase):
-    # TODO: Try testing a bad csv for a Model.
     def test_get_effect_model(self):
         # Cases:
         #  1.- e_model=None, oparams=whatever, oparams_file=whatever, model_name=None -> None, None, None, None.
@@ -137,7 +136,6 @@ class TestEffectModel(TestCase):
         #  4.- filename=file, oparams
 
         for dt in [0.01, 0.1, 0.5, 1.0, 1.5, 2.0]:
-
             # Test 1
             # ---------------------------
             my_model = em.RNAPUniform()  # default
@@ -161,8 +159,8 @@ class TestEffectModel(TestCase):
             self.assertEqual(my_enzyme.effect_model.gamma, params.gamma)
 
             self.assertEqual(my_effect.position, correct_position)
-            self.assertLessEqual(abs(my_effect.twist_left)-correct_twist, 0.000001)
-            self.assertLessEqual(abs(my_effect.twist_right)-correct_twist, 0.000001)
+            self.assertLessEqual(abs(my_effect.twist_left) - correct_twist, 0.000001)
+            self.assertLessEqual(abs(my_effect.twist_right) - correct_twist, 0.000001)
 
             # Test 2
             # ---------------------------
@@ -185,8 +183,8 @@ class TestEffectModel(TestCase):
             self.assertEqual(my_model.gamma, 2.0)
 
             self.assertEqual(my_effect.position, correct_position)
-            self.assertLessEqual(abs(my_effect.twist_left)-correct_twist, 0.000001)
-            self.assertLessEqual(abs(my_effect.twist_right)-correct_twist, 0.000001)
+            self.assertLessEqual(abs(my_effect.twist_left) - correct_twist, 0.000001)
+            self.assertLessEqual(abs(my_effect.twist_right) - correct_twist, 0.000001)
 
             # Test 3
             # ---------------------------
@@ -237,7 +235,6 @@ class TestEffectModel(TestCase):
             self.assertLessEqual(abs(my_effect.twist_left) - correct_twist, 0.000001)
             self.assertLessEqual(abs(my_effect.twist_right) - correct_twist, 0.000001)
 
-    # TODO: Do the same for binding and unbinding models!
     def test_RNAPUniform_bad_csv(self):
         # test 1 = bad velocity
         filename = 'test_inputs/test_effect/RNAPUniform_badvelocity.csv'
@@ -252,8 +249,20 @@ class TestEffectModel(TestCase):
         self.assertEqual(str(context.exception), 'Error, gamma parameter missing in csv file for RNAPUniform')
 
 
+class TestEffect(TestCase):
 
-class TestEffects(TestCase):
+    # Just test that it assigns the data correctly.
+    def test_effect_1(self):
+        for index, enzyme in enumerate(enzyme_list1):
+            my_effect = em.Effect(index=index, position=enzyme.position,
+                                  twist_left=enzyme.twist, twist_right=enzyme.twist)
+            self.assertEqual(my_effect.index, index)
+            self.assertEqual(my_effect.position, enzyme.position)
+            self.assertEqual(my_effect.twist_left, enzyme.twist)
+            self.assertEqual(my_effect.twist_right, enzyme.twist)
+
+
+class TestEffectFunctions(TestCase):
 
     def test_get_start_end_c(self):
         nbp = 5
