@@ -6,7 +6,6 @@ from TORCphysics import effect_model as em
 
 class TestBindingModel(TestCase):
 
-    # TODO: Testea esto
     def test_get_unbinding_model(self):
         # Cases:
         #  1.- ub_model=None, oparams=whatever, oparams_file=whatever, model_name=None -> None, None, None, None.
@@ -144,3 +143,10 @@ class TestBindingModel(TestCase):
             self.assertEqual(my_model.k_off, 1.0)
             self.assertGreaterEqual(probability, 0.0)
             self.assertLessEqual(probability, 1.0)
+
+    def test_PoissonUnBinding_bad_csv(self):
+        # Poisson Binding model that has k_on but not k_off
+        filename = 'test_inputs/test_binding/PoissonBinding_params1.csv'
+        with self.assertRaises(ValueError) as context:
+            ubm.PoissonUnBinding(filename=filename)
+        self.assertEqual(str(context.exception), 'Error, k_off parameter missing in csv file for PoissonUnBinding')

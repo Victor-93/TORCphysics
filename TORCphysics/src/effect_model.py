@@ -138,6 +138,7 @@ class RNAPUniform(EffectModel):
      oparams : dict, optional
         A dictionary containing the parameters used for the effect model.
     """
+
     # def __init__(self, name, filename):
     def __init__(self, filename=None, **oparams):
         """ The constructor of the RNAPUniform subclass.
@@ -160,11 +161,13 @@ class RNAPUniform(EffectModel):
             else:  # There is a file!
                 mydata = pd.read_csv(filename)
                 if 'velocity' in mydata.columns:
-                    self.velocity = float(mydata['velocity'])
+                    #  self.velocity = float(mydata['velocity'])
+                    self.velocity = mydata['velocity'][0]
                 else:
                     raise ValueError('Error, velocity parameter missing in csv file for RNAPUniform')  # ', filename)
                 if 'gamma' in mydata.columns:
-                    self.gamma = float(mydata['gamma'])
+                    #  self.gamma = float(mydata['gamma'])
+                    self.gamma = mydata['gamma'][0]
                 else:
                     raise ValueError('Error, gamma parameter missing in csv file for RNAPUniform')  #: ', filename)
         else:

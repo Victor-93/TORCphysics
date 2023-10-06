@@ -153,4 +153,9 @@ class TestBindingModel(TestCase):
             self.assertGreaterEqual(probability, 0.0)
             self.assertLessEqual(probability, 1.0)
 
-
+    def test_PoissonBinding_bad_csv(self):
+        # bad k_on
+        filename = 'test_inputs/test_binding/PoissonBinding_bad.csv'
+        with self.assertRaises(ValueError) as context:
+            bm.PoissonBinding(filename=filename)
+        self.assertEqual(str(context.exception), 'Error, k_on parameter missing in csv file for PoissonBinding')
