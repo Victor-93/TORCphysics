@@ -16,6 +16,7 @@ class AddEnzyme:
         self.enzyme = Enzyme(e_type=e_type, name=name, site=site, position=position, size=size,
                              twist=0.0, superhelical=0.0, k_cat=0.0, k_off=0.0)
 
+
 # Run normal simulation but adding custom enzymes.
 # custom enzymes is a list of CustomEnzyme objects...
 def run_simulation(my_circuit, custom_enzymes):

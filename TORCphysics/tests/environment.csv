@@ -1,6 +1,0 @@
-type,name,site_type,concentration,size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
-topo,topoI,DNA,0.25,120,recognition,recognition_topoI.csv,constant,none,poisson,none
-topo,gyrase,DNA,0.25,120,recognition,none,constant,none,poisson,none
-ATP,ATP,none,0.0,0.0,none,none,none,none,none,none
-NAP,lacI,lacOP,0.0,0.0,none,none,none,none,none,none
-RNAP,RNAP,gene,1.0,32,none,none,uniform,none,gene_transcribed,none
