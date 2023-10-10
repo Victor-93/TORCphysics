@@ -6,6 +6,8 @@ import pandas as pd
 
 
 # TODO: Sort output names of tests
+# TODO: Queria ver como puedo definir los bare DNA sites. Pensaba que anadiendo un global en el sites haria las cosas
+#  mas faciles, pero aun no se.
 class TestCircuit(TestCase):
 
     # For this test, Circuit should be able to process these non-empty input files (which hopefully are correct).

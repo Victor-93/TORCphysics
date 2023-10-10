@@ -56,19 +56,6 @@ class Circuit:
         # these new sites will need to be created
         # TODO: Maybe we can store it in define_bar_DNA_binding_sites, so this happens in general, for DNA binding
         #  enzymes.
-        if topoisomerase_model == 'stochastic':
-            topo_list = [environment for environment in self.environmental_list
-                         if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
-            for topo in topo_list:
-                # The idea is that the topos will recognize these specific sites.
-                # These sites will be created dynamically, and will have different names :0,1,2,3,...
-                # I will have to ignore this first site in specific, because this one will be the overall, and is the
-                # one that is output in the sites_df.csv
-                t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global',
-                              start=1, end=self.size, k_min=0, k_max=0,
-                              s_model_name=topo.binding_model + '_' + topo.name, oparams=topo.binding_oparams)
-                self.site_list.append(t_site)
-
         # Define bare DNA binding sites for bare DNA binding enzymes
         self.define_bare_DNA_binding_sites()
 
@@ -815,6 +802,21 @@ class Circuit:
     # This function defines the binding sites of enzymes that recognize bare DNA, that means just DNA.
     # It partitions the DNA in N binding sites of size enzyme.size
     def define_bare_DNA_binding_sites(self):
+
+        if self.topoisomerase_model == 'stochastic':
+            topo_list = [environment for environment in self.environmental_list
+                         if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
+            for topo in topo_list:
+                # The idea is that the topos will recognize these specific sites.
+                # These sites will be created dynamically, and will have different names :0,1,2,3,...
+                # I will have to ignore this first site in specific, because this one will be the overall, and is the
+                # one that is output in the sites_df.csv
+                t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global',
+                              start=1, end=self.size, k_min=0, k_max=0,
+                              s_model_name=topo.binding_model + '_' + topo.name, oparams=topo.binding_oparams)
+                self.site_list.append(t_site)
+
+
         environment_list = [environment for environment in self.environmental_list
                             if environment.site_type == 'DNA']
 
