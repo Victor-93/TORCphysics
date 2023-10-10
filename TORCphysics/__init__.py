@@ -6,6 +6,7 @@ from .src import effect_model
 from .src.site import Site, SiteFactory
 from .src.environment import Environment, EnvironmentFactory
 from .src.enzyme import Enzyme, EnzymeFactory
+from .src import models_workflow
 from .src.log import Event, Log
 from .src import analysis
 from .src import visualization

@@ -28,6 +28,9 @@ class Site:
         The ending position of the site.
     k_on : float
         The minimum binding rate.
+    global_site : bool
+        Indicates if the site is a global site. Global sites are not actually bound by enzymes, but they keep track of
+        the number of times an enzyme/molecule that recognizes bare DNA, bound the DNA anywhere.
     direction : int
         The direction of sites: -1 = left; 0 = no direction; 1 = right
     binding_model_name : str, optional
@@ -50,7 +53,8 @@ class Site:
 
     def __init__(self, site_type, name, start, end, k_on,
                  binding_model_name=None, binding_oparams_file=None,
-                 binding_model=None, binding_model_oparams=None):
+                 binding_model=None, binding_model_oparams=None,
+                 global_site=False):
         """ The constructor of  Site class.
 
         Parameters
@@ -75,6 +79,10 @@ class Site:
             The preloaded binding model to use. This binding model already contains any additional oparams parameters.
         binding_model_oparams : dict, optional
             Dictionary with parameters to include in the binding model.
+        global_site : bool
+            Indicates if the site is a global site. Global sites are not actually bound by enzymes, but they keep track of
+            the number of times an enzyme/molecule that recognizes bare DNA, bound the DNA anywhere.
+
 
         Example
         ----------
@@ -94,6 +102,7 @@ class Site:
         self.start = start
         self.end = end
         self.k_on = k_on
+        self.global_site = global_site
 
         # Assign models
         self.binding_model_name = binding_model_name

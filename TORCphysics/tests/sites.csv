@@ -1,8 +1,0 @@
-type,name,start,end,k_min,k_max,model,oparams
-gene,tetA,85,1276,0.016,0.016,poisson,none
-gene,CDS,1914,2106,0.001,0.001,poisson,none
-gene,mKalama1,4267,3449,0.002,0.0244,maxmin,mKalama1_response.csv
-gene,Raspberry,4491,5273,0.002,0.0244,sam,none
-origin,ori,3085,0,0.0,0.0,none,none
-lacOP,lac1,3167,0,0.0,0.0,none,none
-lacOP,lac2,4371,0,0.0,0.0,none,none

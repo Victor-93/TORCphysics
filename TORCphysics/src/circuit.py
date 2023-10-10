@@ -5,9 +5,12 @@ import sys
 from TORCphysics import Site, SiteFactory, Enzyme, EnzymeFactory, Environment, EnvironmentFactory, Event, Log, params
 from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
+from TORCphysics import models_workflow as mw
 
 
 # TODO: Check how you determine enzymes bind, do they bind where with the left end on the site.start?
+# TODO: Check which inputs are optional (this is not urgent right now).
+# TODO: Remove topoisomerase_model and mechanistic_model
 class Circuit:
 
     def __init__(self, circuit_filename, sites_filename, enzymes_filename, environment_filename,
@@ -28,13 +31,15 @@ class Circuit:
         self.size = 0
         self.twist = None
         self.superhelical = None
+        self.sequence = None
         self.dt = dt  # time step
         self.topoisomerase_model = topoisomerase_model
         self.mechanical_model = mechanical_model
         self.read_csv()  # Here, it gets the name,structure, etc
-        self.site_list = SiteFactory(sites_filename).site_list
-        self.enzyme_list = EnzymeFactory(enzymes_filename, self.site_list).enzyme_list
-        self.environmental_list = EnvironmentFactory(environment_filename, self.site_list).environment_list
+        self.site_list = SiteFactory(filename=sites_filename).site_list
+        self.enzyme_list = EnzymeFactory(filename=enzymes_filename, site_list=self.site_list).enzyme_list
+        self.environmental_list = EnvironmentFactory(filename=environment_filename,
+                                                     site_list=self.site_list).environment_list
         self.check_object_inputs()  # Checks that the site, environmental and enzyme lists are correct
         self.time = 0
         # create a time-based seed and save it, and initialize our random generator with this seed
@@ -43,12 +48,14 @@ class Circuit:
         # This option indicates if you want to include the specific sites for non-specific DNA binding proteins
         self.write_nonspecific_sites = False  # TODO: add this option as input
         # TODO: Create list of warnings in the future, and remove duplicates to print at the end of simulation
-        # self.warnings = []  # List with warningss
+        # self.warnings = []  # List with warnings
 
         # -----------------------------------------------
         # We add new DNA sites which is the ones that we will link topos binding
         # Note: In the future there might be cases in which new enzymes will be added to the environment, so maybe,
         # these new sites will need to be created
+        # TODO: Maybe we can store it in define_bar_DNA_binding_sites, so this happens in general, for DNA binding
+        #  enzymes.
         if topoisomerase_model == 'stochastic':
             topo_list = [environment for environment in self.environmental_list
                          if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
@@ -94,6 +101,42 @@ class Circuit:
         self.environmental_dict_list = []
         self.append_environmental_to_dict()
 
+    # This reads the circuit csv and sorts out the twist and structure
+    def read_csv(self):
+        df = pd.read_csv(self.circuit_filename)
+        sequence_file = df['sequence'][0]
+        self.name = df['name'][0]
+        self.structure = df['structure'][0]
+        if self.structure == 'circle' or self.structure == 'circular' or self.structure == 'close':
+            self.circle = True
+        elif self.structure == 'linear' or self.structure == 'lineal' or self.structure == 'open':
+            self.circle = False
+        else:
+            self.circle = False
+        self.size = df['size'][0]
+        self.twist = df['twist'][0]
+        self.superhelical = df['superhelical'][0]
+        # And the sequence if given
+        if (sequence_file == '' or sequence_file == 'None' or sequence_file == 'none' or sequence_file is None
+                or sequence_file == np.nan):
+            self.sequence = None
+        else:
+            self.read_fasta(sequence_file)
+            self.size = len(self.sequence)
+
+    # Read fasta file. Returns the sequence
+    def read_fasta(self, file_name):
+        fasta_file = open(file_name, 'r')
+        header = fasta_file.readline()  # Reads the header
+        lines = []  # This one will contain all the lines
+        while True:
+            line = fasta_file.readline()
+            if not line:  # If we reach the end, break loop
+                break
+            lines.append(line[:-1])  # -1 so we remove the spacing
+        self.sequence = ''.join(lines)  # And join all lines to obtain sequence
+        fasta_file.close()
+
     # This one runs the simulation
     # TODO: Think a way of making your run() function run for additional number of frames. This will make the code more
     #  versatile and will allow you create experiments where you add stuff manually
@@ -122,7 +165,7 @@ class Circuit:
             # BINDING
             # --------------------------------------------------------------
             # Apply binding model and get list of new enzymes
-            new_enzyme_list = bm.binding_model(self.enzyme_list, self.environmental_list, self.dt, self.rng)
+            new_enzyme_list = mw.binding_model(self.enzyme_list, self.environmental_list, self.dt, self.rng)
             # These new enzymes are lacking twist and superhelical, we need to fix them and actually add them
             # to the enzyme_list
             # But before, add the binding events to the log  (it's easier to do it first)
@@ -397,8 +440,13 @@ class Circuit:
 
     def add_fake_boundaries(self):
         # I  need to add a fake site, so I can link the fake boundaries
-        self.site_list.append(Site(s_type='EXT', name='EXT', start=1, end=self.size, k_min=0, k_max=0, s_model_name=None,
-                                   oparams=None))  # twist=self.twist, superhelical=self.superhelical) )
+        #    def __init__(self, site_type, name, start, end, k_on,
+        #                 binding_model_name=None, binding_oparams_file=None,
+        #                 binding_model=None, binding_model_oparams=None):
+        print(self.size)
+
+        self.site_list.append(
+            Site(site_type='EXT', name='EXT', start=1, end=float(self.size), k_on=0.0))
 
         # TODO: So the way you define continuations is with the fake boundaries? I should also include the local
         #  DNA sites
@@ -426,23 +474,18 @@ class Circuit:
                 position_left = 0
                 position_right = self.size + 1  # it is the same in this case for either linear or circular
 
-            # TODO: I can distribute the supercoiling when defining the sites?
-            #            for site in self.site_list:  # Distribute supercoiling -
-            #                site.superhelical = self.superhelical
             for enzyme in self.enzyme_list:  # Distribute supercoiling -
                 enzyme.superhelical = self.superhelical
 
             # Let's treat the boundaries of our system as objects.
             # ----------------------------------------------------------------
             # Notice that we don't specify the end
-            # TODO: the site needs to be defined first
-            extra_left = Enzyme(e_type='EXT', name='EXT_L', site=self.site_match('EXT', 'EXT'), position=position_left,
-                                size=0, k_off=0, twist=0, superhelical=self.superhelical,
-                                effect_model=None, effect_oparams=None)
+            extra_left = Enzyme(e_type='EXT', name='EXT_L', site=self.site_match('EXT', 'EXT'),
+                                position=position_left, size=0, effective_size=0,
+                                twist=0, superhelical=self.superhelical)
             extra_right = Enzyme(e_type='EXT', name='EXT_R', site=self.site_match('EXT', 'EXT'),
-                                 position=position_right,
-                                 size=0, k_off=0, twist=0, superhelical=self.superhelical,
-                                 effect_model=None, effect_oparams=None)
+                                 position=position_right, size=0, effective_size=0,
+                                 twist=0, superhelical=self.superhelical)
 
             self.enzyme_list.append(extra_left)
             self.enzyme_list.append(extra_right)
@@ -463,22 +506,6 @@ class Circuit:
     def update_supercoiling(self):
         for i, enzyme in enumerate(self.enzyme_list[:-1]):
             enzyme.superhelical = em.calculate_supercoiling(enzyme, self.enzyme_list[i + 1])
-
-    # This reads the circuit csv and sorts out the twist and structure
-    def read_csv(self):
-        df = pd.read_csv(self.circuit_filename)
-        self.name = df['name'][0]
-        self.structure = df['structure'][0]
-        if self.structure == 'circle' or self.structure == 'circular' or self.structure == 'close':
-            self.circle = True
-        elif self.structure == 'linear' or self.structure == 'lineal' or self.structure == 'open':
-            self.circle = False
-        else:
-            self.circle = False
-        self.size = df['size'][0]
-        self.twist = df['twist'][0]
-        self.superhelical = df['superhelical'][0]
-        # (Maybe it shouldn't be provided)
 
     # Get number of enzymes
     def get_num_enzymes(self):
@@ -825,66 +852,67 @@ class Circuit:
          provided, it assigns them to the default models if necessary
          """
 
-        # TODO: Define list of available and supported models in params.
-        #  If the model that is specified is not supported, then remove the model by model = None, and oparams=None
-        # Sites
+        # TODO: The sites, environmentals and enzymes check their inputs on their own. Here we should focus on checking
+        #  the inputs of the circle class
+        # TODO: Also check that size of bound enzymes, or sites are within the size of the circuit.
+        # Sites - The Site class is capable of checking this on its own.
         # ================================
-        for site in self.site_list:
-            if site.site_model == 'maxmin' and site.oparams is None:
-                site.site_model = 'sam'
-                print('For site ', site.name, 'maxmin model selected but no parameters provided. '
-                                              'Switching to sam model')
+        # for site in self.site_list:
+        #    if site.site_model == 'maxmin' and site.oparams is None:
+        #        site.site_model = 'sam'
+        #        print('For site ', site.name, 'maxmin model selected but no parameters provided. '
+        #                                      'Switching to sam model')
 
         # Environment
         # ================================
-        for environment in self.environmental_list:
+        # for environment in self.environmental_list:
 
-            # For the binding model
-            # -------------------------------------------------------------------
-            if environment.binding_oparams is None:
+        # For the binding model
+        # -------------------------------------------------------------------
+        #   if environment.binding_oparams is None:#
 
-                # In case of topoisomerase enzyme and stochastic model
-                if self.topoisomerase_model == 'stochastic' and 'topo' in environment.enzyme_type:
-                    environment.binding_model = 'recognition'  # The default recognition model in case of stochastic
-                    if 'topoI' in environment.name:
-                        environment.binding_oparams = {'width': params.topo_b_w, 'threshold': params.topo_b_t}
-                    elif 'gyrase' in environment.name:
-                        environment.binding_oparams = {'width': params.gyra_b_w, 'threshold': params.gyra_b_t}
+        # In case of topoisomerase enzyme and stochastic model
+        #       if self.topoisomerase_model == 'stochastic' and 'topo' in environment.enzyme_type:
+        #           environment.binding_model = 'recognition'  # The default recognition model in case of stochastic
+        #           if 'topoI' in environment.name:
+        #               environment.binding_oparams = {'width': params.topo_b_w, 'threshold': params.topo_b_t}
+        #           elif 'gyrase' in environment.name:
+        #               environment.binding_oparams = {'width': params.gyra_b_w, 'threshold': params.gyra_b_t}
 
-            # In case it is a continuum model, then there's no binding
-            if self.topoisomerase_model == 'continuum' and 'topo' in environment.enzyme_type:
-                environment.binding_model = None
-                environment.binding_oparams = None
+        # In case it is a continuum model, then there's no binding
+        #  if self.topoisomerase_model == 'continuum' and 'topo' in environment.enzyme_type:
+        #      environment.binding_model = None
+        #      environment.binding_oparams = None
 
-            # For the effect model
-            # -------------------------------------------------------------------
-            if environment.effect_oparams is None:
-                # In case of topo
-                if 'topo' in environment.enzyme_type:
-                    if 'topoI' in environment.name:
-                        environment.effect_oparams = {'k_cat': params.topo_k, 'width': params.topo_e_w,
-                                                      'threshold': params.topo_e_t}
-                    elif 'gyrase' in environment.name:
-                        environment.effect_oparams = {'k_cat': params.gyra_k, 'width': params.gyra_e_w,
-                                                      'threshold': params.gyra_e_t}
-                # In case of RNAP
-                elif 'RNAP' in environment.enzyme_type:
-                    environment.effect_oparams = {'velocity': params.v0, 'gamma': params.gamma}
+        # For the effect model
+        # -------------------------------------------------------------------
+        #   if environment.effect_oparams is None:
+        # In case of topo
+        #       if 'topo' in environment.enzyme_type:
+        #           if 'topoI' in environment.name:
+        #               environment.effect_oparams = {'k_cat': params.topo_k, 'width': params.topo_e_w,
+        #                                             'threshold': params.topo_e_t}
+        #           elif 'gyrase' in environment.name:
+        #               environment.effect_oparams = {'k_cat': params.gyra_k, 'width': params.gyra_e_w,
+        #                                             'threshold': params.gyra_e_t}
+        # In case of RNAP
+        #       elif 'RNAP' in environment.enzyme_type:
+        #           environment.effect_oparams = {'velocity': params.v0, 'gamma': params.gamma}
 
         # Enzyme
         # ================================
-        for enzyme in self.enzyme_list:
-            if enzyme.effect_oparams is None:
-                # In case of topo
-                if 'topo' in environment.enzyme_type:
-                    if self.topoisomerase_model == 'continuum':
-                        enzyme.effect_model = 'continuum'
-                    if 'topoI' in environment.name:
-                        environment.effect_oparams = {'k_cat': params.topo_k, 'width': params.topo_e_w,
-                                                      'threshold': params.topo_e_t}
-                    elif 'gyrase' in environment.name:
-                        environment.effect_oparams = {'k_cat': params.gyra_k, 'width': params.gyra_e_w,
-                                                      'threshold': params.gyra_e_t}
-                # In case of RNAP
-                elif 'RNAP' in environment.enzyme_type:
-                    environment.effect_oparams = {'velocity': params.v0, 'gamma': params.gamma}
+        # for enzyme in self.enzyme_list:
+        #    if enzyme.effect_oparams is None:
+        # In case of topo
+        #        if 'topo' in environment.enzyme_type:
+        #            if self.topoisomerase_model == 'continuum':
+        #                enzyme.effect_model = 'continuum'
+        #            if 'topoI' in environment.name:
+        #                environment.effect_oparams = {'k_cat': params.topo_k, 'width': params.topo_e_w,
+        #                                              'threshold': params.topo_e_t}
+        #            elif 'gyrase' in environment.name:
+        #                environment.effect_oparams = {'k_cat': params.gyra_k, 'width': params.gyra_e_w,
+        #                                              'threshold': params.gyra_e_t}
+        # In case of RNAP
+        #        elif 'RNAP' in environment.enzyme_type:
+        #            environment.effect_oparams = {'velocity': params.v0, 'gamma': params.gamma}
