@@ -144,7 +144,6 @@ class Circuit:
         for frame in range(1, self.frames + 1):
             self.frame += 1
             self.time = frame * self.dt
-            print(frame)
             if self.series:
                 self.append_sites_to_dict_step1()
 
@@ -247,6 +246,7 @@ class Circuit:
             my_supercoiling[frame] = self.superhelical
         return my_supercoiling
 
+    # TODO: Make these functions are compatible with the new input csvs.
     # Returns list of enzymes in the form of dataframe. This function is with the intention of outputting the system
     def enzyme_list_to_df(self):
         enzyme_aux = []  # This will be a list of dicts
@@ -274,8 +274,10 @@ class Circuit:
     def site_list_to_df(self):
         site_aux = []  # This will be a list of dicts
         for site in self.site_list:
-            d = {'type': site.site_type, 'name': site.name, 'start': site.start, 'end': site.end, 'k_min': site.k_min,
-                 'k_max': site.k_max, 'model': site.site_model, 'oparams': site.oparams}
+            d = {'type': site.site_type, 'name': site.name, 'start': site.start, 'end': site.end,
+                 'model': site.binding_model_name}  # , 'oparams': site.oparams}
+#            d = {'type': site.site_type, 'name': site.name, 'start': site.start, 'end': site.end, 'k_min': site.k_min,
+#                 'k_max': site.k_max, 'model': site.site_model, 'oparams': site.oparams}
             site_aux.append(d)
         my_df = pd.DataFrame.from_dict(site_aux)
         return my_df
@@ -325,8 +327,12 @@ class Circuit:
                 site_superhelical = self.superhelical
                 site_twist = self.twist
             else:
+                # TODO: Something is going on here with the EXT positions!
                 enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start]
                 if len(enzyme_before) <= 0:
+                    # TODO: Raises ValueError.
+                    # TODO: The error that causes this, is that some enzymes go off the edges, find a way to prevent or
+                    #  handle these situations
                     print('Some error in append_sites_dict_step1')
                     sys.exit()
                 enzyme_before = [enzyme for enzyme in self.enzyme_list if enzyme.position <= site.start][-1]

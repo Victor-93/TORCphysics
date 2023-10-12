@@ -1,0 +1,34 @@
+TORCphysics log file 
+
+General information: 
+---------------------------------------------------------------------------------------
+Circuit name: test1_output
+Size: 6000
+Structure: circle
+Number of sites: 5
+Number of frames: 1500
+Simulation time: 750.0
+Simulation timestep: 0.5
+Seed: 928135384643740910
+ 
+Overall simulation information 
+---------------------------------------------------------------------------------------
+Initial twist: -208.24271
+Final twist: -208.24271
+Initial superhelical density: -0.06000
+Final superhelical density: -0.06073
+ 
+Overall rates 
+---------------------------------------------------------------------------------------
+site type            site name            #binding events      #unbinding events    binding rates        
+ EXT                  EXT                                   0.0                  0.0                   0.0 
+gene                 tetA                                  1.0                  1.0  0.0013333333333333333 
+origin               ori                                   0.0                  0.0                   0.0 
+lacOP                lac1                                  0.0                  0.0                   0.0 
+gene                 mKalama1                              1.0                  0.0  0.0013333333333333333 
+ 
+Events
+---------------------------------------------------------------------------------------
+frame 4 time 2.0 binding_event at gene mKalama1 enzyme RNAP2 with twist -108.21440 superhelical -0.06217 global twist -208.24271 global supercoiling -0.06000
+frame 37 time 18.5 binding_event at gene tetA enzyme RNAP1 with twist -128.15715 superhelical -0.09299 global twist -208.24271 global supercoiling -0.06073
+frame 79 time 39.5 unbinding_event at gene tetA enzyme RNAP1 with twist -72.35685 superhelical -0.15146 global twist -208.24271 global supercoiling -0.06127
