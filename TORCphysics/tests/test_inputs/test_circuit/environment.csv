@@ -1,3 +1,3 @@
 type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
-RNAP,RNAP1,gene,0.2,50,32,none,none,RNAPUniform,none,none,none
-RNAP,RNAP2,gene,0.2,70,42,none,none,RNAPUniform,none,none,none
+RNAP,RNAP1,gene,0.2,50,32,none,none,RNAPUniform,none,RNAPSimpleUnbinding,none
+RNAP,RNAP2,gene,0.2,70,42,none,none,RNAPUniform,none,RNAPSimpleUnbinding,none

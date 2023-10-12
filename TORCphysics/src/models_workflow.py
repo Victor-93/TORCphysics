@@ -282,7 +282,7 @@ def unbinding_workflow(enzymes_list, dt, rng):
 
         # According enzyme_type, apply unbinding condition
         # ------------------------------------------------------------------
-        unbinding_probability = enzyme.unbinding_model.unbinding_probability()
+        unbinding_probability = enzyme.unbinding_model.unbinding_probability(enzyme, dt)
 
         urandom = rng.uniform()  # we need a random number
 

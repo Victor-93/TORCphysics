@@ -91,11 +91,13 @@ class PoissonUnBinding(UnBindingModel):
         self.oparams = {'k_off': self.k_off}  # Just in case
 
     #    def unbinding_probability(self, off_rate, dt) -> float:
-    def unbinding_probability(self, dt) -> float:
+    def unbinding_probability(self, enzyme, dt) -> float:
         """ Method for calculating the probability of unbinding according a Poisson Process.
 
         Parameters
         ----------
+        enzyme : Enzyme
+            The enzyme that is currently transcribing the DNA and its site.
         dt : float
             Timestep in seconds (s).
 
@@ -105,6 +107,59 @@ class PoissonUnBinding(UnBindingModel):
             A number that indicates the probability of unbinding in the current timestep.
         """
         return Poisson_process(self.k_off, dt)
+
+
+class RNAPSimpleUnbinding(UnBindingModel):
+    """
+     An UnbindingModel subclass that calculates unbinding probabilities of a RNAP transcribing a gene.
+     In this simple model, the RNAP unbinds if it reaches the end of the transcribing region.
+
+     This model doesn't really have any useful attributes.
+
+     Attributes
+     ----------
+     filename : str, optional
+         Path to the site csv file that parametrises the unbinding model.
+     oparams : dict, optional
+         A dictionary containing the parameters used for the unbinding model.
+    """
+    def __init__(self, filename=None, **oparams):
+        """ The constructor of the PoissonUnBinding subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the unbinding model; for this model, there's nothing useful in
+            a file.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the unbinding model. In this case, it is not required
+        """
+        super().__init__(filename, **oparams)  # Call the base class constructor
+
+    #    def unbinding_probability(self, off_rate, dt) -> float:
+    def unbinding_probability(self, enzyme, dt) -> float:
+        """ Method for calculating the probability of unbinding according a Poisson Process.
+
+        Parameters
+        ----------
+        enzyme : Enzyme
+            The enzyme that is currently transcribing the DNA and its site.
+        dt : float
+            Timestep in seconds (s).
+
+        Returns
+        ----------
+        probability : float
+            A number that indicates the probability of unbinding in the current timestep.
+        """
+
+        probability = -0.01  # It will not unbind unless fulfils the condition
+        if (enzyme.direction == 1 and enzyme.end - enzyme.position <= 0) or \
+                (enzyme.direction == -1 and enzyme.end - enzyme.position >= 0):
+            probability = 1.1  # There's no way it won't unbind with this
+
+        return probability
+
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -221,6 +276,8 @@ def assign_unbinding_model(model_name, oparams_file=None, **oparams):
     """
     if model_name == 'PoissonUnBinding':
         my_model = PoissonUnBinding(filename=oparams_file, **oparams)
+    elif model_name == 'RNAPSimpleUnbinding':
+        my_model = RNAPSimpleUnbinding(filename=oparams_file, **oparams)
     else:
         raise ValueError('Could not recognise unbinding model ' + model_name)
     return my_model
