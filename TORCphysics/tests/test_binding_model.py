@@ -1,7 +1,10 @@
 from unittest import TestCase
-from TORCphysics import params
+from TORCphysics import params, Environment
 from TORCphysics import binding_model as bm
 from TORCphysics import effect_model as em
+
+environmental1 = Environment(e_type='RNAP', name='test1', site_list=[], concentration=0.1, size=100,
+                             effective_size=50, site_type='gene')
 
 
 class TestBindingModel(TestCase):
@@ -118,11 +121,11 @@ class TestBindingModel(TestCase):
         #  3.- filename=None, oparams
         #  4.- filename=file, oparams
 
-        for dt in [0.01, 0.1, 0.5, 1.0, 1.5, 2.0]:
-
+        for dt in [0.01, 0.1, 0.5, 1.0, 1.5, 2.0]:#
+            supercoiling = -0.06
             # Test 1
             my_model = bm.PoissonBinding()
-            probability = my_model.binding_probability(dt)
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
             self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
             self.assertEqual(my_model.k_on, params.k_on)
             self.assertGreaterEqual(probability, 0.0)
@@ -130,7 +133,7 @@ class TestBindingModel(TestCase):
 
             # Test 2
             my_model = bm.PoissonBinding(filename='test_inputs/test_binding/PoissonBinding_params1.csv')
-            probability = my_model.binding_probability(dt)
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
             self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
             self.assertEqual(my_model.k_on, 0.888)
             self.assertGreaterEqual(probability, 0.0)
@@ -138,7 +141,7 @@ class TestBindingModel(TestCase):
 
             # Test 3
             my_model = bm.PoissonBinding(**{'k_on': 1.0})
-            probability = my_model.binding_probability(dt)
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
             self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
             self.assertEqual(my_model.k_on, 1.0)
             self.assertGreaterEqual(probability, 0.0)
@@ -147,7 +150,7 @@ class TestBindingModel(TestCase):
             # Test 4
             my_model = bm.PoissonBinding(filename='test_inputs/test_binding/PoissonBinding_params1.csv',
                                          **{'k_on': 1.0})  # oparams is priority!
-            probability = my_model.binding_probability(dt)
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
             self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
             self.assertEqual(my_model.k_on, 1.0)
             self.assertGreaterEqual(probability, 0.0)
