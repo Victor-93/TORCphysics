@@ -144,6 +144,7 @@ class Circuit:
         for frame in range(1, self.frames + 1):
             self.frame += 1
             self.time = frame * self.dt
+            print(frame)
             if self.series:
                 self.append_sites_to_dict_step1()
 
@@ -153,7 +154,7 @@ class Circuit:
             # BINDING
             # --------------------------------------------------------------
             # Apply binding model and get list of new enzymes
-            new_enzyme_list = mw.binding_model(self.enzyme_list, self.environmental_list, self.dt, self.rng)
+            new_enzyme_list = mw.binding_workflow(self.enzyme_list, self.environmental_list, self.dt, self.rng)
             # These new enzymes are lacking twist and superhelical, we need to fix them and actually add them
             # to the enzyme_list
             # But before, add the binding events to the log  (it's easier to do it first)
@@ -162,13 +163,13 @@ class Circuit:
 
             # EFFECT
             # --------------------------------------------------------------
-            effects_list = em.effect_model(self.enzyme_list, self.environmental_list, self.dt,
-                                           self.topoisomerase_model, self.mechanical_model)
+            effects_list = mw.effect_workflow(self.enzyme_list, self.environmental_list, self.dt,
+                                                    self.topoisomerase_model, self.mechanical_model)
             self.apply_effects(effects_list)
 
             # UNBINDING
             # --------------------------------------------------------------
-            drop_list_index, drop_list_enzyme = bm.unbinding_model(self.enzyme_list, self.dt, self.rng)
+            drop_list_index, drop_list_enzyme = mw.unbinding_workflow(self.enzyme_list, self.dt, self.rng)
             self.drop_enzymes(drop_list_index)
             self.add_to_environment(drop_list_enzyme)
             #            self.add_unbinding_events_to_log(drop_list)
@@ -817,7 +818,6 @@ class Circuit:
                               start=1, end=self.size, k_min=0, k_max=0,
                               s_model_name=topo.binding_model + '_' + topo.name, oparams=topo.binding_oparams)
                 self.site_list.append(t_site)
-
 
         environment_list = [environment for environment in self.environmental_list
                             if environment.site_type == 'DNA']
