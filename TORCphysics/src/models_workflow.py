@@ -5,6 +5,8 @@ import pandas as pd
 from abc import ABC, abstractmethod
 
 
+# TODO: Properly sort, comment and document your functions.
+
 # Runs through each bound enzyme (in enzyme_list) and creates an effect.
 # It an effects_list which contains indications on how to update the current position and how the twist on the local
 # neighbouring domains are effected
@@ -23,37 +25,45 @@ def effect_workflow(enzyme_list, environmental_list, dt, topoisomerase_model, me
         # -------------------------------------------------------------------------------------------------------------
         # From these models, they can update the position of the current enzyme and affect the local twist on the right
         # and left
-        if enzyme.enzyme_type == 'RNAP':  # For now, only RNAPs have an effect
-            # TODO: in the future, according the input we may choose between different motion models, maybe one with
-            #  torques and not uniform motion
-            if mechanical_model == 'uniform':
-                # Calculates change in position and the twist that it injected on the left and right
-                position, twist_left, twist_right = rnap_uniform_motion(enzyme, enzyme_list, dt)
-            elif mechanical_model == 'torque_stall_Geng':
-                position, twist_left, twist_right = rnap_torque_stall_Geng(enzyme, enzyme_list, dt)
-            else:
-                print('Sorry, cannot recognise mechanistic model')
-                sys.exit()
-            # size = abs(enzyme.site.start - enzyme.site.end + 1)
-            # output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
-            #                                 k_on=0, k_off=0, k_cat=0, size=size)
+
+        # Check if bound enzyme has effect model
+        if enzyme.effect_model is None:
+            continue
+        # Calculate effect and add it to the list
+        effect_i = enzyme.effect_model.calculate_effect(index=i, z=enzyme, z_list=enzyme_list, dt=dt)
+        effect_list.append(effect_i)
+
+        # if enzyme.enzyme_type == 'RNAP':  # For now, only RNAPs have an effect
+        #    # TODO: in the future, according the input we may choose between different motion models, maybe one with
+        #    #  torques and not uniform motion
+        #    if mechanical_model == 'uniform':
+        #        # Calculates change in position and the twist that it injected on the left and right
+        #        position, twist_left, twist_right = rnap_uniform_motion(enzyme, enzyme_list, dt)
+        #    elif mechanical_model == 'torque_stall_Geng':
+        #        position, twist_left, twist_right = rnap_torque_stall_Geng(enzyme, enzyme_list, dt)
+        #    else:
+        #        print('Sorry, cannot recognise mechanistic model')
+        #        sys.exit()
+        #    # size = abs(enzyme.site.start - enzyme.site.end + 1)
+        #    # output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
+        #    #                                 k_on=0, k_off=0, k_cat=0, size=size)
         #            output_enzyme = Enzyme(e_type='mRNA', name=enzyme.site.name, site=None, position=None, size=size,
         #                                   twist=0, superhelical=0)
-        elif enzyme.enzyme_type == 'topo':
-            # topo = [environment for environment in environmental_list
-            #         if environment.name == enzyme.name][0]  # Can select the model from here?
-            position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
-            # TODO: It would probably be better if we have sub-models for effects?
-            #  So we would have a binding model and a effect model.
-        #           if topoisomerase_model == 'stochastic':
-        #                position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
-        #            if topoisomerase_model == 'random_lineal':
-        #                position, twist_left, twist_right = topoisomerase_lineal_supercoiling_injection(enzyme, dt)
-        else:
-            continue
+        # elif enzyme.enzyme_type == 'topo':
+        #    # topo = [environment for environment in environmental_list
+        #    #         if environment.name == enzyme.name][0]  # Can select the model from here?
+        #    position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
+        #    # TODO: It would probably be better if we have sub-models for effects?
+        #    #  So we would have a binding model and a effect model.
+        ##           if topoisomerase_model == 'stochastic':
+        ##                position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
+        ##            if topoisomerase_model == 'random_lineal':
+        ##                position, twist_left, twist_right = topoisomerase_lineal_supercoiling_injection(enzyme, dt)
+        # else:
+        #    continue
 
         # Now create the effect taken place at the enzyme i
-        effect_list.append(Effect(index=i, position=position, twist_left=twist_left, twist_right=twist_right))
+        # effect_list.append(Effect(index=i, position=position, twist_left=twist_left, twist_right=twist_right))
 
     # Topoisomerase continuum model - If we are using a continuum model, then we need to add the topos effects
     # --------------------------------------------------------------
@@ -165,7 +175,7 @@ def select_unbinding_model(enzyme, dt, rng):
 # If the site is available, then, according site binding model calculate the binding probability.
 # It then returns a list of new_enzymes that will bind the DNA
 # rng - is a numpy random generator
-def binding_model(enzyme_list, environmental_list, dt, rng):
+def binding_workflow(enzyme_list, environmental_list, dt, rng):
     new_enzymes = []  # here I will include the new enzymes
 
     # Go through environment
@@ -181,6 +191,10 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
 
         # Go through sites
         for j, site in enumerate(environment.site_list):
+
+            # Pass if site does not have binding model
+            if site.binding_model is None:
+                continue
             # We will do the binding process in this order:
             # Check site and model to use.
             # And calculate binding probability and if it'll bind
@@ -247,13 +261,15 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
     # TODO: check_binding_conflicts() needs testing
     new_enzymes = check_binding_conflicts(new_enzymes, rng)
 
+    # TODO: In the future, It can also return changes in the environment. Maybe the binding of an enzyme changes the
+    #  concentration? Or not...?
     return new_enzymes
 
 
 # Goes through the enzymes in enzymes list and according to their unbinding condition unbind them.
 # Returns a list of enzyme indexes that will unbind, the enzyme that unbinds
 # ---------------------------------------------------------------------------------------------------------------------
-def unbinding_model(enzymes_list, dt, rng):
+def unbinding_workflow(enzymes_list, dt, rng):
     drop_list_index = []  # This list will have the indices of the enzymes that will unbind, and the enzyme
     drop_list_enzyme = []  # And a list with the enzymes
     for i, enzyme in enumerate(enzymes_list):
@@ -261,17 +277,28 @@ def unbinding_model(enzymes_list, dt, rng):
         if enzyme.enzyme_type == 'EXT':  # The fake boundaries can't unbind
             continue
 
+        if enzyme.unbinding_model is None:  # Skip if enzyme doesn't have unbinding model (cannot unbind)
+            continue
+
         # According enzyme_type, apply unbinding condition
         # ------------------------------------------------------------------
-        unbind, have_model = select_unbinding_model(enzyme, dt, rng)
-        if not have_model:  # If I don't have a model, then we skip
-            continue
+        unbinding_probability = enzyme.unbinding_model.unbinding_probability()
+
+        urandom = rng.uniform()  # we need a random number
+
+        if urandom <= unbinding_probability:  # and decide if it'll unbind
+            drop_list_index.append(i)
+            drop_list_enzyme.append(enzyme)
+
+        #  unbind, have_model = select_unbinding_model(enzyme, dt, rng)
+        #  if not have_model:  # If I don't have a model, then we skip
+         #   continue
 
         # Now add it to the drop_list if the enzyme will unbind
         # ------------------------------------------------------------------
-        if unbind:
-            drop_list_index.append(i)
-            drop_list_enzyme.append(enzyme)
+        #  if unbind:
+        #    drop_list_index.append(i)
+        #    drop_list_enzyme.append(enzyme)
 
     return drop_list_index, drop_list_enzyme
 
