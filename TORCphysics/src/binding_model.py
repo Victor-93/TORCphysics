@@ -155,13 +155,17 @@ class PoissonBinding(BindingModel):
 
 #    def binding_probability(self, on_rate, dt) -> float:
     # NOTE: Shouldn't on_rate be the same that k_on? It should be a property of the Site on it's own, right?
-    def binding_probability(self, dt) -> float:
+    def binding_probability(self, environmental, superhelical, dt) -> float:
         """ Method for calculating the probability of binding according a Poisson Process.
 
         Parameters
         ----------
         dt : float
             Timestep in seconds (s).
+        environmental : Environment
+            The environmental molecule that is trying to bind the site.
+        superhelical : float
+            The local supercoiling region in the site.
 
         Returns
         ----------
@@ -196,9 +200,9 @@ class TopoIRecognition(BindingModel):
         self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
 
     # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
-    def binding_probability(self, enzyme, sigma) -> float:
+    def binding_probability(self, environmental, sigma) -> float:
 
-        a = enzyme.concentration * self.k_on
+        a = environmental.concentration * self.k_on
         b = 1 + np.exp((sigma - self.threshold) / self.width)
         rate = a / b
         return rate
@@ -496,68 +500,3 @@ def read_csv_to_dict(filename):
     """
     return pd.read_csv(filename).to_dict()
 
-
-# This function checks if a site is not blocked by other enzymes
-def check_site_availability(site, enzyme_list, size):
-    # Check if the site is available for binding.
-    # It assumes that the probability has already been calculated, and we have a candidate enzyme for the binding
-    # with size=size.
-    # We need the list of current enzymes to see if the one before and after the site overlap with the start site.
-    enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
-    enzyme_after = [enzyme for enzyme in enzyme_list if enzyme.position >= site.start][0]
-    # And a range of their occupancy
-    range_before = [enzyme_before.position, enzyme_before.position + enzyme_before.size]
-    range_after = [enzyme_after.position, enzyme_after.position + enzyme_after.size]
-    # TODO: Check if this is correct! I think it is assuming that enzymes bind just before the start site, which might
-    #  not be true.
-    if site.direction > 0:
-        my_range = [site.start - size, site.start]
-    #        my_range = [site.start, site.start + size]
-    elif site.direction <= 0:
-        my_range = [site.start, site.start + size]
-    else:
-        print('Error in checking site availability. Site=', site.site_type, site.name)
-        sys.exit()
-        #  my_range = [site.start, site.start + size]
-    #        my_range = [site.start, site.start - size]
-
-    # If any of them intersect
-    if (set(range_before) & set(my_range)) or (set(range_after) & set(my_range)):
-        available = False
-    # there is an intersection
-    else:
-        available = True
-
-    return available
-
-
-# ----------------------------------------------------------
-# This function makes sure that only one enzyme will end up binding a region.
-# It checks that the enzymes in the list of new_enzymes do not overlap and if they do, decide which will end up
-# binding
-# TODO: test this function - design a experiment in which you kind of know what outcome you should get.
-def check_binding_conflicts(enzyme_list, rng):
-    enzyme_list.sort(key=lambda x: x.position)  # sort by position
-    checked_enzyme_list = []
-    s = 0
-    for i, my_enzyme in enumerate(enzyme_list):
-        if i == 0:  # We need enzymes after
-            continue
-        enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= my_enzyme.position][-1]
-
-        # Check if they overlap
-        if enzyme_before.position + enzyme_before.size >= my_enzyme.position:
-            # It overlaps, so decide which enzymes stays
-            urandom = rng.uniform()  # we need a random number for the decision
-            if urandom <= 0.5:  # If it is <= 0.5, then the enzyme before stays.
-                del enzyme_list[i - s - 1]
-                s += 1
-                # checked_enzyme_list.append(enzyme_before)
-            else:  # And if >0.5, then we don't add the enzyme before (we lose it).
-                del enzyme_list[i - s]
-                s += 1
-                # continue
-        # else:
-        # checked_enzyme_list.append(enzyme_before)  # If nothing overlaps, then nothing happens
-
-    return enzyme_list  # checked_enzyme_list

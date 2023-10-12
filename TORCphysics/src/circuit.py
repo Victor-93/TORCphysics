@@ -14,7 +14,8 @@ from TORCphysics import models_workflow as mw
 class Circuit:
 
     def __init__(self, circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                 output_prefix, frames, series, continuation, dt, topoisomerase_model, mechanical_model):
+                 output_prefix, frames, series, continuation, dt, topoisomerase_model, mechanical_model,
+                 random_seed=random.randrange(sys.maxsize)):
         # I'll save the input filenames just in case
         self.circuit_filename = circuit_filename
         self.sites_filename = sites_filename
@@ -43,7 +44,7 @@ class Circuit:
         self.check_object_inputs()  # Checks that the site, environmental and enzyme lists are correct
         self.time = 0
         # create a time-based seed and save it, and initialize our random generator with this seed
-        self.seed = random.randrange(sys.maxsize)
+        self.seed = random_seed  # random.randrange(sys.maxsize)
         self.rng = np.random.default_rng(self.seed)
         # This option indicates if you want to include the specific sites for non-specific DNA binding proteins
         self.write_nonspecific_sites = False  # TODO: add this option as input
@@ -799,6 +800,7 @@ class Circuit:
         self.sort_site_list()
         return
 
+    # TODO: See how the sites of enzymes that bind DNA stochastically can be defined here. (with site_global as well).
     # This function defines the binding sites of enzymes that recognize bare DNA, that means just DNA.
     # It partitions the DNA in N binding sites of size enzyme.size
     def define_bare_DNA_binding_sites(self):

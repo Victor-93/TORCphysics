@@ -1,5 +1,5 @@
 import numpy as np
-from TORCphysics import params
+from TORCphysics import params, Enzyme
 import sys
 import pandas as pd
 from abc import ABC, abstractmethod
@@ -162,8 +162,8 @@ def select_unbinding_model(enzyme, dt, rng):
 
 
 # Goes through enzymes in the environment (environmental_list) and search for the available sites that it recognizes.
-# If the site is available, then, according site model (and in the future also environmental model) calculate the
-# binding probability. It then returns a list of new_enzymes that will bind the DNA
+# If the site is available, then, according site binding model calculate the binding probability.
+# It then returns a list of new_enzymes that will bind the DNA
 # rng - is a numpy random generator
 def binding_model(enzyme_list, environmental_list, dt, rng):
     new_enzymes = []  # here I will include the new enzymes
@@ -191,6 +191,7 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
             # -----------------------------------------------------------
             # if site.site_type != 'gene':
             #    continue
+            # TODO: Use site_global
             if '_global' in site.name:  # We don't actually model it for globals
                 continue
 
@@ -200,18 +201,12 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
 
             # According model, calculate the binding probability
             # -----------------------------------------------------------
-            # We need to figure out 1 or 2 models.
-            # A model for the rate in case it is modulated by supercoiling
-            # And a model for calculating the binding probability.
-
-            rate, binding_probability, have_model = select_binding_model(site, environment, site_superhelical, dt)
-            if not have_model:  # If I don't have a model, then we skip
-                continue
+            binding_probability = site.binding_model.binding_probability(environmental=environment,
+                                                                         superhelical=site_superhelical, dt=dt)
 
             # Decide if the enzyme will bind
             # -------------------------------------------------------------
             urandom = rng.uniform()  # we need a random number
-            # print(environment.name, urandom, binding_probability)
 
             if urandom <= binding_probability:  # and decide
 
@@ -227,6 +222,8 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
                 # We first need to figure out the position, twist and superhelical (these last two will be sorted in
                 # the circuit module
 
+                # TODO: Make sure that this applies to any sites and enzymes binding.
+                #  It means that enzymes always bind on the left from the start site.
                 # position:
                 if site.direction > 0:
                     position = site.start - environment.size
@@ -238,10 +235,13 @@ def binding_model(enzyme_list, environmental_list, dt, rng):
 
                 # Create enzyme, and note that it is missing twist and the superhelical density.
                 # I think it's better to fix it in the circuit module
-                enzyme = Enzyme(e_type=environment.enzyme_type, name=environment.name, site=site, position=position,
-                                size=environment.size, k_cat=environment.k_cat, k_off=environment.k_off,
-                                twist=0.0, superhelical=0.0)
 
+                # TODO: Check the unbinding model and effect model. Some unbinding models depend on the site parameters,
+                #  for example, in genes, their unbinding model depends on the site. But the site is already provided,
+                #  so maybe is better that the unbinding model does this on its own.
+                enzyme = Enzyme(e_type=environment.enzyme_type, name=environment.name, site=site, position=position,
+                                size=environment.size, effective_size=environment.effective_size, twist=0.0,
+                                superhelical=0.0, unbinding_model=environment.unbinding_model)
                 new_enzymes.append(enzyme)
 
     # TODO: check_binding_conflicts() needs testing
@@ -274,3 +274,69 @@ def unbinding_model(enzymes_list, dt, rng):
             drop_list_enzyme.append(enzyme)
 
     return drop_list_index, drop_list_enzyme
+
+
+# This function checks if a site is not blocked by other enzymes
+def check_site_availability(site, enzyme_list, size):
+    # Check if the site is available for binding.
+    # It assumes that the probability has already been calculated, and we have a candidate enzyme for the binding
+    # with size=size.
+    # We need the list of current enzymes to see if the one before and after the site overlap with the start site.
+    enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
+    enzyme_after = [enzyme for enzyme in enzyme_list if enzyme.position >= site.start][0]
+    # And a range of their occupancy
+    range_before = [enzyme_before.position, enzyme_before.position + enzyme_before.size]
+    range_after = [enzyme_after.position, enzyme_after.position + enzyme_after.size]
+    # TODO: Check if this is correct! I think it is assuming that enzymes bind just before the start site, which might
+    #  not be true.
+    if site.direction > 0:
+        my_range = [site.start - size, site.start]
+    #        my_range = [site.start, site.start + size]
+    elif site.direction <= 0:
+        my_range = [site.start, site.start + size]
+    else:
+        print('Error in checking site availability. Site=', site.site_type, site.name)
+        sys.exit()
+        #  my_range = [site.start, site.start + size]
+    #        my_range = [site.start, site.start - size]
+
+    # If any of them intersect
+    if (set(range_before) & set(my_range)) or (set(range_after) & set(my_range)):
+        available = False
+    # there is an intersection
+    else:
+        available = True
+
+    return available
+
+
+# ----------------------------------------------------------
+# This function makes sure that only one enzyme will end up binding a region.
+# It checks that the enzymes in the list of new_enzymes do not overlap and if they do, decide which will end up
+# binding
+# TODO: test this function - design a experiment in which you kind of know what outcome you should get.
+def check_binding_conflicts(enzyme_list, rng):
+    enzyme_list.sort(key=lambda x: x.position)  # sort by position
+    checked_enzyme_list = []
+    s = 0
+    for i, my_enzyme in enumerate(enzyme_list):
+        if i == 0:  # We need enzymes after
+            continue
+        enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= my_enzyme.position][-1]
+
+        # Check if they overlap
+        if enzyme_before.position + enzyme_before.size >= my_enzyme.position:
+            # It overlaps, so decide which enzymes stays
+            urandom = rng.uniform()  # we need a random number for the decision
+            if urandom <= 0.5:  # If it is <= 0.5, then the enzyme before stays.
+                del enzyme_list[i - s - 1]
+                s += 1
+                # checked_enzyme_list.append(enzyme_before)
+            else:  # And if >0.5, then we don't add the enzyme before (we lose it).
+                del enzyme_list[i - s]
+                s += 1
+                # continue
+        # else:
+        # checked_enzyme_list.append(enzyme_before)  # If nothing overlaps, then nothing happens
+
+    return enzyme_list  # checked_enzyme_list
