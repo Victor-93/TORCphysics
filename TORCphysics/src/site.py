@@ -139,15 +139,17 @@ class Site:
         #            raise ValueError('Error, site k_max must be a number')
 
         # Binding model
-        if self.binding_model_name == '' or self.binding_model_name == 'None' or self.binding_model_name == 'none':
+        if (self.binding_model_name == '' or self.binding_model_name == 'None' or self.binding_model_name == 'none'
+                or self.binding_model_name == 'nan'):
             self.binding_model_name = None
-        if self.binding_model == '' or self.binding_model == 'None' or self.binding_model == 'none':
+        if (self.binding_model == '' or self.binding_model == 'None' or self.binding_model == 'none' or
+                self.binding_model == 'nan'):
             self.binding_model = None
         if (self.binding_oparams_file == '' or self.binding_oparams_file == 'None'
-                or self.binding_oparams_file == 'none'):
+                or self.binding_oparams_file == 'none' or self.binding_oparams_file == 'nan'):
             self.binding_oparams_file = None
         if (self.binding_model_oparams == '' or self.binding_model_oparams == 'None' or
-                self.binding_model_oparams == 'none'):
+                self.binding_model_oparams == 'none' or self.binding_model_oparams == 'nan'):
             self.binding_model_oparams = None
 
         # Check k_on coincides with the one in oparams
@@ -243,8 +245,8 @@ class SiteFactory:
         df = pd.read_csv(self.filename)
         for index, row in df.iterrows():
             new_site = Site(site_type=row['type'], name=row['name'], start=float(row['start']), end=float(row['end']),
-                            k_on=float(row['k_on']), binding_model_name=row['binding_model'],
-                            binding_oparams_file=row['binding_oparams'])
+                            k_on=float(row['k_on']), binding_model_name=str(row['binding_model']),
+                            binding_oparams_file=str(row['binding_oparams']))
             # new_site = Site(site_type=row['type'], name=row['name'], start=float(row['start']), end=float(row['end']),
             #  k_min=float(row['k_min']), k_max=float(row['k_max']), binding_model_name=row['model'],
             #                            binding_model_oparams=row['oparams'])

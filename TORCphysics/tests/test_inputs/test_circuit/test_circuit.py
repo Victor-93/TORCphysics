@@ -38,8 +38,7 @@ class TestCircuit(TestCase):
         self.assertGreater(my_circuit.get_num_sites(), 0, "Empty enzyme list")
         self.assertGreater(my_circuit.get_num_environmentals(), 0, "Empty enzyme list")
 
-    # TODO: This can be several tests in one? 1.- Prove that statistical binding works, 2.- That the effects take place
-    #  3.- And that the proteins unbind at the end?
+    # TODO: Try doing many enzyme types. Topos that bind stochastically, and topos that act continuosly on the DNA.
     def test_run(self):
         circuit_filename = 'circuit.csv'
         sites_filename = 'sites.csv'

@@ -171,39 +171,45 @@ class Environment:
             raise ValueError('Error: effective_size > size')
 
         # Binding model
-        if self.binding_model_name == '' or self.binding_model_name == 'None' or self.binding_model_name == 'none':
+        if (self.binding_model_name == '' or self.binding_model_name == 'None' or self.binding_model_name == 'none'
+                or self.binding_model_name == 'nan'):
             self.binding_model_name = None
-        if self.binding_model == '' or self.binding_model == 'None' or self.binding_model == 'none':
+        if (self.binding_model == '' or self.binding_model == 'None' or self.binding_model == 'none' or
+                self.binding_model == 'nan'):
             self.binding_model = None
         if (self.binding_oparams_file == '' or self.binding_oparams_file == 'None'
-                or self.binding_oparams_file == 'none'):
+                or self.binding_oparams_file == 'none' or self.binding_oparams_file == 'nan'):
             self.binding_oparams_file = None
         if (self.binding_model_oparams == '' or self.binding_model_oparams == 'None' or
-                self.binding_model_oparams == 'none'):
+                self.binding_model_oparams == 'none' or self.binding_model_oparams == 'nan'):
             self.binding_model_oparams = None
 
         # Effect model
-        if self.effect_model_name == '' or self.effect_model_name == 'None' or self.effect_model_name == 'none':
+        if (self.effect_model_name == '' or self.effect_model_name == 'None' or self.effect_model_name == 'none' or
+                self.effect_model_name == 'nan'):
             self.effect_model_name = None
-        if self.effect_model == '' or self.effect_model == 'None' or self.effect_model == 'none':
+        if (self.effect_model == '' or self.effect_model == 'None' or self.effect_model == 'none' or
+                self.effect_model == 'nan'):
             self.effect_model = None
-        if self.effect_oparams_file == '' or self.effect_oparams_file == 'None' or self.effect_oparams_file == 'none':
+        if (self.effect_oparams_file == '' or self.effect_oparams_file == 'None' or self.effect_oparams_file == 'none'
+                or self.effect_oparams_file == 'nan'):
             self.effect_oparams_file = None
         if (self.effect_model_oparams == '' or self.effect_model_oparams == 'None' or
-                self.effect_model_oparams == 'none'):
+                self.effect_model_oparams == 'none' or self.effect_model_oparams == 'nan'):
             self.effect_model_oparams = None
 
         # Unbinding model
         if (self.unbinding_model_name == '' or self.unbinding_model_name == 'None'
-                or self.unbinding_model_name == 'none'):
+                or self.unbinding_model_name == 'none' or self.unbinding_model_name == 'nan'):
             self.unbinding_model_name = None
-        if self.unbinding_model == '' or self.unbinding_model == 'None' or self.unbinding_model == 'none':
+        if (self.unbinding_model == '' or self.unbinding_model == 'None' or self.unbinding_model == 'none' or
+                self.unbinding_model == 'nan'):
             self.unbinding_model = None
         if (self.unbinding_oparams_file == '' or self.unbinding_oparams_file == 'None'
-                or self.unbinding_oparams_file == 'none'):
+                or self.unbinding_oparams_file == 'none' or self.unbinding_oparams_file == 'nan'):
             self.unbinding_oparams_file = None
         if (self.unbinding_model_oparams == '' or self.unbinding_model_oparams == 'None' or
-                self.unbinding_model_oparams == 'none'):
+                self.unbinding_model_oparams == 'none' or self.unbinding_model_oparams == 'nan'):
             self.unbinding_model_oparams = None
 
     def get_models(self):
@@ -435,12 +441,12 @@ class EnvironmentFactory:
                                           size=float(row['size']),
                                           effective_size=float(row['effective_size']),
                                           site_type=row['site_type'],
-                                          binding_model_name=row['binding_model'],
-                                          binding_oparams_file=row['binding_oparams'],
-                                          effect_model_name=row['effect_model'],
-                                          effect_oparams_file=row['effect_oparams'],
-                                          unbinding_model_name=row['unbinding_model'],
-                                          unbinding_oparams_file=row['unbinding_oparams'])
+                                          binding_model_name=str(row['binding_model']),
+                                          binding_oparams_file=str(row['binding_oparams']),
+                                          effect_model_name=str(row['effect_model']),
+                                          effect_oparams_file=str(row['effect_oparams']),
+                                          unbinding_model_name=str(row['unbinding_model']),
+                                          unbinding_oparams_file=str(row['unbinding_oparams']))
             self.environment_list.append(new_environment)
 
     def site_match(self, label):
