@@ -41,28 +41,6 @@ gyra_t = params.gyra_b_t
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# UNBINDING MODELS
-# ---------------------------------------------------------------------------------------------------------------------
-# These functions are for applying particular unbinding conditions.
-# Their output is "unbind", which can be True if the bound enzyme will unbind, or False if it will not unbind (stays).
-# If you need to add your own, create it here!
-
-# Model that controls the unbinding condition for DNA topoisomerases
-# ---------------------------------------------------------------------------------------------------------------------
-def RNAP_unbinding_model(enzyme):
-    # condition for transcription in >>>>>>>>>>>>> right direction or
-    # condition for transcription in <<<<<<<<<<<<< left  direction
-    unbind = False
-    if (enzyme.direction == 1 and enzyme.end - enzyme.position <= 0) or \
-            (enzyme.direction == -1 and enzyme.end - enzyme.position >= 0):
-        unbind = True
-    return unbind
-
-
-# Unbinding model for enzymes that unbind spontaneously
-# ---------------------------------------------------------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------------------------------------------------
 # BINDING MODELS
 # ---------------------------------------------------------------------------------------------------------------------
 # These functions are for the particular binding model.
@@ -176,23 +154,60 @@ class PoissonBinding(BindingModel):
 
 
 class TopoIRecognition(BindingModel):
+    """
+     A BindingModel subclass that calculates binding probabilities according a sigmoid recognition curve.
+     This model represents the binding mechanism of Topoisomerase I, where it recognises the DNA's shape according
+     the local supercoiling density. In this case, the binding rate varies as a function of supercoiling
+
+     Attributes
+     ----------
+     k_on : float
+        Rate (1/s) at which the enzymes bind.
+     threshold : float
+        The threshold of the sigmoid curve. This is a dimensionless parameter.
+     width : float
+        The width of the sigmoid curve. This is a dimensionless parameter.
+     filename : str, optional
+        Path to the site csv file that parametrises the binding model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the binding model.
+    """
+
     def __init__(self, filename=None, **oparams):
-        super().__init__(filename, **oparams)  # name  # Call the base class constructor
+        """ The constructor of the TopoIRecognition subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the binding model; this file should have the k_on, width and
+             threshold parameters.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the binding model. In this case, it would be k_on, width
+            and threshold.
+        """
+
+        super().__init__(filename, **oparams)
         if not oparams:
             if filename is None:
                 self.width = params.topo_b_w
                 self.threshold = params.topo_b_t
                 self.k_on = params.topo_b_k_on
             else:
-                rows = pd.read_csv(filename)
-                #  self.width = float(rows['width'])
-                #  self.threshold = float(rows['threshold'])
-                #  self.k_on = float(rows['k_on'])
-                self.width = rows['width'][0]
-                self.threshold = rows['threshold'][0]
-                self.k_on = rows['k_on'][0]
-
+                mydata = pd.read_csv(filename)
+                if 'k_on' in mydata.columns:
+                    self.k_on = mydata['k_on'][0]
+                else:
+                    raise ValueError('Error, k_on parameter missing in csv file for TopoIRecognition')
+                if 'width' in mydata.columns:
+                    self.width = mydata['width'][0]
+                else:
+                    raise ValueError('Error, width parameter missing in csv file for TopoIRecognition')
+                if 'threshold' in mydata.columns:
+                    self.threshold = mydata['threshold'][0]
+                else:
+                    raise ValueError('Error, threshold parameter missing in csv file for TopoIRecognition')
         else:
+            # No point testing or checking that we have these variables, as python gives error on its own.
             self.width = float(oparams['width'])
             self.threshold = float(oparams['threshold'])
             self.k_on = float(oparams['k_on'])
@@ -200,28 +215,84 @@ class TopoIRecognition(BindingModel):
         self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
 
     # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
-    def binding_probability(self, environmental, sigma) -> float:
+    def binding_probability(self, environmental, superhelical, dt) -> float:
+        """ Method for calculating the probability of binding according the TopoIRecognition model.
+
+        Parameters
+        ----------
+        dt : float
+            Timestep in seconds (s).
+        environmental : Environment
+            The environmental molecule that is trying to bind the site.
+        superhelical : float
+            The local supercoiling region in the site.
+
+        Returns
+        ----------
+        probability : float
+            A number that indicates the probability of binding in the current timestep.
+        """
 
         a = environmental.concentration * self.k_on
-        b = 1 + np.exp((sigma - self.threshold) / self.width)
+        b = 1 + np.exp((superhelical - self.threshold) / self.width)
         rate = a / b
-        return rate
+        return P_binding_Nonh_Poisson(rate=rate, dt=dt)
 
 
 class GyraseRecognition(BindingModel):
+    """
+     A BindingModel subclass that calculates binding probabilities according a sigmoid recognition curve.
+     This model represents the binding mechanism of Gyrase, where it recognises the DNA's shape according
+     the local supercoiling density. In this case, the binding rate varies as a function of supercoiling
+
+     Attributes
+     ----------
+     k_on : float
+        Rate (1/s) at which the enzymes bind.
+     threshold : float
+        The threshold of the sigmoid curve. This is a dimensionless parameter.
+     width : float
+        The width of the sigmoid curve. This is a dimensionless parameter.
+     filename : str, optional
+        Path to the site csv file that parametrises the binding model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the binding model.
+    """
+
 
     def __init__(self, filename=None, **oparams):
-        super().__init__(filename, **oparams)  # name  # Call the base class constructor
+        """ The constructor of the GyraseRecognition subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the binding model; this file should have the k_on, width and
+             threshold parameters.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the binding model. In this case, it would be k_on, width
+            and threshold.
+        """
+
+        super().__init__(filename, **oparams)
         if not oparams:
             if filename is None:
                 self.width = params.gyra_b_w
                 self.threshold = params.gyra_b_t
                 self.k_on = params.gyra_b_k_on
             else:
-                rows = pd.read_csv(filename)
-                self.width = float(rows['width'])
-                self.threshold = float(rows['threshold'])
-                self.k_on = float(rows['k_on'])
+                mydata = pd.read_csv(filename)
+                if 'k_on' in mydata.columns:
+                    self.k_on = mydata['k_on'][0]
+                else:
+                    raise ValueError('Error, k_on parameter missing in csv file for GyraseRecognition')
+                if 'width' in mydata.columns:
+                    self.width = mydata['width'][0]
+                else:
+                    raise ValueError('Error, width parameter missing in csv file for GyraseRecognition')
+                if 'threshold' in mydata.columns:
+                    self.threshold = mydata['threshold'][0]
+                else:
+                    raise ValueError('Error, threshold parameter missing in csv file for GyraseRecognition')
         else:
             self.width = float(oparams['width'])
             self.threshold = float(oparams['threshold'])
@@ -230,12 +301,28 @@ class GyraseRecognition(BindingModel):
         self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
 
     # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
-    def binding_probability(self, enzyme, sigma) -> float:
+    def binding_probability(self, environmental, superhelical, dt) -> float:
+        """ Method for calculating the probability of binding according the GyraseRecognition model.
 
-        a = enzyme.concentration * self.k_on
-        b = 1 + np.exp(-(sigma - self.threshold) / self.width)
+        Parameters
+        ----------
+        dt : float
+            Timestep in seconds (s).
+        environmental : Environment
+            The environmental molecule that is trying to bind the site.
+        superhelical : float
+            The local supercoiling region in the site.
+
+        Returns
+        ----------
+        probability : float
+            A number that indicates the probability of binding in the current timestep.
+        """
+
+        a = environmental.concentration * self.k_on
+        b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
         rate = a / b
-        return rate
+        return P_binding_Nonh_Poisson(rate=rate, dt=dt)
 
 
 # class lacI_binding(binding_model):

@@ -38,7 +38,16 @@ class TestCircuit(TestCase):
         self.assertGreater(my_circuit.get_num_sites(), 0, "Empty enzyme list")
         self.assertGreater(my_circuit.get_num_environmentals(), 0, "Empty enzyme list")
 
-    # TODO: Try doing many enzyme types. Topos that bind stochastically, and topos that act continuosly on the DNA.
+    # TODO: Try doing many enzyme types. Topos that bind stochastically, and topos that act continuously on the DNA.
+    # TODO:
+    #  1.- Let's make the code work with these many types of enzymes.
+    #  1.1.- Add new bindings - TopoI and Gyrase DONE!
+    #  1.2 - Add topoisomerase action - stochastic and continuum
+    #  1.3 - Add topoisomerase unbinding.
+    #  2.- Also remove the topo model and mechanistic model and all that
+    #  3.- Then, start documenting and tidying up workflow
+    #  4.- Test models_workflow
+    #  5.- Then start tidying and documenting circuit, while doing this, fix the optional inputs, outputs and all that.
     def test_run(self):
         circuit_filename = 'circuit.csv'
         sites_filename = 'sites.csv'

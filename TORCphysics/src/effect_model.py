@@ -223,6 +223,124 @@ class RNAPUniform(EffectModel):
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
+class TopoIContinuum(EffectModel):
+    """
+     An EffectModel subclass that calculates represents the continuum effect of Topoisomerase I, on the DNA.
+     This model affects every region on the DNA continuously. These effects are represented by a sigmoid curve.
+     This model is compatible with the Houdaigui et al. 2019 model.
+
+     The amount of supercoils removed is calculated by:
+     supercoils_removed = concentration * k_cat * dt / (1 + exp( (supercoiling - threshold)/width)
+
+
+     Attributes
+     ----------
+     k_cat : float
+        Catalysis rate at which supercoils are being removed per second (1/nM*s).
+     threshold : float
+        The threshold of the sigmoid curve. This parameter is dimensionless.
+     width : float
+        The width of the sigmoid curve. This parameter is dimensionless.
+     filename : str, optional
+        Path to the site csv file that parametrises the effect model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the effect model.
+    """
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, **oparams):
+        """ The constructor of the RNAPUniform subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the TopoIContinuum effect model; this file should have
+            the k_cat, threshold and width parameters.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the binding model. In this case, it would be k_cat,
+            threshold and width
+        """
+
+        super().__init__(filename, **oparams)  # name  # Call the base class constructor
+
+        if not oparams:
+            if filename is None:
+                self.k_cat = params.topo_sam_kcat
+                self.threshold = params.topo_sam_threshold
+                self.width = params.topo_sam_width
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'k_cat' in mydata.columns:
+                    self.k_cat = mydata['k_cat'][0]
+                else:
+                    raise ValueError('Error, k_cat parameter missing in csv file for TopoIContinuum')
+                if 'threshold' in mydata.columns:
+                    self.threshold = mydata['threshold'][0]
+                else:
+                    raise ValueError('Error, threshold parameter missing in csv file for TopoIContinuum')
+                if 'width' in mydata.columns:
+                    self.width = mydata['width'][0]
+                else:
+                    raise ValueError('Error, width parameter missing in csv file for TopoIContinuum')
+        else:
+            self.k_cat = float(oparams['k_cat'])
+            self.threshold = float(oparams['threshold'])
+            self.width = float(oparams['width'])
+
+        self.oparams = {'k_cat': self.k_cat, 'threshold': self.threshold, 'width': self.width}  # Just in case
+
+    # TODO: Check how to implement continuum actions on the DNA. Should there be a parameter in the environment that
+    #  indicates if the action of the enzyme is continuous? Should the effects on each local domains be applied by the
+    #  workflow? Or should this function implement it.
+    #  * The problem is that the continuous actions require the concentration parameter, so we either add that
+    #    parameter to all of our effect models, or we indicate that our environment has a continous action on the DNA?
+    #  *IDEA: Maybe, when defining environmentals, according the effect model provided, the program can add a parameter
+    #   self.continuum = True or False. So, if we have a continuous action or effect model, those enzymes don't bind
+    #   the DNA, but they have a continuous action, that way we avoid some errors, and the workflow could do two types
+    #   of effects, effects for Enzyme's actually bound to the DNA, or Environmentals that have continuous
+    #   actions/effects on the DNA. I like this IDEA!
+
+    # TODO: I have to keep checking this funciton, and Implement the idea that I wrote up here ^^^^
+    def calculate_effect(self, concentration, index, z, z_list, dt) -> Effect:
+
+        """ Method for calculating the Effect that continuum action of TopoI causes on the DNA.
+
+         Parameters
+         ----------
+         concentration : float
+             Enzyme concentration in the environment.
+         index : int
+             Enzyme's index in the list of enzymes "enzyme_list".
+         z : Enzyme
+             This is the object of the current Enzyme (RNAP) that is moving along the DNA.
+         z_list : list
+             This is a list of Enzyme objects.
+         dt : float
+             Timestep in seconds (s).
+
+         Returns
+         ----------
+         effect : Effect
+             This function returns an Effect object, which indicates the changes in position and local twist that
+             the current RNAP caused on the DNA.
+         """
+
+        # Calculates the amount of coils removed by topoisomerase I activity.
+        # This function only depends on the supercoiling density (sigma)
+        # I took this function from Sam Meyer's paper (2019)
+        # the function has the form of (concentration*sigmoid)*rate*dt
+        z_n = [e for e in z_list if e.position > z.position][0]  # Enzyme on the right
+        a = concentration * self.k_cat * dt
+        try:
+            b = 1 + np.exp((z.superhelical - self.threshold) / self.width)
+            supercoiling_removed = a / b
+        except OverflowError as oe:
+            supercoiling_removed = 0.0
+
+        twist_right = calculate_twist_from_sigma(z, z_n, z.superhelical)
+        return Effect(index=index, position=0.0, twist_left=0.0, twist_right=twist_right)
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 # UTILITY FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
@@ -314,6 +432,7 @@ def topo1_continuum(sigma, topo, dt):
     except OverflowError as oe:
         sigma_removed = 0.0
     return sigma_removed
+
 
 
 # ----------------------------------------------------------
