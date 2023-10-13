@@ -180,27 +180,31 @@ class Enzyme:
             raise ValueError('Error: effective_size > size')
 
         # Effect model
-        if self.effect_model_name == '' or self.effect_model_name == 'None' or self.effect_model_name == 'none':
+        if (self.effect_model_name == '' or self.effect_model_name == 'None' or self.effect_model_name == 'none' or
+                self.effect_model_name == 'nan'):
             self.effect_model_name = None
-        if self.effect_model == '' or self.effect_model == 'None' or self.effect_model == 'none':
+        if (self.effect_model == '' or self.effect_model == 'None' or self.effect_model == 'none' or
+                self.effect_model == 'nan'):
             self.effect_model = None
-        if self.effect_oparams_file == '' or self.effect_oparams_file == 'None' or self.effect_oparams_file == 'none':
+        if (self.effect_oparams_file == '' or self.effect_oparams_file == 'None' or self.effect_oparams_file == 'none'
+                or self.effect_oparams_file == 'nan'):
             self.effect_oparams_file = None
         if (self.effect_model_oparams == '' or self.effect_model_oparams == 'None' or
-                self.effect_model_oparams == 'none'):
+                self.effect_model_oparams == 'none' or self.effect_model_oparams == 'nan'):
             self.effect_model_oparams = None
 
         # Unbinding model
         if (self.unbinding_model_name == '' or self.unbinding_model_name == 'None'
-                or self.unbinding_model_name == 'none'):
+                or self.unbinding_model_name == 'none' or self.unbinding_model_name == 'nan'):
             self.unbinding_model_name = None
-        if self.unbinding_model == '' or self.unbinding_model == 'None' or self.unbinding_model == 'none':
+        if (self.unbinding_model == '' or self.unbinding_model == 'None' or self.unbinding_model == 'none' or
+                self.unbinding_model == 'nan'):
             self.unbinding_model = None
         if (self.unbinding_oparams_file == '' or self.unbinding_oparams_file == 'None'
-                or self.unbinding_oparams_file == 'none'):
+                or self.unbinding_oparams_file == 'none' or self.unbinding_oparams_file == 'nan'):
             self.unbinding_oparams_file = None
         if (self.unbinding_model_oparams == '' or self.unbinding_model_oparams == 'None' or
-                self.unbinding_model_oparams == 'none'):
+                self.unbinding_model_oparams == 'none' or self.unbinding_model_oparams == 'nan'):
             self.unbinding_model_oparams = None
 
     def get_models(self):
@@ -274,10 +278,10 @@ class EnzymeFactory:
                                 site=self.site_match(row['site']), position=float(row['position']),
                                 size=float(row['size']), effective_size=float(row['effective_size']),
                                 twist=float(row['twist']), superhelical=float(row['superhelical']),
-                                effect_model_name=row['effect_model'],
-                                effect_oparams_file=row['effect_oparams'],
-                                unbinding_model_name=row['unbinding_model'],
-                                unbinding_oparams_file=row['unbinding_oparams'])
+                                effect_model_name=str(row['effect_model']),
+                                effect_oparams_file=str(row['effect_oparams']),
+                                unbinding_model_name=str(row['unbinding_model']),
+                                unbinding_oparams_file=str(row['unbinding_oparams']))
 
             self.enzyme_list.append(new_enzyme)
 

@@ -246,14 +246,16 @@ class Circuit:
             my_supercoiling[frame] = self.superhelical
         return my_supercoiling
 
-    # TODO: Make these functions are compatible with the new input csvs.
     # Returns list of enzymes in the form of dataframe. This function is with the intention of outputting the system
     def enzyme_list_to_df(self):
         enzyme_aux = []  # This will be a list of dicts
         for enzyme in self.enzyme_list:
-            d = {'type': enzyme.enzyme_type, 'name': enzyme.name, 'site': enzyme.site.name,
-                 'position': enzyme.position, 'direction': enzyme.direction, 'size': enzyme.size, 'twist': enzyme.twist,
-                 'superhelical': enzyme.superhelical}
+
+            d = {'type': enzyme.enzyme_type, 'name': enzyme.name, 'site': enzyme.site.name, 'position': enzyme.position,
+                 'size': enzyme.size, 'effective_size': enzyme.effective_size, 'twist': enzyme.twist,
+                 'superhelical': enzyme.superhelical, 'effect_model': enzyme.effect_model_name,
+                 'effect_oparams': enzyme.effect_oparams_file, 'unbinding_model': enzyme.unbinding_model_name,
+                 'unbinding_oparams': enzyme.unbinding_oparams_file}
             enzyme_aux.append(d)
         my_df = pd.DataFrame.from_dict(enzyme_aux)
         return my_df
@@ -264,8 +266,13 @@ class Circuit:
         for environmental in self.environmental_list:
             d = {'type': environmental.enzyme_type, 'name': environmental.name,
                  'site_type': environmental.site_type, 'concentration': environmental.concentration,
-                 'k_on': environmental.k_on, 'k_off': environmental.k_off, 'k_cat': environmental.k_cat,
-                 'size': environmental.size}
+                 'size': environmental.size, 'effective_size': environmental.effective_size,
+                 'binding_model': environmental.binding_model_name,
+                 'binding_oparams': environmental.binding_oparams_file,
+                 'effect_model': environmental.effect_model_name,
+                 'effect_oparams': environmental.effect_oparams_file,
+                 'unbinding_model': environmental.unbinding_model_name,
+                 'unbinding_oparams': environmental.unbinding_oparams_file}
             environmental_aux.append(d)
         my_df = pd.DataFrame.from_dict(environmental_aux)
         return my_df
@@ -274,10 +281,8 @@ class Circuit:
     def site_list_to_df(self):
         site_aux = []  # This will be a list of dicts
         for site in self.site_list:
-            d = {'type': site.site_type, 'name': site.name, 'start': site.start, 'end': site.end,
-                 'model': site.binding_model_name}  # , 'oparams': site.oparams}
-#            d = {'type': site.site_type, 'name': site.name, 'start': site.start, 'end': site.end, 'k_min': site.k_min,
-#                 'k_max': site.k_max, 'model': site.site_model, 'oparams': site.oparams}
+            d = {'type': site.site_type, 'name': site.name, 'start': site.start, 'end': site.end, 'k_on': site.k_on,
+                 'binding_model': site.binding_model_name, 'binding_oparams': site.binding_oparams_file}
             site_aux.append(d)
         my_df = pd.DataFrame.from_dict(site_aux)
         return my_df

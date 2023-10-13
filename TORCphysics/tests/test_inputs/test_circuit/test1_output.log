@@ -9,7 +9,7 @@ Number of sites: 5
 Number of frames: 1500
 Simulation time: 750.0
 Simulation timestep: 0.5
-Seed: 928135384643740910
+Seed: 8967601883749189742
  
 Overall simulation information 
 ---------------------------------------------------------------------------------------
@@ -29,6 +29,6 @@ gene                 mKalama1                              1.0                  
  
 Events
 ---------------------------------------------------------------------------------------
-frame 4 time 2.0 binding_event at gene mKalama1 enzyme RNAP2 with twist -108.21440 superhelical -0.06217 global twist -208.24271 global supercoiling -0.06000
-frame 37 time 18.5 binding_event at gene tetA enzyme RNAP1 with twist -128.15715 superhelical -0.09299 global twist -208.24271 global supercoiling -0.06073
-frame 79 time 39.5 unbinding_event at gene tetA enzyme RNAP1 with twist -72.35685 superhelical -0.15146 global twist -208.24271 global supercoiling -0.06127
+frame 1 time 0.5 binding_event at gene mKalama1 enzyme RNAP2 with twist -102.82882 superhelical -0.06000 global twist -208.24271 global supercoiling -0.06000
+frame 51 time 25.5 binding_event at gene tetA enzyme RNAP1 with twist -154.64426 superhelical -0.10284 global twist -208.24271 global supercoiling -0.06073
+frame 79 time 39.5 unbinding_event at gene tetA enzyme RNAP1 with twist -63.68612 superhelical -0.13939 global twist -208.24271 global supercoiling -0.06127
