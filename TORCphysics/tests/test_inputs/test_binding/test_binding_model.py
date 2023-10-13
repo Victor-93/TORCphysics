@@ -42,7 +42,7 @@ class TestBindingModel(TestCase):
         # Test 4
         binding_model, binding_model_name, binding_oparams_file, binding_model_oparams = (
             bm.get_binding_model(name='test4', b_model=None, model_name='PoissonBinding',
-                                 oparams_file='test_inputs/test_binding/PoissonBinding_params1.csv', oparams=None))
+                                 oparams_file='PoissonBinding_params1.csv', oparams=None))
         self.assertEqual(binding_model_name, 'PoissonBinding')
         self.assertEqual(binding_model.k_on, 0.888)
 
@@ -81,7 +81,7 @@ class TestBindingModel(TestCase):
 
         # Test 2
         my_model = bm.assign_binding_model(model_name='PoissonBinding',
-                                           oparams_file='test_inputs/test_binding/PoissonBinding_params1.csv')
+                                           oparams_file='PoissonBinding_params1.csv')
         self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
         self.assertEqual(my_model.k_on, 0.888)
 
@@ -93,7 +93,7 @@ class TestBindingModel(TestCase):
 
         # Test 4
         my_model = bm.assign_binding_model(model_name='PoissonBinding',
-                                           oparams_file='test_inputs/test_binding/PoissonBinding_params1.csv',
+                                           oparams_file='PoissonBinding_params1.csv',
                                            **{'k_on': 1.0})
         self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
         self.assertEqual(my_model.k_on, 1.0)  # DICTIONARY IS PRIORITY
@@ -121,7 +121,7 @@ class TestBindingModel(TestCase):
         #  3.- filename=None, oparams
         #  4.- filename=file, oparams
 
-        for dt in [0.01, 0.1, 0.5, 1.0, 1.5, 2.0]:#
+        for dt in [0.01, 0.1, 0.5, 1.0, 1.5, 2.0]:  #
             supercoiling = -0.06
             # Test 1
             my_model = bm.PoissonBinding()
@@ -132,7 +132,7 @@ class TestBindingModel(TestCase):
             self.assertLessEqual(probability, 1.0)
 
             # Test 2
-            my_model = bm.PoissonBinding(filename='test_inputs/test_binding/PoissonBinding_params1.csv')
+            my_model = bm.PoissonBinding(filename='PoissonBinding_params1.csv')
             probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
             self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
             self.assertEqual(my_model.k_on, 0.888)
@@ -148,7 +148,7 @@ class TestBindingModel(TestCase):
             self.assertLessEqual(probability, 1.0)
 
             # Test 4
-            my_model = bm.PoissonBinding(filename='test_inputs/test_binding/PoissonBinding_params1.csv',
+            my_model = bm.PoissonBinding(filename='PoissonBinding_params1.csv',
                                          **{'k_on': 1.0})  # oparams is priority!
             probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
             self.assertEqual(my_model.__class__.__name__, 'PoissonBinding')
@@ -158,7 +158,128 @@ class TestBindingModel(TestCase):
 
     def test_PoissonBinding_bad_csv(self):
         # bad k_on
-        filename = 'test_inputs/test_binding/PoissonBinding_bad.csv'
+        filename = 'PoissonBinding_bad.csv'
         with self.assertRaises(ValueError) as context:
             bm.PoissonBinding(filename=filename)
         self.assertEqual(str(context.exception), 'Error, k_on parameter missing in csv file for PoissonBinding')
+
+    # TODO test topoIRecognition, and GyraseRecognition
+    def test_TopoIRecognition(self):
+        # For each test case, we should have the TopoIRecognition Model with params, and 0 <= probability <=1.
+        #  The test cases should work for a various timesteps.
+        #  Test cases:
+        #  1.- filename=None, no oparams -> Model & 0 <= probability <=1
+        #  2.- filename=file, no oparams
+        #  3.- filename=None, oparams
+        #  4.- filename=file, oparams
+
+        for dt in [0.01, 0.1, 0.5, 1.0, 1.5, 2.0]:  #
+            supercoiling = -0.06
+            # Test 1
+            my_model = bm.TopoIRecognition()
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
+            self.assertEqual(my_model.__class__.__name__, 'TopoIRecognition')
+            self.assertEqual(my_model.k_on, params.topo_b_k_on)
+            self.assertEqual(my_model.width, params.topo_b_w)
+            self.assertEqual(my_model.threshold, params.topo_b_t)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+            # Test 2
+            my_model = bm.TopoIRecognition(filename='TopoIRecognition_params1.csv')
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
+            self.assertEqual(my_model.__class__.__name__, 'TopoIRecognition')
+            self.assertEqual(my_model.k_on, 0.005)
+            self.assertEqual(my_model.width, 0.03)
+            self.assertEqual(my_model.threshold, 0.01)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+            # Test 3
+            my_model = bm.TopoIRecognition(**{'k_on': 1.0, 'width': 0.3, 'threshold': 0.2})
+
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
+            self.assertEqual(my_model.__class__.__name__, 'TopoIRecognition')
+            self.assertEqual(my_model.k_on, 1.0)
+            self.assertEqual(my_model.width, 0.3)
+            self.assertEqual(my_model.threshold, 0.2)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+            # Test 4
+            my_model = bm.TopoIRecognition(filename='TopoIRecognition_params1.csv',
+                                           **{'k_on': 1.0, 'width': 0.3, 'threshold': 0.2})  # oparams is priority!
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
+            self.assertEqual(my_model.__class__.__name__, 'TopoIRecognition')
+            self.assertEqual(my_model.k_on, 1.0)
+            self.assertEqual(my_model.width, 0.3)
+            self.assertEqual(my_model.threshold, 0.2)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+    def test_TopoIRecognition_bad_csv(self):
+        # bad k_on
+        filename = 'TopoIRecognition_bad.csv'
+        with self.assertRaises(ValueError) as context:
+            bm.TopoIRecognition(filename=filename)
+        self.assertEqual(str(context.exception), 'Error, k_on parameter missing in csv file for TopoIRecognition')
+
+    def test_GyraseRecognition(self):
+        # For each test case, we should have the GyraseRecognition Model with params, and 0 <= probability <=1.
+        #  The test cases should work for a various timesteps.
+        #  Test cases:
+        #  1.- filename=None, no oparams -> Model & 0 <= probability <=1
+        #  2.- filename=file, no oparams
+        #  3.- filename=None, oparams
+        #  4.- filename=file, oparams
+
+        for dt in [0.01, 0.1, 0.5, 1.0, 1.5, 2.0]:  #
+            supercoiling = -0.06
+            # Test 1
+            my_model = bm.GyraseRecognition()
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
+            self.assertEqual(my_model.__class__.__name__, 'GyraseRecognition')
+            self.assertEqual(my_model.k_on, params.gyra_b_k_on)
+            self.assertEqual(my_model.width, params.gyra_b_w)
+            self.assertEqual(my_model.threshold, params.gyra_b_t)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+            # Test 2
+            my_model = bm.GyraseRecognition(filename='GyraseRecognition_params1.csv')
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
+            self.assertEqual(my_model.__class__.__name__, 'GyraseRecognition')
+            self.assertEqual(my_model.k_on, 0.005)
+            self.assertEqual(my_model.width, 0.03)
+            self.assertEqual(my_model.threshold, 0.01)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+            # Test 3
+            my_model = bm.GyraseRecognition(**{'k_on': 1.0, 'width': 0.3, 'threshold': 0.2})
+
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
+            self.assertEqual(my_model.__class__.__name__, 'GyraseRecognition')
+            self.assertEqual(my_model.k_on, 1.0)
+            self.assertEqual(my_model.width, 0.3)
+            self.assertEqual(my_model.threshold, 0.2)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+            # Test 4
+            my_model = bm.GyraseRecognition(filename='GyraseRecognition_params1.csv',
+                                           **{'k_on': 1.0, 'width': 0.3, 'threshold': 0.2})  # oparams is priority!
+            probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
+            self.assertEqual(my_model.__class__.__name__, 'GyraseRecognition')
+            self.assertEqual(my_model.k_on, 1.0)
+            self.assertEqual(my_model.width, 0.3)
+            self.assertEqual(my_model.threshold, 0.2)
+            self.assertGreaterEqual(probability, 0.0)
+            self.assertLessEqual(probability, 1.0)
+
+    def test_GyraseRecognition_bad_csv(self):
+        # bad k_on
+        filename = 'GyraseRecognition_bad.csv'
+        with self.assertRaises(ValueError) as context:
+            bm.GyraseRecognition(filename=filename)
+        self.assertEqual(str(context.exception), 'Error, k_on parameter missing in csv file for GyraseRecognition')

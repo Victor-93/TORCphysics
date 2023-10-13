@@ -20,7 +20,7 @@ v0 = 30.0  # 60.0  # Velocity (bp/sec) of RNAPs
 bp_nm = .34  # nm - base-pair rise
 T_bp = 10.5  # Number of bp per helical turn
 w0 = 2.0 * np.pi / T_bp  # Relaxed twist density per bp
-w0_nm = 2.0 * np.pi / (T_bp * bp_nm)  # nm^{-1} - Now in distance units
+w0_nm = 2.0 * np.pi / (T_bp * bp_nm)  # rad * nm^{-1} - Now in distance units
 gamma = 0.2 * w0  # How much supercoiling is injected per bp
 # sigma0 = -0.06          #Initial supercoiling density
 stall_torque = 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper
@@ -55,20 +55,24 @@ topo_b_w = 0.012  # binding width
 topo_b_t = -0.04  # binding threshold
 topo_b_k_on = 0.005
 topo_b_k_off = 0.5
-topo_e_w = 0.012  # effect width
-topo_e_t = -0.04  # effect threshold
+
+# Houdagui et al. 2019 parameters for topo I activity (effect)
+topo_sam_width = 0.012  # effect width
+topo_sam_threshold = -0.04  # effect threshold
+topo_sam_kcat = 0.001  # basal rate # k_cat
 # topo_c = 0.25#0.1#concentration micromolar 0.025 in meyer -> this is too negative...
-topo_k = 0.001  # basal rate # k_cat
 
 # GYRASE
 gyra_b_w = 0.025  # binding width
 gyra_b_t = 0.01  # binding threshold
 gyra_b_k_on = 0.005
 gyra_b_k_off = 0.5
-gyra_e_w = 0.025  # effect width
-gyra_e_t = 0.01  # effect threshold
+
+# Houdagui et al. 2019 parameters for gyrase activity (effect)
+gyra_sam_width = 0.025  # effect width
+gyra_sam_threshold = 0.01  # effect threshold
 # gyra_c = 0.25#.01 #concentration micromolarb 0.25 in meyer - I'll use concentration in nM better
-gyra_k = 0.001  # minus because it removes negative supercoils
+gyra_sam_kcat = 0.001  # minus because it removes negative supercoils
 # I think it makes more sense to put the negative in the equation rather than in
 # the parameter
 

@@ -154,6 +154,9 @@ class RNAPSimpleUnbinding(UnBindingModel):
         """
 
         probability = -0.01  # It will not unbind unless fulfils the condition
+
+        # condition for transcription in >>>>>>>>>>>>> right direction or
+        # condition for transcription in <<<<<<<<<<<<< left  direction
         if (enzyme.direction == 1 and enzyme.end - enzyme.position <= 0) or \
                 (enzyme.direction == -1 and enzyme.end - enzyme.position >= 0):
             probability = 1.1  # There's no way it won't unbind with this
