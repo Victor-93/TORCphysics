@@ -88,17 +88,24 @@ class EffectModel(ABC):
          A dictionary containing the parameters used for the effect model.
     """
 
-    def __init__(self, filename=None, **oparams):
+    def __init__(self, filename=None, continuum=False, **oparams):
         """ The constructor of EffectModel.
 
         Parameters
         ----------
         filename : str, optional
             Path to the site csv file that parametrises the effect model.
+        continuum : bool, optional
+            Indicates if the actions of the effect model are continuous. Only environmentals should have these type
+            of effects, where they don't bind the DNA, but they affect every local region in the molecule continuously.
+            For example, you might want the effect of topoisomerases to be continuous.
+            Note that if you give an Enzyme that binds the DNA a continuous model, it will only affect it's local
+            domain, but the environmental will affect all the local domains.
         oparams : dict, optional
             A dictionary containing the parameters used for the effect model.
         """
         self.filename = filename
+        self.continuum = continuum
         self.oparams = oparams
 
     @abstractmethod
@@ -140,7 +147,7 @@ class RNAPUniform(EffectModel):
     """
 
     # def __init__(self, name, filename):
-    def __init__(self, filename=None, **oparams):
+    def __init__(self, filename=None, continuum=False, **oparams):
         """ The constructor of the RNAPUniform subclass.
 
         Parameters
@@ -148,11 +155,13 @@ class RNAPUniform(EffectModel):
         filename : str, optional
             Path to the site csv file that parametrises the RNAPUniform effect model; this file should have
             the velocity and gamma parameters
+        continuum : bool, optional
+            Indicates if the actions of the effect model are continuous. For this model, it is not continuous.
         oparams : dict, optional
             A dictionary containing the parameters used for the binding model. In this case, it would be k_on.
         """
 
-        super().__init__(filename, **oparams)  # name  # Call the base class constructor
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
 
         if not oparams:
             if filename is None:
@@ -223,6 +232,7 @@ class RNAPUniform(EffectModel):
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
+# TODO: Test this function
 class TopoIContinuum(EffectModel):
     """
      An EffectModel subclass that calculates represents the continuum effect of Topoisomerase I, on the DNA.
@@ -248,7 +258,7 @@ class TopoIContinuum(EffectModel):
     """
 
     # def __init__(self, name, filename):
-    def __init__(self, filename=None, **oparams):
+    def __init__(self, filename=None, continuum=True, **oparams):
         """ The constructor of the RNAPUniform subclass.
 
         Parameters
@@ -256,12 +266,14 @@ class TopoIContinuum(EffectModel):
         filename : str, optional
             Path to the site csv file that parametrises the TopoIContinuum effect model; this file should have
             the k_cat, threshold and width parameters.
+        continuum : bool, optional
+            Indicates if the actions of the effect model are continuous. For this model, it is!
         oparams : dict, optional
             A dictionary containing the parameters used for the binding model. In this case, it would be k_cat,
             threshold and width
         """
 
-        super().__init__(filename, **oparams)  # name  # Call the base class constructor
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
 
         if not oparams:
             if filename is None:
@@ -337,7 +349,7 @@ class TopoIContinuum(EffectModel):
         except OverflowError as oe:
             supercoiling_removed = 0.0
 
-        twist_right = calculate_twist_from_sigma(z, z_n, z.superhelical)
+        twist_right = calculate_twist_from_sigma(z, z_n, supercoiling_removed)
         return Effect(index=index, position=0.0, twist_left=0.0, twist_right=twist_right)
 
 
@@ -403,6 +415,8 @@ def get_effect_model(name, e_model, model_name, oparams_file, oparams):
 def assign_effect_model(model_name, oparams_file=None, **oparams):
     if model_name == 'RNAPUniform':
         my_model = RNAPUniform(filename=oparams_file, **oparams)
+    elif model_name == 'TopoIContinuum':
+        my_model = TopoIContinuum(filename=oparams_file, **oparams)
     else:
         raise ValueError('Could not recognise effect model ' + model_name)
     return my_model

@@ -5,30 +5,48 @@ General information:
 Circuit name: test1_output
 Size: 6000
 Structure: circle
-Number of sites: 5
+Number of sites: 56
 Number of frames: 1500
-Simulation time: 750.0
-Simulation timestep: 0.5
-Seed: 8967601883749189742
+Simulation time: 1500.0
+Simulation timestep: 1.0
+Seed: 7939541115335899400
  
 Overall simulation information 
 ---------------------------------------------------------------------------------------
 Initial twist: -208.24271
-Final twist: -208.24271
+Final twist: -145.15834
 Initial superhelical density: -0.06000
-Final superhelical density: -0.06073
+Final superhelical density: -0.06574
  
 Overall rates 
 ---------------------------------------------------------------------------------------
 site type            site name            #binding events      #unbinding events    binding rates        
- EXT                  EXT                                   0.0                  0.0                   0.0 
-gene                 tetA                                  1.0                  1.0  0.0013333333333333333 
+ DNA_topoI_stochastic DNA_topoI_stochastic                  0.0                  0.0                   0.0 
+EXT                  EXT                                   0.0                  0.0                   0.0 
+gene                 tetA                                  1.0                  1.0  0.0006666666666666666 
 origin               ori                                   0.0                  0.0                   0.0 
 lacOP                lac1                                  0.0                  0.0                   0.0 
-gene                 mKalama1                              1.0                  0.0  0.0013333333333333333 
+gene                 mKalama1                              1.0                  0.0  0.0006666666666666666 
  
 Events
 ---------------------------------------------------------------------------------------
-frame 1 time 0.5 binding_event at gene mKalama1 enzyme RNAP2 with twist -102.82882 superhelical -0.06000 global twist -208.24271 global supercoiling -0.06000
-frame 51 time 25.5 binding_event at gene tetA enzyme RNAP1 with twist -154.64426 superhelical -0.10284 global twist -208.24271 global supercoiling -0.06073
-frame 79 time 39.5 unbinding_event at gene tetA enzyme RNAP1 with twist -63.68612 superhelical -0.13939 global twist -208.24271 global supercoiling -0.06127
+frame 2 time 2.0 binding_event at gene mKalama1 enzyme RNAP1 with twist -106.38317 superhelical -0.06143 global twist -208.16973 global supercoiling -0.05998
+frame 6 time 6.0 binding_event at DNA_topoI_stochastic 10 enzyme topoI_stochastic with twist -87.28902 superhelical -0.05236 global twist -207.88086 global supercoiling -0.06042
+frame 10 time 10.0 binding_event at DNA_topoI_stochastic 43 enzyme topoI_stochastic with twist -96.32948 superhelical -0.07841 global twist -207.60165 global supercoiling -0.06162
+frame 23 time 23.0 binding_event at gene tetA enzyme RNAP2 with twist -100.69994 superhelical -0.11378 global twist -206.74996 global supercoiling -0.06271
+frame 25 time 25.0 binding_event at DNA_topoI_stochastic 24 enzyme topoI_stochastic with twist -57.40227 superhelical -0.05435 global twist -206.61567 global supercoiling -0.06347
+frame 33 time 33.0 binding_event at DNA_topoI_stochastic 46 enzyme topoI_stochastic with twist -52.34865 superhelical -0.11918 global twist -206.06135 global supercoiling -0.06473
+frame 40 time 40.0 unbinding_event at gene tetA enzyme RNAP1 with twist 31.25078 superhelical -5.16895 global twist -205.60179 global supercoiling -0.06607
+frame 119 time 119.0 binding_event at DNA_topoI_stochastic 36 enzyme topoI_stochastic with twist -40.72432 superhelical -0.08063 global twist -201.46820 global supercoiling -0.06413
+frame 153 time 153.0 binding_event at DNA_topoI_stochastic 41 enzyme topoI_stochastic with twist -40.13726 superhelical -0.09316 global twist -199.74921 global supercoiling -0.06507
+frame 177 time 177.0 binding_event at DNA_topoI_stochastic 0 enzyme topoI_stochastic with twist -31.08114 superhelical -0.13888 global twist -198.57933 global supercoiling -0.06624
+frame 257 time 257.0 binding_event at DNA_topoI_stochastic 3 enzyme topoI_stochastic with twist -98.24310 superhelical -0.14711 global twist -194.58887 global supercoiling -0.06650
+frame 436 time 436.0 binding_event at DNA_topoI_stochastic 1 enzyme topoI_stochastic with twist -26.48494 superhelical -0.16036 global twist -186.08815 global supercoiling -0.06519
+frame 439 time 439.0 binding_event at DNA_topoI_stochastic 28 enzyme topoI_stochastic with twist -33.07248 superhelical -0.05361 global twist -185.95239 global supercoiling -0.06683
+frame 509 time 509.0 binding_event at DNA_topoI_stochastic 6 enzyme topoI_stochastic with twist -68.30488 superhelical -0.15854 global twist -182.80183 global supercoiling -0.06744
+frame 873 time 873.0 binding_event at DNA_topoI_stochastic 48 enzyme topoI_stochastic with twist -20.28442 superhelical -0.09416 global twist -167.40073 global supercoiling -0.06343
+frame 904 time 904.0 binding_event at DNA_topoI_stochastic 30 enzyme topoI_stochastic with twist -24.22233 superhelical -0.05150 global twist -166.17088 global supercoiling -0.06473
+frame 930 time 930.0 binding_event at DNA_topoI_stochastic 8 enzyme topoI_stochastic with twist -38.71561 superhelical -0.17972 global twist -165.14338 global supercoiling -0.06618
+frame 1054 time 1054.0 binding_event at DNA_topoI_stochastic 38 enzyme topoI_stochastic with twist -25.68722 superhelical -0.08943 global twist -160.49916 global supercoiling -0.06623
+frame 1078 time 1078.0 binding_event at DNA_topoI_stochastic 33 enzyme topoI_stochastic with twist -18.67976 superhelical -0.05717 global twist -159.64740 global supercoiling -0.06789
+frame 1133 time 1133.0 binding_event at DNA_topoI_stochastic 35 enzyme topoI_stochastic with twist -8.01237 superhelical -0.07199 global twist -157.73399 global supercoiling -0.06918
