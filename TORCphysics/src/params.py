@@ -24,7 +24,7 @@ dt = 1.0  # timestep (seconds)
 v0 = 30.0  # 60.0  # Velocity (bp/sec) of RNAPs
 bp_nm = .34  # nm - base-pair rise
 T_bp = 10.5  # Number of bp per helical turn
-w0 = 2.0 * np.pi / T_bp  # Relaxed twist density per bp
+w0 = 2.0 * np.pi / T_bp  # Relaxed twist density per bp (rad/bp)
 w0_nm = 2.0 * np.pi / (T_bp * bp_nm)  # rad * nm^{-1} - Now in distance units
 gamma = 0.2 * w0  # How much supercoiling is injected per bp
 # sigma0 = -0.06          #Initial supercoiling density
@@ -80,6 +80,9 @@ gyra_sam_threshold = 0.01  # effect threshold
 gyra_sam_kcat = 0.001  # minus because it removes negative supercoils
 # I think it makes more sense to put the negative in the equation rather than in
 # the parameter
+
+gyra_uniform_k_cat = -10.5 # (bp/second)
+topoI_uniform_k_cat = 7.5 # (bp/second)
 
 # Sam Meyer's PROMOTER CURVE (parameters taken from Houdaigi NAR 2019)
 SM_sigma_t = -0.042  # threshold of promoter openning
