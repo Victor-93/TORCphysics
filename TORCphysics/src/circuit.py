@@ -326,8 +326,9 @@ class Circuit:
             # skip non-specific binding proteins
             if not self.write_nonspecific_sites and site.name.isdigit() and 'DNA' in site.site_type:
                 continue
-            # This is for enzymes that bind bare DNA
-            if 'DNA' in site.site_type and '_global' in site.name:
+            # This for global sites, e.g., for enzymes that bind bare DNA
+            #  if 'DNA' in site.site_type and '_global' in site.name:
+            if site.global_site:
                 site_superhelical = self.superhelical
                 site_twist = self.twist
             else:
@@ -369,8 +370,9 @@ class Circuit:
             global_sum = False  # This variable is for enzymes that recognise bare DNA
             # And is used to update its global quantities.
 
-            # This is for enzymes that bind bare DNA - Let's initialize it
-            if 'DNA' in site.site_type and '_global' in site.name:
+            # This is for global sites, e.g., enzymes that bind bare DNA - Let's initialize it
+            #  if 'DNA' in site.site_type and '_global' in site.name:
+            if site.global_site:
                 self.sites_dict_list_aux[i]['binding'] = 0
                 self.sites_dict_list_aux[i]['unbinding'] = 0
                 global_sum = True
@@ -811,7 +813,7 @@ class Circuit:
         self.sort_site_list()
         return
 
-    # TODO: See how the sites of enzymes that bind DNA stochastically can be defined here. (with site_global as well).
+    # TODO: Comment, test and sort.
     # This function defines the binding sites of enzymes that recognize bare DNA, that means just DNA.
     # It partitions the DNA in N binding sites of size enzyme.size
     def define_bare_DNA_binding_sites(self):
