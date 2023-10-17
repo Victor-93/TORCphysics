@@ -452,8 +452,8 @@ def assign_binding_model(model_name, oparams_file=None, **oparams):
         my_model = PoissonBinding(filename=oparams_file, **oparams)
     elif model_name == 'TopoIRecognition':
         my_model = TopoIRecognition(filename=oparams_file, **oparams)
-    #    elif model_name == 'GyraseRecognition':
-    #        my_model = GyraseRecognition(filename=oparams_file)
+    elif model_name == 'GyraseRecognition':
+        my_model = GyraseRecognition(filename=oparams_file, **oparams)
     else:
         raise ValueError('Could not recognise binding model ' + model_name)
     return my_model

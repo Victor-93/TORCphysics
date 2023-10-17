@@ -158,7 +158,8 @@ class RNAPUniform(EffectModel):
         continuum : bool, optional
             Indicates if the actions of the effect model are continuous. For this model, it is not continuous.
         oparams : dict, optional
-            A dictionary containing the parameters used for the binding model. In this case, it would be k_on.
+            A dictionary containing the parameters used for the effect model. In this case it would be velocity and
+            gamma.
         """
 
         super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
@@ -228,6 +229,156 @@ class RNAPUniform(EffectModel):
 
         # Nothing is next, so the object moves: simple uniform motion
         position, twist_left, twist_right = uniform_motion(z, dt)
+
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+
+# TODO: Test this function
+class TopoIUniform(EffectModel):
+    """
+     An EffectModel subclass that represents the uniform effect that topoisomerase I have on the DNA.
+     In this model, bound enzymes inject supercoils/twist to the left and right uniformly, that is, that the
+     amounts of supercoils injected are independent of the local supercoiling density.
+     For each timestep, supercoils will be injected constantly until the enzyme unbinds.
+
+     Attributes
+     ----------
+     k_cat : float
+        Catalysis rate at which supercoils are being removed per second (bp/sec).
+     filename : str, optional
+        Path to the site csv file that parametrises the effect model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the effect model.
+    """
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=False, **oparams):
+        """ The constructor of the TopoIPUniform subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the TopoIPUniform effect model; this file should have
+            the k_cat parameter
+        continuum : bool, optional
+            Indicates if the actions of the effect model are continuous. For this model, it is not continuous.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the effect model. In this case it would be k_cat.
+        """
+
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        if not oparams:
+            if filename is None:
+                self.k_cat = params.topoI_uniform_k_cat  # TODO: What's the k_cat
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'k_cat' in mydata.columns:
+                    self.k_cat = mydata['k_cat'][0]
+                else:
+                    raise ValueError('Error, k_cat parameter missing in csv file for TopoIPUniform')
+        else:
+            self.k_cat = float(oparams['k_cat'])
+
+        self.oparams = {'k_cat': self.k_cat}  # Just in case
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+        """ Method for calculating the simple and uniform Effect that the bound Topoisomerase I cause on the DNA.
+
+        Parameters
+        ----------
+        index : int
+            Enzyme's index in the list of enzymes "enzyme_list".
+        z : Enzyme
+            This is the object of the current Enzyme (RNAP) that is moving along the DNA.
+        z_list : list
+            This is a list of Enzyme objects.
+        dt : float
+            Timestep in seconds (s).
+
+        Returns
+        ----------
+        effect : Effect
+            This function returns an Effect object, which indicates the changes in position and local twist that
+            the current Topo I caused on the DNA.
+        """
+
+        position, twist_left, twist_right = topoisomerase_supercoiling_injection(self.k_cat, dt)
+
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+
+# TODO: Test this function
+class GyraseUniform(EffectModel):
+    """
+     An EffectModel subclass that represents the uniform effect that gyrase have on the DNA.
+     In this model, bound enzymes inject supercoils/twist to the left and right uniformly, that is, that the
+     amounts of supercoils injected are independent of the local supercoiling density.
+     For each timestep, supercoils will be injected constantly until the enzyme unbinds.
+
+     Attributes
+     ----------
+     k_cat : float
+        Catalysis rate at which supercoils are being removed per second (bp/sec).
+     filename : str, optional
+        Path to the site csv file that parametrises the effect model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the effect model.
+    """
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=False, **oparams):
+        """ The constructor of the GyrasePUniform subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the GyraseUniform effect model; this file should have
+            the k_cat parameter.
+        continuum : bool, optional
+            Indicates if the actions of the effect model are continuous. For this model, it is not continuous.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the effect model. In this case it would be k_cat.
+        """
+
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        if not oparams:
+            if filename is None:
+                self.k_cat = params.gyra_uniform_k_cat
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'k_cat' in mydata.columns:
+                    self.k_cat = mydata['k_cat'][0]
+                else:
+                    raise ValueError('Error, k_cat parameter missing in csv file for GyraseUniform')
+        else:
+            self.k_cat = float(oparams['k_cat'])
+
+        self.oparams = {'k_cat': self.k_cat}  # Just in case
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+        """ Method for calculating the simple and uniform Effect that the bound Gyrase cause on the DNA.
+
+        Parameters
+        ----------
+        index : int
+            Enzyme's index in the list of enzymes "enzyme_list".
+        z : Enzyme
+            This is the object of the current Enzyme (RNAP) that is moving along the DNA.
+        z_list : list
+            This is a list of Enzyme objects.
+        dt : float
+            Timestep in seconds (s).
+
+        Returns
+        ----------
+        effect : Effect
+            This function returns an Effect object, which indicates the changes in position and local twist that
+            the current Gyrase caused on the DNA.
+        """
+
+        position, twist_left, twist_right = topoisomerase_supercoiling_injection(self.k_cat, dt)
 
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
@@ -334,7 +485,7 @@ class TopoIContinuum(EffectModel):
          ----------
          effect : Effect
              This function returns an Effect object, which indicates the changes in position and local twist that
-             the current RNAP caused on the DNA.
+             TopoI caused on the DNA.
          """
 
         # Calculates the amount of coils removed by topoisomerase I activity.
@@ -349,6 +500,115 @@ class TopoIContinuum(EffectModel):
         except OverflowError as oe:
             supercoiling_removed = 0.0
 
+        twist_right = calculate_twist_from_sigma(z, z_n, supercoiling_removed)
+        return Effect(index=index, position=0.0, twist_left=0.0, twist_right=twist_right)
+
+
+# TODO: Test this function
+# TODO: Check if it is easier to find the next neighbour? z_n? Maybe a function that can speed things up
+class GyraseContinuum(EffectModel):
+    """
+     An EffectModel subclass that calculates represents the continuum effect of Gyrase on the DNA.
+     This model affects every region on the DNA continuously. These effects are represented by a sigmoid curve.
+     This model is compatible with the Houdaigui et al. 2019 model.
+
+     The amount of supercoils removed is calculated by:
+     supercoils_removed = concentration * k_cat * dt / (1 + exp( (supercoiling - threshold)/width)
+
+     Attributes
+     ----------
+     k_cat : float
+        Catalysis rate at which supercoils are being removed per second (1/nM*s).
+     threshold : float
+        The threshold of the sigmoid curve. This parameter is dimensionless.
+     width : float
+        The width of the sigmoid curve. This parameter is dimensionless.
+     filename : str, optional
+        Path to the site csv file that parametrises the effect model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the effect model.
+    """
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=True, **oparams):
+        """ The constructor of the RNAPUniform subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the TopoIContinuum effect model; this file should have
+            the k_cat, threshold and width parameters.
+        continuum : bool, optional
+            Indicates if the actions of the effect model are continuous. For this model, it is!
+        oparams : dict, optional
+            A dictionary containing the parameters used for the binding model. In this case, it would be k_cat,
+            threshold and width
+        """
+
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        if not oparams:
+            if filename is None:
+                self.k_cat = params.gyra_sam_kcat
+                self.threshold = params.gyra_sam_threshold
+                self.width = params.gyra_sam_width
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'k_cat' in mydata.columns:
+                    self.k_cat = mydata['k_cat'][0]
+                else:
+                    raise ValueError('Error, k_cat parameter missing in csv file for GyraseContinuum')
+                if 'threshold' in mydata.columns:
+                    self.threshold = mydata['threshold'][0]
+                else:
+                    raise ValueError('Error, threshold parameter missing in csv file for GyraseContinuum')
+                if 'width' in mydata.columns:
+                    self.width = mydata['width'][0]
+                else:
+                    raise ValueError('Error, width parameter missing in csv file for GyraseContinuum')
+        else:
+            self.k_cat = float(oparams['k_cat'])
+            self.threshold = float(oparams['threshold'])
+            self.width = float(oparams['width'])
+
+        self.oparams = {'k_cat': self.k_cat, 'threshold': self.threshold, 'width': self.width}  # Just in case
+
+    def calculate_effect(self, concentration, index, z, z_list, dt) -> Effect:
+
+        """ Method for calculating the Effect that continuum action of Gyrase causes on the DNA.
+
+         Parameters
+         ----------
+         concentration : float
+             Enzyme concentration in the environment.
+         index : int
+             Enzyme's index in the list of enzymes "enzyme_list".
+         z : Enzyme
+             This is the object of the current Enzyme (RNAP) that is moving along the DNA.
+         z_list : list
+             This is a list of Enzyme objects.
+         dt : float
+             Timestep in seconds (s).
+
+         Returns
+         ----------
+         effect : Effect
+             This function returns an Effect object, which indicates the changes in position and local twist that
+             Gyrase caused on the DNA.
+         """
+
+        # Calculates the amount of coils removed by gyrase activity.
+        # This function only depends on the supercoiling density (sigma)
+        # I took this function from Sam Meyer's paper (2019)
+        # the function has the form of (concentration*sigmoid)*rate*dt
+
+        z_n = [e for e in z_list if e.position > z.position][0]  # Enzyme on the right
+        a = concentration * self.k_cat * dt
+        try:
+            b = 1 + np.exp(-(z.superhelical - self.threshold) / self.width)
+            supercoiling_removed = -a / b
+        except OverflowError as oe:
+            supercoiling_removed = 0.0
         twist_right = calculate_twist_from_sigma(z, z_n, supercoiling_removed)
         return Effect(index=index, position=0.0, twist_left=0.0, twist_right=twist_right)
 
@@ -415,8 +675,14 @@ def get_effect_model(name, e_model, model_name, oparams_file, oparams):
 def assign_effect_model(model_name, oparams_file=None, **oparams):
     if model_name == 'RNAPUniform':
         my_model = RNAPUniform(filename=oparams_file, **oparams)
+    elif model_name == 'TopoIUniform':
+        my_model = TopoIUniform(filename=oparams_file, **oparams)
+    elif model_name == 'GyraseUniform':
+        my_model = GyraseUniform(filename=oparams_file, **oparams)
     elif model_name == 'TopoIContinuum':
         my_model = TopoIContinuum(filename=oparams_file, **oparams)
+    elif model_name == 'GyraseContinuum':
+        my_model = GyraseContinuum(filename=oparams_file, **oparams)
     else:
         raise ValueError('Could not recognise effect model ' + model_name)
     return my_model
@@ -429,49 +695,14 @@ def read_csv_to_dict(filename):
     return pd.read_csv(filename).to_dict()
 
 
-# ---------------------------------------------------------------------------------------------------------------------
-# TOPOISOMERASE ACTIVITY FUNCTIONS
-# ---------------------------------------------------------------------------------------------------------------------
-
-# ----------------------------------------------------------
-# Calculates the amount of coils removed by topoisomerase I
-# activity. This function only depends on the supercoiling density (sigma)
-# I took this function from Sam Meyer's paper (2019)
-def topo1_continuum(sigma, topo, dt):
-    # the function has the form of (concentration*sigmoid)*rate*dt
-    a = topo.concentration * topo.k_cat * dt
-    try:
-        b = 1 + np.exp((sigma - topo.oparams['threshold']) / topo.oparams['width'])
-        sigma_removed = a / b
-    except OverflowError as oe:
-        sigma_removed = 0.0
-    return sigma_removed
-
-
-
-# ----------------------------------------------------------
-# Calculates the amount of coils removed by gyrase
-# activity. This function only depends on the supercoiling density (sigma)
-# I took this function from Sam Meyer's paper (2019)
-def gyrase_continuum(sigma, gyra, dt):
-    # the function has the form of (concentration*sigmoid)*rate*dt
-    a = gyra.concentration * gyra.k_cat * dt
-    try:
-        b = 1 + np.exp(-(sigma - gyra.oparams['threshold']) / gyra.oparams['width'])
-        sigma_removed = -a / b
-    except OverflowError as oe:
-        sigma_removed = 0.0
-    return sigma_removed
-
-
 # Supercoiling injection of topoisomerases. It injects according the k_cat (injected twist per second), so be careful
 # because it can be both positive or negative
-def topoisomerase_supercoiling_injection(topo, dt):
+def topoisomerase_supercoiling_injection(k_cat, dt):
     position = 0.0
     # Note that k_cat is divided by two on each side because it is assumed that k_cat acts on the local region
     # (both sides)
-    twist_left = 0.5 * topo.k_cat * params.w0 * dt
-    twist_right = 0.5 * topo.k_cat * params.w0 * dt
+    twist_left = 0.5 * k_cat * params.w0 * dt
+    twist_right = 0.5 * k_cat * params.w0 * dt
     return position, twist_left, twist_right
 
 

@@ -118,7 +118,7 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
 # Runs through each bound enzyme (in enzyme_list) and creates an effect.
 # It an effects_list which contains indications on how to update the current position and how the twist on the local
 # neighbouring domains are effected
-def effect_workflow(enzyme_list, environmental_list, dt, topoisomerase_model, mechanical_model):
+def effect_workflow(enzyme_list, environmental_list, dt):
     # list of effects: effect = [index, position, twist_left, twist_right]
     # I use an effect list because it's easier because there are multiple changes in the local twists
     effect_list = []
