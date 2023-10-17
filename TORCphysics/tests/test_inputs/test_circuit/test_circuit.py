@@ -42,10 +42,10 @@ class TestCircuit(TestCase):
     # TODO:
     #  1.- Let's make the code work with many types of enzymes.
     #  1.1.- Add new bindings - TopoI and Gyrase DONE!
-    #  1.2 - Add topoisomerase action - stochastic and continuum
+    #  1.2 - Add topoisomerase action - DONE
     #  1.2.1 - Let's make it work for topoI continuum and stochastic, remove the tm and mm parameters, then add both
-    #          mechanisms for gyrase.
-    #  1.3 - Add topoisomerase unbinding.
+    #          mechanisms for gyrase - Here we are!
+    #  1.3 - Add Topoisomerases Effects
     #  2.- Also remove the topo model and mechanistic model and all that
     #  3.- Then, start documenting and tidying up workflow
     #  4.- Test models_workflow
@@ -64,6 +64,7 @@ class TestCircuit(TestCase):
         mm = 'uniform'
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation, dt, tm, mm)
+        my_circuit.environmental_list[3].unbinding_model.k_off = 0.5
         # Let's make the rates
         my_circuit.run()
 
