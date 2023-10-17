@@ -58,7 +58,7 @@ class TestEffectModel(TestCase):
         # Test 4
         effect_model, effect_model_name, effect_oparams_file, effect_model_oparams = (
             em.get_effect_model(name='test4', e_model=None, model_name='RNAPUniform',
-                                oparams_file='test_inputs/test_effect/RNAPUniform_params.csv', oparams=None))
+                                oparams_file='RNAPUniform_params.csv', oparams=None))
         self.assertEqual(effect_model_name, 'RNAPUniform')
         self.assertEqual(effect_model.velocity, 20.0)
         self.assertEqual(effect_model.gamma, 2.0)
@@ -100,7 +100,7 @@ class TestEffectModel(TestCase):
 
         # Test 2
         my_model = em.assign_effect_model(model_name='RNAPUniform',
-                                          oparams_file='test_inputs/test_effect/RNAPUniform_params.csv')
+                                          oparams_file='RNAPUniform_params.csv')
         self.assertEqual(my_model.__class__.__name__, 'RNAPUniform')
         self.assertEqual(my_model.velocity, 20.0)
         self.assertEqual(my_model.gamma, 2.0)
@@ -114,7 +114,7 @@ class TestEffectModel(TestCase):
 
         # Test 4
         my_model = em.assign_effect_model(model_name='RNAPUniform',
-                                          oparams_file='test_inputs/test_effect/RNAPUniform_params.csv',
+                                          oparams_file='RNAPUniform_params.csv',
                                           **{'velocity': 30.0, 'gamma': 0.02})
         self.assertEqual(my_model.__class__.__name__, 'RNAPUniform')
         self.assertEqual(my_model.velocity, 30.0)  # DICTIONARY IS PRIORITY
@@ -164,7 +164,7 @@ class TestEffectModel(TestCase):
 
             # Test 2
             # ---------------------------
-            my_model = em.RNAPUniform(filename='test_inputs/test_effect/RNAPUniform_params.csv')
+            my_model = em.RNAPUniform(filename='RNAPUniform_params.csv')
             my_enzyme = Enzyme(e_type='RNAP', name='RNAPUniform_test', site=site_list1[0], size=30,
                                effective_size=15, position=500, twist=0.0, superhelical=0.0, effect_model=my_model)
             my_list = [enzyme1, enzyme2, my_enzyme, enzyme3, enzyme4]
@@ -212,7 +212,7 @@ class TestEffectModel(TestCase):
 
             # Test 4
             # ---------------------------
-            my_model = em.RNAPUniform(filename='test_inputs/test_effect/RNAPUniform_params.csv',
+            my_model = em.RNAPUniform(filename='RNAPUniform_params.csv',
                                       **{'velocity': 30.0, 'gamma': 0.02})  # oparams is priority!
             my_enzyme = Enzyme(e_type='RNAP', name='RNAPUniform_test', site=site_list1[0], size=30,
                                effective_size=15, position=500, twist=0.0, superhelical=0.0, effect_model=my_model)
@@ -237,13 +237,13 @@ class TestEffectModel(TestCase):
 
     def test_RNAPUniform_bad_csv(self):
         # test 1 = bad velocity
-        filename = 'test_inputs/test_effect/RNAPUniform_badvelocity.csv'
+        filename = 'RNAPUniform_badvelocity.csv'
         with self.assertRaises(ValueError) as context:
             em.RNAPUniform(filename=filename)
         self.assertEqual(str(context.exception), 'Error, velocity parameter missing in csv file for RNAPUniform')
 
         # test 2 = bad gamma
-        filename = 'test_inputs/test_effect/RNAPUniform_badgamma.csv'
+        filename = 'RNAPUniform_badgamma.csv'
         with self.assertRaises(ValueError) as context:
             em.RNAPUniform(filename=filename)
         self.assertEqual(str(context.exception), 'Error, gamma parameter missing in csv file for RNAPUniform')

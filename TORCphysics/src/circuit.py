@@ -163,7 +163,7 @@ class Circuit:
             # EFFECT
             # --------------------------------------------------------------
             effects_list = mw.effect_workflow(self.enzyme_list, self.environmental_list, self.dt,
-                                                    self.topoisomerase_model, self.mechanical_model)
+                                              self.topoisomerase_model, self.mechanical_model)
             self.apply_effects(effects_list)
 
             # UNBINDING
@@ -250,7 +250,6 @@ class Circuit:
     def enzyme_list_to_df(self):
         enzyme_aux = []  # This will be a list of dicts
         for enzyme in self.enzyme_list:
-
             d = {'type': enzyme.enzyme_type, 'name': enzyme.name, 'site': enzyme.site.name, 'position': enzyme.position,
                  'size': enzyme.size, 'effective_size': enzyme.effective_size, 'twist': enzyme.twist,
                  'superhelical': enzyme.superhelical, 'effect_model': enzyme.effect_model_name,
@@ -817,45 +816,80 @@ class Circuit:
     # It partitions the DNA in N binding sites of size enzyme.size
     def define_bare_DNA_binding_sites(self):
 
-        if self.topoisomerase_model == 'stochastic':
-            topo_list = [environment for environment in self.environmental_list
-                         if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
-            for topo in topo_list:
-                # The idea is that the topos will recognize these specific sites.
-                # These sites will be created dynamically, and will have different names :0,1,2,3,...
-                # I will have to ignore this first site in specific, because this one will be the overall, and is the
-                # one that is output in the sites_df.csv
-                t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global',
-                              start=1, end=self.size, k_min=0, k_max=0,
-                              s_model_name=topo.binding_model + '_' + topo.name, oparams=topo.binding_oparams)
+        # Let's create the global sites.
+        # -----------------------------------------------
+
+        # These global sites count how many times enzymes bound to the DNA molecule in general, but these sites
+        # are not actually bound for any type of environmental, so they don't have binding/effect/unbinding models.
+        for environmental in self.environmental_list:
+            if 'DNA' in environmental.site_type:
+                t_site = Site(site_type='DNA_' + environmental.name, name='DNA_' + environmental.name,
+                              start=1, end=float(self.size), k_on=0.0, global_site=True)
                 self.site_list.append(t_site)
 
-        environment_list = [environment for environment in self.environmental_list
-                            if environment.site_type == 'DNA']
+        #        if self.topoisomerase_model == 'stochastic':
+        #            topo_list = [environment for environment in self.environmental_list
+        #                         if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
+        #            for topo in topo_list:
+        #                # The idea is that the topos will recognize these specific sites.
+        #                # These sites will be created dynamically, and will have different names :0,1,2,3,...
+        #                # I will have to ignore this first site in specific, because this one will be the overall, and is the
+        #                # one that is output in the sites_df.csv
+        #                t_site = Site(s_type='DNA_' + topo.name, name='DNA_' + topo.name + '_global',
+        #                              start=1, end=self.size, k_min=0, k_max=0,
+        #                              s_model_name=topo.binding_model + '_' + topo.name, oparams=topo.binding_oparams)
+        #                self.site_list.append(t_site)
 
-        for environment in environment_list:
-            # No point in defining topoisomerase binding sites if it's a continuum model
-            if environment.enzyme_type == 'topo' and self.topoisomerase_model == 'continuum':
+        # Let's create the local sites.
+        # -----------------------------------------------
+        for environmental in self.environmental_list:
+            if environmental.binding_model is None:  # There is no point in defining local sites if the environmentals
+                # don't have a binding model
                 continue
-            n_sites = int(self.size / environment.size)
-            s = 0
-            for n in range(n_sites):
-                start = 1 + environment.size * n
-                end = environment.size * (1 + n)
-                if end > self.size:  # Little break to avoid making it bigger than the actual plasmid
-                    continue
-                environment_site = Site(s_type='DNA_' + environment.name,
-                                        name=str(s),
-                                        start=start, end=end, k_min=0, k_max=0,
-                                        s_model_name=environment.binding_model + '_' + environment.name,
-                                        oparams=environment.binding_oparams)
-                self.site_list.append(environment_site)
+            if 'DNA' in environmental.site_type:
+                n_sites = int(self.size / environmental.size)
+                s = 0
+                for n in range(n_sites):
+                    start = 1 + environmental.size * n
+                    end = environmental.size * (1 + n)
+                    if end > self.size:  # Little break to avoid making it bigger than the actual plasmid
+                        continue
+                    local_site = Site(site_type='DNA_' + environmental.name, name=str(s), start=start, end=end,
+                                      k_on=environmental.binding_model.k_on, binding_model=environmental.binding_model)
+                    self.site_list.append(local_site)
+                    environmental.site_list.append(local_site)
 
-                s = s + 1
-                environment.site_list.append(environment_site)
+                    s = s + 1
 
-            # The next line makes the environmental recognize the specific binding site
-            environment.site_type = 'DNA_' + environment.name
+                # The next line makes the environmental recognize the specific binding site
+                environmental.site_type = 'DNA_' + environmental.name
+
+        #        environment_list = [environment for environment in self.environmental_list
+        #                            if environment.site_type == 'DNA']
+
+        #        for environment in environment_list:
+        #            # No point in defining topoisomerase binding sites if it's a continuum model
+        #            if environment.enzyme_type == 'topo' and self.topoisomerase_model == 'continuum':
+        #                continue
+        #            n_sites = int(self.size / environment.size)
+        #            s = 0
+        #            for n in range(n_sites):
+        #                start = 1 + environment.size * n
+        #                end = environment.size * (1 + n)
+        #                if end > self.size:  # Little break to avoid making it bigger than the actual plasmid
+        #                    continue
+        #                environment_site = Site(s_type='DNA_' + environment.name,
+        #                                        name=str(s),
+        #                                        start=start, end=end, k_min=0, k_max=0,
+        #                                        s_model_name=environment.binding_model + '_' + environment.name,
+        #                                        oparams=environment.binding_oparams)
+        #                self.site_list.append(environment_site)
+
+        #                s = s + 1
+        #                environment.site_list.append(environment_site)
+
+        #            # The next line makes the environmental recognize the specific binding site
+        #            environment.site_type = 'DNA_' + environment.name
 
         self.sort_site_list()
         return

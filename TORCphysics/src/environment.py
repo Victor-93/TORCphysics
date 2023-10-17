@@ -155,8 +155,11 @@ class Environment:
             raise ValueError('Error, environmentals must have a name')
         if not isinstance(self.site_list, list):
             raise ValueError('Error, environmentals site_list must be a list')
-        if not isinstance(self.site_type, str) or self.site_type == '':
-            raise ValueError('Error, environmentals need to recognise a site_type')
+        if (self.site_type == '' or self.site_type == 'None' or self.site_type == 'none' or
+                self.site_type == 'nan'):
+            self.site_type = ''
+#        if not isinstance(self.site_type, str) or self.site_type == '':
+#            raise ValueError('Error, environmentals need to recognise a site_type')
         if not isinstance(self.concentration, float) and not isinstance(self.concentration, int):
             raise ValueError('Error, environmentals need a number for concentration')
         if not isinstance(self.size, float) and not isinstance(self.size, int):
@@ -435,12 +438,12 @@ class EnvironmentFactory:
         """
         df = pd.read_csv(self.filename)
         for index, row in df.iterrows():
-            new_environment = Environment(e_type=row['type'], name=row['name'],
+            new_environment = Environment(e_type=str(row['type']), name=str(row['name']),
                                           site_list=self.site_match(row['site_type']),
                                           concentration=float(row['concentration']),
                                           size=float(row['size']),
                                           effective_size=float(row['effective_size']),
-                                          site_type=row['site_type'],
+                                          site_type=str(row['site_type']),
                                           binding_model_name=str(row['binding_model']),
                                           binding_oparams_file=str(row['binding_oparams']),
                                           effect_model_name=str(row['effect_model']),

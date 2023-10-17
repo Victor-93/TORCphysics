@@ -2,5 +2,5 @@ type,name,site_type,concentration,size,effective_size,binding_model,binding_opar
 RNAP,RNAP1,gene,0.2,50,32,none,none,RNAPUniform,none,RNAPSimpleUnbinding,none
 RNAP,RNAP2,gene,0.2,70,42,,,RNAPUniform,,RNAPSimpleUnbinding,
 NAP,IHF,IHF_op,0.01,100,70,,,,,,
-topo,topo1_stochastic,DNA,0.25,120,100,,,,,,
-topo,gyrase_stochastic,DNA,0.25,120,100,,,,,,
+topo,topoI_stochastic,DNA,0.25,120,100,TopoIRecognition,,,,,
+topo,topoI_continuum,,0.025,0.0,0.0,,,TopoIContinuum,,,

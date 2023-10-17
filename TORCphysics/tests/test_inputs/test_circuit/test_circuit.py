@@ -40,9 +40,11 @@ class TestCircuit(TestCase):
 
     # TODO: Try doing many enzyme types. Topos that bind stochastically, and topos that act continuously on the DNA.
     # TODO:
-    #  1.- Let's make the code work with these many types of enzymes.
+    #  1.- Let's make the code work with many types of enzymes.
     #  1.1.- Add new bindings - TopoI and Gyrase DONE!
     #  1.2 - Add topoisomerase action - stochastic and continuum
+    #  1.2.1 - Let's make it work for topoI continuum and stochastic, remove the tm and mm parameters, then add both
+    #          mechanisms for gyrase.
     #  1.3 - Add topoisomerase unbinding.
     #  2.- Also remove the topo model and mechanistic model and all that
     #  3.- Then, start documenting and tidying up workflow
@@ -57,14 +59,11 @@ class TestCircuit(TestCase):
         frames = 1500
         series = True
         continuation = False
-        dt = 0.5
+        dt = 1.0
         tm = 'continuum'
         mm = 'uniform'
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation, dt, tm, mm)
-        #        for site in my_circuit.site_list:  # I'll increase the rates
-        #             site.k_min = site.k_min * 100
-        # site.k_min = site.k_min * 5
         # Let's make the rates
         my_circuit.run()
 
