@@ -1,7 +1,17 @@
 from unittest import TestCase
-from TORCphysics import params
+from TORCphysics import params, Site, Enzyme
 from TORCphysics import unbinding_model as ubm
 from TORCphysics import effect_model as em
+
+site_gene1 = Site(site_type='gene', name='test_gene1', start=100, end=500, k_on=3.00)
+site_gene2 = Site(site_type='gene', name='test_gene2', start=600, end=800, k_on=3.00)
+site_gene3 = Site(site_type='gene', name='test_gene3', start=1200, end=1000, k_on=3.00)
+site_tf = Site(site_type='TF', name='test_TF', start=1200, end=1000, k_on=3.00)
+site_list1 = [site_gene1, site_gene2, site_gene3, site_tf]
+
+# 1. E Model + defaults
+enzyme1 = Enzyme(e_type='RNAP', name='test1', site=site_list1[0], size=100, effective_size=50, position=30,
+                 twist=0.0, superhelical=0.0)
 
 
 class TestBindingModel(TestCase):
@@ -39,7 +49,7 @@ class TestBindingModel(TestCase):
         # Test 4
         unbinding_model, unbinding_model_name, unbinding_oparams_file, unbinding_model_oparams = (
             ubm.get_unbinding_model(name='test4', ub_model=None, model_name='PoissonUnBinding',
-                                    oparams_file='test_inputs/test_unbinding/PoissonUnBinding_params1.csv',
+                                    oparams_file='PoissonUnBinding_params1.csv',
                                     oparams=None))
         self.assertEqual(unbinding_model_name, 'PoissonUnBinding')
         self.assertEqual(unbinding_model.k_off, 2.5)
@@ -78,7 +88,7 @@ class TestBindingModel(TestCase):
 
         # Test 2
         my_model = ubm.assign_unbinding_model(model_name='PoissonUnBinding',
-                                              oparams_file='test_inputs/test_unbinding/PoissonUnBinding_params1.csv')
+                                              oparams_file='PoissonUnBinding_params1.csv')
         self.assertEqual(my_model.__class__.__name__, 'PoissonUnBinding')
         self.assertEqual(my_model.k_off, 2.5)
 
@@ -90,7 +100,7 @@ class TestBindingModel(TestCase):
 
         # Test 4
         my_model = ubm.assign_unbinding_model(model_name='PoissonUnBinding',
-                                              oparams_file='test_inputs/test_unbinding/PoissonUnBinding_params1.csv',
+                                              oparams_file='PoissonUnBinding_params1.csv',
                                               **{'k_off': 1.0})
         self.assertEqual(my_model.__class__.__name__, 'PoissonUnBinding')
         self.assertEqual(my_model.k_off, 1.0)  # DICTIONARY IS PRIORITY
@@ -100,6 +110,9 @@ class TestBindingModel(TestCase):
         with self.assertRaises(ValueError) as context:
             my_model = ubm.assign_unbinding_model(model_name=model_name)
         self.assertEqual(str(context.exception), 'Could not recognise unbinding model ' + model_name)
+
+
+class TestPoissonUnBindingModel(TestCase):
 
     def test_PoissonUnBinding(self):
         # For each test case, we should have the PoissonUnBinding Model with params, and 0 <= probability <=1.
@@ -113,15 +126,15 @@ class TestBindingModel(TestCase):
         for dt in [0.01, 0.1, 0.5, 1.0, 1.5, 2.0]:
             # Test 1
             my_model = ubm.PoissonUnBinding()
-            probability = my_model.unbinding_probability(dt)
+            probability = my_model.unbinding_probability(enzyme1, dt)
             self.assertEqual(my_model.__class__.__name__, 'PoissonUnBinding')
             self.assertEqual(my_model.k_off, params.k_off)
             self.assertGreaterEqual(probability, 0.0)
             self.assertLessEqual(probability, 1.0)
 
             # Test 2
-            my_model = ubm.PoissonUnBinding(filename='test_inputs/test_unbinding/PoissonUnBinding_params1.csv')
-            probability = my_model.unbinding_probability(dt)
+            my_model = ubm.PoissonUnBinding(filename='PoissonUnBinding_params1.csv')
+            probability = my_model.unbinding_probability(enzyme1, dt)
             self.assertEqual(my_model.__class__.__name__, 'PoissonUnBinding')
             self.assertEqual(my_model.k_off, 2.5)
             self.assertGreaterEqual(probability, 0.0)
@@ -129,16 +142,16 @@ class TestBindingModel(TestCase):
 
             # Test 3
             my_model = ubm.PoissonUnBinding(**{'k_off': 1.0})
-            probability = my_model.unbinding_probability(dt)
+            probability = my_model.unbinding_probability(enzyme1, dt)
             self.assertEqual(my_model.__class__.__name__, 'PoissonUnBinding')
             self.assertEqual(my_model.k_off, 1.0)
             self.assertGreaterEqual(probability, 0.0)
             self.assertLessEqual(probability, 1.0)
 
             # Test 4
-            my_model = ubm.PoissonUnBinding(filename='test_inputs/test_unbinding/PoissonUnBinding_params1.csv',
+            my_model = ubm.PoissonUnBinding(filename='PoissonUnBinding_params1.csv',
                                             **{'k_off': 1.0})  # oparams is priority!
-            probability = my_model.unbinding_probability(dt)
+            probability = my_model.unbinding_probability(enzyme1, dt)
             self.assertEqual(my_model.__class__.__name__, 'PoissonUnBinding')
             self.assertEqual(my_model.k_off, 1.0)
             self.assertGreaterEqual(probability, 0.0)
@@ -146,7 +159,92 @@ class TestBindingModel(TestCase):
 
     def test_PoissonUnBinding_bad_csv(self):
         # Poisson Binding model that has k_on but not k_off
-        filename = 'test_inputs/test_binding/PoissonBinding_params1.csv'
+        filename = '..//test_binding/PoissonBinding_params1.csv'
         with self.assertRaises(ValueError) as context:
             ubm.PoissonUnBinding(filename=filename)
         self.assertEqual(str(context.exception), 'Error, k_off parameter missing in csv file for PoissonUnBinding')
+
+
+class TestRNAPSimpleUnbindingModel(TestCase):
+
+    def test_RNAPSimpleUnbinding_load(self):
+        # Here we test if the model is loaded correctly. This model does not need any parameters and if they're given
+        # those should be ignored.
+        #  Test cases:
+        #  1.- filename=None, no oparams, and checks name
+        #  2.- filename=file, no oparams, and checks name
+        #  3.- filename=None, oparams and checks name
+        #  4.- filename=file, oparams
+        my_model = ubm.RNAPSimpleUnbinding()
+        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
+
+        # Test 2
+        my_model = ubm.RNAPSimpleUnbinding(filename='RNAPSimpleUnbinding_params1.csv')  # This file doesn't even exist
+        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
+
+        # Test 3
+        my_model = ubm.RNAPSimpleUnbinding(**{'k_off': 1.0})
+        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
+
+        # Test 4
+        my_model = ubm.RNAPSimpleUnbinding(filename='RNAPSimpleUnbinding_params1.csv',
+                                           **{'k_off': 1.0})  # oparams is priority!
+        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
+
+    # TODO: test this
+    def test_RNAPSimpleUnbinding_probabilities(self):
+
+        # For each test case, we should have the RNAPSimpleUnbinding Model with params, and 0 <= probability <=1.
+        #  Test cases:
+        #   R = RNAP, S = Start, E = End
+        #   1.- S____R____E; direction +1, p =0
+        #   2.- S________RE; p=1
+        #   3.- S_________E____R; p=1
+        #   4.- R____S_____E;  p=0
+        #   5.- S____R______E; but direction=0, error?
+        #   6.- E____R____S; direction -1, p =0
+        #   7.- ER________S; p=1
+        #   8.- R___E_________S; p=1
+        #   9.- E_____S______R;  p=0
+        #   10.- E____R______S; but direction=0, error?
+
+        # Test 1
+        my_model = ubm.RNAPSimpleUnbinding()
+        # TODO: I need to build the cases, with two different sites, and then I define a test enzyme for each case
+        probability = my_model.unbinding_probability(enzyme1, dt)
+        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
+        self.assertEqual(my_model.k_off, params.k_off)
+        self.assertGreaterEqual(probability, 0.0)
+        self.assertLessEqual(probability, 1.0)
+
+        # Test 2
+        my_model = ubm.RNAPSimpleUnbinding(filename='RNAPSimpleUnbinding_params1.csv')
+        probability = my_model.unbinding_probability(enzyme1, dt)
+        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
+        self.assertEqual(my_model.k_off, 2.5)
+        self.assertGreaterEqual(probability, 0.0)
+        self.assertLessEqual(probability, 1.0)
+
+        # Test 3
+        my_model = ubm.RNAPSimpleUnbinding(**{'k_off': 1.0})
+        probability = my_model.unbinding_probability(enzyme1, dt)
+        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
+        self.assertEqual(my_model.k_off, 1.0)
+        self.assertGreaterEqual(probability, 0.0)
+        self.assertLessEqual(probability, 1.0)
+
+        # Test 4
+        my_model = ubm.RNAPSimpleUnbinding(filename='RNAPSimpleUnbinding_params1.csv',
+                                        **{'k_off': 1.0})  # oparams is priority!
+        probability = my_model.unbinding_probability(enzyme1, dt)
+        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
+        self.assertEqual(my_model.k_off, 1.0)
+        self.assertGreaterEqual(probability, 0.0)
+        self.assertLessEqual(probability, 1.0)
+
+    def test_RNAPSimpleUnbinding_bad_csv(self):
+        # Poisson Binding model that has k_on but not k_off
+        filename = '..//test_binding/PoissonBinding_params1.csv'
+        with self.assertRaises(ValueError) as context:
+            ubm.RNAPSimpleUnbinding(filename=filename)
+        self.assertEqual(str(context.exception), 'Error, k_off parameter missing in csv file for RNAPSimpleUnbinding')

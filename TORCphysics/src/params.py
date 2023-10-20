@@ -4,6 +4,7 @@ import numpy as np
 # DESCRIPTION
 # ---------------------------------------------------------------------------------------------------------------------
 # This module contains all the parameters that will be used in the main code
+
 # ---------------------------------------------------------------------------------------------------------------------
 # TODO: ORGANIZE PARAMETERS by
 #  Physical Constants
@@ -14,6 +15,7 @@ import numpy as np
 # ---------------------------------------------------------------------------------------------------------------------
 # PARAMETERS
 # ---------------------------------------------------------------------------------------------------------------------
+
 # Physical constants
 # -----------------------------------------------------------
 # kB_kcalmolK = 1/310
@@ -21,15 +23,10 @@ kBT_pN_nm = 4.1  # pN nm at T=300K
 kB_kcalmolK = 1.987204259 * .001  # 10**(-3) #Boltzman constant in kcal/(mol*K) units...
 # kB_kcalmolK = .593 #10**(-3) #Boltzman constant in kcal/(mol*K) units...
 dt = 1.0  # timestep (seconds)
-v0 = 30.0  # 60.0  # Velocity (bp/sec) of RNAPs
 bp_nm = .34  # nm - base-pair rise
 T_bp = 10.5  # Number of bp per helical turn
 w0 = 2.0 * np.pi / T_bp  # Relaxed twist density per bp (rad/bp)
 w0_nm = 2.0 * np.pi / (T_bp * bp_nm)  # rad * nm^{-1} - Now in distance units
-gamma = 0.2 * w0  # How much supercoiling is injected per bp
-# sigma0 = -0.06          #Initial supercoiling density
-stall_torque = 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper
-sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall
 
 # Elasticity parameters - from Marko's elasticity model
 # -----------------------------------------------------------
@@ -52,14 +49,42 @@ sigma_s = (1 / cs_energy) * np.sqrt(2 * p_stiffness * g_energy / (1 - p_stiffnes
 # |sigma| > |sigma_p| - > only writhe exists
 sigma_p = (1 / p_stiffness) * np.sqrt(2 * p_stiffness * g_energy / (1 - p_stiffness / cs_energy))
 
-k_on = 0.01  # default binding rate for any enzyme
-k_off = 0.001  # default unbinding rate for any enzyme
+# ---------------------------------------------------------------------------------------------------------------------
+# SPECIFIC ENZYME PARAMETERS
+# ---------------------------------------------------------------------------------------------------------------------
+# RNA Polymerase (RNAP)
+v0 = 30.0  # 60.0  # Velocity (bp/sec) of RNAPs
+gamma = 0.2 * w0  # How much supercoiling is injected per bp
+stall_torque = 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper
+sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall
 
 # TOPOISOMERASE I
+topo_b_k_off = 0.5
+
+# GYRASE
+gyra_b_k_off = 0.5
+
+# ---------------------------------------------------------------------------------------------------------------------
+# BINDING MODEL PARAMETERS
+# ---------------------------------------------------------------------------------------------------------------------
+# PoissonBinding
+k_on = 0.01  # default binding rate
+
+# TopoIRecognition
 topo_b_w = 0.012  # binding width
 topo_b_t = -0.04  # binding threshold
 topo_b_k_on = 0.005
-topo_b_k_off = 0.5
+
+# GyraseRecognition
+gyra_b_w = 0.025  # binding width
+gyra_b_t = 0.01  # binding threshold
+gyra_b_k_on = 0.005
+
+# ---------------------------------------------------------------------------------------------------------------------
+# TODO: UNBINDING MODEL PARAMETERS
+#  ---------------------------------------------------------------------------------------------------------------------
+# PoissonUnBinding
+k_off = 0.001  # default unbinding rate for any enzyme
 
 # Houdagui et al. 2019 parameters for topo I activity (effect)
 topo_sam_width = 0.012  # effect width
@@ -67,11 +92,6 @@ topo_sam_threshold = -0.04  # effect threshold
 topo_sam_kcat = 0.001  # basal rate # k_cat
 # topo_c = 0.25#0.1#concentration micromolar 0.025 in meyer -> this is too negative...
 
-# GYRASE
-gyra_b_w = 0.025  # binding width
-gyra_b_t = 0.01  # binding threshold
-gyra_b_k_on = 0.005
-gyra_b_k_off = 0.5
 
 # Houdagui et al. 2019 parameters for gyrase activity (effect)
 gyra_sam_width = 0.025  # effect width

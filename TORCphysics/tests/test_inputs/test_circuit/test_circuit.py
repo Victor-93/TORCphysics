@@ -49,7 +49,7 @@ class TestCircuit(TestCase):
     #  2.- Also remove the topo model and mechanistic model and all that DONE!
     #  3.- Then, start documenting and tidying up workflow. We have to do this!
     #  3.1.- Also document and test the new/old functions of:
-    #  3.1.1.- Binding
+    #  3.1.1.- Binding - DONE
     #  3.1.2.- Effect
     #  3.1.3.- Unbinding
     #  4.- Test models_workflow
