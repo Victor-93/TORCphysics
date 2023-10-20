@@ -89,7 +89,7 @@ for p, path in enumerate(paths):
     axs.set_title('Cross-Correlation with tetA - ' + title[p], fontsize=20)
     axs.grid(True)
     axs.set_xlim(-150, 150)
-    plt.savefig(title[p]+'.png')
+    plt.savefig(title[p]+'_v2.png')
 
 
 
