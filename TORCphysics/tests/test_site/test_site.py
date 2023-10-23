@@ -21,7 +21,7 @@ class TestSite(TestCase):
         #  1. No model.
         #  2. Name ; Binding model with default params.
         #  3. Name + oparams + k_on=0.0; Model with params and k_on = 0.0
-        site_file = 'test_inputs/test_site/site1.csv'
+        site_file = 'site1.csv'
         csv_site = SiteFactory(filename=site_file)
         self.assertEqual(len(csv_site.site_list), 3)  # All loaded correctly
         self.assertEqual(csv_site.site_list[0].binding_model, None)  # Check specifics...
@@ -33,7 +33,7 @@ class TestSite(TestCase):
     # Reads site csv with an incorrect model name. It tests that the error is raised
     def test_sites_binding_csv_wrong_name(self):
         # Check wrong model name
-        site_file = 'test_inputs/test_site/site_model_wrong_name.csv'
+        site_file = 'site_model_wrong_name.csv'
         with self.assertRaises(ValueError) as context:
             SiteFactory(filename=site_file)
         self.assertEqual(str(context.exception), 'Could not recognise binding model Poisson')

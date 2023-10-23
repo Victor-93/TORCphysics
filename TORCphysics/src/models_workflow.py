@@ -22,14 +22,39 @@ from abc import ABC, abstractmethod
 # It then returns a list of new_enzymes that will bind the DNA
 # rng - is a numpy random generator
 def binding_workflow(enzyme_list, environmental_list, dt, rng):
+    """
+    This function implements the binding workflow, where a list of newly bound enzymes are returned.
+    Basically, it goes through the environmentals in environmental_list and the sites they recognise to determine
+    if they will ind each of them. Some binding models depend on local variables such as the superhelical density,
+    which are stored in the Enzymes in the enzyme_list.
+
+    Inputs
+    ----------
+    enzyme_list : list
+        This is a list of Enzymes that are currently bound to the DNA.
+    environmental_list : list
+        This is a list of Environmentals.
+    dt : float
+        Simulation timestep in seconds (s).
+    rng : numpy object
+        Random number generator. This object needs to be previously defined.
+
+    Returns
+    ----------
+    new_enzymes : list
+        This is a list that contains the new Enzymes to be added to the current enzyme_list.
+    """
+
     new_enzymes = []  # here I will include the new enzymes
+
+    # We will do the binding process in this order:
+    # Go through the sites each environmental recognise.
+    # For each of those sites, check the model to use.
+    # Then, calculate the binding probability and if the enzyme will bind, check if the binding site is available
+    # If there are multiple enzymes that want to bind but their ranges overlap, we must choose which will bind.
 
     # Go through environment
     for i, environment in enumerate(environmental_list):
-
-        # For now, only RNAPs/genes
-        # if environment.enzyme_type != 'RNAP':
-        #    continue
 
         # If we ran out of the enzyme in the environment, then there's nothing to do
         if environment.concentration <= 0.0:
@@ -41,18 +66,8 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
             # Pass if site does not have binding model
             if site.binding_model is None:
                 continue
-            # We will do the binding process in this order:
-            # Check site and model to use.
-            # And calculate binding probability and if it'll bind
-            # Check if binding site is available
-            # If there are multiple enzymes that want to bind but their ranges overlap, we must choose
 
-            # For now, only genes!
-            # -----------------------------------------------------------
-            # if site.site_type != 'gene':
-            #    continue
-            # TODO: Use site_global
-            if '_global' in site.name:  # We don't actually model it for globals
+            if site.global_site:  # We don't actually model it for globals (they can't be bind)
                 continue
 
             # Get superhelical density at site
@@ -79,7 +94,7 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
 
                 # Add enzyme
                 # --------------------------------------------------------
-                # We first need to figure out the position, twist and superhelical (these last two will be sorted in
+                # We still need to figure out the position, twist and superhelical, but these last two will be sorted in
                 # the circuit module
 
                 # TODO: Make sure that this applies to any sites and enzymes binding.
@@ -94,11 +109,7 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
                     sys.exit()
 
                 # Create enzyme, and note that it is missing twist and the superhelical density.
-                # I think it's better to fix it in the circuit module
-
-                # TODO: Check the unbinding model and effect model. Some unbinding models depend on the site parameters,
-                #  for example, in genes, their unbinding model depends on the site. But the site is already provided,
-                #  so maybe is better that the unbinding model does this on its own.
+                # Those will be added in the circuit module
                 enzyme = Enzyme(e_type=environment.enzyme_type, name=environment.name, site=site, position=position,
                                 size=environment.size, effective_size=environment.effective_size, twist=0.0,
                                 superhelical=0.0, unbinding_model=environment.unbinding_model)
@@ -119,16 +130,39 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
 # It an effects_list which contains indications on how to update the current position and how the twist on the local
 # neighbouring domains are effected
 def effect_workflow(enzyme_list, environmental_list, dt):
+    """
+    This function implements the effect workflow, where a list of Effects that affect the local variables of DNA,
+    are returned.
+    Basically, it goes through the list of bound Enzymes stored in enzyme_list and implement the EffectModel of each
+    of them.
+    Some Environmentals have a continuum representation of their activity, and those can affect every local region in
+    the DNA defined by the bound enzymes.
+
+    Inputs
+    ----------
+    enzyme_list : list
+        This is a list of Enzymes that are currently bound to the DNA.
+    environmental_list : list
+        This is a list of Environmentals.
+    dt : float
+        Simulation timestep in seconds (s).
+
+    Returns
+    ----------
+    effect : list
+        This is a list that contains the Effects that will be applied to each local region on the DNA.
+    """
+
     # list of effects: effect = [index, position, twist_left, twist_right]
     # I use an effect list because it's easier because there are multiple changes in the local twists
     effect_list = []
+
+    # The plan is to go through each enzyme in enzyme_list, and apply their effect_model
     for i, enzyme in enumerate(enzyme_list):
 
         if enzyme.enzyme_type == 'EXT':  # We can speed up things a bit by ignoring the fake boundaries
             continue
 
-        # TODO: add effect for other type of enzymes, like NAPs? Maybe their effect is to do nothing. And definitely
-        #  an effect for topos
         # Administer the effect model to use.
         # -------------------------------------------------------------------------------------------------------------
         # From these models, they can update the position of the current enzyme and affect the local twist on the right
@@ -141,34 +175,10 @@ def effect_workflow(enzyme_list, environmental_list, dt):
         effect_i = enzyme.effect_model.calculate_effect(index=i, z=enzyme, z_list=enzyme_list, dt=dt)
         effect_list.append(effect_i)
 
-        # if enzyme.enzyme_type == 'RNAP':  # For now, only RNAPs have an effect
-        #    # TODO: in the future, according the input we may choose between different motion models, maybe one with
-        #    #  torques and not uniform motion
-        #    if mechanical_model == 'uniform':
-        #        # Calculates change in position and the twist that it injected on the left and right
-        #        position, twist_left, twist_right = rnap_uniform_motion(enzyme, enzyme_list, dt)
-        #    elif mechanical_model == 'torque_stall_Geng':
-        #        position, twist_left, twist_right = rnap_torque_stall_Geng(enzyme, enzyme_list, dt)
-        #    else:
-        #        print('Sorry, cannot recognise mechanistic model')
-        #        sys.exit()
-        #    # size = abs(enzyme.site.start - enzyme.site.end + 1)
-        #    # output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
-        #    #                                 k_on=0, k_off=0, k_cat=0, size=size)
-        #            output_enzyme = Enzyme(e_type='mRNA', name=enzyme.site.name, site=None, position=None, size=size,
-        #                                   twist=0, superhelical=0)
-        # elif enzyme.enzyme_type == 'topo':
-        #    # topo = [environment for environment in environmental_list
-        #    #         if environment.name == enzyme.name][0]  # Can select the model from here?
-        #    position, twist_left, twist_right = topoisomerase_supercoiling_injection(enzyme, dt)
-        # else:
-        #    continue
-
-        # Now create the effect taken place at the enzyme i
-        # effect_list.append(Effect(index=i, position=position, twist_left=twist_left, twist_right=twist_right))
-
     # Topoisomerase continuum model - If we are using a continuum model, then we need to add the topos effects
     # --------------------------------------------------------------
+    # The plan is to go through the list of environmentals in environmental_list, abd if they have a continuum
+    # effect_model, then go through the list of enzymes and apply the effect on each of the local regions.
     for environmental in environmental_list:
         if environmental.effect_model is None:
             continue
@@ -186,32 +196,6 @@ def effect_workflow(enzyme_list, environmental_list, dt):
                                                                        index=i, z=enzyme, z_list=enzyme_list, dt=dt)
                 effect_list.append(effect_i)
 
-#    if topoisomerase_model == 'continuum':
-#        # Gets list of topoisomerase enzymes in the environment
-#        topo_list = [environment for environment in environmental_list
-#                     if environment.enzyme_type == 'topo' or environment.enzyme_type == 'topoisomerase']
-#        position = 0  # topoisomerases cannot change enzymes positions and only affect each local site (twist_right)
-#        twist_left = 0
-#        for topo in topo_list:
-#            for i, enzyme in enumerate(enzyme_list):
-#                # We can speed up things a bit by ignoring the fake boundaries
-#                if enzyme.name == 'EXT_L' and len(enzyme_list) > 2:
-#                    continue
-#                elif enzyme.name == 'EXT_R':
-#                    continue
-
-#                if topo.name == 'topoI':
-#                    sigma = topo1_continuum(enzyme.superhelical, topo, dt)
-#                    twist_right = calculate_twist_from_sigma(enzyme, enzyme_list[i + 1], sigma)
-#                elif topo.name == 'gyrase':
-#                    sigma = gyrase_continuum(enzyme.superhelical, topo, dt)
-#                    twist_right = calculate_twist_from_sigma(enzyme, enzyme_list[i + 1], sigma)
-#                else:
-#                    twist_right = 0  # If it doesn't recognize the topo, then don't do anything
-
-#                # Now create the effect taken place at the enzyme i
-#                effect_list.append(Effect(index=i, position=position, twist_left=twist_left, twist_right=twist_right))
-
     return effect_list
 
 
@@ -221,9 +205,34 @@ def effect_workflow(enzyme_list, environmental_list, dt):
 # Goes through the enzymes in enzymes list and according to their unbinding condition unbind them.
 # Returns a list of enzyme indexes that will unbind, the enzyme that unbinds
 # ---------------------------------------------------------------------------------------------------------------------
+# TODO: Think if substances to the environment will be realised with these reactions, e.g., maybe mRNA will be realised?
 def unbinding_workflow(enzymes_list, dt, rng):
+    """
+    This function implements the unbinding workflow, where a list of unbinding enzymes is returned.
+    Basically, it goes through the enzymes in enzymes_list and according to their unbinding probability calculated with
+    their unbinding_model, they will unbind the DNA.
+
+    Inputs
+    ----------
+    enzyme_list : list
+        This is a list of Enzymes that are currently bound to the DNA.
+    dt : float
+        Simulation timestep in seconds (s).
+    rng : numpy object
+        Random number generator. This object needs to be previously defined.
+
+    Returns
+    ----------
+    drop_list_index : list
+        This is a list with the indices of the enzymes (in enzyme_list) that will unbind.
+    drop_list_enzyme : list
+        And a list of the same enzymes that will unbind the DNA.
+    """
+
     drop_list_index = []  # This list will have the indices of the enzymes that will unbind, and the enzyme
     drop_list_enzyme = []  # And a list with the enzymes
+
+    # Go through each enzyme and determine if they will unbind.
     for i, enzyme in enumerate(enzymes_list):
 
         if enzyme.enzyme_type == 'EXT':  # The fake boundaries can't unbind
@@ -242,18 +251,7 @@ def unbinding_workflow(enzymes_list, dt, rng):
             drop_list_index.append(i)
             drop_list_enzyme.append(enzyme)
 
-        #  unbind, have_model = select_unbinding_model(enzyme, dt, rng)
-        #  if not have_model:  # If I don't have a model, then we skip
-         #   continue
-
-        # Now add it to the drop_list if the enzyme will unbind
-        # ------------------------------------------------------------------
-        #  if unbind:
-        #    drop_list_index.append(i)
-        #    drop_list_enzyme.append(enzyme)
-
     return drop_list_index, drop_list_enzyme
-
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -392,5 +390,3 @@ def select_unbinding_model(enzyme, dt, rng):
         # print('Warning, we do not have the unbinding model for your enzyme type:', enzyme.enzyme_type)
         have_model = False
     return unbind, have_model
-
-

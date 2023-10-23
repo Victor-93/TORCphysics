@@ -1,5 +1,5 @@
 type,name,site_type,concentration,size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams,effective_size
 test,No_model,DNA,0.2,120,None,None,none,none,none,none,100
 test,Poisson_noparams,DNA,0.2,120,PoissonBinding,None,none,none,none,none,100
-test,TopoIR_params,DNA,0.2,120,TopoIRecognition,test_inputs/test_environment/topoI_params.csv,none,none,none,none,100
+test,TopoIR_params,DNA,0.2,120,TopoIRecognition,topoI_params.csv,none,none,none,none,100
 test,TopoIR_noparams,DNA,0.2,120,TopoIRecognition,None,none,none,none,none,100

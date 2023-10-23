@@ -1,4 +1,4 @@
 type,name,site,position,size,effective_size,twist,superhelical,effect_model,effect_oparams,unbinding_model,unbinding_oparams
 test_e,No_model,test_gene1,10,50,30,0.0,0.0,none,none,none,none
 test_e,RNAP_noparams,test_gene2,1000,50,30,0.0,0.0,RNAPUniform,none,none,none
-test_e,RNAP_params,test_gene3,1000,50,30,0.0,0.0,RNAPUniform,test_inputs/test_environment/RNAP_params.csv,none,none
+test_e,RNAP_params,test_gene3,1000,50,30,0.0,0.0,RNAPUniform,../test_environment/RNAP_params.csv,none,none

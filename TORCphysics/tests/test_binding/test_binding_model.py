@@ -112,6 +112,9 @@ class TestBindingModel(TestCase):
             my_model = bm.assign_binding_model(model_name=model_name)
         self.assertEqual(str(context.exception), 'Could not recognise binding model ' + model_name)
 
+
+class TestPoissonBinding(TestCase):
+
     def test_PoissonBinding(self):
         # For each test case, we should have the PoissonBinding Model with params, and 0 <= probability <=1.
         #  The test cases should work for a various timesteps.
@@ -163,7 +166,9 @@ class TestBindingModel(TestCase):
             bm.PoissonBinding(filename=filename)
         self.assertEqual(str(context.exception), 'Error, k_on parameter missing in csv file for PoissonBinding')
 
-    # TODO test topoIRecognition, and GyraseRecognition
+
+class TestTopoIRecognition(TestCase):
+
     def test_TopoIRecognition(self):
         # For each test case, we should have the TopoIRecognition Model with params, and 0 <= probability <=1.
         #  The test cases should work for a various timesteps.
@@ -224,6 +229,9 @@ class TestBindingModel(TestCase):
             bm.TopoIRecognition(filename=filename)
         self.assertEqual(str(context.exception), 'Error, k_on parameter missing in csv file for TopoIRecognition')
 
+
+class TestGyraseRecognition(TestCase):
+
     def test_GyraseRecognition(self):
         # For each test case, we should have the GyraseRecognition Model with params, and 0 <= probability <=1.
         #  The test cases should work for a various timesteps.
@@ -268,7 +276,7 @@ class TestBindingModel(TestCase):
 
             # Test 4
             my_model = bm.GyraseRecognition(filename='GyraseRecognition_params1.csv',
-                                           **{'k_on': 1.0, 'width': 0.3, 'threshold': 0.2})  # oparams is priority!
+                                            **{'k_on': 1.0, 'width': 0.3, 'threshold': 0.2})  # oparams is priority!
             probability = my_model.binding_probability(environmental=environmental1, superhelical=supercoiling, dt=dt)
             self.assertEqual(my_model.__class__.__name__, 'GyraseRecognition')
             self.assertEqual(my_model.k_on, 1.0)
