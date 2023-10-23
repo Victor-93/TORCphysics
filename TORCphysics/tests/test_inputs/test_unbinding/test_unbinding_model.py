@@ -191,7 +191,6 @@ class TestRNAPSimpleUnbindingModel(TestCase):
                                            **{'k_off': 1.0})  # oparams is priority!
         self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
 
-    # TODO: test this
     def test_RNAPSimpleUnbinding_probabilities(self):
 
         # For each test case, we should have the RNAPSimpleUnbinding Model with params, and 0 <= probability <=1.
@@ -208,43 +207,100 @@ class TestRNAPSimpleUnbindingModel(TestCase):
         #   9.- E_____S______R;  p=0
         #   10.- E____R______S; but direction=0, error?
 
-        # Test 1
-        my_model = ubm.RNAPSimpleUnbinding()
-        # TODO: I need to build the cases, with two different sites, and then I define a test enzyme for each case
-        probability = my_model.unbinding_probability(enzyme1, dt)
-        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
-        self.assertEqual(my_model.k_off, params.k_off)
+        unbinding_model = ubm.RNAPSimpleUnbinding()
+        dt = 1.0
+
+        # This site will be used for tests 1-5
+        # --------------------------------------------------------------
+        test_site = Site(site_type='gene', name='test_gene', start=200, end=1200, k_on=3.00)
+
+        # Test 1 : S____R____E; direction +1, p =0
+        test_enzyme = Enzyme(e_type='RNAP', name='test', site=test_site, size=50, effective_size=30, position=500,
+                             twist=0.0, superhelical=0.0, unbinding_model=unbinding_model)
+        probability = test_enzyme.unbinding_model.unbinding_probability(test_enzyme, dt)
+        self.assertEqual(test_enzyme.unbinding_model.__class__.__name__, 'RNAPSimpleUnbinding')
         self.assertGreaterEqual(probability, 0.0)
         self.assertLessEqual(probability, 1.0)
+        self.assertEqual(probability, 0.0)
 
-        # Test 2
-        my_model = ubm.RNAPSimpleUnbinding(filename='RNAPSimpleUnbinding_params1.csv')
-        probability = my_model.unbinding_probability(enzyme1, dt)
-        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
-        self.assertEqual(my_model.k_off, 2.5)
+        # Test 2 : S________RE; p=1
+        test_enzyme = Enzyme(e_type='RNAP', name='test', site=test_site, size=50, effective_size=30, position=1200,
+                             twist=0.0, superhelical=0.0, unbinding_model=unbinding_model)
+        probability = test_enzyme.unbinding_model.unbinding_probability(test_enzyme, dt)
+        self.assertEqual(test_enzyme.unbinding_model.__class__.__name__, 'RNAPSimpleUnbinding')
         self.assertGreaterEqual(probability, 0.0)
         self.assertLessEqual(probability, 1.0)
+        self.assertEqual(probability, 1.0)
 
-        # Test 3
-        my_model = ubm.RNAPSimpleUnbinding(**{'k_off': 1.0})
-        probability = my_model.unbinding_probability(enzyme1, dt)
-        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
-        self.assertEqual(my_model.k_off, 1.0)
+        # Test 3 : S_________E____R; p=1
+        test_enzyme = Enzyme(e_type='RNAP', name='test', site=test_site, size=50, effective_size=30, position=1500,
+                             twist=0.0, superhelical=0.0, unbinding_model=unbinding_model)
+        probability = test_enzyme.unbinding_model.unbinding_probability(test_enzyme, dt)
+        self.assertEqual(test_enzyme.unbinding_model.__class__.__name__, 'RNAPSimpleUnbinding')
         self.assertGreaterEqual(probability, 0.0)
         self.assertLessEqual(probability, 1.0)
+        self.assertEqual(probability, 1.0)
 
-        # Test 4
-        my_model = ubm.RNAPSimpleUnbinding(filename='RNAPSimpleUnbinding_params1.csv',
-                                        **{'k_off': 1.0})  # oparams is priority!
-        probability = my_model.unbinding_probability(enzyme1, dt)
-        self.assertEqual(my_model.__class__.__name__, 'RNAPSimpleUnbinding')
-        self.assertEqual(my_model.k_off, 1.0)
+        # Test 4 : R____S_____E;  p=0
+        test_enzyme = Enzyme(e_type='RNAP', name='test', site=test_site, size=50, effective_size=30, position=10,
+                             twist=0.0, superhelical=0.0, unbinding_model=unbinding_model)
+        probability = test_enzyme.unbinding_model.unbinding_probability(test_enzyme, dt)
+        self.assertEqual(test_enzyme.unbinding_model.__class__.__name__, 'RNAPSimpleUnbinding')
         self.assertGreaterEqual(probability, 0.0)
         self.assertLessEqual(probability, 1.0)
+        self.assertEqual(probability, 0.0)
 
-    def test_RNAPSimpleUnbinding_bad_csv(self):
-        # Poisson Binding model that has k_on but not k_off
-        filename = '..//test_binding/PoissonBinding_params1.csv'
+        # Test 5 : S____R______E; but direction=0, error?
+        test_enzyme = Enzyme(e_type='RNAP', name='test', site=test_site, size=50, effective_size=30, position=500,
+                             twist=0.0, superhelical=0.0, unbinding_model=unbinding_model)
+        test_enzyme.direction = 0
         with self.assertRaises(ValueError) as context:
-            ubm.RNAPSimpleUnbinding(filename=filename)
-        self.assertEqual(str(context.exception), 'Error, k_off parameter missing in csv file for RNAPSimpleUnbinding')
+            test_enzyme.unbinding_model.unbinding_probability(test_enzyme, dt)
+        self.assertEqual(str(context.exception), 'Error. Enzyme with invalid direction in RNAPSimpleUnbinding.')
+
+        # This site will be used for tests 6-10
+        # --------------------------------------------------------------
+        test_site = Site(site_type='gene', name='test_gene', start=1200, end=200, k_on=3.00)
+
+        # Test 6 : E____R____S; direction -1, p =0
+        test_enzyme = Enzyme(e_type='RNAP', name='test', site=test_site, size=50, effective_size=30, position=500,
+                             twist=0.0, superhelical=0.0, unbinding_model=unbinding_model)
+        probability = test_enzyme.unbinding_model.unbinding_probability(test_enzyme, dt)
+        self.assertEqual(test_enzyme.unbinding_model.__class__.__name__, 'RNAPSimpleUnbinding')
+        self.assertGreaterEqual(probability, 0.0)
+        self.assertLessEqual(probability, 1.0)
+        self.assertEqual(probability, 0.0)
+
+        # Test 7 : ER________S; p=1
+        test_enzyme = Enzyme(e_type='RNAP', name='test', site=test_site, size=50, effective_size=30, position=200,
+                             twist=0.0, superhelical=0.0, unbinding_model=unbinding_model)
+        probability = test_enzyme.unbinding_model.unbinding_probability(test_enzyme, dt)
+        self.assertEqual(test_enzyme.unbinding_model.__class__.__name__, 'RNAPSimpleUnbinding')
+        self.assertGreaterEqual(probability, 0.0)
+        self.assertLessEqual(probability, 1.0)
+        self.assertEqual(probability, 1.0)
+
+        # Test 8 : R___E_________S; p=1
+        test_enzyme = Enzyme(e_type='RNAP', name='test', site=test_site, size=50, effective_size=30, position=20,
+                             twist=0.0, superhelical=0.0, unbinding_model=unbinding_model)
+        probability = test_enzyme.unbinding_model.unbinding_probability(test_enzyme, dt)
+        self.assertEqual(test_enzyme.unbinding_model.__class__.__name__, 'RNAPSimpleUnbinding')
+        self.assertGreaterEqual(probability, 0.0)
+        self.assertLessEqual(probability, 1.0)
+        self.assertEqual(probability, 1.0)
+        # Test 9 : E_____S______R;  p=0
+        test_enzyme = Enzyme(e_type='RNAP', name='test', site=test_site, size=50, effective_size=30, position=1500,
+                             twist=0.0, superhelical=0.0, unbinding_model=unbinding_model)
+        probability = test_enzyme.unbinding_model.unbinding_probability(test_enzyme, dt)
+        self.assertEqual(test_enzyme.unbinding_model.__class__.__name__, 'RNAPSimpleUnbinding')
+        self.assertGreaterEqual(probability, 0.0)
+        self.assertLessEqual(probability, 1.0)
+        self.assertEqual(probability, 0.0)
+
+        # Test 10 : E____R______S; but direction=0, error?
+        test_enzyme = Enzyme(e_type='RNAP', name='test', site=test_site, size=50, effective_size=30, position=500,
+                             twist=0.0, superhelical=0.0, unbinding_model=unbinding_model)
+        test_enzyme.direction = 0
+        with self.assertRaises(ValueError) as context:
+            test_enzyme.unbinding_model.unbinding_probability(test_enzyme, dt)
+        self.assertEqual(str(context.exception), 'Error. Enzyme with invalid direction in RNAPSimpleUnbinding.')
