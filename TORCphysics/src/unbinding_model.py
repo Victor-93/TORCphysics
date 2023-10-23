@@ -123,6 +123,7 @@ class RNAPSimpleUnbinding(UnBindingModel):
      oparams : dict, optional
          A dictionary containing the parameters used for the unbinding model.
     """
+
     def __init__(self, filename=None, **oparams):
         """ The constructor of the PoissonUnBinding subclass.
 
@@ -153,16 +154,19 @@ class RNAPSimpleUnbinding(UnBindingModel):
             A number that indicates the probability of unbinding in the current timestep.
         """
 
-        probability = -0.01  # It will not unbind unless fulfils the condition
+        probability = 0.0  # It will not unbind unless fulfils the condition
 
+        if enzyme.direction != 1 and enzyme.direction != -1:
+            raise ValueError('Error. Enzyme with invalid direction in RNAPSimpleUnbinding.')
+
+        # TODO: Check how it changes with the sizes and effective_size
         # condition for transcription in >>>>>>>>>>>>> right direction or
         # condition for transcription in <<<<<<<<<<<<< left  direction
         if (enzyme.direction == 1 and enzyme.end - enzyme.position <= 0) or \
                 (enzyme.direction == -1 and enzyme.end - enzyme.position >= 0):
-            probability = 1.1  # There's no way it won't unbind with this
+            probability = 1.0  # There's no way it won't unbind with this
 
         return probability
-
 
 
 # ---------------------------------------------------------------------------------------------------------------------

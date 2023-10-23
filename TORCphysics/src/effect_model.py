@@ -452,18 +452,6 @@ class TopoIContinuum(EffectModel):
 
         self.oparams = {'k_cat': self.k_cat, 'threshold': self.threshold, 'width': self.width}  # Just in case
 
-    # TODO: Check how to implement continuum actions on the DNA. Should there be a parameter in the environment that
-    #  indicates if the action of the enzyme is continuous? Should the effects on each local domains be applied by the
-    #  workflow? Or should this function implement it.
-    #  * The problem is that the continuous actions require the concentration parameter, so we either add that
-    #    parameter to all of our effect models, or we indicate that our environment has a continous action on the DNA?
-    #  *IDEA: Maybe, when defining environmentals, according the effect model provided, the program can add a parameter
-    #   self.continuum = True or False. So, if we have a continuous action or effect model, those enzymes don't bind
-    #   the DNA, but they have a continuous action, that way we avoid some errors, and the workflow could do two types
-    #   of effects, effects for Enzyme's actually bound to the DNA, or Environmentals that have continuous
-    #   actions/effects on the DNA. I like this IDEA!
-
-    # TODO: I have to keep checking this funciton, and Implement the idea that I wrote up here ^^^^
     def calculate_effect(self, concentration, index, z, z_list, dt) -> Effect:
 
         """ Method for calculating the Effect that continuum action of TopoI causes on the DNA.
@@ -619,7 +607,39 @@ class GyraseContinuum(EffectModel):
 
 # According inputs, loads the binding model, name and its params. This function is used in environment and enzyme.
 # This function calls assign_effect_model
+# TODO: Me quede documentando
 def get_effect_model(name, e_model, model_name, oparams_file, oparams):
+    """ This function loads the EffectModel to implement according the provided inputs.
+    This function is used for Environments and Enzymes. So this function is implemented by those two classes.
+
+    Parameters
+    ----------
+    name : str
+        Name of the environmental or enzyme.
+    e_model : EffectModel or None
+        An EffectModel or None.
+    model_name : str
+        Name of the model to use, e.g. 'RNAPUniform'
+    oparams_file : str, optional
+        Path to the csv file containing the parametrisation of the BindingModel to use.
+    oparams : dict, optional
+        A dictionary containing the parameters used for the binding model. In this case, it would be k_on.
+
+    Returns
+    ----------
+    binding_model : BindingModel or None
+        The BindingModel to implement for the Site/Environment. If no BindingModel could be determined, this variable
+        will be None.
+    binding_model_name: str or None
+        Name of the BindingModel to use. It is the same as binding_model.__class__.__name__
+        If the BindingModel was not determined, then this variable is None.
+    binding_oparams_file: str or None
+        Path to the csv file containing the parametrisation of the BindingModel. None if file was not given.
+    binding_model_oparams : dict or None
+        Dictionary with the parametrisation of the BindingModel. None will be returned if the BindingModel could not
+        be determined.
+    """
+
     # If no model is given
     if e_model is None:
 
