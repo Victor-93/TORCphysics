@@ -233,7 +233,6 @@ class RNAPUniform(EffectModel):
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
-# TODO: Test this function
 class TopoIUniform(EffectModel):
     """
      An EffectModel subclass that represents the uniform effect that topoisomerase I have on the DNA.
@@ -270,13 +269,13 @@ class TopoIUniform(EffectModel):
 
         if not oparams:
             if filename is None:
-                self.k_cat = params.topoI_uniform_k_cat  # TODO: What's the k_cat
+                self.k_cat = params.topoI_uniform_k_cat
             else:  # There is a file!
                 mydata = pd.read_csv(filename)
                 if 'k_cat' in mydata.columns:
                     self.k_cat = mydata['k_cat'][0]
                 else:
-                    raise ValueError('Error, k_cat parameter missing in csv file for TopoIPUniform')
+                    raise ValueError('Error, k_cat parameter missing in csv file for TopoIUniform')
         else:
             self.k_cat = float(oparams['k_cat'])
 
@@ -308,7 +307,6 @@ class TopoIUniform(EffectModel):
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
-# TODO: Test this function
 class GyraseUniform(EffectModel):
     """
      An EffectModel subclass that represents the uniform effect that gyrase have on the DNA.
@@ -383,7 +381,6 @@ class GyraseUniform(EffectModel):
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
-# TODO: Test this function
 class TopoIContinuum(EffectModel):
     """
      An EffectModel subclass that calculates represents the continuum effect of Topoisomerase I, on the DNA.
@@ -420,7 +417,7 @@ class TopoIContinuum(EffectModel):
         continuum : bool, optional
             Indicates if the actions of the effect model are continuous. For this model, it is!
         oparams : dict, optional
-            A dictionary containing the parameters used for the binding model. In this case, it would be k_cat,
+            A dictionary containing the parameters used for the effect model. In this case, it would be k_cat,
             threshold and width
         """
 
@@ -492,7 +489,6 @@ class TopoIContinuum(EffectModel):
         return Effect(index=index, position=0.0, twist_left=0.0, twist_right=twist_right)
 
 
-# TODO: Test this function
 # TODO: Check if it is easier to find the next neighbour? z_n? Maybe a function that can speed things up
 class GyraseContinuum(EffectModel):
     """
@@ -529,7 +525,7 @@ class GyraseContinuum(EffectModel):
         continuum : bool, optional
             Indicates if the actions of the effect model are continuous. For this model, it is!
         oparams : dict, optional
-            A dictionary containing the parameters used for the binding model. In this case, it would be k_cat,
+            A dictionary containing the parameters used for the effect model. In this case, it would be k_cat,
             threshold and width
         """
 
@@ -605,9 +601,8 @@ class GyraseContinuum(EffectModel):
 # UTILITY FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
 
-# According inputs, loads the binding model, name and its params. This function is used in environment and enzyme.
+# According inputs, loads the effect model, name and its params. This function is used in environment and enzyme.
 # This function calls assign_effect_model
-# TODO: Me quede documentando
 def get_effect_model(name, e_model, model_name, oparams_file, oparams):
     """ This function loads the EffectModel to implement according the provided inputs.
     This function is used for Environments and Enzymes. So this function is implemented by those two classes.
@@ -621,22 +616,23 @@ def get_effect_model(name, e_model, model_name, oparams_file, oparams):
     model_name : str
         Name of the model to use, e.g. 'RNAPUniform'
     oparams_file : str, optional
-        Path to the csv file containing the parametrisation of the BindingModel to use.
+        Path to the csv file containing the parametrisation of the EffectModel to use.
     oparams : dict, optional
-        A dictionary containing the parameters used for the binding model. In this case, it would be k_on.
+        A dictionary containing the parameters used for the effect model. In the case of RNAPUniform, it would be
+        velocity and gamma.
 
     Returns
     ----------
-    binding_model : BindingModel or None
-        The BindingModel to implement for the Site/Environment. If no BindingModel could be determined, this variable
+    effect_model : EffectModel or None
+        The EffectModel to implement for the Enzyme/Environment. If no EffectModel could be determined, this variable
         will be None.
-    binding_model_name: str or None
-        Name of the BindingModel to use. It is the same as binding_model.__class__.__name__
-        If the BindingModel was not determined, then this variable is None.
-    binding_oparams_file: str or None
-        Path to the csv file containing the parametrisation of the BindingModel. None if file was not given.
-    binding_model_oparams : dict or None
-        Dictionary with the parametrisation of the BindingModel. None will be returned if the BindingModel could not
+    effect_model_name: str or None
+        Name of the EffectModel to use. It is the same as effect_model.__class__.__name__
+        If the EffectModel was not determined, then this variable is None.
+    effect_oparams_file: str or None
+        Path to the csv file containing the parametrisation of the EffectModel. None if file was not given.
+    effect_model_oparams : dict or None
+        Dictionary with the parametrisation of the EffectModel. None will be returned if the EffectModel could not
         be determined.
     """
 
@@ -687,12 +683,35 @@ def get_effect_model(name, e_model, model_name, oparams_file, oparams):
             model_name = None
             oparams_file = None
             oparams = None
+            
+    effect_model = e_model
+    effect_model_name = model_name
+    effect_oparams_file = oparams_file
+    effect_model_oparams = oparams
 
-    return e_model, model_name, oparams_file, oparams
+    return effect_model, effect_model_name, effect_oparams_file, effect_model_oparams
 
 
 # Add your models into this function so it the code can recognise it
 def assign_effect_model(model_name, oparams_file=None, **oparams):
+    """ This function decides the EffectModel to use according the provided inputs.
+
+    Parameters
+    ----------
+
+    model_name : str
+        Name of the EffectModel to use. e,g, RNAPUniform.
+    oparams_file : str, optional
+        Path to the csv file containing the parametrisation of the EffectModel to use.
+    oparams : dict, optional
+        A dictionary containing the parameters used for the effect model. In the case of RNAPUniform, it would be
+        velocity and gamma.
+
+    Returns
+    ----------
+    my_model : EffectModel
+        A EffectModel object that describes the effect mechanism of the given Enzyme.
+    """
     if model_name == 'RNAPUniform':
         my_model = RNAPUniform(filename=oparams_file, **oparams)
     elif model_name == 'TopoIUniform':
@@ -752,7 +771,6 @@ def uniform_motion(z, dt):
     return position, twist_left, twist_right
 
 
-# TODO: Because you have a k_cat now, this indicates how much twist RNAPs inject on each side.
 # Returns new RNAP position, and the twist it injected on the left and right
 def rnap_uniform_motion(z, z_list, dt):
     # Everything 0 for now

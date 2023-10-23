@@ -49,10 +49,11 @@ class TestCircuit(TestCase):
     #  2.- Also remove the topo model and mechanistic model and all that DONE!
     #  3.- Then, start documenting and tidying up workflow. We have to do this!
     #  3.1.- Also document and test the new/old functions of:
-    #  3.1.1.- Binding - DONE
-    #  3.1.2.- Effect - Missing documentation and TESTING
-    #  3.1.3.- Unbinding - DONE
-    #  4.- Test models_workflow
+    #  3.1.1.- Binding - DONE!
+    #  3.1.2.- Effect - DONE!
+    #  3.1.3.- Unbinding - DONE!
+    #  AQUIMEQUEDE!
+    #  4.- Test models_workflow - Documenting last functions. After documenting, Do the TESTING!
     #  5.- Then start tidying and documenting circuit, while doing this, fix the optional inputs, outputs and all that.
     #  5.1.- When you test the circuit, test the individual functions, and make an overall/simple simulation run.
     #  6.- Create a new type of test, where you test systems, and plot the results so you can also use them as examples?

@@ -17,7 +17,7 @@ class TestEnvironment(TestCase):
         #  3. Name + oparams; Model with params.
         #  4. Name = Model with defaults
         site_list = []
-        environment_file = 'test_inputs/test_environment/environment_binding.csv'
+        environment_file = 'environment_binding.csv'
         csv_environment = EnvironmentFactory(filename=environment_file, site_list=site_list)
         self.assertEqual(len(csv_environment.get_environment_list()), 4)  # All loaded correctly
         self.assertEqual(csv_environment.environment_list[0].binding_model, None)  # Check specifics...
@@ -30,7 +30,7 @@ class TestEnvironment(TestCase):
         site_list = []
 
         # Check wrong model name
-        environment_file2 = 'test_inputs/test_environment/environment_binding_wrong_name.csv'
+        environment_file2 = 'environment_binding_wrong_name.csv'
         with self.assertRaises(ValueError) as context:
             EnvironmentFactory(filename=environment_file2, site_list=site_list)
         self.assertEqual(str(context.exception), 'Could not recognise binding model Poisson')
@@ -90,7 +90,7 @@ class TestEnvironment(TestCase):
         #  2. Name + oparams=None; Effect model with default params.
         #  3. Name + oparams; Model with params.
         site_list = []
-        environment_file = 'test_inputs/test_environment/environment_effect.csv'
+        environment_file = 'environment_effect.csv'
         csv_environment = EnvironmentFactory(filename=environment_file, site_list=site_list)
         self.assertEqual(len(csv_environment.get_environment_list()), 3)  # All loaded correctly
         self.assertEqual(csv_environment.environment_list[0].effect_model, None)  # Check specifics...
@@ -102,7 +102,7 @@ class TestEnvironment(TestCase):
         site_list = []
 
         # Check wrong model name
-        environment_file2 = 'test_inputs/test_environment/environment_effect_wrong_name.csv'
+        environment_file2 = 'environment_effect_wrong_name.csv'
         with self.assertRaises(ValueError) as context:
             EnvironmentFactory(filename=environment_file2, site_list=site_list)
         self.assertEqual(str(context.exception), 'Could not recognise effect model RNAP')
@@ -157,7 +157,7 @@ class TestEnvironment(TestCase):
         #  3. Name + oparams; Model with params.
         #  4. Wrong model name; should handle the situation?
         site_list = []
-        environment_file = 'test_inputs/test_environment/environment_unbinding.csv'
+        environment_file = 'environment_unbinding.csv'
         csv_environment = EnvironmentFactory(filename=environment_file, site_list=site_list)
         self.assertEqual(len(csv_environment.get_environment_list()), 3)  # All loaded correctly
         self.assertEqual(csv_environment.environment_list[0].unbinding_model, None)  # Check specifics...
@@ -169,7 +169,7 @@ class TestEnvironment(TestCase):
         site_list = []
 
         # Check wrong model name
-        environment_file = 'test_inputs/test_environment/environment_unbinding_wrong_name.csv'
+        environment_file = 'environment_unbinding_wrong_name.csv'
         with self.assertRaises(ValueError) as context:
             EnvironmentFactory(filename=environment_file, site_list=site_list)
         self.assertEqual(str(context.exception), 'Could not recognise unbinding model Poisson')
@@ -220,6 +220,8 @@ class TestEnvironment(TestCase):
                         effective_size=150, site_type='gene')
         self.assertEqual(str(context.exception), 'Error: effective_size > size')
 
+class TestEnvironmentFactory(TestCase):
+
     # TODO: You need to fix these two tests because you modified your code!
     # Test the environment is not empty and that it loaded topoI correctly
     def test_EnvironmentFactory(self):
@@ -230,6 +232,6 @@ class TestEnvironment(TestCase):
         self.assertEqual("topoI", sf_list[0].name, "Did not load topoI correctly")
 
     def test_empty_environment(self):
-        site_list = SiteFactory("test_inputs/sites_1_gene.csv").get_site_list()
-        sf = EnvironmentFactory(filename="test_inputs/empty_environment.csv", site_list=site_list)
+        site_list = SiteFactory("..//sites_1_gene.csv").get_site_list()
+        sf = EnvironmentFactory(filename="..//empty_environment.csv", site_list=site_list)
         self.assertEqual(len(sf.get_environment_list()), 0, "Environment not empty")

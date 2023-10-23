@@ -15,14 +15,14 @@ class TestEnzyme(TestCase):
 
     # Reads an Enzyme csv file, where the site does not exist in the site_list.
     def test_Enzyme_bad_site(self):
-        enzyme_file = 'test_inputs/test_enzyme/enzyme_bad_site.csv'
+        enzyme_file = 'enzyme_bad_site.csv'
         with self.assertRaises(ValueError) as context:
             EnzymeFactory(filename=enzyme_file, site_list=site_list1)
         self.assertEqual(str(context.exception), 'Error, (bound) Enzymes must be linked to a Site')
 
     # Tests EnzymeFactory with the possible bad inputs
     def test_bad_EnzymeFactory(self):
-        enzyme_file = 'test_inputs/test_enzyme/enzyme_effect.csv'
+        enzyme_file = 'enzyme_effect.csv'
 
         # Filename given but no site_list
         with self.assertRaises(ValueError) as context:
@@ -46,7 +46,7 @@ class TestEnzyme(TestCase):
         #  1. Name = None; no model.
         #  2. Name + oparams=None; Effect model with default params.
         #  3. Name + oparams; Model with params.
-        enzyme_file = 'test_inputs/test_enzyme/enzyme_effect.csv'
+        enzyme_file = 'enzyme_effect.csv'
         csv_enzyme = EnzymeFactory(filename=enzyme_file, site_list=site_list1)
         self.assertEqual(len(csv_enzyme.get_enzyme_list()), 3)  # All loaded correctly
         self.assertEqual(csv_enzyme.enzyme_list[0].effect_model, None)  # Check specifics...
@@ -56,7 +56,7 @@ class TestEnzyme(TestCase):
     # Reads enzyme csv with an incorrect model name. It tests that the error is raised. This for effect model
     def test_enzyme_effect_csv_wrong_name(self):
         # Check wrong model name
-        enzyme_file = 'test_inputs/test_enzyme/enzyme_effect_wrong_name.csv'
+        enzyme_file = 'enzyme_effect_wrong_name.csv'
         with self.assertRaises(ValueError) as context:
             EnzymeFactory(filename=enzyme_file, site_list=site_list1)
         self.assertEqual(str(context.exception), 'Could not recognise effect model RNAP')
@@ -106,7 +106,7 @@ class TestEnzyme(TestCase):
         #  1. Name = None; no model.
         #  2. Name + oparams=None; Binding model with default params.
         #  3. Name + oparams; Model with params.
-        enzyme_file = 'test_inputs/test_enzyme/enzyme_unbinding.csv'
+        enzyme_file = 'enzyme_unbinding.csv'
         csv_enzyme = EnzymeFactory(filename=enzyme_file, site_list=site_list1)
         self.assertEqual(len(csv_enzyme.get_enzyme_list()), 3)  # All loaded correctly
         self.assertEqual(csv_enzyme.enzyme_list[0].unbinding_model, None)  # Check specifics...
@@ -116,7 +116,7 @@ class TestEnzyme(TestCase):
     # Reads enzyme csv with an incorrect model name. It tests that the error is raised. This for effect model
     def test_enzyme_unbinding_csv_wrong_name(self):
         # Check wrong model name
-        enzyme_file = 'test_inputs/test_enzyme/enzyme_unbinding_wrong_name.csv'
+        enzyme_file = 'enzyme_unbinding_wrong_name.csv'
         with self.assertRaises(ValueError) as context:
             EnzymeFactory(filename=enzyme_file, site_list=site_list1)
         self.assertEqual(str(context.exception), 'Could not recognise unbinding model Poisson')
@@ -159,6 +159,8 @@ class TestEnzyme(TestCase):
         self.assertEqual(manual_enzyme.enzyme_list[1].unbinding_model.k_off, 10.0)
         self.assertEqual(manual_enzyme.enzyme_list[2].unbinding_model.k_off, 10.0)
         self.assertEqual(manual_enzyme.enzyme_list[3].unbinding_model, None)
+
+class TestEnzymeFactory(TestCase):
 
     # TODO: These two need testing
     # Checks it's not empty and that it loaded the origin correctly
