@@ -98,7 +98,11 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
                 # the circuit module
 
                 # TODO: Make sure that this applies to any sites and enzymes binding.
-                #  It means that enzymes always bind on the left from the start site.
+                #  It means that enzymes always bind on the behind the start site. This makes sense for genes.
+                #  I think this is correct! Draw it, think about it, and apply it everywhere.
+                #  And think about how TF would work, or repressors, they should block the sites, but TF should
+                #  increase the binding probability.
+                # TODO: Think about this,
                 # position:
                 if site.direction > 0:
                     position = site.start - environment.size
@@ -257,9 +261,6 @@ def unbinding_workflow(enzymes_list, dt, rng):
 # ---------------------------------------------------------------------------------------------------------------------
 # HELPFUL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
-# If you create a new model, modify these functions so the program can process them, and select the appropriate
-# binding and unbinding models
-
 # This function checks if a site is not blocked by other enzymes
 def check_site_availability(site, enzyme_list, size):
     # Check if the site is available for binding.
@@ -284,6 +285,7 @@ def check_site_availability(site, enzyme_list, size):
         #  my_range = [site.start, site.start + size]
     #        my_range = [site.start, site.start - size]
 
+    # TODO: The function does not work!
     # If any of them intersect
     if (set(range_before) & set(my_range)) or (set(range_after) & set(my_range)):
         available = False
