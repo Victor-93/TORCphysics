@@ -192,9 +192,7 @@ class Site:
 
         direction = 0
         # Doesn't have direction if it's not a gene
-        if self.site_type.lower() != 'gene':
-            return direction
-        else:
+        if 'gene' in self.site_type.lower():
             if self.start < self.end:
                 direction = 1
                 return direction
@@ -203,6 +201,8 @@ class Site:
                 return direction
             else:
                 raise ValueError("Error, cannot work out gene's direction")
+        else:
+            return direction
 
 
 class SiteFactory:
