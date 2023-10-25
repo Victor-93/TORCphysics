@@ -1,4 +1,5 @@
 from .src import params
+from .src import utils
 # from .src.enzyme import Enzyme, EnzymeFactory
 from .src import binding_model
 from .src import unbinding_model

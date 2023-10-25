@@ -1,5 +1,5 @@
 from unittest import TestCase
-from TORCphysics import Site, Enzyme, Environment, params
+from TORCphysics import Site, Enzyme, Environment, params, utils
 from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 import numpy as np
@@ -516,7 +516,7 @@ class TestTopoIContinuum(TestCase):
                     supercoiling_removed = 0.0
 
                 correct_position = 0.0
-                correct_twist = em.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
+                correct_twist = utils.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
 
                 # And test
                 self.assertEqual(my_environment.effect_model.__class__.__name__, 'TopoIContinuum')
@@ -549,7 +549,7 @@ class TestTopoIContinuum(TestCase):
                     supercoiling_removed = 0.0
 
                 correct_position = 0.0
-                correct_twist = em.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
+                correct_twist = utils.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
 
                 # And test
                 self.assertEqual(my_environment.effect_model.__class__.__name__, 'TopoIContinuum')
@@ -582,7 +582,7 @@ class TestTopoIContinuum(TestCase):
                     supercoiling_removed = 0.0
 
                 correct_position = 0.0
-                correct_twist = em.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
+                correct_twist = utils.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
 
                 # And test
                 self.assertEqual(my_environment.effect_model.__class__.__name__, 'TopoIContinuum')
@@ -616,7 +616,7 @@ class TestTopoIContinuum(TestCase):
                     supercoiling_removed = 0.0
 
                 correct_position = 0.0
-                correct_twist = em.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
+                correct_twist = utils.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
 
                 # And test
                 self.assertEqual(my_environment.effect_model.__class__.__name__, 'TopoIContinuum')
@@ -684,7 +684,7 @@ class TestGyraseContinuum(TestCase):
                     supercoiling_removed = 0.0
 
                 correct_position = 0.0
-                correct_twist = em.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
+                correct_twist = utils.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
 
                 # And test
                 self.assertEqual(my_environment.effect_model.__class__.__name__, 'GyraseContinuum')
@@ -717,7 +717,7 @@ class TestGyraseContinuum(TestCase):
                     supercoiling_removed = 0.0
 
                 correct_position = 0.0
-                correct_twist = em.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
+                correct_twist = utils.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
 
                 # And test
                 self.assertEqual(my_environment.effect_model.__class__.__name__, 'GyraseContinuum')
@@ -750,7 +750,7 @@ class TestGyraseContinuum(TestCase):
                     supercoiling_removed = 0.0
 
                 correct_position = 0.0
-                correct_twist = em.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
+                correct_twist = utils.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
 
                 # And test
                 self.assertEqual(my_environment.effect_model.__class__.__name__, 'GyraseContinuum')
@@ -784,7 +784,7 @@ class TestGyraseContinuum(TestCase):
                     supercoiling_removed = 0.0
 
                 correct_position = 0.0
-                correct_twist = em.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
+                correct_twist = utils.calculate_twist_from_sigma(enzyme, enzyme_n, supercoiling_removed)
 
                 # And test
                 self.assertEqual(my_environment.effect_model.__class__.__name__, 'GyraseContinuum')
@@ -837,7 +837,7 @@ class TestEffectFunctions(TestCase):
                        oparams=None)
         my_enzyme = Enzyme(e_type='test', name='YO', site=my_site, position=2, size=1, k_cat=0.0, k_off=0.0,
                            twist=0, superhelical=0)
-        position_left, position_right = em.get_start_end_c(my_enzyme, my_enzyme, nbp)
+        position_left, position_right = utils.get_start_end_c(my_enzyme, my_enzyme, nbp)
         self.assertEqual(-2, position_left, "Incorrectly calculated the left position")
         self.assertEqual(7, position_right, "Incorrectly calculated the right position")
 
@@ -849,5 +849,5 @@ class TestEffectFunctions(TestCase):
                          twist=0, superhelical=0)
         enzyme2 = Enzyme(e_type='test', name='YO', site=my_site, position=1200, size=50, k_cat=0.0, k_off=0.0,
                          twist=0, superhelical=0)
-        length = em.calculate_length(enzyme1, enzyme2)
+        length = utils.calculate_length(enzyme1, enzyme2)
         self.assertEqual(length, 950, "Incorrectly calculated the length")

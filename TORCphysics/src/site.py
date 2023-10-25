@@ -2,16 +2,6 @@ import pandas as pd
 from TORCphysics import binding_model as bm
 
 
-# TODO: It seems that the Site is working now! The next steps are as follows:
-#  1.- Rearrange effect_model, binding_model and unbinding_model, so the sites and environment can use them. -
-#   Kind of done, I still need to tide a bit the modules, but I can do it later.
-#  2.- Fix Enzyme. - DONE
-#  3.- Document Enzyme. 3.1- Test Enzyme. - DONE
-#   3.2- Test Binding models. 3.3- Test Effect models  - I have to do these two
-#  4.- Make the code works with the new changes, and don't forget to add the effective_size.
-#  5.- Document binding/effect/unbinding.
-#  6.- Document everything
-
 class Site:
     """    A class used to represent functioning sites (sequence) on the DNA.
 

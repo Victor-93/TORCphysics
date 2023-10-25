@@ -1,8 +1,14 @@
 import numpy as np
-from TORCphysics import params
+from TORCphysics import params, utils
 import pandas as pd
 from abc import ABC, abstractmethod
 import sys
+
+# TODO: Decide which of these parameters you need
+# All parameters are already in the params module, but I prefer to have them here with more simple names:
+v0 = params.v0
+w0 = params.w0
+gamma = params.gamma
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -10,13 +16,6 @@ import sys
 # This module contains the mathematical functions that compose the effects model.
 # Effects can describe the motion of RNAPs as well as twist injection; topoisomerase activity; overall mechanics of
 # enzymes bound to DNA, etc...
-
-# TODO: Decide which of these parameters you need
-# All paramete# rs are already in the params module, but I prefer to have them here with more simple names:
-v0 = params.v0
-w0 = params.w0
-gamma = params.gamma
-
 
 # ---------------------------------------------------------------------------------------------------------------------
 # EFFECT
@@ -485,7 +484,7 @@ class TopoIContinuum(EffectModel):
         except OverflowError as oe:
             supercoiling_removed = 0.0
 
-        twist_right = calculate_twist_from_sigma(z, z_n, supercoiling_removed)
+        twist_right = utils.calculate_twist_from_sigma(z, z_n, supercoiling_removed)
         return Effect(index=index, position=0.0, twist_left=0.0, twist_right=twist_right)
 
 
@@ -593,7 +592,7 @@ class GyraseContinuum(EffectModel):
             supercoiling_removed = -a / b
         except OverflowError as oe:
             supercoiling_removed = 0.0
-        twist_right = calculate_twist_from_sigma(z, z_n, supercoiling_removed)
+        twist_right = utils.calculate_twist_from_sigma(z, z_n, supercoiling_removed)
         return Effect(index=index, position=0.0, twist_left=0.0, twist_right=twist_right)
 
 
@@ -725,13 +724,6 @@ def assign_effect_model(model_name, oparams_file=None, **oparams):
     else:
         raise ValueError('Could not recognise effect model ' + model_name)
     return my_model
-
-
-def read_csv_to_dict(filename):
-    """
-    Reads csv file and puts it in a dictionary
-    """
-    return pd.read_csv(filename).to_dict()
 
 
 # Supercoiling injection of topoisomerases. It injects according the k_cat (injected twist per second), so be careful
@@ -866,91 +858,3 @@ def Marko_torque(sigma):
 # USEFUL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
 
-# ----------------------------------------------------------
-# This function calculates the length between two objects (proteins) considering their sizes
-def calculate_length(z0, z1):
-    x0 = z0.position  # positions
-    x1 = z1.position
-    b0 = z0.size  # size -_-
-    # b1 = z1.size
-    length = abs(x1 - (x0 + b0))
-    # There are 4 possibilities
-    # if z0.direction >= 0 and z1.direction >= 0:
-    #    length = (x1 - b1) - x0
-    # elif z0.direction >= 0 and z1.direction < 0:
-    #    length = x1 - x0
-    # elif z0.direction < 0 and z1.direction >= 0:
-    #    length = (x1 - b1) - (x0 + b0)
-    # elif z0.direction < 0 and z1.direction < 0:
-    #    length = x1 - (x0 + b0)
-    # else:
-    #    print("Something went wrong in lengths")
-    #    sys.exit()
-    # length+=1 #1 bp needs to be added
-    return length
-
-
-# ----------------------------------------------------------
-# This function calculates/updates the twist parameter according
-# the supercoiling value of the current object Z0, and according
-# the length between object Z0 and Z1.
-def calculate_twist(z0, z1):
-    length = calculate_length(z0, z1)  # First, I need to get the length
-    sigma = z0.superhelical
-    twist = sigma * w0 * length
-    return twist
-
-
-# ----------------------------------------------------------
-# This function calculates/updates the supercoiling according
-# the twist of the current object Z0, and the distance between
-# Z1-Z0
-def calculate_supercoiling(z0, z1):
-    length = calculate_length(z0, z1)  # First, I need to get the length
-    twist = z0.twist  # and twist
-    if length != 0:
-        sigma = twist / (w0 * length)  # and calculate the supercoiling
-    else:
-        sigma = 0  # I don't know if this is a solution... #But basically, this happens when a RNAP
-        # binds right after one has bound
-    return sigma
-
-
-# ----------------------------------------------------------
-# This function is equivalent to calculate_twist(), however, we use this function when
-# the twist stored in the enzyme is not reliable. For example, when topoisomerases act on the DNA in the continumm
-# model, we might need to convert from superhelical to twist
-def calculate_twist_from_sigma(z0, z1, sigma):
-    length = calculate_length(z0, z1)  # First, I need to get the length
-    twist = sigma * w0 * length
-    return twist
-
-
-# -----------------------------------------------------------------------
-# Gets the start and end positions of the fake boundaries (for circular DNA)
-# In case that there is not fake boundaries, Z_N should be the last element [-1],
-# in case that you have N objects including the fake boundaries, Z_N -> [N-2]
-def get_start_end_c(z0, zn, nbp):
-    # b_0 = z0.size
-    b_n = zn.size
-    x_0 = z0.position  # position of first object
-    x_n = zn.position  # position of last object
-
-    # fake position on the left
-    #    position_left = 1 + x_n + b_n - nbp  # the size of the last object is considered
-    position_left = x_n + b_n - nbp  # the size of the last object is considered
-    # if zn.direction >= 0:  # depends on the direction
-    #    position_left = 0 - (nbp - x_n)  # this is the position of the fake bit,
-    # else:
-    #    position_left = 0 - (nbp - (x_n + b_n))  # the size of the last object is considered
-
-    # fake end
-    position_right = nbp + x_0
-    # if z0.direction >= 0:  # depends on the direction
-    #    position_right = nbp + x_0 - b_0  # I think I had the sign wrong...
-    # else:
-    #    position_right = nbp + x_0
-
-    return position_left, position_right
-
-# -----------------------------------------------------------------------

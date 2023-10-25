@@ -25,7 +25,7 @@ class TestCircuit(TestCase):
         mm = 'uniform'
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt, tm, mm)
+                             output_prefix, frames, series, continuation, dt)
         self.assertGreater(my_circuit.get_num_enzymes(), 0, "Empty enzyme list")
         self.assertGreater(my_circuit.get_num_sites(), 0, "Empty enzyme list")
         self.assertGreater(my_circuit.get_num_environmentals(), 0, "Empty enzyme list")
@@ -33,7 +33,7 @@ class TestCircuit(TestCase):
         # And test the one with the sequence
         circuit_filename = 'circuit_sequence.csv'
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt, tm, mm)
+                             output_prefix, frames, series, continuation, dt)
         self.assertGreater(my_circuit.get_num_enzymes(), 0, "Empty enzyme list")
         self.assertGreater(my_circuit.get_num_sites(), 0, "Empty enzyme list")
         self.assertGreater(my_circuit.get_num_environmentals(), 0, "Empty enzyme list")

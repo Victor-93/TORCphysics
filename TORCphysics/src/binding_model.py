@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-from TORCphysics import params
+from TORCphysics import params, utils
 import pandas as pd
 from abc import ABC, abstractmethod
 
@@ -150,7 +150,7 @@ class PoissonBinding(BindingModel):
         probability : float
             A number that indicates the probability of binding in the current timestep.
         """
-        return Poisson_process(self.k_on, dt)
+        return utils.Poisson_process(self.k_on, dt)
 
 
 class TopoIRecognition(BindingModel):
@@ -236,7 +236,7 @@ class TopoIRecognition(BindingModel):
         a = environmental.concentration * self.k_on
         b = 1 + np.exp((superhelical - self.threshold) / self.width)
         rate = a / b
-        return P_binding_Nonh_Poisson(rate=rate, dt=dt)
+        return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
 
 
 class GyraseRecognition(BindingModel):
@@ -322,7 +322,7 @@ class GyraseRecognition(BindingModel):
         a = environmental.concentration * self.k_on
         b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
         rate = a / b
-        return P_binding_Nonh_Poisson(rate=rate, dt=dt)
+        return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
 
 
 # class lacI_binding(binding_model):
@@ -460,15 +460,6 @@ def assign_binding_model(model_name, oparams_file=None, **oparams):
 
 
 # ----------------------------------------------------------
-# This equation calculates the probability of binding according
-# a Non-homogeneous Poisson process, which is basically a Poisson process
-# with variable rate (simply modelling).
-# It assumes that the rate was already varied and obtained by one of the opening energies
-# sigma - supercoiling density
-def P_binding_Nonh_Poisson(rate, dt):
-    probability = rate * dt  # The smaller dt the more accurate it is.
-
-    return probability
 
 
 # ----------------------------------------------------------
@@ -573,33 +564,4 @@ def gyrase_binding(gyra, sigma):
 # will bind, etc...
 
 # ----------------------------------------------------------
-
-
-def Poisson_process(rate, dt):
-    """
-    Calculates probability of a Poisson process. Note that this is an approximation for a timestep dt that is smaller
-    than the rate. Hence, it calculates the probability of observing one occurrence.
-
-    Parameters
-    ----------
-    rate : float
-        This is the frequency (rate) at which one event occurs (1/s).
-    dt : float
-        Timestep in seconds (s).
-
-    Returns
-    ----------
-    probability : float
-        It represents the probability of observing one occurrence.
-    """
-    rdt = rate * dt  # it is what is in the exponent (is that how you call it?)
-    probability = rdt * np.exp(-rdt)
-    return probability
-
-
-def read_csv_to_dict(filename):
-    """
-    Reads csv file and puts it in a dictionary
-    """
-    return pd.read_csv(filename).to_dict()
 
