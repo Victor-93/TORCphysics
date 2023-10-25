@@ -155,7 +155,7 @@ class TestWorkflows(TestCase):
         #  7.- Also check how enzymes are added.
 
     def test_effect_workflow(self):
-        # TODO: Test cases:
+        # Test cases:
         #  Test 1. Enzyme is EXT - returns empty list
         #  Test 2. Enzyme has no effect_model - returns empty list
         #  Test 3. Enzyme has effect_model - returns one Effect
@@ -163,5 +163,157 @@ class TestWorkflows(TestCase):
         #  Test 5. List of environments, but not continuum - returns empty list
         #  Test 6. List of continuum environments, but only EXT_ enzymes - returns empty list
         #  Test 7. List of M continuum environments, but with N enzymes - returns M*N Effects
-        s=2
+        #  Test 8. List of M continuum environments, with N enzymes, and K enzymes with effects - returns M*N+K Effects
 
+        # Let's create sites. We'll have 4 genes, two genes are type gene1 and the other two are
+        # type gene2
+        s0 = Site(site_type='EXT', name='EXT', start=1, end=5000, k_on=0.0)
+        s1 = Site(site_type='gene1', name='gene1', start=100, end=500, k_on=0.0)
+        s2 = Site(site_type='gene2', name='gene2', start=1100, end=1500, k_on=0.0)
+        site_list = [s0, s1, s2]
+
+        # And let's creat enzymes that act as boundaries
+        extra_left = Enzyme(e_type='EXT', name='EXT_L', site=s0,
+                            position=1, size=0, effective_size=0,
+                            twist=0, superhelical=-0.06)
+        extra_right = Enzyme(e_type='EXT', name='EXT_R', site=s0,
+                             position=5000, size=0, effective_size=0,
+                             twist=0, superhelical=-0.06)
+
+        # And let's define some enzymes
+        RNAP = Enzyme(e_type='RNAP', name='RNAPUniform_test', site=s1, size=30,
+                      effective_size=15, position=200, twist=0.0, superhelical=0.0, effect_model=em.RNAPUniform())
+        NAP = Enzyme(e_type='NAP', name='NAP_test', site=s0, size=50,
+                     effective_size=30, position=300, twist=0.0, superhelical=0.0)
+        NAP2 = Enzyme(e_type='NAP', name='NAP2_test', site=s0, size=50,
+                      effective_size=30, position=1300, twist=0.0, superhelical=0.0)
+        TOPO = Enzyme(e_type='RNAP', name='Topo_test', site=s1, size=100,
+                      effective_size=50, position=2000, twist=0.0, superhelical=0.0, effect_model=em.TopoIUniform())
+
+        # Some environmentals
+        e1 = Environment(e_type='RNAP', name='test1', site_list=site_list, concentration=10.0,
+                         size=60, effective_size=30, site_type='gene1')
+        e2 = Environment(e_type='RNAP', name='test2', site_list=site_list, concentration=10.0,
+                         size=60, effective_size=30, site_type='gene2')
+        etopo_c = Environment(e_type='topo', name='topoIC_test', site_list=[], concentration=0.1, size=0.0,
+                              effective_size=0.0, site_type='none', effect_model=em.TopoIContinuum())
+        egyra_c = Environment(e_type='topo', name='gyraC_test', site_list=[], concentration=0.1, size=0.0,
+                              effective_size=0.0, site_type='none', effect_model=em.GyraseContinuum())
+        etopo_s = Environment(e_type='topo', name='topoIS_test', site_list=[], concentration=0.1, size=0.0,
+                              effective_size=0.0, site_type='DNA', effect_model=em.TopoIUniform())
+
+        environmental_list = [e1, e2]
+        # And let's set our dt and rng
+        dt = 1.0
+
+        #  Test 1. Enzyme is EXT - returns empty list
+        enzyme_list = [extra_left, extra_right]
+        effects_list = mw.effect_workflow(enzyme_list=enzyme_list, environmental_list=environmental_list, dt=dt)
+        self.assertEqual(len(effects_list), 0)
+
+        #  Test 2. Enzyme has no effect_model - returns empty list
+        enzyme_list = [extra_left, NAP, extra_right]
+        effects_list = mw.effect_workflow(enzyme_list=enzyme_list, environmental_list=environmental_list, dt=dt)
+        self.assertEqual(len(effects_list), 0)
+
+        #  Test 3. Enzyme has effect_model - returns one Effect
+        enzyme_list = [extra_left, RNAP, extra_right]
+        effects_list = mw.effect_workflow(enzyme_list=enzyme_list, environmental_list=environmental_list, dt=dt)
+        self.assertEqual(len(effects_list), 1)
+
+        #  Test 4. List of environments with no effect_models - returns empty list
+        environmental_list = [e1, e2]
+        enzyme_list = [extra_left, NAP, extra_right]
+        effects_list = mw.effect_workflow(enzyme_list=enzyme_list, environmental_list=environmental_list, dt=dt)
+        self.assertEqual(len(effects_list), 0)
+
+        #  Test 5. List of environments, but not continuum - returns empty list
+        environmental_list = [e1, e2]
+        enzyme_list = [extra_left, NAP, extra_right]
+        effects_list = mw.effect_workflow(enzyme_list=enzyme_list, environmental_list=environmental_list, dt=dt)
+        self.assertEqual(len(effects_list), 0)
+
+        #  Test 6. List of continuum environments, but only EXT_ enzymes - returns empty list
+        environmental_list = [e1, e2, etopo_s]
+        enzyme_list = [extra_left, NAP, extra_right]
+        effects_list = mw.effect_workflow(enzyme_list=enzyme_list, environmental_list=environmental_list, dt=dt)
+        self.assertEqual(len(effects_list), 0)
+
+        #  Test 7. List of M continuum environments, but with N enzymes - returns M*N Effects
+        environmental_list = [e1, e2, etopo_c, egyra_c]
+        enzyme_list = [extra_left, NAP, NAP2, extra_right]
+        effects_list = mw.effect_workflow(enzyme_list=enzyme_list, environmental_list=environmental_list, dt=dt)
+        self.assertEqual(len(effects_list), 4)
+
+        #  Test 8. List of M continuum environments, with N enzymes, and K enzymes with effects - returns M*N+K Effects
+        environmental_list = [e1, e2, etopo_c, egyra_c]
+        enzyme_list = [extra_left, RNAP, NAP, NAP2, TOPO, extra_right]
+        effects_list = mw.effect_workflow(enzyme_list=enzyme_list, environmental_list=environmental_list, dt=dt)
+        self.assertEqual(len(effects_list), 2 * 4 + 2)
+
+    def test_unbinding_workflow(self):
+        # Test cases:
+        #  Test 1. EXT enzymes - returns two empty lists
+        #  Test 2. Enzymes with no unbinding model  - returns empty lists
+        #  Test 3. Enzymes with unbinding model but low k_off - returns empty lists
+        #  Test 4. Enzymes with unbinding models and high k_off - returns lists
+
+        # Let's create sites. We'll have 4 genes, two genes are type gene1 and the other two are
+        # type gene2
+        s0 = Site(site_type='EXT', name='EXT', start=1, end=5000, k_on=0.0)
+        s1 = Site(site_type='gene1', name='gene1', start=100, end=500, k_on=0.0)
+        s2 = Site(site_type='gene2', name='gene2', start=1100, end=1500, k_on=0.0)
+        site_list = [s0, s1, s2]
+
+        # And let's creat enzymes that act as boundaries
+        extra_left = Enzyme(e_type='EXT', name='EXT_L', site=s0,
+                            position=1, size=0, effective_size=0,
+                            twist=0, superhelical=-0.06)
+        extra_right = Enzyme(e_type='EXT', name='EXT_R', site=s0,
+                             position=5000, size=0, effective_size=0,
+                             twist=0, superhelical=-0.06)
+
+        RNAP1 = Enzyme(e_type='RNAP', name='RNAP1_test', site=s1, size=30,
+                       effective_size=15, position=200, twist=0.0, superhelical=0.0,
+                       unbinding_model=ubm.RNAPSimpleUnbinding())
+        RNAP2 = Enzyme(e_type='RNAP', name='RNAP2_test', site=s2, size=30,
+                       effective_size=15, position=1200, twist=0.0, superhelical=0.0,
+                       unbinding_model=ubm.RNAPSimpleUnbinding())
+        NAP = Enzyme(e_type='NAP', name='NAP_test', site=s0, size=50,
+                     effective_size=30, position=300, twist=0.0, superhelical=0.0)
+        NAP2 = Enzyme(e_type='NAP', name='NAP2_test', site=s0, size=50,
+                      effective_size=30, position=1500, twist=0.0, superhelical=0.0)
+        RNAP3 = Enzyme(e_type='RNAP', name='RNAP3_test', site=s1, size=30,
+                       effective_size=15, position=500, twist=0.0, superhelical=0.0,
+                       unbinding_model=ubm.RNAPSimpleUnbinding())
+        RNAP4 = Enzyme(e_type='RNAP', name='RNAP4_test', site=s2, size=30,
+                       effective_size=15, position=1500, twist=0.0, superhelical=0.0,
+                       unbinding_model=ubm.RNAPSimpleUnbinding())
+
+        # And let's set our dt and rng
+        dt = 1.0
+        rng = np.random.default_rng(1993)  # my birth year
+
+        #  Test 1. EXT enzymes - returns two empty lists
+        enzyme_list = [extra_left, extra_right]
+        drop_list_index, drop_list_enzyme = mw.unbinding_workflow(enzymes_list=enzyme_list, dt=dt, rng=rng)
+        self.assertEqual(len(drop_list_index), 0)
+        self.assertEqual(len(drop_list_enzyme), 0)
+
+        #  Test 2. Enzymes with no unbinding model  - returns empty lists
+        enzyme_list = [extra_left, NAP, NAP2, extra_right]
+        drop_list_index, drop_list_enzyme = mw.unbinding_workflow(enzymes_list=enzyme_list, dt=dt, rng=rng)
+        self.assertEqual(len(drop_list_index), 0)
+        self.assertEqual(len(drop_list_enzyme), 0)
+
+        #  Test 3. Enzymes with unbinding model but low k_off - returns empty lists
+        enzyme_list = [extra_left, RNAP1, NAP, RNAP2, NAP2, extra_right]
+        drop_list_index, drop_list_enzyme = mw.unbinding_workflow(enzymes_list=enzyme_list, dt=dt, rng=rng)
+        self.assertEqual(len(drop_list_index), 0)
+        self.assertEqual(len(drop_list_enzyme), 0)
+
+        #  Test 4. Enzymes with unbinding models and high k_off - returns lists
+        enzyme_list = [extra_left, RNAP1, RNAP3, NAP, RNAP2, RNAP4, NAP2, extra_right]
+        drop_list_index, drop_list_enzyme = mw.unbinding_workflow(enzymes_list=enzyme_list, dt=dt, rng=rng)
+        self.assertEqual(len(drop_list_index), 2)
+        self.assertEqual(len(drop_list_enzyme), 2)

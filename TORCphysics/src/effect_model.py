@@ -10,6 +10,7 @@ v0 = params.v0
 w0 = params.w0
 gamma = params.gamma
 
+
 # ---------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
 # ---------------------------------------------------------------------------------------------------------------------
@@ -682,7 +683,7 @@ def get_effect_model(name, e_model, model_name, oparams_file, oparams):
             model_name = None
             oparams_file = None
             oparams = None
-            
+
     effect_model = e_model
     effect_model_name = model_name
     effect_oparams_file = oparams_file
@@ -853,8 +854,6 @@ def Marko_torque(sigma):
         sys.exit()
     return torque
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # USEFUL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
-
