@@ -1,8 +1,6 @@
 import numpy as np
-from TORCphysics import params, Enzyme
+from TORCphysics import utils, Enzyme
 import sys
-import pandas as pd
-from abc import ABC, abstractmethod
 
 
 # TODO: Properly sort, comment and document your functions.
@@ -88,7 +86,8 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
                 # Check if site is available  - it is actually faster to first calculate the probability, so I move
                 # it here.
                 # -------------------------------------------------------------
-                site_available = check_site_availability(site, enzyme_list, environment.size)
+                site_available = utils.check_site_availability(site=site, enzyme_list=enzyme_list,
+                                                               environmental=environment)
                 if not site_available:
                     continue
 
@@ -261,8 +260,76 @@ def unbinding_workflow(enzymes_list, dt, rng):
 # ---------------------------------------------------------------------------------------------------------------------
 # HELPFUL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
+# TODO: Maybe in the future, when including TF, this function could be included in the binding model.
+#  But for the mean time, just leave it here. Maybe TFs don't work like I have on my mind, which is that they
+#  provide an adhesive energy and in consequence, increase the rate of binding of RNAPs, and when RNAPs bind, the TF
+#  unbind? Maybe this isn't the case.
+
+# site = site to be bound
+# environmental = enzyme binding the site
+# enzyme_list = list of enzymes currently bound to the DNA
+def check_site_availability3(site, environmental, enzyme_list):
+
+    # Enzyme before the start site
+    e_b = [enzyme for enzyme in enzyme_list if enzyme.position <= site.start][-1]
+    # Enzyme after the start site
+    e_a = [enzyme for enzyme in enzyme_list if enzyme.position >= site.start][0]
+
+    # Let's build ranges
+    # ----------------------------------------------------
+    # Range of binding enzyme. This the region that the environmental is trying to bind in the DNA
+    bind_r1 = site.start - (environmental.size - environmental.effective_size)*.05
+    bind_r2 = site.start + (environmental.size + environmental.effective_size)*.05
+    # Range of DNA that occupies the enzyme before
+    r_b1 = e_b.position - (e_b.size - e_b.effective_size)*0.5
+    r_b2 = e_b.position + (e_b.size + e_b.effective_size)*0.5
+    # Range of DNA that occupies the enzyme after
+    r_a1 = e_a.position - (e_a.size - e_a.effective_size)*0.5
+    r_a2 = e_a.position + (e_a.size + e_a.effective_size)*0.5
+
+    # Check if ranges overlap
+    # ----------------------------------------------------
+
+    # Let's check for the enzyme on the left (r_b)
+    overlap = max(r_b1, bind_r1) <= min(r_b2, bind_r2)
+
+    if overlap:
+        available = False
+        return available
+
+    # Let's check for the enzyme on the right (r_a)
+    overlap = max(bind_r1, r_a1) <= min(bind_r2, r_a2)
+
+    if overlap:
+        available = False
+        return available
+
+    # TODO: I did something, but does the direction matter? yes! Check how!
+    if site.direction > 0:
+        my_range = [site.start - size, site.start]
+    #        my_range = [site.start, site.start + size]
+    elif site.direction <= 0:
+        my_range = [site.start, site.start + size]
+    else:
+        print('Error in checking site availability. Site=', site.site_type, site.name)
+        sys.exit()
+        #  my_range = [site.start, site.start + size]
+    #        my_range = [site.start, site.start - size]
+
+    # TODO: The function does not work!
+    # If any of them intersect
+    if (set(range_before) & set(my_range)) or (set(range_after) & set(my_range)):
+        available = False
+    # there is an intersection
+    else:
+        available = True
+
+    return available
+
+
+
 # This function checks if a site is not blocked by other enzymes
-def check_site_availability(site, enzyme_list, size):
+def check_site_availability2(site, enzyme_list, size):
     # Check if the site is available for binding.
     # It assumes that the probability has already been calculated, and we have a candidate enzyme for the binding
     # with size=size.
@@ -299,8 +366,9 @@ def check_site_availability(site, enzyme_list, size):
 # ----------------------------------------------------------
 # This function makes sure that only one enzyme will end up binding a region.
 # It checks that the enzymes in the list of new_enzymes do not overlap and if they do, decide which will end up
-# binding
+# binding3
 # TODO: test this function - design a experiment in which you kind of know what outcome you should get.
+# TODO: pass this enzye to utils
 def check_binding_conflicts(enzyme_list, rng):
     enzyme_list.sort(key=lambda x: x.position)  # sort by position
     checked_enzyme_list = []

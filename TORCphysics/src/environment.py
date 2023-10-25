@@ -1,4 +1,5 @@
 import pandas as pd
+from TORCphysics import utils
 from TORCphysics import binding_model as bm
 from TORCphysics import unbinding_model as ubm
 from TORCphysics import effect_model as em
@@ -439,7 +440,8 @@ class EnvironmentFactory:
         df = pd.read_csv(self.filename)
         for index, row in df.iterrows():
             new_environment = Environment(e_type=str(row['type']), name=str(row['name']),
-                                          site_list=self.site_match(row['site_type']),
+                                          site_list=utils.site_match_by_type(site_list=self.site_list,
+                                                                             label=row['site_type']),
                                           concentration=float(row['concentration']),
                                           size=float(row['size']),
                                           effective_size=float(row['effective_size']),
@@ -451,27 +453,3 @@ class EnvironmentFactory:
                                           unbinding_model_name=str(row['unbinding_model']),
                                           unbinding_oparams_file=str(row['unbinding_oparams']))
             self.environment_list.append(new_environment)
-
-    def site_match(self, label):
-        """ Given the site_list, filters sites by site_type 'label'.
-
-        Parameters
-        ----------
-        label : str
-            Type of site.
-
-        Returns
-        ----------
-        list : A list of sites of the type 'label'.
-
-        """
-        #        enzyme_before = [enzyme.position for enzyme in enzyme_list if enzyme.position <= site.start][-1]
-        site_list = [site for site in self.site_list if site.site_type == label]
-        return site_list
-
-#        if label in [site.name for site in self.site_list]:
-#            for site in self.site_list:
-#                if site.name == label:
-#                    return site  # the first one?
-#        else:
-#            return None

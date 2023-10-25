@@ -1,5 +1,5 @@
 import numpy as np
-from TORCphysics import params
+from TORCphysics import params, utils
 import pandas as pd
 from abc import ABC, abstractmethod
 
@@ -106,7 +106,7 @@ class PoissonUnBinding(UnBindingModel):
         probability : float
             A number that indicates the probability of unbinding in the current timestep.
         """
-        return Poisson_process(self.k_off, dt)
+        return utils.Poisson_process(self.k_off, dt)
 
 
 class RNAPSimpleUnbinding(UnBindingModel):
@@ -290,30 +290,3 @@ def assign_unbinding_model(model_name, oparams_file=None, **oparams):
     return my_model
 
 
-def Poisson_process(rate, dt):
-    """
-    Calculates probability of a Poisson process. Note that this is an approximation for a timestep dt that is smaller
-    than the rate. Hence, it calculates the probability of observing one occurrence.
-
-    Parameters
-    ----------
-    rate : float
-        This is the frequency (rate) at which one event occurs (1/s).
-    dt : float
-        Timestep in seconds (s).
-
-    Returns
-    ----------
-    probability : float
-        It represents the probability of observing one occurrence.
-    """
-    rdt = rate * dt  # it is what is in the exponent (is that how you call it?)
-    probability = rdt * np.exp(-rdt)
-    return probability
-
-
-def read_csv_to_dict(filename):
-    """
-    Reads csv file and puts it in a dictionary
-    """
-    return pd.read_csv(filename).to_dict()

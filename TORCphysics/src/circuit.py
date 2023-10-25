@@ -2,7 +2,8 @@ import pandas as pd
 import random
 import numpy as np
 import sys
-from TORCphysics import Site, SiteFactory, Enzyme, EnzymeFactory, Environment, EnvironmentFactory, Event, Log, params
+from TORCphysics import (Site, SiteFactory, Enzyme, EnzymeFactory, Environment,
+                         EnvironmentFactory, Event, Log, params, utils)
 from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 from TORCphysics import models_workflow as mw
@@ -106,21 +107,10 @@ class Circuit:
                 or sequence_file == np.nan):
             self.sequence = None
         else:
-            self.read_fasta(sequence_file)
+            self.sequence = utils.read_fasta(file_name=sequence_file)
+            # self.read_fasta(sequence_file)
             self.size = len(self.sequence)
 
-    # Read fasta file. Returns the sequence
-    def read_fasta(self, file_name):
-        fasta_file = open(file_name, 'r')
-        header = fasta_file.readline()  # Reads the header
-        lines = []  # This one will contain all the lines
-        while True:
-            line = fasta_file.readline()
-            if not line:  # If we reach the end, break loop
-                break
-            lines.append(line[:-1])  # -1 so we remove the spacing
-        self.sequence = ''.join(lines)  # And join all lines to obtain sequence
-        fasta_file.close()
 
     # This one runs the simulation
     # TODO: Think a way of making your run() function run for additional number of frames. This will make the code more
@@ -458,8 +448,8 @@ class Circuit:
         else:  # If it is a new run
             if self.get_num_enzymes() > 0:  # This can only happen if there are objects bound to the DNA
                 if self.circle:  # For circular DNA
-                    position_left, position_right = em.get_start_end_c(self.enzyme_list[0], self.enzyme_list[-1],
-                                                                       self.size)
+                    position_left, position_right = utils.get_start_end_c(self.enzyme_list[0], self.enzyme_list[-1],
+                                                                          self.size)
 
                 else:  # For linear DNA
                     position_left = 0
@@ -495,12 +485,12 @@ class Circuit:
     def update_twist(self):
 
         for i, enzyme in enumerate(self.enzyme_list[:-1]):
-            enzyme.twist = em.calculate_twist(enzyme, self.enzyme_list[i + 1])
+            enzyme.twist = utils.calculate_twist(enzyme, self.enzyme_list[i + 1])
 
     # Updates the supercoiling/superhelical in enzymes
     def update_supercoiling(self):
         for i, enzyme in enumerate(self.enzyme_list[:-1]):
-            enzyme.superhelical = em.calculate_supercoiling(enzyme, self.enzyme_list[i + 1])
+            enzyme.superhelical = utils.calculate_supercoiling(enzyme, self.enzyme_list[i + 1])
 
     # Get number of enzymes
     def get_num_enzymes(self):
@@ -562,7 +552,7 @@ class Circuit:
             # And quantities prior binding
             region_twist = enzyme_before.twist
             region_superhelical = enzyme_before.superhelical
-            region_length = em.calculate_length(enzyme_before, enzyme_after)
+            region_length = utils.calculate_length(enzyme_before, enzyme_after)
 
             # First, add the enzyme to the list and sort it
             self.enzyme_list.append(new_enzyme)
@@ -579,8 +569,8 @@ class Circuit:
             # Now we need to update the positions of the fake boundaries in circular DNA
             # --------------------------------------------------------------------------
             if self.circle:
-                position_left, position_right = em.get_start_end_c(self.enzyme_list[1], self.enzyme_list[-2],
-                                                                   self.size)
+                position_left, position_right = utils.get_start_end_c(self.enzyme_list[1], self.enzyme_list[-2],
+                                                                      self.size)
                 self.enzyme_list[0].position = position_left
                 self.enzyme_list[-1].position = position_right
 
@@ -588,8 +578,8 @@ class Circuit:
             # We need to partition the twist, so it is conserved...
             # --------------------------------------------------------
             # These quantities are the sizes of the new local domains on the left and right of the new enzyme
-            new_length_left = em.calculate_length(enzyme_before, new_enzyme)
-            new_length_right = em.calculate_length(new_enzyme, enzyme_after)
+            new_length_left = utils.calculate_length(enzyme_before, new_enzyme)
+            new_length_right = utils.calculate_length(new_enzyme, enzyme_after)
 
             # now to calculate the new twists
             # NOTE that I don't partition using the supercoiling density because the region that is actually bound
@@ -708,7 +698,7 @@ class Circuit:
         if self.circle:
             if self.get_num_enzymes() > 2:
                 self.enzyme_list[0].position, self.enzyme_list[-1].position = \
-                    em.get_start_end_c(self.enzyme_list[1], self.enzyme_list[-2], self.size)
+                    utils.get_start_end_c(self.enzyme_list[1], self.enzyme_list[-2], self.size)
             else:
                 self.enzyme_list[0].position = 0
                 self.enzyme_list[-1].position = self.size + 1
@@ -748,9 +738,9 @@ class Circuit:
         # Now we need to update the positions of the fake boundaries in circular DNA
         # --------------------------------------------------------------------------
         if self.circle and self.get_num_enzymes() > 2:
-            position_left, position_right = em.get_start_end_c(self.enzyme_list[1],
-                                                               self.enzyme_list[self.get_num_enzymes() - 2],
-                                                               self.size)
+            position_left, position_right = utils.get_start_end_c(self.enzyme_list[1],
+                                                                  self.enzyme_list[self.get_num_enzymes() - 2],
+                                                                  self.size)
             self.enzyme_list[0].position = position_left
             self.enzyme_list[-1].position = position_right
             self.enzyme_list[0].twist = self.enzyme_list[self.get_num_enzymes() - 2].twist
@@ -791,7 +781,7 @@ class Circuit:
             s = 0
             for i, enzyme in enumerate(self.enzyme_list[:-1]):
                 next_enzyme = self.enzyme_list[i + 1]
-                length = em.calculate_length(enzyme, next_enzyme)
+                length = utils.calculate_length(enzyme, next_enzyme)
                 n_sites = int(length / topo.size)
                 for n in range(n_sites):  # The 1+n is to leave some space 1 empty space between enzymes
                     start = enzyme.position + enzyme.size + topo.size * n + (1 + n)

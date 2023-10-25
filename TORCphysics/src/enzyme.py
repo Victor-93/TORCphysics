@@ -1,5 +1,5 @@
 import pandas as pd
-from TORCphysics import Site
+from TORCphysics import utils, Site
 from TORCphysics import effect_model as em
 from TORCphysics import unbinding_model as ubm
 
@@ -275,8 +275,9 @@ class EnzymeFactory:
         df = pd.read_csv(self.filename)
         for index, row in df.iterrows():
             new_enzyme = Enzyme(e_type=row['type'], name=row['name'],
-                                site=self.site_match(row['site']), position=float(row['position']),
-                                size=float(row['size']), effective_size=float(row['effective_size']),
+                                site=utils.site_match_by_name(site_list=self.site_list, label=row['site']),
+                                position=float(row['position']), size=float(row['size']),
+                                effective_size=float(row['effective_size']),
                                 twist=float(row['twist']), superhelical=float(row['superhelical']),
                                 effect_model_name=str(row['effect_model']),
                                 effect_oparams_file=str(row['effect_oparams']),
@@ -284,24 +285,3 @@ class EnzymeFactory:
                                 unbinding_oparams_file=str(row['unbinding_oparams']))
 
             self.enzyme_list.append(new_enzyme)
-
-    def site_match(self, label):
-        """ Given the site_list, filters sites by name 'label'.
-
-        Parameters
-        ----------
-        label : str
-            Name of site the enzyme is bound to.
-
-        Returns
-        ----------
-        list : The site with the name 'label'.
-
-        """
-
-        if label in [site.name for site in self.site_list]:
-            for site in self.site_list:
-                if site.name == label:
-                    return site  # the first one?
-        else:
-            return None
