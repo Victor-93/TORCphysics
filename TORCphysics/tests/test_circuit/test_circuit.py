@@ -21,8 +21,6 @@ class TestCircuit(TestCase):
         frames = 5
         series = True
         continuation = False
-        tm = 'stochastic'
-        mm = 'uniform'
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                              output_prefix, frames, series, continuation, dt)
@@ -67,7 +65,7 @@ class TestCircuit(TestCase):
         enzymes_filename = 'enzymes.csv'
         environment_filename = 'environment.csv'
         output_prefix = 'output'
-        frames = 1500
+        frames = 500
         series = True
         continuation = False
         dt = 1.0

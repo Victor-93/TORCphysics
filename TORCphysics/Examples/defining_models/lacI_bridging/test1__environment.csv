@@ -1,0 +1,7 @@
+type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+RNAP,RNAP,gene,0.2,50.0,32.0,,,RNAPUniform,,RNAPSimpleUnbinding,
+topo,topoI_continuum,,0.25,0.0,0.0,,,TopoIContinuum,,,
+topo,gyra_continuum,,0.25,0.0,0.0,,,GyraseContinuum,,,
+lacI,lacI,lacOP,0.2,10.0,10.0,,,,,PoissonUnBinding,
+mRNA,tetA,,11.0,1190.0,0.0,,,,,,
+mRNA,mKalama1,,7.0,819.0,0.0,,,,,,
