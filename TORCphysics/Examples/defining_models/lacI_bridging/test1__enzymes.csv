@@ -1,0 +1,6 @@
+type,name,site,position,size,effective_size,twist,superhelical,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+EXT,EXT_L,EXT,-1490.0,0.0,0.0,-70.54111129301076,-0.03377740653625241,,,,
+NAP,ori,ori,2000.0,50.0,50.0,-37.8960146148533,-0.056695657581991424,,,,
+lacI,lacI_bridge,lac1,3167.0,10.0,10.0,-25.902365722037977,-0.03271817097171758,LacIPoissonBridging,,PoissonUnBinding,
+lacI,lacI,lac2,4500.0,10.0,10.0,-70.54111129301076,-0.03377740653625241,LacIPoissonBridging,,PoissonUnBinding,
+EXT,EXT_R,EXT,8000.0,0.0,0.0,0.0,-0.3,,,,

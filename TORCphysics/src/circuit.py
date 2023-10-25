@@ -111,7 +111,6 @@ class Circuit:
             # self.read_fasta(sequence_file)
             self.size = len(self.sequence)
 
-
     # This one runs the simulation
     # TODO: Think a way of making your run() function run for additional number of frames. This will make the code more
     #  versatile and will allow you create experiments where you add stuff manually
@@ -466,10 +465,10 @@ class Circuit:
             # ----------------------------------------------------------------
             # Notice that we don't specify the end
             extra_left = Enzyme(e_type='EXT', name='EXT_L', site=self.site_match('EXT', 'EXT'),
-                                position=position_left, size=0, effective_size=0,
+                                position=float(position_left), size=0, effective_size=0,
                                 twist=0, superhelical=self.superhelical)
             extra_right = Enzyme(e_type='EXT', name='EXT_R', site=self.site_match('EXT', 'EXT'),
-                                 position=position_right, size=0, effective_size=0,
+                                 position=float(position_right), size=0, effective_size=0,
                                  twist=0, superhelical=self.superhelical)
 
             self.enzyme_list.append(extra_left)
@@ -756,10 +755,11 @@ class Circuit:
 
         for enzyme in drop_list_enzymes:
 
+            # TODO: Check this, it might notbe completly correct
             if enzyme.name == 'RNAP':
                 size = abs(enzyme.site.start - enzyme.site.end + 1)
                 output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
-                                                 k_on=0, k_off=0, k_cat=0, size=size, site_type=None, oparams=None)
+                                                 size=size, effective_size=0, site_type=None)
             else:
                 continue
 

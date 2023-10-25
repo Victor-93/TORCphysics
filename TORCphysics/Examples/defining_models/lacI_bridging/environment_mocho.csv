@@ -1,0 +1,4 @@
+type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+RNAP,RNAP,gene,0.2,50,32,none,none,RNAPUniform,none,RNAPSimpleUnbinding,none
+topo,topoI_continuum,,0.0,0.0,0.0,,,TopoIContinuum,,,
+topo,gyra_continuum,,0.0,0.0,0.0,,,GyraseContinuum,,,

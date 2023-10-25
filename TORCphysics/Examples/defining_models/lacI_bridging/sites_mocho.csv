@@ -1,0 +1,5 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+gene,tetA,85,1276,0.001,PoissonBinding,none
+gene,mKalama1,4267,3449,0.001,PoissonBinding,
+origin,ori,3085,0.0,0.0,,
+lacOP,lac2,4500,0.0,0.05,PoissonBinding,none
