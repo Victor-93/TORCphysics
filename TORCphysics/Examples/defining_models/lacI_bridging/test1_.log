@@ -6,52 +6,72 @@ Circuit name: test1_
 Size: 6000
 Structure: circle
 Number of sites: 6
-Number of frames: 200
-Simulation time: 600
-Simulation timestep: 3
-Seed: 6738989317118731680
+Number of frames: 1000
+Simulation time: 1000.0
+Simulation timestep: 1.0
+Seed: 8647013011913394872
  
 Overall simulation information 
 ---------------------------------------------------------------------------------------
 Initial twist: 0.00000
-Final twist: 0.00000
+Final twist: 370.05204
 Initial superhelical density: 0.00000
-Final superhelical density: 0.00000
+Final superhelical density: 0.10699
  
 Overall rates 
 ---------------------------------------------------------------------------------------
 site type            site name            #binding events      #unbinding events    binding rates        
  EXT                  EXT                                   0.0                  0.0                   0.0 
-gene                 tetA                                 11.0                 10.0  0.018333333333333333 
+gene                 tetA                                 17.0                 16.0                 0.017 
 origin               ori                                   0.0                  0.0                   0.0 
-lacOP                lac1                                  1.0                  0.0  0.0016666666666666668 
-gene                 mKalama1                              1.0                  1.0  0.0016666666666666668 
-lacOP                lac2                                  1.0                  0.0  0.0016666666666666668 
+lacOP                lac1                                  1.0                  0.0                 0.001 
+gene                 mKalama1                              6.0                  4.0                 0.006 
+lacOP                lac2                                  1.0                  0.0                 0.001 
  
 Events
 ---------------------------------------------------------------------------------------
-frame 17 time 51 binding_event at gene tetA enzyme RNAP with twist 0.00000 superhelical 0.00000 global twist 0.00000 global supercoiling 0.00000
-frame 30 time 90 binding_event at lacOP lac1 enzyme lacI_bridge with twist -140.02527 superhelical -0.04539 global twist 0.00000 global supercoiling 0.00000
-frame 30 time 90 unbinding_event at gene tetA enzyme RNAP with twist 29.48804 superhelical -0.04923 global twist 0.00000 global supercoiling 0.00000
-frame 43 time 129 binding_event at gene tetA enzyme RNAP with twist 20.46005 superhelical 0.00709 global twist 0.00000 global supercoiling 0.00000
-frame 44 time 132 binding_event at lacOP lac2 enzyme lacI_bridge with twist 0.82017 superhelical 0.00046 global twist 0.00000 global supercoiling 0.00000
-frame 50 time 150 binding_event at gene tetA enzyme RNAP with twist -59.58244 superhelical -0.04620 global twist 0.00000 global supercoiling 0.00000
-frame 56 time 168 unbinding_event at gene tetA enzyme RNAP with twist 142.26836 superhelical -0.04690 global twist 0.00000 global supercoiling 0.00000
-frame 63 time 189 unbinding_event at gene tetA enzyme RNAP with twist 65.08019 superhelical -0.09156 global twist -0.00000 global supercoiling -0.00000
-frame 79 time 237 binding_event at gene tetA enzyme RNAP with twist 55.62383 superhelical 0.02663 global twist -0.00000 global supercoiling -0.00000
-frame 92 time 276 unbinding_event at gene tetA enzyme RNAP with twist 55.62383 superhelical -0.07577 global twist -0.00000 global supercoiling -0.00000
-frame 96 time 288 binding_event at gene tetA enzyme RNAP with twist 55.62383 superhelical 0.02663 global twist -0.00000 global supercoiling -0.00000
-frame 102 time 306 binding_event at gene mKalama1 enzyme RNAP with twist -29.42239 superhelical -0.03716 global twist -0.00000 global supercoiling -0.00000
-frame 103 time 309 binding_event at gene tetA enzyme RNAP with twist -50.86776 superhelical -0.03945 global twist -0.00000 global supercoiling -0.00000
-frame 109 time 327 unbinding_event at gene tetA enzyme RNAP with twist 167.56154 superhelical -0.04004 global twist -0.00000 global supercoiling -0.00000
-frame 111 time 333 unbinding_event at gene mKalama1 enzyme RNAP with twist -29.42239 superhelical 0.72888 global twist -0.00000 global supercoiling -0.00000
-frame 116 time 348 unbinding_event at gene tetA enzyme RNAP with twist 55.62383 superhelical -0.11241 global twist -0.00000 global supercoiling -0.00000
-frame 130 time 390 binding_event at gene tetA enzyme RNAP with twist 55.62383 superhelical 0.02663 global twist -0.00000 global supercoiling -0.00000
-frame 136 time 408 binding_event at gene tetA enzyme RNAP with twist -40.09659 superhelical -0.03245 global twist -0.00000 global supercoiling -0.00000
-frame 143 time 429 unbinding_event at gene tetA enzyme RNAP with twist 171.87060 superhelical -0.03296 global twist -0.00000 global supercoiling -0.00000
-frame 149 time 447 binding_event at gene tetA enzyme RNAP with twist -170.10264 superhelical -0.10548 global twist -0.00000 global supercoiling -0.00000
-frame 149 time 447 unbinding_event at gene tetA enzyme RNAP with twist 163.80639 superhelical -0.10675 global twist -0.00000 global supercoiling -0.00000
-frame 154 time 462 binding_event at gene tetA enzyme RNAP with twist -151.26726 superhelical -0.12799 global twist -0.00000 global supercoiling -0.00000
-frame 162 time 486 unbinding_event at gene tetA enzyme RNAP with twist 271.28935 superhelical -0.13010 global twist 0.00000 global supercoiling 0.00000
-frame 167 time 501 unbinding_event at gene tetA enzyme RNAP with twist 55.62383 superhelical -0.16173 global twist 0.00000 global supercoiling 0.00000
-frame 196 time 588 binding_event at gene tetA enzyme RNAP with twist 55.62383 superhelical 0.02663 global twist 0.00000 global supercoiling 0.00000
+frame 34 time 34.0 binding_event at gene tetA enzyme RNAP with twist 0.00000 superhelical 0.00000 global twist 0.00000 global supercoiling 0.00000
+frame 43 time 43.0 binding_event at gene tetA enzyme RNAP with twist -32.31352 superhelical -0.01269 global twist 0.00000 global supercoiling 0.00000
+frame 61 time 61.0 binding_event at gene tetA enzyme RNAP with twist -95.11945 superhelical -0.03513 global twist 0.00000 global supercoiling 0.00000
+frame 64 time 64.0 binding_event at lacOP lac2 enzyme lacI_bridge with twist -95.13596 superhelical -0.03901 global twist 0.00000 global supercoiling 0.00000
+frame 75 time 75.0 unbinding_event at gene tetA enzyme RNAP with twist 148.97532 superhelical -0.01279 global twist 0.00000 global supercoiling 0.00000
+frame 80 time 80.0 binding_event at gene tetA enzyme RNAP with twist -85.84006 superhelical -0.06847 global twist 0.00000 global supercoiling 0.00000
+frame 84 time 84.0 unbinding_event at gene tetA enzyme RNAP with twist 170.53419 superhelical -0.03538 global twist 0.00000 global supercoiling 0.00000
+frame 102 time 102.0 unbinding_event at gene tetA enzyme RNAP with twist 212.77541 superhelical -0.06953 global twist 0.00000 global supercoiling 0.00000
+frame 105 time 105.0 binding_event at gene tetA enzyme RNAP with twist -129.12689 superhelical -0.09485 global twist -0.00000 global supercoiling -0.00000
+frame 119 time 119.0 binding_event at lacOP lac1 enzyme lacI_bridge with twist -105.49252 superhelical -0.07196 global twist 0.00000 global supercoiling 0.00000
+frame 121 time 121.0 unbinding_event at gene tetA enzyme RNAP with twist 239.65843 superhelical -0.09620 global twist 0.00000 global supercoiling 0.00000
+frame 122 time 122.0 binding_event at gene tetA enzyme RNAP with twist 239.65843 superhelical 0.19681 global twist 0.00000 global supercoiling 0.00000
+frame 146 time 146.0 unbinding_event at gene tetA enzyme RNAP with twist 386.61080 superhelical 0.19995 global twist 370.05204 global supercoiling 0.10607
+frame 163 time 163.0 unbinding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical -0.00083 global twist 370.05204 global supercoiling 0.10517
+frame 165 time 165.0 binding_event at gene mKalama1 enzyme RNAP with twist -39.91104 superhelical -0.05041 global twist 370.05204 global supercoiling 0.10428
+frame 192 time 192.0 unbinding_event at gene mKalama1 enzyme RNAP with twist -39.91104 superhelical 0.44675 global twist 370.05204 global supercoiling 0.10517
+frame 207 time 207.0 binding_event at gene mKalama1 enzyme RNAP with twist -39.91104 superhelical -0.05041 global twist 370.05204 global supercoiling 0.10428
+frame 223 time 223.0 binding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical 0.21368 global twist 370.05204 global supercoiling 0.10517
+frame 234 time 234.0 unbinding_event at gene mKalama1 enzyme RNAP with twist -39.91104 superhelical 0.44675 global twist 370.05204 global supercoiling 0.10607
+frame 240 time 240.0 binding_event at gene mKalama1 enzyme RNAP with twist -39.91104 superhelical -0.05041 global twist 370.05204 global supercoiling 0.10517
+frame 264 time 264.0 unbinding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical 0.02761 global twist 370.05204 global supercoiling 0.10607
+frame 267 time 267.0 unbinding_event at gene mKalama1 enzyme RNAP with twist -39.91104 superhelical 0.44675 global twist 370.05204 global supercoiling 0.10517
+frame 289 time 289.0 binding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical 0.21368 global twist 370.05204 global supercoiling 0.10428
+frame 323 time 323.0 binding_event at gene tetA enzyme RNAP with twist 74.73031 superhelical 0.04907 global twist 370.05204 global supercoiling 0.10517
+frame 330 time 330.0 unbinding_event at gene tetA enzyme RNAP with twist 429.63374 superhelical 0.04970 global twist 370.05204 global supercoiling 0.10607
+frame 364 time 364.0 unbinding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical -0.06327 global twist 370.05204 global supercoiling 0.10517
+frame 509 time 509.0 binding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical 0.21368 global twist 370.05204 global supercoiling 0.10428
+frame 532 time 532.0 binding_event at gene tetA enzyme RNAP with twist 114.22461 superhelical 0.08618 global twist 370.05204 global supercoiling 0.10517
+frame 550 time 550.0 unbinding_event at gene tetA enzyme RNAP with twist 434.68269 superhelical 0.08744 global twist 370.05204 global supercoiling 0.10607
+frame 573 time 573.0 unbinding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical -0.04260 global twist 370.05204 global supercoiling 0.10517
+frame 578 time 578.0 binding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical 0.21368 global twist 370.05204 global supercoiling 0.10428
+frame 619 time 619.0 unbinding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical 0.02761 global twist 370.05204 global supercoiling 0.10517
+frame 635 time 635.0 binding_event at gene mKalama1 enzyme RNAP with twist -39.91104 superhelical -0.05041 global twist 370.05204 global supercoiling 0.10428
+frame 662 time 662.0 unbinding_event at gene mKalama1 enzyme RNAP with twist -39.91104 superhelical 0.44675 global twist 370.05204 global supercoiling 0.10517
+frame 825 time 825.0 binding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical 0.21368 global twist 370.05204 global supercoiling 0.10428
+frame 846 time 846.0 binding_event at gene tetA enzyme RNAP with twist 121.40540 superhelical 0.09415 global twist 370.05204 global supercoiling 0.10517
+frame 854 time 854.0 binding_event at gene tetA enzyme RNAP with twist 58.48517 superhelical 0.05537 global twist 370.05204 global supercoiling 0.10607
+frame 866 time 866.0 unbinding_event at gene tetA enzyme RNAP with twist 434.45020 superhelical 0.09556 global twist 370.05204 global supercoiling 0.10699
+frame 877 time 877.0 binding_event at gene tetA enzyme RNAP with twist -31.11341 superhelical -0.02347 global twist 370.05204 global supercoiling 0.10607
+frame 887 time 887.0 unbinding_event at gene tetA enzyme RNAP with twist 516.86799 superhelical 0.05640 global twist 370.05204 global supercoiling 0.10699
+frame 895 time 895.0 unbinding_event at gene tetA enzyme RNAP with twist 536.21292 superhelical -0.02382 global twist 370.05204 global supercoiling 0.10607
+frame 918 time 918.0 unbinding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical -0.10353 global twist 370.05204 global supercoiling 0.10517
+frame 974 time 974.0 binding_event at gene tetA enzyme RNAP with twist 446.26028 superhelical 0.21368 global twist 370.05204 global supercoiling 0.10428
+frame 990 time 990.0 binding_event at gene mKalama1 enzyme RNAP with twist -39.91104 superhelical -0.05041 global twist 370.05204 global supercoiling 0.10517
+frame 996 time 996.0 binding_event at gene mKalama1 enzyme RNAP with twist -27.75623 superhelical -0.12174 global twist 370.05204 global supercoiling 0.10607

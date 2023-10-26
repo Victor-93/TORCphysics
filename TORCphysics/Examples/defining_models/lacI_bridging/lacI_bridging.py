@@ -15,7 +15,7 @@ class LacIPoissonBridging(em.EffectModel):
         super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
 
         self.k_on = 0.02  # Rate at which bridge forms
-        self.k_off = 0.002  # Rate at which bridge separates
+        self.k_off = 0.001  # Rate at which bridge separates
         self.state = 'OFF'  # State of the bridge. OFF = No Bridge, ON = Bridge
         self.bridge = False  # True if bridge is formed
         self.bound_with = None  # This is the enzyme that the bridge is bound with
@@ -207,10 +207,10 @@ sites_filename = 'sites.csv'
 enzymes_filename = 'enzymes.csv'
 environment_filename = 'environment.csv'
 output_prefix = ''
-frames = 200
+frames = 1000
 series = True
 continuation = False
-dt = 3
+dt = 1.
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation, dt)
 my_circuit.environmental_list[3].effect_model = LacIPoissonBridging()

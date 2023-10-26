@@ -196,6 +196,7 @@ def plot_signal_profiles(my_circuit, sites_df, axs=None, ignore=None, colors=Non
     else:
         signals, names = an.build_signal_by_type(sites_df, site_type)
     time = np.arange(0, my_circuit.dt * len(signals[0]), my_circuit.dt)
+    y_0s = time*0.0
     for i, signal in enumerate(signals):
         name = names[i]
         if ignore is not None:
@@ -203,6 +204,7 @@ def plot_signal_profiles(my_circuit, sites_df, axs=None, ignore=None, colors=Non
                 continue
         if colors is not None:
             axs.plot(time, signal, color=colors[name], label=names[i], alpha=0.5, **kwargs)
+            axs.fill_between(time, signal, y_0s, color=colors[name], alpha=0.5, **kwargs)
         else:
             axs.plot(time, signal, label=names[i], alpha=0.5, **kwargs)
     if labels:
