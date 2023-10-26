@@ -131,7 +131,7 @@ class PoissonBinding(BindingModel):
 
         self.oparams = {'k_on': self.k_on}  # Just in case
 
-#    def binding_probability(self, on_rate, dt) -> float:
+    #    def binding_probability(self, on_rate, dt) -> float:
     # NOTE: Shouldn't on_rate be the same that k_on? It should be a property of the Site on it's own, right?
     def binding_probability(self, environmental, superhelical, dt) -> float:
         """ Method for calculating the probability of binding according a Poisson Process.
@@ -151,6 +151,35 @@ class PoissonBinding(BindingModel):
             A number that indicates the probability of binding in the current timestep.
         """
         return utils.Poisson_process(self.k_on, dt)
+
+
+class MeyerPromoterOpening(BindingModel):
+
+    def __init__(self, filename=None, **oparams):
+
+        super().__init__(filename, **oparams)  # Call the base class constructor
+        if not oparams:
+            if filename is None:
+                self.k_on = params.k_on  # If no filename was given, then it uses default k_on.
+                # Note that the value used also depends on the input site.csv file.
+            else:
+                mydata = pd.read_csv(filename)
+                if 'k_on' in mydata.columns:
+                    #  self.k_on = float(rows['k_on'])
+                    self.k_on = mydata['k_on'][0]
+                else:
+                    raise ValueError('Error, k_on parameter missing in csv file for MeyerPromoterOpening')
+        else:
+            self.k_on = oparams['k_on']
+
+        self.oparams = {'k_on': self.k_on}  # Just in case
+
+    #    def binding_probability(self, on_rate, dt) -> float:
+    # NOTE: Shouldn't on_rate be the same that k_on? It should be a property of the Site on it's own, right?
+    def binding_probability(self, environmental, superhelical, dt) -> float:
+        rate = utils.promoter_curve_Meyer(basal_rate=self.k_on, superhelical=superhelical)
+        probability = utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+        return probability
 
 
 class TopoIRecognition(BindingModel):
@@ -258,7 +287,6 @@ class GyraseRecognition(BindingModel):
      oparams : dict, optional
         A dictionary containing the parameters used for the binding model.
     """
-
 
     def __init__(self, filename=None, **oparams):
         """ The constructor of the GyraseRecognition subclass.
@@ -454,6 +482,8 @@ def assign_binding_model(model_name, oparams_file=None, **oparams):
         my_model = TopoIRecognition(filename=oparams_file, **oparams)
     elif model_name == 'GyraseRecognition':
         my_model = GyraseRecognition(filename=oparams_file, **oparams)
+    elif model_name == 'MeyerPromoterOpening':
+        my_model = MeyerPromoterOpening(filename=oparams_file, **oparams)
     else:
         raise ValueError('Could not recognise binding model ' + model_name)
     return my_model
@@ -462,14 +492,7 @@ def assign_binding_model(model_name, oparams_file=None, **oparams):
 # ----------------------------------------------------------
 
 
-# ----------------------------------------------------------
-# The promoter activation curve according Sam Meyer 2019
-# For this function, we use the minimum rate
-def promoter_curve_Meyer(basal_rate, sigma):
-    u = 1.0 / (1.0 + np.exp((sigma - SM_sigma_t) / SM_epsilon_t))  # the energy required for melting
-    f = np.exp(SM_m * u)  # the activation curve
-    rate = basal_rate * f  # and the rate modulated through the activation curve
-    return rate
+
 
 
 # ----------------------------------------------------------
@@ -555,7 +578,6 @@ def gyrase_binding(gyra, sigma):
     rate = a / b
     return rate
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # HELPFUL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
@@ -564,4 +586,3 @@ def gyrase_binding(gyra, sigma):
 # will bind, etc...
 
 # ----------------------------------------------------------
-

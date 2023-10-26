@@ -111,6 +111,8 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
                     print("Error in adding new enzyme to list of new enzymes")
                     sys.exit()
 
+                # TODO : Check that enzyme has correct models! This do it in a Test! It works for the moment, but
+                #  it'll be wise to include it in the testing
                 # Create enzyme, and note that it is missing twist and the superhelical density.
                 # Those will be added in the circuit module
                 enzyme = Enzyme(e_type=environment.enzyme_type, name=environment.name, site=site, position=position,
