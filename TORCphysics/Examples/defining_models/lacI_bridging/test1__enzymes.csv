@@ -1,6 +1,7 @@
 type,name,site,position,size,effective_size,twist,superhelical,effect_model,effect_oparams,unbinding_model,unbinding_oparams
-EXT,EXT_L,EXT,-1490.0,0.0,0.0,-70.54111129301076,-0.03377740653625241,,,,
-NAP,ori,ori,2000.0,50.0,50.0,-37.8960146148533,-0.056695657581991424,,,,
-lacI,lacI_bridge,lac1,3167.0,10.0,10.0,-25.902365722037977,-0.03271817097171758,LacIPoissonBridging,,PoissonUnBinding,
-lacI,lacI,lac2,4500.0,10.0,10.0,-70.54111129301076,-0.03377740653625241,LacIPoissonBridging,,PoissonUnBinding,
-EXT,EXT_R,EXT,8000.0,0.0,0.0,0.0,-0.3,,,,
+EXT,EXT_L,EXT,-1490.0,0.0,0.0,-29.325412646411188,-0.024813410632558056,,,,
+RNAP,RNAP,tetA,485.0,50.0,32.0,84.94923925199353,0.09572552869719064,RNAPUniform,,RNAPSimpleUnbinding,
+NAP,ori,ori,2000.0,50.0,50.0,-26.20143724447038,-0.03919957624214886,,,,
+lacI,lacI_bridge,lac1,3167.0,10.0,10.0,-29.422389361111783,-0.03716443416186772,LacIPoissonBridging,,LacISimpleUnBinding,
+lacI,lacI_bridge,lac2,4500.0,10.0,10.0,-29.325412646411188,-0.024813410632558056,LacIPoissonBridging,,LacISimpleUnBinding,
+EXT,EXT_R,EXT,6485.0,0.0,0.0,0.0,-0.0,,,,

@@ -7,11 +7,30 @@ from TORCphysics import params
 v0 = params.v0
 w0 = params.w0
 gamma = params.gamma
+# dt     = params.dt
+
+kBT = 310.0 * params.kB_kcalmolK  # The Boltzmann constant multiplied by 310K which is the temperature
+# at which the SIDD code is ran...
+
+# Sam Meyer's PROMOTER CURVE (parameters taken from Houdaigi NAR 2019)
+SM_sigma_t = params.SM_sigma_t
+SM_epsilon_t = params.SM_epsilon_t
+SM_m = params.SM_m
+
+# EFFECTIVE ENERGY PROMOTER CURVE (inspired by Houdaigi NAR 2019)
+EE_alpha = params.EE_alpha
+
+# Topoisomerase activity parameters
+topo_w = params.topo_b_w
+topo_t = params.topo_b_t
+gyra_w = params.gyra_b_w
+gyra_t = params.gyra_b_t
 
 
 # The idea of this module, is to define utility functions, that are used several times by the other main modules.
-
+# TODO: You need to test this!
 def get_enzyme_before_position(position, enzyme_list):
+#    enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= position][-1]
     enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= position][-1]
     return enzyme_before
 
@@ -213,6 +232,16 @@ def Poisson_process(rate, dt):
     rdt = rate * dt  # it is what is in the exponent (is that how you call it?)
     probability = rdt * np.exp(-rdt)
     return probability
+
+
+# ----------------------------------------------------------
+# The promoter activation curve according Sam Meyer 2019
+# For this function, we use the minimum rate
+def promoter_curve_Meyer(basal_rate, superhelical):
+    u = 1.0 / (1.0 + np.exp((superhelical - SM_sigma_t) / SM_epsilon_t))  # the energy required for melting
+    f = np.exp(SM_m * u)  # the activation curve
+    rate = basal_rate * f  # and the rate modulated through the activation curve
+    return rate
 
 
 def read_csv_to_dict(filename):

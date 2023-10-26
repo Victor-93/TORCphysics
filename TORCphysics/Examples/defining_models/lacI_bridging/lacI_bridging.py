@@ -1,5 +1,6 @@
-from TORCphysics import Circuit, Site, Environment, SiteFactory, utils
+from TORCphysics import Circuit, utils
 from TORCphysics import effect_model as em
+from TORCphysics import unbinding_model as ubm
 import numpy as np
 import random
 import sys
@@ -14,11 +15,11 @@ class LacIPoissonBridging(em.EffectModel):
         super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
 
         self.k_on = 0.02  # Rate at which bridge forms
-        self.k_off = 0.008  # Rate at which bridge separates
+        self.k_off = 0.002  # Rate at which bridge separates
         self.state = 'OFF'  # State of the bridge. OFF = No Bridge, ON = Bridge
         self.bridge = False  # True if bridge is formed
         self.bound_with = None  # This is the enzyme that the bridge is bound with
-        self.k_cat = 0.2  # Percentage of twist injected (when not bridged)
+        self.k_cat = 0.01  # Percentage of twist injected (when not bridged)
 
         # self.oparams = {'velocity': self.velocity, 'gamma': self.gamma}  # Just in case
 
@@ -117,7 +118,7 @@ class LacIPoissonBridging(em.EffectModel):
             random_enzyme.effect_model.bound_width = z
             random_enzyme.effect_model.bridge = True
             random_enzyme.effect_model.state = 'ON'
-#            random_enzyme.name = random_enzyme.name+'_bridge'
+            #            random_enzyme.name = random_enzyme.name+'_bridge'
             random_enzyme.name = 'lacI_bridge'
 
         return do_bridge
@@ -151,18 +152,22 @@ class LacIPoissonBridging(em.EffectModel):
             self.state = 'OFF'
             z.name = 'lacI'
 
-
         return undo_bridge
 
     def leak_twist(self, z, z_list, dt):
 
         # get enzyme on the left of z
-        z_left = utils.get_enzyme_before_position(position=z.position, enzyme_list=z_list)
+        # z_left = utils.get_enzyme_before_position(position=z.position, enzyme_list=z_list)
+        # For some reason it fails.... and I have to do the -d. I'll have to check this in the future.
+        # If I don't do this, it gives me the incorrect enzyme (it actually gives me the same...)
+        d = 0.002
+        z_left = [enzyme for enzyme in z_list if enzyme.position <= z.position - d][-1]
+
         # If the superhelical density on the left is higher than the one on the right, then share a bit...
-        if abs(z_left.superhelical) > abs(z_left.superhelical):
+        if abs(z_left.superhelical) > abs(z.superhelical):
             twist_left = -z_left.twist * self.k_cat * dt
             twist_right = -twist_left
-        elif abs(z_left.superhelical) < abs(z_left.superhelical):
+        elif abs(z_left.superhelical) < abs(z.superhelical):
             twist_right = -z.twist * self.k_cat * dt
             twist_left = -twist_right
         # Or if something else happens, don't do anything
@@ -171,6 +176,24 @@ class LacIPoissonBridging(em.EffectModel):
             twist_left = 0.0
 
         return twist_left, twist_right
+
+
+class LacISimpleUnBinding(ubm.UnBindingModel):
+
+    def __init__(self, filename=None, **oparams):
+        self.k_off = 0.001  # 0.01  # Rate at which bridge separates
+        self.oparams = {'k_off': self.k_off}  # Just in case
+
+    #    def unbinding_probability(self, off_rate, dt) -> float:
+    def unbinding_probability(self, enzyme, dt) -> float:
+
+        # If the bridge is formed, then it can't unbind
+        if enzyme.effect_model.bridge:
+            probability = 0.0
+        # If the bridge isn't formed, then it can unbind
+        else:
+            probability = utils.Poisson_process(self.k_off, dt)
+        return probability
 
 
 # TODO: El problema de que a veces se queda roja una y la otra verde, puede ser porque a veces una se unbindea cuando
@@ -184,13 +207,14 @@ sites_filename = 'sites.csv'
 enzymes_filename = 'enzymes.csv'
 environment_filename = 'environment.csv'
 output_prefix = ''
-frames = 1000
+frames = 200
 series = True
 continuation = False
-dt = 1
+dt = 3
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation, dt)
 my_circuit.environmental_list[3].effect_model = LacIPoissonBridging()
+my_circuit.environmental_list[3].unbinding_model = LacISimpleUnBinding()
 # my_circuit.enzyme_list[1].effect_model = LacIPoissonBridging()
 my_circuit.run()
 my_circuit.print_general_information()
