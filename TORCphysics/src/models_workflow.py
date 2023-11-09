@@ -96,20 +96,11 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
                 # We still need to figure out the position, twist and superhelical, but these last two will be sorted in
                 # the circuit module
 
-                # TODO: Make sure that this applies to any sites and enzymes binding.
-                #  It means that enzymes always bind on the behind the start site. This makes sense for genes.
-                #  I think this is correct! Draw it, think about it, and apply it everywhere.
-                #  And think about how TF would work, or repressors, they should block the sites, but TF should
-                #  increase the binding probability.
-                # TODO: Think about this,
-                # position:
-                if site.direction > 0:
-                    position = site.start - environment.size
-                elif site.direction <= 0:
-                    position = site.start
-                else:
-                    print("Error in adding new enzyme to list of new enzymes")
-                    sys.exit()
+                # TODO: IDEA. Maybe when including TFs, we can include the TF-RNAP type of notation, if they stay
+                #  together. If not, then we do need to make the Binding Workflow be able to expulse the TF.
+
+                # The position of binding is determined by a function.
+                position = utils.get_enzyme_to_bind_position(site=site, environmental=environment)
 
                 # TODO : Check that enzyme has correct models! This do it in a Test! It works for the moment, but
                 #  it'll be wise to include it in the testing

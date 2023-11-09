@@ -1,3 +1,1 @@
-type,name,site_type,concentration,k_on,k_off,k_cat,size,oparams
-topo,topoI,DNA,0.25,0.005,0.5,7.5,120,none
-topo,gyrase,DNA,0.25,0.005,0.5,-12.5,120,none
+type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
