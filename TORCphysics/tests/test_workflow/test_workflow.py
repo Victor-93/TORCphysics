@@ -18,8 +18,8 @@ class TestWorkflows(TestCase):
         s0 = Site(site_type='EXT', name='EXT', start=1, end=5000, k_on=0.0)
         s1 = Site(site_type='gene1', name='gene1_1', start=100, end=500, k_on=0.0)
         s2 = Site(site_type='gene1', name='gene1_2', start=1100, end=1500, k_on=0.0)
-        s3 = Site(site_type='gene2', name='gene2_1', start=2100, end=2500, k_on=0.0)
-        s4 = Site(site_type='gene2', name='gene2_2', start=3100, end=3500, k_on=0.0)
+        s3 = Site(site_type='gene2', name='gene2_1', start=2500, end=2100, k_on=0.0)
+        s4 = Site(site_type='gene2', name='gene2_2', start=3500, end=3100, k_on=0.0)
 
         # And let's creat enzymes that act as boundaries
         extra_left = Enzyme(e_type='EXT', name='EXT_L', site=s0,
@@ -125,12 +125,21 @@ class TestWorkflows(TestCase):
         s4.binding_model = bm.PoissonBinding(**{'k_on': 1})
         site_list = [s0, s1, s2, s3, s4]
         e1 = Environment(e_type='RNAP', name='test1', site_list=site_list, concentration=10.0,
-                         size=60, effective_size=30, site_type='gene1')
+                         size=60, effective_size=30, site_type='gene1',
+                         effect_model=em.RNAPUniform(), unbinding_model=ubm.PoissonUnBinding())
         e2 = Environment(e_type='RNAP', name='test2', site_list=site_list, concentration=10.0,
-                         size=60, effective_size=30, site_type='gene2')
+                         size=60, effective_size=30, site_type='gene2',
+                         effect_model=em.TopoIUniform(), unbinding_model=ubm.PoissonUnBinding())
         environment_list = [e1, e2]
         new_enzymes = mw.binding_workflow(enzyme_list=enzyme_list, environmental_list=environment_list, dt=dt, rng=rng)
         self.assertGreater(len(new_enzymes), 0)  # With the rng, 2 enzymes bind. So don't change the seed!
+        # Test correct position and test correct model
+        self.assertEqual(new_enzymes[0].effect_model_name, 'RNAPUniform')
+        self.assertEqual(new_enzymes[1].effect_model_name, 'RNAPUniform')
+        self.assertEqual(new_enzymes[0].unbinding_model_name, 'PoissonUnBinding')
+        self.assertEqual(new_enzymes[1].unbinding_model_name, 'PoissonUnBinding')
+        self.assertEqual(new_enzymes[0].position, s2.start-e1.effective_size)
+        self.assertEqual(new_enzymes[1].position, s4.start)
 
         # ---------------------------------------------------------------
         # Test 6. Environment and sites with k_on=1, but sites occupied with enzymes, returns empty list.
@@ -149,10 +158,11 @@ class TestWorkflows(TestCase):
         enzyme_list = [extra_left, en1, en2, en3, en4, extra_right]
 
         new_enzymes = mw.binding_workflow(enzyme_list=enzyme_list, environmental_list=environment_list, dt=dt, rng=rng)
-        self.assertEqual(len(new_enzymes), 0)
-
-        # TODO: We need to test every part of the code.
-        #  7.- Also check how enzymes are added.
+        self.assertEqual(len(new_enzymes), 1)
+        # Test correct position and test correct model
+        self.assertEqual(new_enzymes[0].effect_model_name, 'TopoIUniform')
+        self.assertEqual(new_enzymes[0].unbinding_model_name, 'PoissonUnBinding')
+        self.assertEqual(new_enzymes[0].position, s4.start)
 
     def test_effect_workflow(self):
         # Test cases:

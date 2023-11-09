@@ -1,1 +1,1 @@
-type,name,site,position,direction,size,k_cat,k_off,twist,superhelical,oparams
+type,name,site,position,size,effective_size,twist,superhelical,effect_model,effect_oparams,unbinding_model,unbinding_oparams

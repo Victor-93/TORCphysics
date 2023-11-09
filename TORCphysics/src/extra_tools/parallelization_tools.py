@@ -16,10 +16,8 @@ def run_single_simulation(item):
     series = item['series']
     continuation = item['continuation']
     dt = item['dt']
-    tm = item['tm']
-    mm = item['mm']
     my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                         output_prefix, frames, series, continuation, dt, tm, mm)
+                         output_prefix, frames, series, continuation, dt)
     my_circuit.name = my_circuit.name + '_' + str(simulation_number)
     my_circuit.sites_dict_list[0]['name'] = my_circuit.name
     my_circuit.log.name = my_circuit.name
@@ -29,7 +27,7 @@ def run_single_simulation(item):
 
 # Helps to set the items
 def set_item(circuit_filename, sites_filename, enzymes_filename, environment_filename, output_prefix, frames, series,
-             continuation, dt, tm, mm, simulation_number):
+             continuation, dt, simulation_number):
     item = {
         'circuit_filename': circuit_filename,
         'sites_filename': sites_filename,
@@ -40,8 +38,6 @@ def set_item(circuit_filename, sites_filename, enzymes_filename, environment_fil
         'series': series,
         'continuation': continuation,
         'dt': dt,
-        'tm': tm,
-        'mm': mm,
         'simulation_number': simulation_number
     }
     return item
@@ -50,13 +46,13 @@ def set_item(circuit_filename, sites_filename, enzymes_filename, environment_fil
 # This next functions are used for calibrating the stochastic topoisomerase model
 # ----------------------------------------------------------------------------------------------------------------------
 def set_items_topo_calibration(circuit_filename, sites_filename, enzymes_filename, environment_filename, output_prefix,
-                               frames, series, continuation, dt, tm, mm, n_simulations, initial_supercoiling,
+                               frames, series, continuation, dt, n_simulations, initial_supercoiling,
                                list_names, list_k_cat, list_k_on, list_k_off, list_width, list_threshold,
                                list_concentration, DNA_concentration):
     items = []
     for simulation_number in range(n_simulations):
         item = set_item_topo_calibration(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                                         output_prefix, frames, series, continuation, dt, tm, mm, simulation_number,
+                                         output_prefix, frames, series, continuation, dt, simulation_number,
                                          initial_supercoiling, list_names, list_k_cat, list_k_on, list_k_off,
                                          list_width, list_threshold, list_concentration, DNA_concentration)
         items.append(item)
@@ -67,7 +63,7 @@ def set_items_topo_calibration(circuit_filename, sites_filename, enzymes_filenam
 # Because we want to test different conditions for different type of enzymes, list_names contains a list of enzyme
 # names that we want to vary its parameters. According to these names, the parameters on the list_* will be assigned.
 def set_item_topo_calibration(circuit_filename, sites_filename, enzymes_filename, environment_filename, output_prefix,
-                              frames, series, continuation, dt, tm, mm, simulation_number, initial_supercoiling,
+                              frames, series, continuation, dt, simulation_number, initial_supercoiling,
                               list_names, list_k_cat, list_k_on, list_k_off, list_width, list_threshold,
                               list_concentration, DNA_concentration):
     item = {
@@ -80,8 +76,6 @@ def set_item_topo_calibration(circuit_filename, sites_filename, enzymes_filename
         'series': series,
         'continuation': continuation,
         'dt': dt,
-        'tm': tm,
-        'mm': mm,
         'simulation_number': simulation_number,
         'initial_supercoiling': initial_supercoiling,
         'list_names': list_names,
@@ -114,8 +108,6 @@ def run_single_simulation_topo_calibration(item):
     series = item['series']
     continuation = item['continuation']
     dt = item['dt']
-    tm = item['tm']
-    mm = item['mm']
     initial_supercoiling = item['initial_supercoiling']
     list_names = item['list_names']
     list_k_cat = item['list_k_cat']
@@ -126,7 +118,8 @@ def run_single_simulation_topo_calibration(item):
     list_concentration = item['list_concentration']
     DNA_concentration = item['DNA_concentration']
     my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                         output_prefix, frames, series, continuation, dt, tm, mm)
+                         output_prefix, frames, series, continuation, dt)
+
     my_circuit.name = my_circuit.name + '_' + str(simulation_number)
     my_circuit.sites_dict_list[0]['name'] = my_circuit.name
     my_circuit.log.name = my_circuit.name

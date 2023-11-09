@@ -9,9 +9,7 @@ from TORCphysics import binding_model as bm
 from TORCphysics import models_workflow as mw
 
 
-# TODO: Check how you determine enzymes bind, do they bind where with the left end on the site.start?
 # TODO: Check which inputs are optional (this is not urgent right now).
-# TODO: Remove topoisomerase_model and mechanistic_model
 class Circuit:
 
     def __init__(self, circuit_filename, sites_filename, enzymes_filename, environment_filename,
@@ -206,22 +204,26 @@ class Circuit:
         for frame in range(1, self.frames + 1):
             # BINDING
             # --------------------------------------------------------------
-            new_enzyme_list = bm.binding_model(self.enzyme_list, self.environmental_list, self.dt,
-                                               self.rng)
-            self.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
+            new_enzyme_list = mw.binding_workflow(self.enzyme_list, self.environmental_list, self.dt, self.rng)
+
+            self.add_new_enzymes(new_enzyme_list)
 
             # EFFECT
             # --------------------------------------------------------------
-            effects_list = em.effect_model(self.enzyme_list, self.environmental_list, self.dt,
-                                           self.topoisomerase_model, self.mechanical_model)
+            effects_list = mw.effect_workflow(self.enzyme_list, self.environmental_list, self.dt)
             self.apply_effects(effects_list)
+
+            # UPDATE GLOBALS
+            # --------------------------------------------------------------
+            self.update_global_twist()
+            self.update_global_superhelical()
 
             # UNBINDING
             # --------------------------------------------------------------
-            drop_list_index, drop_list_enzyme = bm.unbinding_model(self.enzyme_list, self.dt,
-                                                                   self.rng)
+            drop_list_index, drop_list_enzyme = mw.unbinding_workflow(self.enzyme_list, self.dt, self.rng)
             self.drop_enzymes(drop_list_index)
             self.add_to_environment(drop_list_enzyme)
+
             # UPDATE GLOBALS
             # --------------------------------------------------------------
             self.update_global_twist()
@@ -427,7 +429,7 @@ class Circuit:
         #    def __init__(self, site_type, name, start, end, k_on,
         #                 binding_model_name=None, binding_oparams_file=None,
         #                 binding_model=None, binding_model_oparams=None):
-        print(self.size)
+        # print(self.size)
 
         self.site_list.append(
             Site(site_type='EXT', name='EXT', start=1, end=float(self.size), k_on=0.0))

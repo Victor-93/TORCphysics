@@ -30,7 +30,7 @@ gyra_t = params.gyra_b_t
 # The idea of this module, is to define utility functions, that are used several times by the other main modules.
 # TODO: You need to test this!
 def get_enzyme_before_position(position, enzyme_list):
-#    enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= position][-1]
+    #    enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= position][-1]
     enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= position][-1]
     return enzyme_before
 
@@ -95,6 +95,25 @@ def get_enzyme_to_bind_ranges(site, environmental):
     else:
         raise ValueError('Error, invalid direction in site ' + site.name)
     return a, b
+
+
+# Direction ==1
+# Enzymes that advance to the right (RNAPs with ->>> direction of transcription) load/bind just behind the start site:
+#  ___|RNAP|START|_______ ==== ____|EffectiveSize|START|________, Notice that the actual size (not effective size) might
+#  overlap with the START size, but the actual contact happens just before the start site
+# Direction == 0,-1
+# Enzymes that don't move (do not have direction) or that advance to the left (RNAP with <<<- direction of
+# transcription) load/bind just after the start site:
+# ___|START|RNAP________ === ___|START|EffectiveSize|_____; Notice that the complete size could overlap with the start
+# site, but the contact with the DNA happens just at the start of the site.
+def get_enzyme_to_bind_position(site, environmental):
+    if site.direction == 1:
+        position = site.start - environmental.effective_size
+    elif site.direction == 0 or site.direction == -1:
+        position = site.start
+    else:
+        raise ValueError('Error, invalid direction in site ' + site.name)
+    return position
 
 
 def new_enzyme_start_position(site, environmental):
