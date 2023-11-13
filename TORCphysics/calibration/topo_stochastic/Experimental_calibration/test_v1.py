@@ -1,12 +1,10 @@
-import sys
-
 import matplotlib.pyplot as plt
 import numpy as np
 from hyperopt import tpe, hp, fmin
 import multiprocessing
 from TORCphysics import parallelization_tools as pt
-# import pickle
 import pandas as pd
+import topo_calibration_tools as tct
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -33,9 +31,15 @@ frames = len(time)
 
 # For the simulation
 circuit_filename = 'circuit_test.csv'
-sites_filename = 'sites_test.csv'
-enzymes_filename = 'enzymes_test.csv'
+sites_filename = None  # 'sites_test.csv'
+enzymes_filename = None  # 'enzymes_test.csv'
 environment_filename = 'environment_test.csv'
+# Antiguo environment_test:
+# type,name,site_type,concentration,k_on,k_off,k_cat,size,oparams
+# topo,topoI,DNA,0.25,0.005,0.5,7.5,120,none
+# topo,gyrase,DNA,0.25,0.005,0.5,-12.5,120,none
+
+
 tm = 'stochastic'
 output_prefix = 'test0'
 series = True
@@ -43,8 +47,8 @@ continuation = False
 mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 10
-tests = 20  # 00  # number of tests for parametrization
+n_simulations = 1
+tests = 2  # 00  # number of tests for parametrization
 
 my_vars = ['k_cat', 'k_on', 'k_off', 'width', 'threshold']
 
@@ -93,48 +97,6 @@ colors = ['blue', 'red', 'green', 'black', 'grey', 'yellow', 'cyan', 'purple', '
 fig, axs = plt.subplots(2, 2, figsize=(2 * width, 2 * height), tight_layout=True)
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Functions
-# ----------------------------------------------------------------------------------------------------------------------
-def Michael_Menten_equation(vmax, KM, S):
-    return vmax * S / (KM + S)
-
-
-def integrate_MM(vmax, KM, substrate0, product0, frames, dt):
-    substrate_array = np.zeros(frames)
-    product_array = np.zeros(frames)
-    substrate_array[0] = substrate0
-    product_array[0] = product0
-
-    substrate = substrate0
-    product = product0
-
-    for k in range(1, frames):
-        v = Michael_Menten_equation(vmax=vmax, KM=KM, S=substrate)
-        product = product + v * dt
-        substrate = substrate - v * dt
-        substrate_array[k] = substrate
-        product_array[k] = product
-    return substrate_array, product_array
-
-
-def rescale_product_to_sigma(product, sigma_min, sigma_max):
-    #    current_min
-    #    frames = len(product)
-    #    sigma = np.zeros(frames)
-    #    sigma = product-np.min(product)
-    #    sigma = sigma/np.max(sigma) # Normalized
-    #    d = sigma_f - sigma_i
-    #    sigma = (sigma - sigma_i)/1#abs(sigma_f-sigma_i)
-
-    current_min = np.min(product)
-    current_max = np.max(product)
-    range_ = current_max - current_min
-    desired_range = sigma_max - sigma_min
-    sigma = ((product - current_min) / range_) * desired_range + sigma_min
-    return sigma
-
-
 # Optimization functions
 # ----------------------------------------------------------------------------------------------------------------------
 # This one runs the objective function in parallel. It returns the objective function as well as the mean superhelical
@@ -147,10 +109,16 @@ def run_objective_function(list_names, list_k_cat, list_k_on, list_k_off, list_w
     print(list_names, 'initial_sigma', initial_sigma)
     for s, substrate0 in enumerate(initial_substrates):
         exp_superhelical = exp_superhelicals[s]
+        global_dict = {'circuit_filename': circuit_filename, 'sites_filename': sites_filename,
+                       'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
+                       'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
+                       'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': initial_sigma,
+                       'DNA_concentration': substrate0}
+
         # Create items
         items = pt.set_items_topo_calibration(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                                               output_prefix,
-                                              frames, series, continuation, dt, tm, mm, n_simulations,
+                                              frames, series, continuation, dt, n_simulations,
                                               initial_sigma,
                                               list_names, list_k_cat, list_k_on, list_k_off, list_width, list_threshold,
                                               list_concentration, substrate0)
@@ -169,6 +137,47 @@ def run_objective_function(list_names, list_k_cat, list_k_on, list_k_off, list_w
 
 
 def topoI_objective_function(params):
+    #   * So what we have is a dictionary with many entries.
+    #   'initial_conditions': dict with global parameters, including files (environment, enzymes, sites, etc...)
+    #   * We also have 'variations': list with dictionaries. Every entry is regarding a molecule/model to calibrate.
+    #   * In general, the idea is that an external costumable function builds this type of entry. So we have.
+    #   Item = {'initial_conditions': dict{superhelical:-0.04, 'circuit_filename': csv, 'dt':0.1, etc..}.
+    #           'variations': list[ dict{'name': topoI, 'type': environment, 'binding_model': TopoI,
+    #           'effect_model': None, etc...}
+
+    # We need to prepare the inputs.
+    name = 'topoI'
+    mol_type = 'environmental'
+    binding_model_name = 'TopoIRecognition'
+    binding_oparams = {'k_on': params['k_on'], 'width': params['width'], 'threshold': params['threshold']}
+    effect_model_name = 'TopoIUniform'
+    effect_oparams = {'k_cat': params['k_cat']}
+    unbinding_model_name = 'PoissonUnBinding'
+    unbinding_oparams = {'k_off': params['k_off']}
+    concentration = 0.2
+
+    topo_variation = {'name': name, 'mol_type': mol_type,
+                      'binding_model_name': binding_model_name, 'binding_oparams': binding_oparams,
+                      'effect_model_name': effect_model_name, 'effect_oparams': effect_oparams,
+                      'unbinding_model_name': unbinding_model_name, 'unbinding_oparams': unbinding_oparams,
+                      'concentration': concentration}
+    # TODO: My idea here was to brindg the objective function here? Or maybe just find a way to fill th econcentrations.
+    #  I think it doesn't make a difference if I bring the objective function here, it might be easier that way.
+
+    # TODO: IDEA. Notice that, I could also try to define models here, in this script... If I want to define new
+    #  models, I could just do it here... Load it once, and then just have the same model for every simulation test.
+    #  Or maybe it doesn't make that much difference. You know what, I'll leave it just as it is now.
+    # Let's dp the variations list of dicts
+    variations_list = []
+    # Let's start with the globals
+
+    #    circuit_filename, sites_filename, enzymes_filename, environment_filename,
+    #    output_prefix,
+    ##    frames, series, continuation, dt, n_simulations,
+    #    initial_sigma,
+    #    list_names, list_k_cat, list_k_on, list_k_off, list_width, list_threshold,
+    #    list_concentration, substrate0)
+
     list_names = ['topoI', 'gyrase']
 
     list_k_cat, list_k_on, list_k_off, list_width, list_threshold, list_concentration = \
@@ -233,20 +242,34 @@ for count, initial_substrate in enumerate(initial_substrates):
     # Substrates and products
     # ----------------------------------
     ax = axs[0, 0]
-    substrate, product = integrate_MM(vmax=v_max, KM=K_M, substrate0=initial_substrate, product0=initial_product,
-                                      frames=frames, dt=dt)
+    substrate, product = tct.integrate_MM(vmax=v_max, KM=K_M, substrate0=initial_substrate, product0=initial_product,
+                                          frames=frames, dt=dt)
     ax.plot(time, product, lw=lw, color=colors[count])
 
     # Sigma deduction
     # ----------------------------------
     ax = axs[1, 0]
-    superhelical = rescale_product_to_sigma(product, initial_sigma, final_sigma)
+    superhelical = tct.rescale_product_to_sigma(product, initial_sigma, final_sigma)
     ax.plot(time, superhelical, lw=lw, color=colors[count])
 
     exp_substrates.append(substrate)
     exp_products.append(product)
     exp_superhelicals.append(superhelical)
 
+# TODO: Here is what you need to fix:
+#  1.- When you do the space thing and call your function, you already have params; so you can give this dictionary
+#   directly to your binding, effect or unbinding model.
+#  2.- So we have to pass those params to the model.oparams.
+#   2.1.- We also need to give some initial conditions to the simulations.
+#   * So what we have is a dictionary with many entries.
+#   'initial_conditions': dict with global parameters, including files (environment, enzymes, sites, etc...)
+#   * We also have 'variations': list with dictionaries. Every entry is regarding a molecule/model to calibrate.
+#   * In general, the idea is that an external costumable function builds this type of entry. So we have.
+#   Item = {'initial_conditions': dict{superhelical:-0.04, 'circuit_filename': csv, 'dt':0.1, etc..}.
+#           'variations': list[ dict{'name': topoI, 'type': environment, 'binding_model': TopoI,
+#           'effect_model': None, etc...}
+#           }
+#  3.- We pass it to a function in parallelization that sets up all of this.
 # Optimization
 # ------------------
 space = {
@@ -307,14 +330,14 @@ for count, initial_substrate in enumerate(initial_substrates):
     # Substrates and products
     # ----------------------------------
     ax = axs[0, 1]
-    substrate, product = integrate_MM(vmax=v_max, KM=K_M, substrate0=initial_substrate, product0=initial_product,
-                                      frames=frames, dt=dt)
+    substrate, product = tct.integrate_MM(vmax=v_max, KM=K_M, substrate0=initial_substrate, product0=initial_product,
+                                          frames=frames, dt=dt)
     ax.plot(time, substrate, lw=lw, color=colors[count])
 
     # Sigma deduction
     # ----------------------------------
     ax = axs[1, 1]
-    superhelical = rescale_product_to_sigma(substrate, initial_sigma, final_sigma)
+    superhelical = tct.rescale_product_to_sigma(substrate, initial_sigma, final_sigma)
     ax.plot(time, superhelical, lw=lw, color=colors[count])
 
     exp_substrates.append(substrate)
@@ -351,7 +374,7 @@ list_names = ['gyrase', 'topoI']
 list_k_cat, list_k_on, list_k_off, list_width, list_threshold, list_concentration = set_params_lists(gyrase_best)
 # Let's run experiments for the substrate concentrations
 my_objective, simulation_superhelicals2 = run_objective_function(list_names, list_k_cat, list_k_on, list_k_off,
-                                                                list_width, list_threshold, list_concentration)
+                                                                 list_width, list_threshold, list_concentration)
 # And plot
 ax = axs[1, 1]
 for count, initial_substrate in enumerate(initial_substrates):
