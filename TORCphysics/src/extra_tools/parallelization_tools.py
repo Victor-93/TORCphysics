@@ -1,5 +1,7 @@
 from TORCphysics import Circuit
-import multiprocessing
+from TORCphysics import binding_model as bm
+from TORCphysics import effect_model as em
+from TORCphysics import unbinding_model as ubm
 
 
 # TODO: Maybe later it can accept specific conditions
@@ -91,7 +93,7 @@ def set_item_topo_calibration(circuit_filename, sites_filename, enzymes_filename
 
 
 # This function runs another a case/system/circuit, given a set of conditions 'items'.
-#def run_simulations_parallel(items, my_funciton):
+# def run_simulations_parallel(items, my_funciton):
 #    # Create a multiprocessing pool
 #    pool = multiprocessing.Pool()
 #    pool_results = pool.map(my_function, items)
@@ -123,7 +125,7 @@ def run_single_simulation_topo_calibration(item):
     my_circuit.name = my_circuit.name + '_' + str(simulation_number)
     my_circuit.sites_dict_list[0]['name'] = my_circuit.name
     my_circuit.log.name = my_circuit.name
-#    my_circuit.superhelical = initial_supercoiling
+    #    my_circuit.superhelical = initial_supercoiling
     for enzyme in my_circuit.enzyme_list:
         enzyme.superhelical = initial_supercoiling
     my_circuit.update_twist()
@@ -143,5 +145,88 @@ def run_single_simulation_topo_calibration(item):
                 environmental.k_cat = list_k_cat[count]
                 environmental.oparams = {'width': list_width[count], 'threshold': list_threshold[count]}
 
+    supercoiling = my_circuit.run_return_global_supercoiling()
+    return supercoiling
+
+
+def single_simulation_calibration_w_supercoiling(item):
+    # Item = {'global_conditions': global_dict, 'variations': variations_list}
+
+    # Retrieve
+    global_dict = item['global_conditions']
+    variations_list = item['variations']
+
+    my_circuit = Circuit(circuit_filename=global_dict['circuit_filename'], sites_filename=global_dict['sites_filename'],
+                         enzymes_filename=global_dict['enzymes_filename'],
+                         environment_filename=global_dict['environment_filename'],
+                         output_prefix=global_dict['output_prefix'], frames=global_dict['frames'],
+                         series=global_dict['series'], continuation=global_dict['continuation'],
+                         dt=global_dict['dt'])
+
+    my_circuit.name = my_circuit.name + '_' + str(global_dict['n_simulations'])
+    my_circuit.sites_dict_list[0]['name'] = my_circuit.name
+    my_circuit.log.name = my_circuit.name
+
+    # Let's fix first initial supercoiling density and update all relevant parameters
+    for enzyme in my_circuit.enzyme_list:
+        enzyme.superhelical = global_dict['initial_sigma']
+    my_circuit.update_twist()
+    my_circuit.update_supercoiling()
+    my_circuit.update_global_twist()
+    my_circuit.update_global_superhelical()
+
+    # And let's apply some variations.
+    # Filter object to apply variations.
+    # -----------------------
+    for variation in variations_list:
+        # We need to filter and find our my_object, which is the name of the molecule/site that we will apply the
+        # variations
+        if variation['object_type'] == 'enzyme':
+            for enzyme in my_circuit.enzyme_list:
+                if enzyme.name == variation['name']:
+                    my_object = enzyme
+        elif variation['object_type'] == 'environment' or variation['object_type'] == 'environmental':
+            for environmental in my_circuit.environmental_list:
+                if environmental.name == variation['name']:
+                    my_object = environmental
+                    # And let's modify concentration
+                    my_object.concentration = variation['concentration'] * global_dict['DNA_concentration']
+                    # Here, we are multiplying
+                    # [E] * [S], so the rate would be something like k = k_on * [E] * [S] * f(sigma),
+                    # where [E] is the enzyme concentration, [S] the substrate concentration which in this case is the
+                    # DNA, and f(sigma) the recognition curve.
+
+        elif variation['object_type'] == 'site':
+            for site in my_circuit.site_list:
+                if site.name == variation['name']:
+                    my_object = site
+        else:
+            raise ValueError('Error, object_type not recognised')
+
+        # Apply model variations
+        # Models
+        # -----------------------
+        # Binding Model
+        if variation['binding_model_name'] is not None:
+            my_object.binding_model = bm.assign_binding_model(model_name=variation['binding_model_name'],
+                                                              **variation['binding_oparams'])
+        # Effect Model
+        if variation['effect_model_name'] is not None:
+            my_object.effect_model = em.assign_effect_model(model_name=variation['effect_model_name'],
+                                                            **variation['effect_oparams'])
+        # Unbinding Model
+        if variation['unbinding_model_name'] is not None:
+            my_object.unbinding_model = ubm.assign_unbinding_model(model_name=variation['unbinding_model_name'],
+                                                                   **variation['unbinding_oparams'])
+
+    # TODO: For some reason, the models are not passing through
+    # And in case our variations are for environmentals that recognise and bind bare DNA,
+    # let's define the DNA bare binding sites
+    # Define bare DNA binding sites for bare DNA binding enzymes
+    my_circuit.define_bare_DNA_binding_sites()
+    # Sort list of enzymes and sites by position/start
+    my_circuit.sort_lists()
+
+    # Finally, run simulation
     supercoiling = my_circuit.run_return_global_supercoiling()
     return supercoiling
