@@ -18,7 +18,7 @@ initial_time = 0
 final_time = 600
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'calibration_1'
+file_out = 'calibration'
 
 # For the simulation
 circuit_filename = 'circuit.csv'
@@ -38,9 +38,7 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 2
-tests = 2  # 00  # number of tests for parametrization
-
+n_simulations = 120
 # Molecule/model to calibrate/test
 # -----------------------------------
 # Topo I
@@ -52,10 +50,10 @@ topoI_unbinding_model_name = 'PoissonUnBinding'
 topoI_calibration_file = 'topoI_calibration.csv'
 
 # Gyrase
-gyrase_name = 'topoI'
+gyrase_name = 'gyrase'
 gyrase_type = 'environmental'
-gyrase_binding_model_name = 'TopoIRecognition'
-gyrase_effect_model_name = 'TopoIUniform'
+gyrase_binding_model_name = 'GyraseRecognition'
+gyrase_effect_model_name = 'GyraseUniform'
 gyrase_unbinding_model_name = 'PoissonUnBinding'
 gyrase_calibration_file = 'gyrase_calibration.csv'
 
@@ -90,11 +88,12 @@ def topoI_objective_function(params):
     name = topoI_name
     object_type = topoI_type
     binding_model_name = topoI_binding_model_name
-    binding_oparams = {'k_on': params['k_on'], 'width': params['width'], 'threshold': params['threshold']}
+    binding_oparams = {'k_on': float(params['k_on'][0]), 'width': float(params['width'][0]),
+                       'threshold': float(params['threshold'][0])}
     effect_model_name = topoI_effect_model_name
-    effect_oparams = {'k_cat': params['k_cat']}
+    effect_oparams = {'k_cat': float(params['k_cat'][0])}
     unbinding_model_name = topoI_unbinding_model_name
-    unbinding_oparams = {'k_off': params['k_off']}
+    unbinding_oparams = {'k_off': float(params['k_off'][0])}
     concentration = topoI_concentration
 
     topo_variation = {'name': name, 'object_type': object_type,
@@ -127,11 +126,12 @@ def gyrase_objective_function(params):
     name = gyrase_name
     object_type = gyrase_type
     binding_model_name = gyrase_binding_model_name
-    binding_oparams = {'k_on': params['k_on'], 'width': params['width'], 'threshold': params['threshold']}
+    binding_oparams = {'k_on': float(params['k_on'][0]), 'width': float(params['width'][0]),
+                       'threshold': float(params['threshold'][0])}
     effect_model_name = gyrase_effect_model_name
-    effect_oparams = {'k_cat': params['k_cat']}
+    effect_oparams = {'k_cat': float(params['k_cat'][0])}
     unbinding_model_name = gyrase_unbinding_model_name
-    unbinding_oparams = {'k_off': params['k_off']}
+    unbinding_oparams = {'k_off': float(params['k_off'][0])}
     concentration = gyrase_concentration
 
     topo_variation = {'name': name, 'object_type': object_type,
@@ -163,7 +163,6 @@ def gyrase_objective_function(params):
 initial_sigma = -.047
 final_sigma = 0.0
 initial_product = 0.0
-initial_substrate = .7
 initial_substrates = [0.35, 0.7, 1.1, 1.8, 2.1]
 enzyme_concentration = topoI_concentration
 K_M = 1.5
@@ -195,30 +194,63 @@ for count, initial_substrate in enumerate(initial_substrates):
 # Plot simulation example for TopoI
 # ---------------------------------------------------------------------------------------------------------------------
 params = pd.read_csv(topoI_calibration_file).to_dict()
-objective, s_superhelicals = topoI_objective_function(params=params)
-name = topoI_name
-object_type = topoI_type
-binding_model_name = topoI_binding_model_name
-binding_oparams = {'k_on': params['k_on'], 'width': params['width'], 'threshold': params['threshold']}
-effect_model_name = topoI_effect_model_name
-effect_oparams = {'k_cat': params['k_cat']}
-unbinding_model_name = topoI_unbinding_model_name
-unbinding_oparams = {'k_off': params['k_off']}
-concentration = topoI_concentration
+objective, simulation_superhelicals = topoI_objective_function(params=params)
 
-topo_variation = {'name': name, 'object_type': object_type,
-                  'binding_model_name': binding_model_name, 'binding_oparams': binding_oparams,
-                  'effect_model_name': effect_model_name, 'effect_oparams': effect_oparams,
-                  'unbinding_model_name': unbinding_model_name, 'unbinding_oparams': unbinding_oparams,
-                  'concentration': concentration}
-
-objective, s_superhelicals = tct.run_objective_function(global_dict=global_dict,
-                                                                    variations_list=[topo_variation],
-                                                                    initial_substrates=initial_substrates,
-                                                                    exp_superhelicals=exp_superhelicals,
-                                                                    n_simulations=n_simulations)
 # And plot
 ax = axs[1, 0]
+for count, initial_substrate in enumerate(initial_substrates):
+    superhelical = simulation_superhelicals[count]
+    ax.plot(time, superhelical, '--', lw=lw, color=colors[count])
+
+
+# ==================================================================================================================
+# ==================================================================================================================
+# Build experimental curve for TOPO I
+# ==================================================================================================================
+# ==================================================================================================================
+# Kinetics: SDNA + TopoI -> SDNA-TopoI -> RDNA + TopoI
+# Product = Fluorescent or Relaxed DNA
+# Substrate = Concentration of Supercoiled DNAs
+initial_sigma = -0.02  # Is actually the other way around, but there's an error somewhere but I'm lazy to find it
+final_sigma = 0.0
+initial_product = 4.0
+initial_substrate = .75
+initial_substrates = [0.75, 1.50, 3.6, 5.4, 7.2]
+enzyme_concentration = gyrase_concentration
+K_M = 2.7
+k_cat = .0011
+v_max = k_cat * enzyme_concentration
+exp_substrates = []
+exp_products = []
+exp_superhelicals = []
+for count, initial_substrate in enumerate(initial_substrates):
+    # Substrates and products
+    # ----------------------------------
+    ax = axs[0, 1]
+    substrate, product = tct.integrate_MM(vmax=v_max, KM=K_M, substrate0=initial_substrate, product0=initial_product,
+                                          frames=frames, dt=dt)
+    ax.plot(time, substrate, lw=lw, color=colors[count])
+
+    # Sigma deduction
+    # ----------------------------------
+    ax = axs[1, 1]
+    superhelical = tct.rescale_product_to_sigma(substrate, initial_sigma, final_sigma)
+    ax.plot(time, superhelical, lw=lw, color=colors[count])
+
+    # Collect
+    exp_substrates.append(substrate)
+    exp_products.append(product)
+    exp_superhelicals.append(superhelical)
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Plot simulation example for TopoI
+# ---------------------------------------------------------------------------------------------------------------------
+initial_sigma = final_sigma # A trick
+params = pd.read_csv(gyrase_calibration_file).to_dict()
+objective, simulation_superhelicals = gyrase_objective_function(params=params)
+
+# And plot
+ax = axs[1, 1]
 for count, initial_substrate in enumerate(initial_substrates):
     superhelical = simulation_superhelicals[count]
     ax.plot(time, superhelical, '--', lw=lw, color=colors[count])

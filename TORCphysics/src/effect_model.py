@@ -381,6 +381,82 @@ class GyraseUniform(EffectModel):
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
+# TODO: Comment and fix
+class TopoisomeraseLinearEffect(EffectModel):
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=False, **oparams):
+
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        # TODO: Check correct parametrization
+        if not oparams:
+            if filename is None:
+                self.k_cat = params.gyra_uniform_k_cat
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'k_cat' in mydata.columns:
+                    self.k_cat = mydata['k_cat'][0]
+                else:
+                    raise ValueError('Error, k_cat parameter missing in csv file for GyraseUniform')
+        else:
+            self.k_cat = float(oparams['k_cat'])
+            self.sigma0 = float(oparams['sigma0'])
+
+        self.oparams = {'k_cat': self.k_cat, 'sigma0': self.sigma0}  # Just in case
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+
+        position = 0.0
+        z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)  # Get the enzyme before
+        z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)  # Get the enzyme after z
+        total_twist = z_b.twist + z.twist  # Total twist in the region.
+        superhelical = total_twist / (params.w0 * (z_a.position - z_b.position))
+        twist_left = 0.5 * self.k_cat * params.w0 * dt * (self.sigma0 - superhelical)
+        twist_right = twist_left
+
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+
+class TopoisomeraseLinearRandEffect(EffectModel):
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=False, **oparams):
+
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        # TODO: Check correct parametrization
+        if not oparams:
+            if filename is None:
+                self.k_cat = params.gyra_uniform_k_cat
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'k_cat' in mydata.columns:
+                    self.k_cat = mydata['k_cat'][0]
+                else:
+                    raise ValueError('Error, k_cat parameter missing in csv file for GyraseUniform')
+        else:
+            self.k_cat = float(oparams['k_cat'])
+            self.sigma0 = float(oparams['sigma0'])
+
+        self.oparams = {'k_cat': self.k_cat, 'sigma0': self.sigma0}  # Just in case
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+
+        position = 0.0
+        z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)  # Get the enzyme before
+        z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)  # Get the enzyme after z
+        total_twist = z_b.twist + z.twist  # Total twist in the region.
+        superhelical = total_twist / (params.w0 * (z_a.position - z_b.position))
+
+        random_addition = np.random.uniform(-0.1, 0.1)  # This is a random variation of supercoils introduced
+
+        twist_left = 0.5 * self.k_cat * params.w0 * dt * (self.sigma0 - superhelical + random_addition)
+        twist_right = twist_left
+
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+
 class TopoIContinuum(EffectModel):
     """
      An EffectModel subclass that calculates represents the continuum effect of Topoisomerase I, on the DNA.
@@ -718,6 +794,10 @@ def assign_effect_model(model_name, oparams_file=None, **oparams):
         my_model = TopoIUniform(filename=oparams_file, **oparams)
     elif model_name == 'GyraseUniform':
         my_model = GyraseUniform(filename=oparams_file, **oparams)
+    elif model_name == 'TopoisomeraseLinearEffect':
+        my_model = TopoisomeraseLinearEffect(filename=oparams_file, **oparams)
+    elif model_name == 'TopoisomeraseLinearRandEffect':
+        my_model = TopoisomeraseLinearRandEffect(filename=oparams_file, **oparams)
     elif model_name == 'TopoIContinuum':
         my_model = TopoIContinuum(filename=oparams_file, **oparams)
     elif model_name == 'GyraseContinuum':

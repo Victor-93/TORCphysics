@@ -75,7 +75,6 @@ threshold_min = -0.05
 threshold_max = -0.001
 
 
-
 # Optimization functions
 # ----------------------------------------------------------------------------------------------------------------------
 # This one runs the objective function in parallel. It returns the objective function as well as the mean superhelical

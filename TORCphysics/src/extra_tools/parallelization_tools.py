@@ -2,6 +2,7 @@ from TORCphysics import Circuit
 from TORCphysics import binding_model as bm
 from TORCphysics import effect_model as em
 from TORCphysics import unbinding_model as ubm
+import numpy as np
 
 
 # TODO: Maybe later it can accept specific conditions
@@ -166,6 +167,10 @@ def single_simulation_calibration_w_supercoiling(item):
     my_circuit.name = my_circuit.name + '_' + str(global_dict['n_simulations'])
     my_circuit.sites_dict_list[0]['name'] = my_circuit.name
     my_circuit.log.name = my_circuit.name
+
+    # And change the seed
+    my_circuit.seed = my_circuit.seed + global_dict['n_simulations']  # random.randrange(sys.maxsize)
+    my_circuit.rng = np.random.default_rng(my_circuit.seed)
 
     # Let's fix first initial supercoiling density and update all relevant parameters
     for enzyme in my_circuit.enzyme_list:

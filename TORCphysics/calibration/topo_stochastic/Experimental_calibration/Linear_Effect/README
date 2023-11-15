@@ -1,0 +1,15 @@
+Here we are trying to calibrate the stochastic topoisomerase activity and its impact on DNA.
+We calibrate our topoI and gyrase models according the study: Kinetic Study of DNA Topoisomerases by Supercoiling-Dependent Fluorescence Quenching, Fenfei et. al.
+Here we use a LINEAR EFFECT MODEL: TopoisomeraseLinearEffect
+
+test_v1.py -  is the test of the new sub-models branch. It produces files  with *_test.*
+test_old.py - is a test of the previous branch version.
+
+topo_calibration_tools.py - contains useful functions to carry out our calibration process
+
+topoI_calibration.py - calibration of topo activity using our uniform model.
+gyrase_calibration.py - calibrates gyrase activity using again the uniform effect model. Produces Gyrase related *_v1.* files
+
+plot_calibration.py - plots curves resulting with the parametrization resulted from the calibration.
+
+calibration_1.png - Results from the calibration using results from topoI_calibration.py and gyrase_calibration_v1.py
