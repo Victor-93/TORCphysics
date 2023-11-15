@@ -1,4 +1,7 @@
 import numpy as np
+import multiprocessing
+from TORCphysics import parallelization_tools as pt
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Description
@@ -45,3 +48,43 @@ def rescale_product_to_sigma(product, sigma_min, sigma_max):
     desired_range = sigma_max - sigma_min
     sigma = ((product - current_min) / range_) * desired_range + sigma_min
     return sigma
+
+
+# global_dict = Dict with global simulation conditions
+# variations_list = A list with a list of variations to implement to the enzymes, environmentals or sites.
+# initial_substrates = A list with DNA DNA concentration
+# exp_superhelicals = list with values of experimental superhelical densities
+# n_simulations = how many simulations to launch.
+def run_objective_function(global_dict, variations_list, initial_substrates, exp_superhelicals, n_simulations):
+    # Let's run experiments for the substrate concentrations
+    my_objective = 0.0
+    simulation_superhelicals = []
+    for s, substrate0 in enumerate(initial_substrates):
+        exp_superhelical = exp_superhelicals[s]  # Experimental superhelical densities
+        global_dict['DNA_concentration'] = substrate0  # DNA concentration
+
+        # Let's create an Item to pass the conditions to the simulation
+        Item = {'global_conditions': global_dict, 'variations': variations_list}
+
+        # But we actually need a list of items, so the pool can pass each item to the function
+        Items = []
+        for simulation_number in range(n_simulations):
+            g_dict = dict(global_dict)
+            g_dict['n_simulations'] = simulation_number
+            Item = {'global_conditions': g_dict, 'variations': variations_list}
+
+            Items.append(Item)
+
+        # Create a multiprocessing pool
+        pool = multiprocessing.Pool()
+        pool_results = pool.map(pt.single_simulation_calibration_w_supercoiling, Items)
+
+        my_supercoiling = np.zeros((global_dict['frames'], n_simulations))
+        for i, sigma in enumerate(pool_results):
+            my_supercoiling[:, i] = sigma[:-1]
+        mea = np.mean(my_supercoiling, axis=1)
+        my_objective += np.sum(np.square(np.mean(my_supercoiling, axis=1) - exp_superhelical))
+        simulation_superhelicals.append(mea)
+
+    my_objective = my_objective + 0.0
+    return my_objective, simulation_superhelicals
