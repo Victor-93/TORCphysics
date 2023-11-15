@@ -5,7 +5,6 @@ import multiprocessing
 from TORCphysics import parallelization_tools as pt
 import pandas as pd
 import topo_calibration_tools as tct
-import sys
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -55,8 +54,8 @@ continuation = False
 mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 24
-tests = 50  # 00  # number of tests for parametrization
+n_simulations = 2
+tests = 2  # 00  # number of tests for parametrization
 
 my_vars = ['k_cat', 'k_on', 'k_off', 'width', 'threshold']
 
