@@ -1,5 +1,5 @@
 import numpy as np
-from hyperopt import tpe, hp, fmin
+from hyperopt import tpe, hp, fmin, Trials
 import pandas as pd
 import topo_calibration_tools as tct
 import sys
@@ -15,6 +15,8 @@ import sys
 # Let's run examples of the actual calibration. Remember that in your simulation, you need to consider the
 # density of the plasmid concentration as well, so you have many concentrations to test.
 
+# TODO: In the future use trials = Trials() - from hyperopt import tpe, hp, fmin, Trials.
+#  This would helpfully will give you a list of parameters explored
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Initial conditions
@@ -36,15 +38,13 @@ environment_filename = 'gyrase_environment.csv'
 # Experimental concentration of topoisomerases
 mol_concentration = 44.6
 
-tm = 'stochastic'
 output_prefix = 'test0'
 series = True
 continuation = False
-mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 120
-tests = 120  # number of tests for parametrization
+n_simulations = 12#0
+tests = 12#0  # number of tests for parametrization
 
 # Molecule/model to calibrate
 # -----------------------------------
@@ -53,7 +53,7 @@ mol_type = 'environmental'
 mol_binding_model_name = 'GyraseRecognition'
 mol_effect_model_name = 'TopoisomeraseLinearEffect'
 mol_unbinding_model_name = 'PoissonUnBinding'
-mol_sigma0 = 0.0
+mol_sigma0 = -0.02
 
 
 # RANGES FOR RANDOM SEARCH
@@ -153,7 +153,9 @@ for count, initial_substrate in enumerate(initial_substrates):
 
 # Optimization
 # ==================================================================================================================
-initial_sigma = final_sigma
+#initial_sigma = final_sigma
+
+trials = Trials()
 
 space = {
     'k_cat': hp.uniform('k_cat', k_cat_min, k_cat_max),
@@ -185,7 +187,8 @@ with open(output_file_path, 'w') as f:
         fn=objective_function,  # Objective Function to optimize
         space=space,  # Hyperparameter's Search Space
         algo=tpe.suggest,  # Optimization algorithm (representative TPE)
-        max_evals=tests  # Number of optimization attempts
+        max_evals=tests,  # Number of optimization attempts
+        trials=trials
     )
 
     print(" ")

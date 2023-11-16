@@ -418,6 +418,7 @@ class TopoisomeraseLinearEffect(EffectModel):
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
+# TODO: Make the random parameter an input.
 class TopoisomeraseLinearRandEffect(EffectModel):
 
     # def __init__(self, name, filename):

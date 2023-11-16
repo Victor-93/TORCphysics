@@ -45,8 +45,8 @@ n_simulations = 120
 topoI_name = 'topoI'
 topoI_type = 'environmental'
 topoI_binding_model_name = 'TopoIRecognition'
-#topoI_effect_model_name = 'TopoisomeraseLinearEffect'
-topoI_effect_model_name = 'TopoisomeraseLinearRandEffect'
+topoI_effect_model_name = 'TopoisomeraseLinearEffect'
+#topoI_effect_model_name = 'TopoisomeraseLinearRandEffect'
 topoI_unbinding_model_name = 'PoissonUnBinding'
 topoI_calibration_file = 'topoI_calibration.csv'
 topoI_sigma0 = 0.0
@@ -56,9 +56,11 @@ topoI_sigma0 = 0.0
 gyrase_name = 'gyrase'
 gyrase_type = 'environmental'
 gyrase_binding_model_name = 'GyraseRecognition'
-gyrase_effect_model_name = 'GyraseUniform'
+gyrase_effect_model_name = 'TopoisomeraseLinearEffect'
+#gyrase_effect_model_name = 'TopoisomeraseLinearRandEffect'
 gyrase_unbinding_model_name = 'PoissonUnBinding'
 gyrase_calibration_file = 'gyrase_calibration.csv'
+gyrase_sigma0 = -0.02
 
 # FIGURE
 # -----------------------------------
@@ -129,10 +131,12 @@ def gyrase_objective_function(params):
     name = gyrase_name
     object_type = gyrase_type
     binding_model_name = gyrase_binding_model_name
-    binding_oparams = {'k_on': float(params['k_on'][0]), 'width': float(params['width'][0]),
+#    binding_oparams = {'k_on': float(params['k_on'][0]), 'width': float(params['width'][0]),
+#                       'threshold': float(params['threshold'][0])}
+    binding_oparams = {'k_on': 0.05, 'width': float(params['width'][0]),
                        'threshold': float(params['threshold'][0])}
     effect_model_name = gyrase_effect_model_name
-    effect_oparams = {'k_cat': float(params['k_cat'][0])}
+    effect_oparams = {'k_cat': float(params['k_cat'][0]), 'sigma0': gyrase_sigma0}
     unbinding_model_name = gyrase_unbinding_model_name
     unbinding_oparams = {'k_off': float(params['k_off'][0])}
     concentration = gyrase_concentration
@@ -215,7 +219,7 @@ for count, initial_substrate in enumerate(initial_substrates):
 # Product = Fluorescent or Relaxed DNA
 # Substrate = Concentration of Supercoiled DNAs
 initial_sigma = -0.02  # Is actually the other way around, but there's an error somewhere but I'm lazy to find it
-final_sigma = 0.0
+final_sigma = 0.01  # It was 0.0, but assuming that you have some intercalators, maybe it increases sigma a bit
 initial_product = 4.0
 initial_substrate = .75
 initial_substrates = [0.75, 1.50, 3.6, 5.4, 7.2]
@@ -246,7 +250,7 @@ for count, initial_substrate in enumerate(initial_substrates):
     exp_superhelicals.append(superhelical)
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Plot simulation example for TopoI
+# Plot simulation example for Gyrase
 # ---------------------------------------------------------------------------------------------------------------------
 initial_sigma = final_sigma # A trick
 params = pd.read_csv(gyrase_calibration_file).to_dict()
