@@ -1,5 +1,5 @@
 import numpy as np
-from hyperopt import tpe, hp, fmin
+from hyperopt import tpe, hp, fmin, Trials
 import pandas as pd
 import topo_calibration_tools as tct
 import sys
@@ -43,31 +43,33 @@ continuation = False
 mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 120
-tests = 120  # number of tests for parametrization
+n_simulations = 48 #96 #120
+tests = 150  # number of tests for parametrization
 
 # Molecule/model to calibrate
 # -----------------------------------
 mol_name = 'gyrase'
 mol_type = 'environmental'
 mol_binding_model_name = 'GyraseRecognition'
-mol_effect_model_name = 'GyraseUniform'
+mol_effect_model_name = 'TopoisomeraseLinearEffect'
 mol_unbinding_model_name = 'PoissonUnBinding'
+mol_sigma0 = -0.02
+
 
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------
 # Gyrase ranges
 file_out = mol_name + '_calibration'
 k_on_min = 0.001
-k_on_max = 0.01
-k_off_min = 0.1
+k_on_max = 0.05
+k_off_min = 0.001
 k_off_max = 1.0
 k_cat_min = -20.0  # Ranges to vary k_cat
-k_cat_max = -5.0
-width_min = 0.001
-width_max = 0.05
-threshold_min = 0.001
-threshold_max = 0.05
+k_cat_max = 20.0#-1.0
+width_min = 0.0  #0.001
+width_max = 1.0
+threshold_min = 0.0  # 0.001
+threshold_max = 1.0
 
 
 # Optimization functions
@@ -94,10 +96,12 @@ def objective_function(params):
     binding_model_name = mol_binding_model_name
     binding_oparams = {'k_on': params['k_on'], 'width': params['width'], 'threshold': params['threshold']}
     effect_model_name = mol_effect_model_name
-    effect_oparams = {'k_cat': params['k_cat']}
+    effect_oparams = {'k_cat': params['k_cat'], 'sigma0': mol_sigma0}
     unbinding_model_name = mol_unbinding_model_name
     unbinding_oparams = {'k_off': params['k_off']}
     concentration = mol_concentration
+
+    #  print('Params testing:', params)
 
     topo_variation = {'name': name, 'object_type': object_type,
                       'binding_model_name': binding_model_name, 'binding_oparams': binding_oparams,
@@ -166,6 +170,8 @@ original_stdout = sys.stdout
 # Define the file where you want to save the output
 output_file_path = file_out + '.info'
 
+trials = Trials()
+
 # Open the file in write mode
 with open(output_file_path, 'w') as f:
     # Redirect the standard output to the file
@@ -183,7 +189,8 @@ with open(output_file_path, 'w') as f:
         fn=objective_function,  # Objective Function to optimize
         space=space,  # Hyperparameter's Search Space
         algo=tpe.suggest,  # Optimization algorithm (representative TPE)
-        max_evals=tests  # Number of optimization attempts
+        max_evals=tests,  # Number of optimization attempts
+        trials=trials
     )
 
     print(" ")
@@ -192,3 +199,14 @@ with open(output_file_path, 'w') as f:
 
 best_df = pd.DataFrame.from_dict([best])
 best_df.to_csv(file_out + '.csv', index=False, sep=',')
+
+#vals_dict = {}
+#my_dict = {'name': 'John', 'age': 30, 'city': 'New York'}
+
+#for key, value in trials.vals.items():
+
+#    print(f"{key}: {value}")
+
+#for
+vals_df = pd.DataFrame(data =trials.vals)
+vals_df.to_csv(file_out + '_space.csv', index=False, sep=',')
