@@ -871,7 +871,7 @@ def assign_effect_model(model_name, oparams_file=None, **oparams):
     """
     if model_name == 'RNAPUniform':
         my_model = RNAPUniform(filename=oparams_file, **oparams)
-    if model_name == 'RNAPStall':
+    elif model_name == 'RNAPStall':
         my_model = RNAPStall(filename=oparams_file, **oparams)
     elif model_name == 'TopoIUniform':
         my_model = TopoIUniform(filename=oparams_file, **oparams)
