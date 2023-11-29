@@ -206,10 +206,6 @@ class RNAPUniform(EffectModel):
             This function returns an Effect object, which indicates the changes in position and local twist that
             the current RNAP caused on the DNA.
         """
-        # Everything 0 for now
-        position = 0.0
-        twist_left = 0.0
-        twist_right = 0.0
         # Get neighbour enzyme
         if z.direction > 0:
             z_n = [e for e in z_list if e.position > z.position][0]  # after - On the right
@@ -218,17 +214,100 @@ class RNAPUniform(EffectModel):
         if z.direction == 0:
             raise ValueError('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
 
+        # This is if the object moves: simple uniform motion
+        position, twist_left, twist_right = uniform_motion(z, dt)
+
         # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid
         # clashing
         if z.direction > 0:  # Moving to the right
             if z_n.position - (z.position + position) <= 0:
-                return position, twist_left, twist_right
+                position = 0.0
+                twist_left = 0.0
+                twist_right = 0.0
         else:  # Moves to the left
             if z_n.position - (z.position + position) >= 0:
-                return position, twist_left, twist_right
+                position = 0.0
+                twist_left = 0.0
+                twist_right = 0.0
 
-        # Nothing is next, so the object moves: simple uniform motion
-        position, twist_left, twist_right = uniform_motion(z, dt)
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+
+# TODO: Document the RNAPStall model. It is a model with velocity but no torques.
+# TODO: Test this function
+class RNAPStall(EffectModel):
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=False, **oparams):
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        if not oparams:
+            if filename is None:
+                self.velocity = params.v0  # Medium velocity
+                self.gamma = params.gamma
+                self.stall_torque = params.stall_torque
+                self.kappa = params.RNAP_kappa
+            else:  # There is a file!
+                # TODO: Do it for the other new parameters
+                mydata = pd.read_csv(filename)
+                if 'velocity' in mydata.columns:
+                    #  self.velocity = float(mydata['velocity'])
+                    self.velocity = mydata['velocity'][0]
+                else:
+                    raise ValueError('Error, velocity parameter missing in csv file for RNAPUniform')  # ', filename)
+                if 'gamma' in mydata.columns:
+                    #  self.gamma = float(mydata['gamma'])
+                    self.gamma = mydata['gamma'][0]
+                else:
+                    raise ValueError('Error, gamma parameter missing in csv file for RNAPUniform')  #: ', filename)
+        else:
+            self.velocity = float(oparams['velocity'])
+            self.gamma = float(oparams['gamma'])
+            self.stall_torque = float(oparams['stall_torque'])
+            self.kappa = float(oparams['kappa'])
+
+        self.oparams = {'velocity': self.velocity, 'gamma': self.gamma,
+                        'kappa': self.kappa, 'stall_torque': self.stall_torque}  # Just in case
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+
+        # if z.direction == 0:
+        #    raise ValueError('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
+
+        # Get enzymes on the right and left
+        z_right = [e for e in z_list if e.position > z.position][0]  # after - On the right
+        z_left = [e for e in z_list if e.position < z.position][-1]  # before - On the left
+
+        # First, we need to calculate the Torque acting on our RNAP.
+        # Calculate torques and determine if the RNAP will stall
+        torque_right = Marko_torque(z.superhelical)  # Torque on the right
+        torque_left = Marko_torque(z_left.superhelical)  # Torque on the left
+
+        if z.direction > 0:  # Moving to the right
+            torque = torque_right - torque_left
+        else:  # Moving to the left
+            torque = torque_left - torque_right
+
+        velocity = velocity_2022SevierBioJ(z, torque)
+
+        position = z.direction * velocity * dt
+
+        # Injects twist: denatures w = gamma*velocity*dt base-pairs
+        twist_left = -z.direction * z.effect_model.gamma * velocity * dt
+        twist_right = z.direction * z.effect_model.gamma * velocity * dt
+
+        # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid
+        # clashing
+        if z.direction > 0:  # Moving to the right
+            if z_right.position - (z.position + position) <= 0:
+                position = 0.0
+                twist_left = 0.0
+                twist_right = 0.0
+        else:  # Moves to the left
+            if z_left.position - (z.position + position) >= 0:
+                position = 0.0
+                twist_left = 0.0
+                twist_right = 0.0
 
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
@@ -397,6 +476,7 @@ class TopoisomeraseLinearEffect(EffectModel):
                 mydata = pd.read_csv(filename)
                 if 'k_cat' in mydata.columns:
                     self.k_cat = mydata['k_cat'][0]
+                    self.sigma0 = mydata['sigma0'][0]
                 else:
                     raise ValueError('Error, k_cat parameter missing in csv file for GyraseUniform')
         else:
@@ -791,6 +871,8 @@ def assign_effect_model(model_name, oparams_file=None, **oparams):
     """
     if model_name == 'RNAPUniform':
         my_model = RNAPUniform(filename=oparams_file, **oparams)
+    if model_name == 'RNAPStall':
+        my_model = RNAPStall(filename=oparams_file, **oparams)
     elif model_name == 'TopoIUniform':
         my_model = TopoIUniform(filename=oparams_file, **oparams)
     elif model_name == 'GyraseUniform':
@@ -934,6 +1016,18 @@ def Marko_torque(sigma):
         print('Error in Marko_torque function')
         sys.exit()
     return torque
+
+
+#  The velocity has the form: v = vmax/ (1+e^{k(T_0 - T_c)} )
+#  where vmax = maximum velocity, k = torque parameter, T_0 = Torque acting on enzyme
+#  and T_c = cutoff or stalling torque.
+#  This function is based on the 2022SevierBioJ paper
+def velocity_2022SevierBioJ(z, torque):
+    top = 2.0 * z.effect_model.velocity
+    exp_arg = z.effect_model.kappa * (torque - z.effect_model.stall_torque)
+    down = 1.0 + np.exp(exp_arg)
+    velocity = top / down
+    return velocity
 
 # ---------------------------------------------------------------------------------------------------------------------
 # USEFUL FUNCTIONS

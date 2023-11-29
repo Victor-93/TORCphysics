@@ -33,7 +33,7 @@ w0_nm = 2.0 * np.pi / (T_bp * bp_nm)  # rad * nm^{-1} - Now in distance units
 P_length = 24.0  # nm - twist stiffness of plectonomic DNA - is it a persistence length?
 C_length = 100.0  # nm - twist persistence length
 A_length = 50.0  # nm - persistence length
-f_stretching = 0.15  # pN - stretching force of enzymes in vivo - this might not be correct, but it is in the range of
+f_stretching = 1.0  # 0.15  # pN - stretching force of enzymes in vivo - this might not be correct, but it is in the range of
 # low forces in the Marko's elasticity model
 Temperature = 300  # K - temperature
 p_stiffness = kBT_pN_nm * P_length * w0_nm * w0_nm  # pN - stiffness related to P
@@ -55,8 +55,12 @@ sigma_p = (1 / p_stiffness) * np.sqrt(2 * p_stiffness * g_energy / (1 - p_stiffn
 # RNA Polymerase (RNAP)
 v0 = 30.0  # 60.0  # Velocity (bp/sec) of RNAPs
 gamma = 0.2 * w0  # How much supercoiling is injected per bp
-stall_torque = 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper
-sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall
+stall_torque = 12.0  # 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper.
+# 12pN*nm according 2022SevierBioJ
+sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall - According Gleng?
+RNAP_kappa = 0.5  # 12pN^{-1} - According 2022SevierBioJ. This is a parameter used in calculating torque dependant
+# velocity.
+
 
 # TOPOISOMERASE I
 topo_b_k_off = 0.5
@@ -101,8 +105,8 @@ gyra_sam_kcat = 0.001  # minus because it removes negative supercoils
 # I think it makes more sense to put the negative in the equation rather than in
 # the parameter
 
-gyra_uniform_k_cat = -10.5 # (bp/second)
-topoI_uniform_k_cat = 7.5 # (bp/second)
+gyra_uniform_k_cat = -10.5  # (bp/second)
+topoI_uniform_k_cat = 7.5  # (bp/second)
 
 # Sam Meyer's PROMOTER CURVE (parameters taken from Houdaigi NAR 2019)
 SM_sigma_t = -0.042  # threshold of promoter openning

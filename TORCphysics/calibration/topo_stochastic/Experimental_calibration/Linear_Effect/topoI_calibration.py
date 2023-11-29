@@ -5,7 +5,11 @@ import topo_calibration_tools as tct
 import sys
 
 
-# TODO: Leave this script ready and well organized, so then you can do the same for gyrase.
+# TODO: It all works now, but we still have some more research to do:
+#  1.- What should be the true values of initial/final sigma? So the Linear model can accurately describe them.
+#  2.- Also check the units of concentration, am I using the correct ones for my model?
+#  3.- And check the substrate (DNA) concentraion, how can we include this in general in our
+#  model and how it affects it?
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
 # ----------------------------------------------------------------------------------------------------------------------
