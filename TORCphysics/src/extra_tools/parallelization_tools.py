@@ -24,6 +24,10 @@ def run_single_simulation(item):
     my_circuit.name = my_circuit.name + '_' + str(simulation_number)
     my_circuit.sites_dict_list[0]['name'] = my_circuit.name
     my_circuit.log.name = my_circuit.name
+    # And change the seed
+    my_circuit.seed = my_circuit.seed + simulation_number  # random.randrange(sys.maxsize)
+    my_circuit.rng = np.random.default_rng(my_circuit.seed)
+    #And run
     my_circuit.run()
     return
 
