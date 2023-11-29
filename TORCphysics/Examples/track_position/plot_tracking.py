@@ -11,7 +11,7 @@ import seaborn as sns
 # Inputs
 # ---------------------------------------------------------
 circuit_name = 'lineartest'
-n_sims = 48
+n_sims = 120
 out = ['uniform', 'stall']
 paths = ['RNAP_uniform/', 'RNAP_stall/'] #['no_bridge/multiple_runs/', 'bridge/multiple_runs/']
 dt = 0.25
@@ -69,7 +69,7 @@ for p, path in enumerate(paths):
 
     #topoI
     fig, axs = plt.subplots(1, figsize=(width, height), tight_layout=True)
-    sns.histplot(topoI, kde=True, bins=50, ax=axs, color='red', label='topoI')
+    sns.histplot(topoI, kde=True, bins=40, ax=axs, color='red', label='topoI')
     axs.set_ylabel('Density', fontsize=15)
     axs.set_xlabel('Position', fontsize=15)
     axs.set_xlim(0, 5000)
@@ -78,7 +78,7 @@ for p, path in enumerate(paths):
 
     #gyrase
     fig, axs = plt.subplots(1, figsize=(width, height), tight_layout=True)
-    sns.histplot(gyrase, kde=True, bins=50, ax=axs, color='cyan', label='gyrase')
+    sns.histplot(gyrase, kde=True, bins=40, ax=axs, color='cyan', label='gyrase')
     axs.set_ylabel('Density', fontsize=15)
     axs.set_xlabel('Position', fontsize=15)
     axs.set_xlim(0, 5000)

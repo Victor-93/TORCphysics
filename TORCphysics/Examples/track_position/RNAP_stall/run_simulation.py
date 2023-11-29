@@ -3,7 +3,7 @@ from TORCphysics import parallelization_tools as pt
 
 
 # Parallel stuff
-n_simulations = 48  # 48 #96 #120
+n_simulations = 120  # 48 #96 #120
 
 # Let's initialize circuit
 circuit_filename = 'circuit2.csv'
