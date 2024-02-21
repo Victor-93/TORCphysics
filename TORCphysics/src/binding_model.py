@@ -87,7 +87,15 @@ class BindingModel(ABC):
         """
         pass
 
+    # TODO: Document this abstract method
+    @abstractmethod
+    def rate_modulation(self) -> float:
+        pass
 
+
+# TODO: Maybe we need to add the reference concentration! OR remember that the concentration you give, you always
+#       need to divide it by the reference in which the model was calibrated.
+#       Or maybe not if you calibrate doing k_on * concentration
 # Model for binding probability according Poisson process
 class PoissonBinding(BindingModel):
     """
@@ -152,7 +160,12 @@ class PoissonBinding(BindingModel):
         """
         return utils.Poisson_process(self.k_on, dt)
 
+    def rate_modulation(self, superhelical) -> float:
+        rate = self.k_on
+        return rate
 
+
+# TODO: Document this function
 class MeyerPromoterOpening(BindingModel):
 
     def __init__(self, filename=None, **oparams):
@@ -180,6 +193,124 @@ class MeyerPromoterOpening(BindingModel):
         rate = utils.promoter_curve_Meyer(basal_rate=self.k_on, superhelical=superhelical)
         probability = utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
         return probability
+
+    def rate_modulation(self, superhelical) -> float:
+        rate = utils.promoter_curve_Meyer(basal_rate=self.k_on, superhelical=superhelical)
+        return rate
+
+
+# TODO: Do you need the inverse version of the function? And if so, would you need another class or is it better
+#  with a boolean?
+#  Also check overflows/underflows
+# TODO: Needs testing
+class MaxMinPromoterBinding(BindingModel):
+    """
+     A BindingModel subclass that calculates binding probabilities according a sigmoid response curve.
+     This model represents the binding mechanism of supercoiling sensitive promoters, which openning curve usually
+     follows a sigmoidal response as function of the local supercoiling density. In this case, the binding rate varies
+     as a function of supercoiling
+
+     Attributes
+     ----------
+     k_min : float
+        Minimum rate (1/s) at which the enzymes bind.
+     k_max : float
+        Maximum rate (1/s) at which the enzymes bind.
+     threshold : float
+        The threshold of the sigmoid curve. This is a dimensionless parameter.
+     width : float
+        The width of the sigmoid curve. This is a dimensionless parameter.
+     filename : str, optional
+        Path to the site csv file that parametrises the binding model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the binding model.
+    """
+
+    def __init__(self, filename=None, **oparams):
+
+        super().__init__(filename, **oparams)
+        if not oparams:
+            if filename is None:
+                self.width = .003
+                self.threshold = -.094
+                self.k_min = 0.001
+                self.k_max = 0.01
+            else:
+                mydata = pd.read_csv(filename)
+                if 'k_min' in mydata.columns:
+                    self.k_min = mydata['k_min'][0]
+                else:
+                    raise ValueError('Error, k_max parameter missing in csv file for MaxMinPromoterBinding')
+                if 'k_max' in mydata.columns:
+                    self.k_max = mydata['k_max'][0]
+                else:
+                    raise ValueError('Error, k_max parameter missing in csv file for MaxMinPromoterBinding')
+                if 'width' in mydata.columns:
+                    self.width = mydata['width'][0]
+                else:
+                    raise ValueError('Error, width parameter missing in csv file for MaxMinPromoterBinding')
+                if 'threshold' in mydata.columns:
+                    self.threshold = mydata['threshold'][0]
+                else:
+                    raise ValueError('Error, threshold parameter missing in csv file for MaxMinPromoterBinding')
+        else:
+            # No point testing or checking that we have these variables, as python gives error on its own.
+            self.width = float(oparams['width'])
+            self.threshold = float(oparams['threshold'])
+            self.k_min = float(oparams['k_min'])
+            self.k_max = float(oparams['k_max'])
+
+        # Just in case
+        self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_min': self.k_min, 'k_max': self.k_max}
+
+        # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
+
+    def binding_probability(self, environmental, superhelical, dt) -> float:
+        """ Method for calculating the probability of binding according the MaxMinPromoter model.
+
+        Parameters
+        ----------
+        dt : float
+            Timestep in seconds (s).
+        environmental : Environment
+            The environmental molecule that is trying to bind the site.
+        superhelical : float
+            The local supercoiling region in the site.
+
+        Returns
+        ----------
+        probability : float
+            A number that indicates the probability of binding in the current timestep.
+        """
+
+        a = np.log(self.k_min / self.k_max)
+        b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
+        rate = self.k_max * np.exp(a / b)
+        return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+
+    def rate_modulation(self, superhelical) -> float:
+        """ Method for calculating the rate modulation as a functino of superhelical density for the
+        MaxMinPromoter model.
+
+        Parameters
+        ----------
+        dt : float
+            Timestep in seconds (s).
+        environmental : Environment
+            The environmental molecule that is trying to bind the site.
+        superhelical : float
+            The local supercoiling region in the site.
+
+        Returns
+        ----------
+        rate : float
+            Rate at which the environmentals bind given the local superhelical density
+        """
+
+        a = np.log(self.k_min / self.k_max)
+        b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
+        rate = self.k_max * np.exp(a / b)
+        return rate
 
 
 class TopoIRecognition(BindingModel):
@@ -267,6 +398,13 @@ class TopoIRecognition(BindingModel):
         rate = a / b
         return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
 
+    def rate_modulation(self, superhelical) -> float:
+        # Note that is not multiplied by the concentration
+        a = self.k_on
+        b = 1 + np.exp((superhelical - self.threshold) / self.width)
+        rate = a / b
+        return rate
+
 
 class GyraseRecognition(BindingModel):
     """
@@ -351,6 +489,13 @@ class GyraseRecognition(BindingModel):
         b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
         rate = a / b
         return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+
+    def rate_modulation(self, superhelical) -> float:
+        # Note that is not multiplied by the concentration
+        a = self.k_on
+        b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
+        rate = a / b
+        return rate
 
 
 # class lacI_binding(binding_model):
@@ -484,15 +629,14 @@ def assign_binding_model(model_name, oparams_file=None, **oparams):
         my_model = GyraseRecognition(filename=oparams_file, **oparams)
     elif model_name == 'MeyerPromoterOpening':
         my_model = MeyerPromoterOpening(filename=oparams_file, **oparams)
+    elif model_name == 'MaxMinPromoterBinding':
+        my_model = MaxMinPromoterBinding(filename=oparams_file, **oparams)
     else:
         raise ValueError('Could not recognise binding model ' + model_name)
     return my_model
 
 
 # ----------------------------------------------------------
-
-
-
 
 
 # ----------------------------------------------------------

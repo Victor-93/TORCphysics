@@ -43,8 +43,8 @@ continuation = False
 mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 48 #96 #120
-tests = 150  # number of tests for parametrization
+n_simulations = 6  # #120
+tests = 10  # 120  # number of tests for parametrization
 
 # Molecule/model to calibrate
 # -----------------------------------
@@ -53,8 +53,7 @@ mol_type = 'environmental'
 mol_binding_model_name = 'GyraseRecognition'
 mol_effect_model_name = 'TopoisomeraseLinearEffect'
 mol_unbinding_model_name = 'PoissonUnBinding'
-mol_sigma0 = -0.02
-
+mol_sigma0 = -0.08  # Estaba a -0.02
 
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------
@@ -65,8 +64,8 @@ k_on_max = 0.05
 k_off_min = 0.001
 k_off_max = 1.0
 k_cat_min = -20.0  # Ranges to vary k_cat
-k_cat_max = 20.0#-1.0
-width_min = 0.0  #0.001
+k_cat_max = 20.0  # -1.0
+width_min = 0.0  # 0.001
 width_max = 1.0
 threshold_min = 0.0  # 0.001
 threshold_max = 1.0
@@ -127,10 +126,11 @@ def objective_function(params):
 # Product = Fluorescent or Relaxed DNA
 # Substrate = Concentration of Supercoiled DNAs
 initial_sigma = -0.02  # Is actually the other way around, but there's an error somewhere but I'm lazy to find it
-final_sigma = 0.0
+initial_sigma = -0.08
+final_sigma = 0.03  # 0.0
 initial_product = 4.0
 initial_substrate = .75
-initial_substrates = [0.75, 1.50, 3.6, 5.4, 7.2]
+initial_substrates = [0.75]  # [0.75, 1.50, 3.6, 5.4, 7.2]
 enzyme_concentration = mol_concentration
 K_M = 2.7
 k_cat = .0011
@@ -200,13 +200,13 @@ with open(output_file_path, 'w') as f:
 best_df = pd.DataFrame.from_dict([best])
 best_df.to_csv(file_out + '.csv', index=False, sep=',')
 
-#vals_dict = {}
-#my_dict = {'name': 'John', 'age': 30, 'city': 'New York'}
+# vals_dict = {}
+# my_dict = {'name': 'John', 'age': 30, 'city': 'New York'}
 
-#for key, value in trials.vals.items():
+# for key, value in trials.vals.items():
 
 #    print(f"{key}: {value}")
 
-#for
-vals_df = pd.DataFrame(data =trials.vals)
+# for
+vals_df = pd.DataFrame(data=trials.vals)
 vals_df.to_csv(file_out + '_space.csv', index=False, sep=',')

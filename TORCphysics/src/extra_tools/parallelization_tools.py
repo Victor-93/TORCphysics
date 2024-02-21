@@ -27,7 +27,7 @@ def run_single_simulation(item):
     # And change the seed
     my_circuit.seed = my_circuit.seed + simulation_number  # random.randrange(sys.maxsize)
     my_circuit.rng = np.random.default_rng(my_circuit.seed)
-    #And run
+    # And run
     my_circuit.run()
     return
 
@@ -154,6 +154,7 @@ def run_single_simulation_topo_calibration(item):
     return supercoiling
 
 
+# TODO: Document
 def single_simulation_calibration_w_supercoiling(item):
     # Item = {'global_conditions': global_dict, 'variations': variations_list}
 
@@ -228,7 +229,6 @@ def single_simulation_calibration_w_supercoiling(item):
             my_object.unbinding_model = ubm.assign_unbinding_model(model_name=variation['unbinding_model_name'],
                                                                    **variation['unbinding_oparams'])
 
-    # TODO: For some reason, the models are not passing through
     # And in case our variations are for environmentals that recognise and bind bare DNA,
     # let's define the DNA bare binding sites
     # Define bare DNA binding sites for bare DNA binding enzymes
@@ -239,3 +239,28 @@ def single_simulation_calibration_w_supercoiling(item):
     # Finally, run simulation
     supercoiling = my_circuit.run_return_global_supercoiling()
     return supercoiling
+
+
+# TODO: Document
+# This function is for running in parallel but returns the dataframes: sites_df, enzyme_df, environmental_df
+def single_simulation_return_dfs(item):
+    my_circuit = Circuit(circuit_filename=item['circuit_filename'], sites_filename=item['sites_filename'],
+                         enzymes_filename=item['enzymes_filename'],
+                         environment_filename=item['environment_filename'],
+                         output_prefix=item['output_prefix'], frames=item['frames'],
+                         series=item['series'], continuation=item['continuation'],
+                         dt=item['dt'])
+
+    my_circuit.name = my_circuit.name + '_' + str(item['n_simulations'])
+    my_circuit.sites_dict_list[0]['name'] = my_circuit.name
+    my_circuit.log.name = my_circuit.name
+
+    # And change the seed
+    my_circuit.seed = my_circuit.seed + item['n_simulations']  # random.randrange(sys.maxsize)
+    my_circuit.rng = np.random.default_rng(my_circuit.seed)
+
+    # Run simulation and collect dataframes
+    enzymes_df, sites_df, environmental_df = my_circuit.run_return_dfs()
+    out_dict = {'enzymes_df': enzymes_df, 'sites_df': sites_df, 'environmental_df': environmental_df}
+    return out_dict
+    # return enzymes_df, sites_df, environmental_df

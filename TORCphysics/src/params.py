@@ -18,6 +18,7 @@ import numpy as np
 
 # Physical constants
 # -----------------------------------------------------------
+Temperature = 300  # K - temperature
 # kB_kcalmolK = 1/310
 kBT_pN_nm = 4.1  # pN nm at T=300K
 kB_kcalmolK = 1.987204259 * .001  # 10**(-3) #Boltzman constant in kcal/(mol*K) units...
@@ -27,6 +28,11 @@ bp_nm = .34  # nm - base-pair rise
 T_bp = 10.5  # Number of bp per helical turn
 w0 = 2.0 * np.pi / T_bp  # Relaxed twist density per bp (rad/bp)
 w0_nm = 2.0 * np.pi / (T_bp * bp_nm)  # rad * nm^{-1} - Now in distance units
+R = 1.9872  # Gas constant cal⋅K−1⋅mol−1
+RT = R*Temperature/1000.0  # kcal * mol^{-1}
+q = 2350 * RT  # Coefficient associated to the superhelical free energy
+#ATP_hydrolysis = 28  # kJ / mol
+ATP_hydrolysis = 6.7  # kcal / mol
 
 # Elasticity parameters - from Marko's elasticity model
 # -----------------------------------------------------------
@@ -35,7 +41,6 @@ C_length = 100.0  # nm - twist persistence length
 A_length = 50.0  # nm - persistence length
 f_stretching = 1.0  # 0.15  # pN - stretching force of enzymes in vivo - this might not be correct, but it is in the range of
 # low forces in the Marko's elasticity model
-Temperature = 300  # K - temperature
 p_stiffness = kBT_pN_nm * P_length * w0_nm * w0_nm  # pN - stiffness related to P
 c_stiffness = kBT_pN_nm * C_length * w0_nm * w0_nm  # pN - stiffness related to C
 # related to free energy of twist stiffness of extended state

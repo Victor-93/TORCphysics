@@ -1,0 +1,88 @@
+from TORCphysics import Circuit
+import numpy as np
+import multiprocessing
+import pandas as pd
+from TORCphysics import parallelization_tools as pt
+
+
+output_variable = 'superhelical'
+
+# Parallelization conditions
+# --------------------------------------------------------------
+n_simulations = 96 # 120
+
+# Circuit initial conditions
+# --------------------------------------------------------------
+circuit_filename = '../circuit.csv'
+sites_filename = '../sites.csv'
+enzymes_filename = 'enzymes.csv'
+environment_filename = 'environment.csv'
+output_prefix = 'nobridge'
+frames = 10000 #50000
+series = True
+continuation = False
+dt = 0.5 #  0.25
+
+# Prepare parallelization
+# --------------------------------------------------------------
+global_dict = {'circuit_filename': circuit_filename, 'sites_filename': sites_filename,
+               'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
+               'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
+               'frames': frames, 'dt': dt, 'n_simulations': n_simulations}
+
+Items = []
+for simulation_number in range(n_simulations):
+    g_dict = dict(global_dict)
+    g_dict['n_simulations'] = simulation_number
+    Items.append(g_dict)
+
+# Run parallelization and collect relevant data
+# --------------------------------------------------------------
+# Create a multiprocessing pool
+pool = multiprocessing.Pool()
+pool_results = pool.map(pt.single_simulation_return_dfs, Items)
+
+# Process simulations outputs
+# --------------------------------------------------------------
+# Create a range of values for the 'frames' column
+frame_values = list(range(frames+1))
+
+# Calculate the corresponding time values using dt
+time_values = [dt * frame for frame in frame_values]
+
+# Create a DataFrame with 'frames' and 'time' columns
+time_df = pd.DataFrame({'frames': frame_values, 'time': time_values})
+
+# Names to filter
+names = ['circuit', 'tetA', 'Raspberry', "mKalama1", 'lac1', 'lac2']
+
+
+# And filter results starting by name
+for name in names:
+
+    print(name)
+    # Prepare output dataframe
+    output_df = time_df.copy()
+
+    # Extract info from dataframes
+    for n, out_dict in enumerate(pool_results):
+        enzymes_df = out_dict['enzymes_df']
+        sites_df = out_dict['sites_df']
+        environmental_df = out_dict['environmental_df']
+
+        # Filter superhelical density
+        if name == 'circuit':
+            mask = sites_df['type'] == name
+        else:
+            mask = sites_df['name'] == name
+        superhelical = sites_df[mask]['superhelical'].to_numpy()
+
+        simulation_df = pd.DataFrame({'simulation_'+str(n): superhelical})
+
+        # output_df = pd.concat([output_df, simulation_df], ignore_index=True)
+        output_df = pd.concat([output_df, simulation_df], axis=1).reset_index(drop=True)
+
+    cout = output_variable + '_' + name + '_df.csv'
+    output_df.to_csv(cout, index=False, sep=',')
+
+pool.close()

@@ -27,6 +27,19 @@ gyra_w = params.gyra_b_w
 gyra_t = params.gyra_b_t
 
 
+# TODO: Test and document
+# Calculates the energy spent of going from state 1 with superhelical 1 to state 2 with superhelical2.
+def change_supercoiling_free_energy(superhelical1, superhelical2, length):
+    a = superhelical2 * superhelical2 - superhelical1 * superhelical1
+    return params.q * a / (2 * length)
+
+
+# TODO: Test and document
+# Calculates superhelical free energy
+def superhelical_free_energy(superhelical, length):
+    return params.q * superhelical * superhelical / (2 * length)
+
+
 # The idea of this module, is to define utility functions, that are used several times by the other main modules.
 # TODO: You need to test this!
 def get_enzyme_before_position(position, enzyme_list):

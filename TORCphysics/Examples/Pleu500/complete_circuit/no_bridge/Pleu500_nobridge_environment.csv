@@ -1,0 +1,8 @@
+type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+RNAP,RNAP,gene,0.2,50.0,32.0,,,RNAPUniform,,RNAPSimpleUnbinding,
+topo,topoI,DNA_topoI,0.017,120.0,100.0,TopoIRecognition,../../topoI_calibration.csv,TopoisomeraseLinearEffect,../../topoI_calibration.csv,PoissonUnBinding,../../topoI_calibration.csv
+topo,gyrase,DNA_gyrase,0.44,120.0,100.0,GyraseRecognition,../../gyrase_calibration.csv,TopoisomeraseLinearEffect,../../gyrase_calibration.csv,PoissonUnBinding,../../gyrase_calibration.csv
+lacI,lacI,lacOP,0.0,10.0,10.0,,,,,,
+mRNA,tetA,,104.0,1190.0,0.0,,,,,,
+mRNA,mKalama1,,17.0,819.0,0.0,,,,,,
+mRNA,Raspberry,,18.0,781.0,0.0,,,,,,

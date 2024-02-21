@@ -108,6 +108,8 @@ class PoissonUnBinding(UnBindingModel):
         """
         return utils.Poisson_process(self.k_off, dt)
 
+# TODO: Gyrase unbinding that depends and takes into account the energy.
+
 
 class RNAPSimpleUnbinding(UnBindingModel):
     """

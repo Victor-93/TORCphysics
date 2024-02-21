@@ -1,0 +1,7 @@
+21/02/2024
+
+All csv files contain superhelical densities of the given sites at every time-step during the simulation.
+
+* superhelical_circuit_df.csv = global superhelical density
+
+* plot_comp_feed.py -> plots results as densities. Produces comp_feed-supercoiling_distribution.p*

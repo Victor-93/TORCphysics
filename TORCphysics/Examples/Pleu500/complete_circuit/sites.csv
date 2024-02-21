@@ -1,0 +1,7 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+gene,tetA,85,1276,0.01,PoissonBinding,none
+gene,mKalama1,4267,3449,0.001,MaxMinPromoterBinding,../mKalama1_response.csv
+gene,Raspberry,4491,5273,0.001,MaxMinPromoterBinding,../Raspberry_response.csv
+origin,ori,3085,0.0,0.0,,
+lacOP,lac1,3167,0.0,0.01,PoissonBinding,none
+lacOP,lac2,4500,0.0,0.01,PoissonBinding,none

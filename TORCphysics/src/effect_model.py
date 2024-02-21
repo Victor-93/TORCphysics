@@ -460,6 +460,117 @@ class GyraseUniform(EffectModel):
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
+class GyraseEnergyPack(EffectModel):
+    """
+     An EffectModel subclass that represents the effect that gyrase have on the DNA.
+     In this model, bound gyrase inject supercoils/twist to the left and right as a function of the free energy
+     associated with the local superhelical density. In this model, gyrase can only introduce a finite amount
+     of negative supercoils to the DNA, that is, bound gyrases have energy packages.
+     When the energy of these packages are depleted, gyrase will not be able to introduce supercoils.
+     For each timestep, supercoils will be injected constantly until the enzyme unbinds.
+
+     Attributes
+     ----------
+     k_cat : float
+        Catalysis rate at which supercoils are being introduced per second (supercoils/sec = 1/sec).
+        * Note: superhelical density is dimensionless
+     filename : str, optional
+        Path to the site csv file that parametrises the effect model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the effect model.
+    """
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=False, **oparams):
+        """ The constructor of the GyrasePUniform subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the GyraseUniform effect model; this file should have
+            the k_cat parameter.
+        continuum : bool, optional
+            Indicates if the actions of the effect model are continuous. For this model, it is not continuous.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the effect model. In this case it would be k_cat.
+        """
+
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        if not oparams:
+            if filename is None:
+                self.k_cat = 0.0001  # TODO: determine params.gyra_energypack_k_cat
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'k_cat' in mydata.columns:
+                    self.k_cat = mydata['k_cat'][0]
+                else:
+                    raise ValueError('Error, k_cat parameter missing in csv file for GyraseEnergyPack')
+        else:
+            self.k_cat = float(oparams['k_cat'])
+
+        self.energy_pack =  params.ATP_hydrolysis  # The amount of free energy it can pay
+
+        self.oparams = {'k_cat': self.k_cat}  # Just in case
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+        """ Method for calculating the Effect that the bound Gyrase cause on the DNA.
+
+        Parameters
+        ----------
+        index : int
+            Enzyme's index in the list of enzymes "enzyme_list".
+        z : Enzyme
+            This is the object of the current Enzyme (RNAP) that is moving along the DNA.
+        z_list : list
+            This is a list of Enzyme objects.
+        dt : float
+            Timestep in seconds (s).
+
+        Returns
+        ----------
+        effect : Effect
+            This function returns an Effect object, which indicates the changes in position and local twist that
+            the current Gyrase caused on the DNA.
+        """
+
+        position = 0.0  # Gyrase does not move
+
+        # If we have energy, then spend some in injecting supercoils.
+        if self.energy_pack > 0.0:
+            # TODO: Think if you can get put this process in the utils file
+            # Let's obtain the superhelical density within the domain
+            z_before = utils.get_enzyme_before_position(position=z.position - 5, enzyme_list=z_list)  # Get the enzyme before
+            z_after = utils.get_enzyme_after_position(position=z.position + 5, enzyme_list=z_list)  # Get the enzyme after z
+            total_twist = z_before.twist + z.twist  # Total twist in the region.
+            # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
+            superhelical = total_twist / (params.w0 * (z_after.position - z_before.position))
+            length = utils.calculate_length(z_before, z_after)
+
+            G_sigma = utils.superhelical_free_energy(superhelical, length)
+
+            # ------
+            twist_left = -0.5 * self.k_cat * np.exp(-G_sigma) * dt * params.w0 * length
+            supercoils_injected = -self.k_cat * np.exp(-G_sigma) * dt
+
+            # ------
+            energy_spent = utils.change_supercoiling_free_energy(superhelical,
+                                                                 superhelical + supercoils_injected, length)
+            self.update_energy_pack(abs(energy_spent))
+        # If we don't have energy, then do nothing.
+        else:
+            twist_left = 0.0
+
+        twist_right = twist_left
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+    # If we spent energy, then the stored energy (energy_pack) decreases
+    def update_energy_pack(self, energy_spent):
+        self.energy_pack = self.energy_pack - energy_spent
+
+
+
+
 # TODO: Comment and fix
 class TopoisomeraseLinearEffect(EffectModel):
 
@@ -491,6 +602,7 @@ class TopoisomeraseLinearEffect(EffectModel):
         z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)  # Get the enzyme before
         z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)  # Get the enzyme after z
         total_twist = z_b.twist + z.twist  # Total twist in the region.
+        # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
         superhelical = total_twist / (params.w0 * (z_a.position - z_b.position))
         twist_left = 0.5 * self.k_cat * params.w0 * dt * (self.sigma0 - superhelical)
         twist_right = twist_left

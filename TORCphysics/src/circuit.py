@@ -189,7 +189,60 @@ class Circuit:
         self.environmental_list_to_df().to_csv(self.name + '_' + self.output_prefix + '_environment' + '.csv',
                                                index=False, sep=',')
 
-    # TODO: Fix this so it can handle the new workflow.
+    # Sometimes, we might want to run a simulation but without producing any output file. Instead, we want
+    # to run the simulation and return the actual dataframes so we can process them within the same script.
+    # This function is particularly useful for that, as it returns the three types of dataframes: sites_df,
+    # enzyme_df and environmental_df.
+    def run_return_dfs(self):
+
+        # run simulation
+        for frame in range(1, self.frames + 1):
+            self.frame += 1
+            self.time = frame * self.dt
+            if self.series:
+                self.append_sites_to_dict_step1()
+
+            # BINDING
+            # --------------------------------------------------------------
+            new_enzyme_list = mw.binding_workflow(self.enzyme_list, self.environmental_list, self.dt, self.rng)
+
+            self.add_new_enzymes(new_enzyme_list)
+
+            # EFFECT
+            # --------------------------------------------------------------
+            effects_list = mw.effect_workflow(self.enzyme_list, self.environmental_list, self.dt)
+            self.apply_effects(effects_list)
+
+            # UPDATE GLOBALS
+            # --------------------------------------------------------------
+            self.update_global_twist()
+            self.update_global_superhelical()
+
+            # UNBINDING
+            # --------------------------------------------------------------
+            drop_list_index, drop_list_enzyme = mw.unbinding_workflow(self.enzyme_list, self.dt, self.rng)
+            self.drop_enzymes(drop_list_index)
+            self.add_to_environment(drop_list_enzyme)
+
+            # UPDATE GLOBALS
+            # --------------------------------------------------------------
+            self.update_global_twist()
+            self.update_global_superhelical()
+
+            # --------------------------------------------------------------
+            if self.series:
+                self.append_enzymes_to_dict()
+                self.append_sites_to_dict_step2(new_enzyme_list, drop_list_enzyme)
+                self.append_environmental_to_dict()
+
+        # Output the dataframes: (series)
+        if self.series:
+            self.enzymes_df = pd.DataFrame.from_dict(self.enzymes_dict_list)
+            self.sites_df = pd.DataFrame.from_dict(self.sites_dict_list)
+            self.environmental_df = pd.DataFrame.from_dict(self.environmental_dict_list)
+
+        return self.enzymes_df, self.sites_df, self.environmental_df
+
     # Sometimes we might be interested in the supercoiling global response, and not care about the specific interactions
     # This function performs a simulation where we do not save the bound/unbound enzymes, hence we do not produce
     # log, df or csv files. Only a numpy array -> my_supercoiling is returned.

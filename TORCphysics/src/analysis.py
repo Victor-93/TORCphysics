@@ -76,7 +76,9 @@ def cross_correlation_hmatrix(signals, dt):
 # Output: 1.- Modulated rates. 2.- Supercoiling density.
 def site_activity_curves(site, environment, dt=1, sigma_min=-.2, sigma_max=.1, delta_sigma=.001):
     sigma = np.arange(sigma_min, sigma_max, delta_sigma)
-    rate, binding_probability, have_model = bm.select_binding_model(site, environment, sigma, dt)
+    rate = np.zeros_like(sigma)
+    for i, si in enumerate(sigma):
+        rate[i] = site.binding_model.rate_modulation(si)
     return rate, sigma
 
 
