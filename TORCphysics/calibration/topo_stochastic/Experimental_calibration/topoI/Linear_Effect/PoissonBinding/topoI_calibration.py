@@ -45,15 +45,14 @@ continuation = False
 mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 120
+n_simulations = 48 #120
 tests = 120  # number of tests for parametrization
 
 # Molecule/model to calibrate
 # -----------------------------------
 mol_name = 'topoI'
 mol_type = 'environmental'
-mol_binding_model_name = 'TopoIRecognition'
-#  mol_binding_model_name = 'PoissonBinding'
+mol_binding_model_name = 'PoissonBinding'
 mol_effect_model_name = 'TopoisomeraseLinearEffect'
 mol_unbinding_model_name = 'PoissonUnBinding'
 mol_sigma0 = 0.0
@@ -62,17 +61,12 @@ mol_sigma0 = 0.0
 # -----------------------------------
 # TopoI ranges
 file_out = mol_name + '_calibration'
-k_on_min = 0.001
+k_on_min = 0.0001
 k_on_max = 0.01
 k_off_min = 0.01
 k_off_max = 1.0
 k_cat_min = 5.0  # Ranges to vary k_cat
 k_cat_max = 20.0
-
-width_min = 0.001
-width_max = 0.05
-threshold_min = -0.05
-threshold_max = -0.001
 
 # Optimization functions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -96,7 +90,7 @@ def objective_function(params):
     name = mol_name
     object_type = mol_type
     binding_model_name = mol_binding_model_name
-    binding_oparams = {'k_on': params['k_on'], 'width': params['width'], 'threshold': params['threshold']}
+    binding_oparams = {'k_on': params['k_on']}
     effect_model_name = mol_effect_model_name
     effect_oparams = {'k_cat': params['k_cat'], 'sigma0': mol_sigma0}
     unbinding_model_name = mol_unbinding_model_name
@@ -157,9 +151,7 @@ for count, initial_substrate in enumerate(initial_substrates):
 space = {
     'k_cat': hp.uniform('k_cat', k_cat_min, k_cat_max),
     'k_on': hp.uniform('k_on', k_on_min, k_on_max),
-    'k_off': hp.uniform('k_off', k_off_min, k_off_max),
-    'width': hp.uniform('width', width_min, width_max),
-    'threshold': hp.uniform('threshold', threshold_min, threshold_max)
+    'k_off': hp.uniform('k_off', k_off_min, k_off_max)
 }
 
 # Save the current standard output

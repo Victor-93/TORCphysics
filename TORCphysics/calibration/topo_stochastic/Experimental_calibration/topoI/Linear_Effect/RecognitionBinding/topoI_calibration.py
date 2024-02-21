@@ -45,15 +45,14 @@ continuation = False
 mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 120
-tests = 120  # number of tests for parametrization
+n_simulations = 48 #120
+tests = 96  # number of tests for parametrization
 
 # Molecule/model to calibrate
 # -----------------------------------
 mol_name = 'topoI'
 mol_type = 'environmental'
 mol_binding_model_name = 'TopoIRecognition'
-#  mol_binding_model_name = 'PoissonBinding'
 mol_effect_model_name = 'TopoisomeraseLinearEffect'
 mol_unbinding_model_name = 'PoissonUnBinding'
 mol_sigma0 = 0.0
@@ -62,6 +61,7 @@ mol_sigma0 = 0.0
 # -----------------------------------
 # TopoI ranges
 file_out = mol_name + '_calibration'
+#k_on_min = 0.0001
 k_on_min = 0.001
 k_on_max = 0.01
 k_off_min = 0.01
@@ -69,10 +69,10 @@ k_off_max = 1.0
 k_cat_min = 5.0  # Ranges to vary k_cat
 k_cat_max = 20.0
 
-width_min = 0.001
-width_max = 0.05
-threshold_min = -0.05
-threshold_max = -0.001
+width_min = 0.0001
+width_max = 0.01
+threshold_min = -0.01 #-.05#-0.05
+threshold_max = 0.0#-0.001
 
 # Optimization functions
 # ----------------------------------------------------------------------------------------------------------------------

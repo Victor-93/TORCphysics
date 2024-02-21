@@ -52,8 +52,8 @@ tests = 120  # number of tests for parametrization
 # -----------------------------------
 mol_name = 'topoI'
 mol_type = 'environmental'
-mol_binding_model_name = 'TopoIRecognition'
-#  mol_binding_model_name = 'PoissonBinding'
+#  mol_binding_model_name = 'TopoIRecognition'
+mol_binding_model_name = 'PoissonBinding'
 mol_effect_model_name = 'TopoisomeraseLinearEffect'
 mol_unbinding_model_name = 'PoissonUnBinding'
 mol_sigma0 = 0.0

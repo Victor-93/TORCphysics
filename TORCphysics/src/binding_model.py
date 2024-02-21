@@ -158,7 +158,7 @@ class PoissonBinding(BindingModel):
         probability : float
             A number that indicates the probability of binding in the current timestep.
         """
-        return utils.Poisson_process(self.k_on, dt)
+        return utils.Poisson_process(self.k_on*environmental.concentration, dt)
 
     def rate_modulation(self, superhelical) -> float:
         rate = self.k_on

@@ -1,0 +1,18 @@
+20/02/2024
+
+Here, we want to calibrate using the same Linear effect model but with a couple of changes.
+
+Calibration method:
+* Models will be calibrated just using a particular substrate concentration [S], and the code will be independent of this
+  variable
+* Models will be calibrated using a reference concentration c0: k = k_cat * F(superhelical) * c / c0
+
+TopoI:
+* Binding model = Poisson binding
+* Effect model = Linear effect
+* Unbinding model = Poisson unbinding
+
+Gyrase:
+* Binding model = Recognition
+* Effect model = Linear effect
+* Unbinding model = Poisson unbinding

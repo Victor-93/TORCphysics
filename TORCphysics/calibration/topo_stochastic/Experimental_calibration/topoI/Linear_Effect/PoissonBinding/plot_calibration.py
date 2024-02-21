@@ -1,20 +1,12 @@
 import numpy as np
-from hyperopt import tpe, hp, fmin
 import pandas as pd
+import matplotlib.pyplot as plt
 import topo_calibration_tools as tct
-import sys
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
 # ----------------------------------------------------------------------------------------------------------------------
-# This is just a test to reproduce the global supercoiling response curves from the paper:
-# Kinetic Study of DNA Topoisomerases by Supercoiling-Dependent Fluorescence Quenching
-
-# We now have estimations of the initial and final superhelical densities.
-# For now, let's not consider ATP.
-# Let's run examples of the actual calibration. Remember that in your simulation, you need to consider the
-# density of the plasmid concentration as well, so you have many concentrations to test.
-
+# We want to plot the results of the calibration
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Initial conditions
@@ -26,53 +18,48 @@ initial_time = 0
 final_time = 600
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
+file_out = 'calibration'
 
 # For the simulation
 circuit_filename = 'circuit.csv'
 sites_filename = None  # 'sites_test.csv'
 enzymes_filename = None  # 'enzymes_test.csv'
-environment_filename = 'topoI_environment.csv'
+topoI_environment_filename = 'topoI_environment.csv'
 gyrase_environment_filename = 'gyrase_environment.csv'
 
 # Experimental concentration of topoisomerases
-# gyrase_concentration = 44.6
-mol_concentration = 17.0
+# TODO: Check bien las concentrations - Creo que estan bien
+gyrase_concentration = 44.6
+topoI_concentration = 17.0
 
-tm = 'stochastic'
+# Simulations conditions
 output_prefix = 'test0'
 series = True
 continuation = False
-mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 120
-tests = 120  # number of tests for parametrization
-
-# Molecule/model to calibrate
+n_simulations = 48 #120
+# Molecule/model to calibrate/test
 # -----------------------------------
-mol_name = 'topoI'
-mol_type = 'environmental'
-mol_binding_model_name = 'TopoIRecognition'
-#  mol_binding_model_name = 'PoissonBinding'
-mol_effect_model_name = 'TopoisomeraseLinearEffect'
-mol_unbinding_model_name = 'PoissonUnBinding'
-mol_sigma0 = 0.0
+# Topo I
+topoI_name = 'topoI'
+topoI_type = 'environmental'
+topoI_binding_model_name = 'PoissonBinding'
+topoI_effect_model_name = 'TopoisomeraseLinearEffect'
+#topoI_effect_model_name = 'TopoisomeraseLinearRandEffect'
+topoI_unbinding_model_name = 'PoissonUnBinding'
+topoI_calibration_file = 'topoI_calibration.csv'
+topoI_sigma0 = 0.0
 
-# RANGES FOR RANDOM SEARCH
+# FIGURE
 # -----------------------------------
-# TopoI ranges
-file_out = mol_name + '_calibration'
-k_on_min = 0.001
-k_on_max = 0.01
-k_off_min = 0.01
-k_off_max = 1.0
-k_cat_min = 5.0  # Ranges to vary k_cat
-k_cat_max = 20.0
+width = 8
+height = 4
+lw = 3
+experiment_color = 'blue'
+model_color = 'red'
+fig, axs = plt.subplots(2, figsize=(width, 2 * height), tight_layout=True)
 
-width_min = 0.001
-width_max = 0.05
-threshold_min = -0.05
-threshold_max = -0.001
 
 # Optimization functions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -80,28 +67,28 @@ threshold_max = -0.001
 # density for each substrate concentration
 
 
-def objective_function(params):
+def topoI_objective_function(params):
     # We need to prepare the inputs.
 
     # Global dictionary
     # ------------------------------------------
     global_dict = {'circuit_filename': circuit_filename, 'sites_filename': sites_filename,
-                   'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
+                   'enzymes_filename': enzymes_filename, 'environment_filename': topoI_environment_filename,
                    'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                    'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': initial_sigma,
                    'DNA_concentration': 0.0}
 
     # Variation dictionary
     # ------------------------------------------
-    name = mol_name
-    object_type = mol_type
-    binding_model_name = mol_binding_model_name
-    binding_oparams = {'k_on': params['k_on'], 'width': params['width'], 'threshold': params['threshold']}
-    effect_model_name = mol_effect_model_name
-    effect_oparams = {'k_cat': params['k_cat'], 'sigma0': mol_sigma0}
-    unbinding_model_name = mol_unbinding_model_name
-    unbinding_oparams = {'k_off': params['k_off']}
-    concentration = mol_concentration  # / mol_concentration  # Because this is the reference.
+    name = topoI_name
+    object_type = topoI_type
+    binding_model_name = topoI_binding_model_name
+    binding_oparams = {'k_on': float(params['k_on'][0])}
+    effect_model_name = topoI_effect_model_name
+    effect_oparams = {'k_cat': float(params['k_cat'][0]), 'sigma0': topoI_sigma0}
+    unbinding_model_name = topoI_unbinding_model_name
+    unbinding_oparams = {'k_off': float(params['k_off'][0])}
+    concentration = topoI_concentration
 
     topo_variation = {'name': name, 'object_type': object_type,
                       'binding_model_name': binding_model_name, 'binding_oparams': binding_oparams,
@@ -114,14 +101,16 @@ def objective_function(params):
                                                                         initial_substrates=initial_substrates,
                                                                         exp_superhelicals=exp_superhelicals,
                                                                         n_simulations=n_simulations)
-    return my_objective
-
+    return my_objective, simulation_superhelicals
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Process
 # ----------------------------------------------------------------------------------------------------------------------
 
-# Experimental evaluation
+# ==================================================================================================================
+# ==================================================================================================================
+# Build experimental curve for TOPO I
+# ==================================================================================================================
 # ==================================================================================================================
 # Kinetics: SDNA + TopoI -> SDNA-TopoI -> RDNA + TopoI
 # Product = Fluorescent or Relaxed DNA
@@ -129,9 +118,8 @@ def objective_function(params):
 initial_sigma = -.047
 final_sigma = 0.0
 initial_product = 0.0
-# initial_substrate = .7
-initial_substrates = [0.7]  # [0.35, 0.7, 1.1, 1.8, 2.1]
-enzyme_concentration = mol_concentration
+initial_substrates = [0.7]  #  [0.35, 0.7, 1.1, 1.8, 2.1]
+enzyme_concentration = topoI_concentration
 K_M = 1.5
 k_cat = .0023  # 0.003
 v_max = k_cat * enzyme_concentration
@@ -141,55 +129,49 @@ exp_superhelicals = []
 for count, initial_substrate in enumerate(initial_substrates):
     # Substrates and products
     # ----------------------------------
+    ax = axs[0]
     substrate, product = tct.integrate_MM(vmax=v_max, KM=K_M, substrate0=initial_substrate, product0=initial_product,
                                           frames=frames, dt=dt)
+    ax.plot(time, product, lw=lw, color=experiment_color)
+
     # Sigma deduction
     # ----------------------------------
+    ax = axs[1]
     superhelical = tct.rescale_product_to_sigma(product, initial_sigma, final_sigma)
+    ax.plot(time, superhelical, lw=lw, color=experiment_color)
 
-    # Collect results
+    # Collect
     exp_substrates.append(substrate)
     exp_products.append(product)
     exp_superhelicals.append(superhelical)
 
-# Optimization
-# ==================================================================================================================
-space = {
-    'k_cat': hp.uniform('k_cat', k_cat_min, k_cat_max),
-    'k_on': hp.uniform('k_on', k_on_min, k_on_max),
-    'k_off': hp.uniform('k_off', k_off_min, k_off_max),
-    'width': hp.uniform('width', width_min, width_max),
-    'threshold': hp.uniform('threshold', threshold_min, threshold_max)
-}
+# ---------------------------------------------------------------------------------------------------------------------
+# Plot simulation example for TopoI
+# ---------------------------------------------------------------------------------------------------------------------
+params = pd.read_csv(topoI_calibration_file).to_dict()
+objective, simulation_superhelicals = topoI_objective_function(params=params)
 
-# Save the current standard output
-original_stdout = sys.stdout
-# Define the file where you want to save the output
-output_file_path = file_out + '.info'
+# And plot
+ax = axs[1]
+for count, initial_substrate in enumerate(initial_substrates):
+    superhelical = simulation_superhelicals[count]
+    ax.plot(time, superhelical, '--', lw=lw, color=model_color)
 
-# Open the file in write mode
-with open(output_file_path, 'w') as f:
-    # Redirect the standard output to the file
-    sys.stdout = f
 
-    # Your code that prints to the screen
-    print("Hello, this is the info file for the calibration of " + mol_name + ' model.')
-    print("Binding Model = " + mol_binding_model_name)
-    print("Effect Model = " + mol_effect_model_name)
-    print("Unbinding Model = " + mol_unbinding_model_name)
-    print('Ran ' + str(n_simulations) + ' simulations per test. ')
-    print('Number of tests = ' + str(tests))
 
-    best = fmin(
-        fn=objective_function,  # Objective Function to optimize
-        space=space,  # Hyperparameter's Search Space
-        algo=tpe.suggest,  # Optimization algorithm (representative TPE)
-        max_evals=tests  # Number of optimization attempts
-    )
+#-------------------------------------------------------------------
+ax = axs[0]
+ax.set_xlabel('time (s)')
+ax.set_ylabel('Relaxed DNA (nM)')
+ax.grid(True)
 
-    print(" ")
-    print("Optimal parameters found from random search: ")
-    print(best)
+ax = axs[1]
+ax.set_xlabel('time (s)')
+ax.set_ylabel('Superhelical response')
+ax.grid(True)
 
-best_df = pd.DataFrame.from_dict([best])  # TODO: fix this because it doesn't save the letters
-best_df.to_csv(file_out + '.csv', index=False, sep=',')
+axs[0].set_title('Topoisomerase I')
+
+plt.savefig(file_out+'.png')
+plt.savefig(file_out+'.pdf')
+plt.show()
