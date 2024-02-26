@@ -4,9 +4,6 @@ import multiprocessing
 import pandas as pd
 from TORCphysics import parallelization_tools as pt
 
-
-output_variable = 'superhelical'
-
 # Parallelization conditions
 # --------------------------------------------------------------
 n_simulations = 96 # 120
@@ -62,7 +59,8 @@ for name in names:
 
     print(name)
     # Prepare output dataframe
-    output_df = time_df.copy()
+    superhelical_output_df = time_df.copy()
+    binding_output_df = time_df.copy()
 
     # Extract info from dataframes
     for n, out_dict in enumerate(pool_results):
@@ -75,14 +73,23 @@ for name in names:
             mask = sites_df['type'] == name
         else:
             mask = sites_df['name'] == name
+
+        # Superhelical
+        # ------------------------------------------------------------------------------
         superhelical = sites_df[mask]['superhelical'].to_numpy()
-
         simulation_df = pd.DataFrame({'simulation_'+str(n): superhelical})
+        superhelical_output_df = pd.concat([superhelical_output_df, simulation_df], axis=1).reset_index(drop=True)
 
-        # output_df = pd.concat([output_df, simulation_df], ignore_index=True)
-        output_df = pd.concat([output_df, simulation_df], axis=1).reset_index(drop=True)
+        # Binding Event
+        # ------------------------------------------------------------------------------
+        binding_event = sites_df[mask]['binding'].to_numpy()
+        simulation_df = pd.DataFrame({'simulation_'+str(n): binding_event})
+        binding_output_df = pd.concat([binding_output_df, simulation_df], axis=1).reset_index(drop=True)
 
-    cout = output_variable + '_' + name + '_df.csv'
-    output_df.to_csv(cout, index=False, sep=',')
+    cout = 'superhelical_' + name + '_df.csv'
+    superhelical_output_df.to_csv(cout, index=False, sep=',')
+
+    cout = 'binding_' + name + '_df.csv'
+    binding_output_df.to_csv(cout, index=False, sep=',')
 
 pool.close()

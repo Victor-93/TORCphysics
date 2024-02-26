@@ -43,6 +43,7 @@ gyra_t = params.gyra_b_t
 # ---------------------------------------------------------------------------------------------------------------------
 # BINDING MODELS
 # ---------------------------------------------------------------------------------------------------------------------
+# TODO: I added the parameter interacts. Think about it and see if you remove it or maybe not?
 # These functions are for the particular binding model.
 # If you need a new one, define it here.
 class BindingModel(ABC):
@@ -55,23 +56,30 @@ class BindingModel(ABC):
      ----------
      filename : str, optional
          Path to the site csv file that parametrises the binding model.
+     interacts : bool, optional
+        Parameter that indicates if the site/environmental interacts with other bound enzymes. It could be the case
+        that the bound enzymem may increase the rate of the binding environmental.
      oparams : dict, optional
          A dictionary containing the parameters used for the binding model.
     """
 
-    def __init__(self, filename=None, **oparams):
+    def __init__(self, filename=None, interacts=False, **oparams):
         """ The constructor of BindingModel.
 
         Parameters
         ----------
         filename : str, optional
             Path to the site csv file that parametrises the binding model.
+        interacts : bool, optional
+            Parameter that indicates if the site/environmental interacts with other bound enzymes. It could be the case
+            that the bound enzymem may increase the rate of the binding environmental.
         oparams : dict, optional
             A dictionary containing the parameters used for the binding model.
         """
 
         self.filename = filename
         self.oparams = oparams
+        self.interacts = interacts
 
     @abstractmethod
     def binding_probability(self) -> float:
@@ -112,7 +120,7 @@ class PoissonBinding(BindingModel):
         A dictionary containing the parameters used for the binding model.
     """
 
-    def __init__(self, filename=None, **oparams):
+    def __init__(self, filename=None, interacts=False, **oparams):
         """ The constructor of the PoissonBinding subclass.
 
         Parameters
@@ -137,6 +145,7 @@ class PoissonBinding(BindingModel):
         else:
             self.k_on = oparams['k_on']
 
+        self.interacts = interacts
         self.oparams = {'k_on': self.k_on}  # Just in case
 
     #    def binding_probability(self, on_rate, dt) -> float:
@@ -158,7 +167,7 @@ class PoissonBinding(BindingModel):
         probability : float
             A number that indicates the probability of binding in the current timestep.
         """
-        return utils.Poisson_process(self.k_on*environmental.concentration, dt)
+        return utils.Poisson_process(self.k_on * environmental.concentration, dt)
 
     def rate_modulation(self, superhelical) -> float:
         rate = self.k_on
@@ -168,7 +177,7 @@ class PoissonBinding(BindingModel):
 # TODO: Document this function
 class MeyerPromoterOpening(BindingModel):
 
-    def __init__(self, filename=None, **oparams):
+    def __init__(self, filename=None, interacts=False, **oparams):
 
         super().__init__(filename, **oparams)  # Call the base class constructor
         if not oparams:
@@ -185,6 +194,7 @@ class MeyerPromoterOpening(BindingModel):
         else:
             self.k_on = oparams['k_on']
 
+        self.interacts = interacts
         self.oparams = {'k_on': self.k_on}  # Just in case
 
     #    def binding_probability(self, on_rate, dt) -> float:
@@ -226,7 +236,7 @@ class MaxMinPromoterBinding(BindingModel):
         A dictionary containing the parameters used for the binding model.
     """
 
-    def __init__(self, filename=None, **oparams):
+    def __init__(self, filename=None, interacts=False, **oparams):
 
         super().__init__(filename, **oparams)
         if not oparams:
@@ -260,6 +270,7 @@ class MaxMinPromoterBinding(BindingModel):
             self.k_min = float(oparams['k_min'])
             self.k_max = float(oparams['k_max'])
 
+        self.interacts = interacts
         # Just in case
         self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_min': self.k_min, 'k_max': self.k_max}
 
@@ -333,7 +344,7 @@ class TopoIRecognition(BindingModel):
         A dictionary containing the parameters used for the binding model.
     """
 
-    def __init__(self, filename=None, **oparams):
+    def __init__(self, filename=None, interacts=False, **oparams):
         """ The constructor of the TopoIRecognition subclass.
 
         Parameters
@@ -372,6 +383,7 @@ class TopoIRecognition(BindingModel):
             self.threshold = float(oparams['threshold'])
             self.k_on = float(oparams['k_on'])
 
+        self.interacts = interacts
         self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
 
     # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
@@ -406,6 +418,144 @@ class TopoIRecognition(BindingModel):
         return rate
 
 
+class TopoIRecognitionRNAPTracking(BindingModel):
+    """
+     A BindingModel subclass that calculates binding probabilities according a sigmoid recognition curve and a
+     RNAP tracking function.
+     This model represents the binding mechanism of Topoisomerase I, where it recognises the DNA's shape according
+     the local supercoiling density and the presence of RNAPs facilitates the binding (increases basal rate).
+     In this case, the binding rate varies as a function of supercoiling and RNAP position.
+
+     Attributes
+     ----------
+     k_on : float
+        Rate (1/s) at which the enzymes bind.
+     threshold : float
+        The threshold of the sigmoid curve. This is a dimensionless parameter.
+     width : float
+        The width of the sigmoid curve. This is a dimensionless parameter.
+    RNAP_dist: float
+        Distance (bp) at which bound RNAPs affect the binding of topo I.
+    fold_change: float
+        Fold change due to the presence of RNAPs. Basically, if a topo I binds within a region in which a RNAP
+        is located within the "RNAP_dist" distance, then the rate is increased by: rate x fold_change.
+     filename : str, optional
+        Path to the site csv file that parametrises the binding model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the binding model.
+    """
+
+    def __init__(self, filename=None, interacts=True, **oparams):
+        """ The constructor of the TopoIRecognition subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the binding model; this file should have the k_on, width and
+             threshold parameters.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the binding model. In this case, it would be k_on, width
+            and threshold.
+        """
+
+        super().__init__(filename, interacts, **oparams)
+        if not oparams:
+            if filename is None:
+                self.width = params.topo_b_w
+                self.threshold = params.topo_b_t
+                self.k_on = params.topo_b_k_on
+            else:
+                mydata = pd.read_csv(filename)
+                if 'k_on' in mydata.columns:
+                    self.k_on = mydata['k_on'][0]
+                else:
+                    raise ValueError('Error, k_on parameter missing in csv file for TopoIRecognition')
+                if 'width' in mydata.columns:
+                    self.width = mydata['width'][0]
+                else:
+                    raise ValueError('Error, width parameter missing in csv file for TopoIRecognition')
+                if 'threshold' in mydata.columns:
+                    self.threshold = mydata['threshold'][0]
+                else:
+                    raise ValueError('Error, threshold parameter missing in csv file for TopoIRecognition')
+        else:
+            # No point testing or checking that we have these variables, as python gives error on its own.
+            self.width = float(oparams['width'])
+            self.threshold = float(oparams['threshold'])
+            self.k_on = float(oparams['k_on'])
+
+        self.RNAP_dist = 200.0  # in bp
+        self.fold_change = 20.0  # Fold change when RNAP is close
+        self.interacts = interacts
+        self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
+
+    # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
+    def binding_probability(self, environmental, superhelical, site, enzyme_list, dt) -> float:
+        """ Method for calculating the probability of binding according the TopoIRecognitionRNAPTracking model.
+
+        Parameters
+        ----------
+        dt : float
+            Timestep in seconds (s).
+        environmental : Environment
+            The environmental molecule that is trying to bind the site.
+        superhelical : float
+            The local supercoiling region in the site.
+
+        Returns
+        ----------
+        probability : float
+            A number that indicates the probability of binding in the current timestep.
+        """
+
+        # Calculate rate based on superhelical density
+        a = environmental.concentration * self.k_on
+        b = 1 + np.exp((superhelical - self.threshold) / self.width)
+        rate = a / b
+
+        # See if RNAP is in the vicinity and if yes, then the rate increases.
+        # TODO:
+        #   1.- We need to check that the RNAP is a distance less or equal than RNAP_dist.
+        #   2.- Then check that has the correct direction:
+        #    * If left and direction == -1, then increases
+        #    * If right and direction == +1, then increases
+        #  Necesitamos distancias del site:  s1____s2
+        #  Necesitamos
+        RNAP_near = False
+        if site.start < site.end:
+            s1 = site.start
+            s2 = site.end
+        else:
+            s1 = site.end
+            s2 = site.start
+
+        # For Enzyme on the left
+        enzyme_left = utils.get_enzyme_before_position(s1, enzyme_list)
+        if 'RNAP' in enzyme_left.enzyme_type:
+            dist_left = s1 - (enzyme_left.position + enzyme_left.effective_size)
+            if 0 <= dist_left <= self.RNAP_dist and enzyme_left.direction == -1:
+                RNAP_near = True
+
+        # For Enzyme on the right
+        enzyme_right = utils.get_enzyme_after_position(s2, enzyme_list)
+        if 'RNAP' in enzyme_right.enzyme_type:
+            dist_right = enzyme_right.position - s2
+            if 0 <= dist_right <= self.RNAP_dist and enzyme_right.direction == 1:
+                RNAP_near = True
+
+        # Check if rate is increased
+        if RNAP_near:
+            rate = rate * self.fold_change
+        return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+
+    def rate_modulation(self, superhelical) -> float:
+        # Note that is not multiplied by the concentration
+        a = self.k_on
+        b = 1 + np.exp((superhelical - self.threshold) / self.width)
+        rate = a / b
+        return rate
+
+
 class GyraseRecognition(BindingModel):
     """
      A BindingModel subclass that calculates binding probabilities according a sigmoid recognition curve.
@@ -426,7 +576,7 @@ class GyraseRecognition(BindingModel):
         A dictionary containing the parameters used for the binding model.
     """
 
-    def __init__(self, filename=None, **oparams):
+    def __init__(self, filename=None, interacts=False, **oparams):
         """ The constructor of the GyraseRecognition subclass.
 
         Parameters
@@ -464,6 +614,7 @@ class GyraseRecognition(BindingModel):
             self.threshold = float(oparams['threshold'])
             self.k_on = float(oparams['k_on'])
 
+        self.interacts = interacts
         self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
 
     # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
@@ -625,6 +776,8 @@ def assign_binding_model(model_name, oparams_file=None, **oparams):
         my_model = PoissonBinding(filename=oparams_file, **oparams)
     elif model_name == 'TopoIRecognition':
         my_model = TopoIRecognition(filename=oparams_file, **oparams)
+    elif model_name == 'TopoIRecognitionRNAPTracking':
+        my_model = TopoIRecognitionRNAPTracking(filename=oparams_file, **oparams)
     elif model_name == 'GyraseRecognition':
         my_model = GyraseRecognition(filename=oparams_file, **oparams)
     elif model_name == 'MeyerPromoterOpening':

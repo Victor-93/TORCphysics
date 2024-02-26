@@ -74,8 +74,17 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
 
             # According model, calculate the binding probability
             # -----------------------------------------------------------
-            binding_probability = site.binding_model.binding_probability(environmental=environment,
-                                                                         superhelical=site_superhelical, dt=dt)
+            # TODO: Think if there is a better way of doing this.
+            # If the site interacts with other bound enzymes, then we need more data
+            if site.binding_model.interacts:
+                binding_probability = site.binding_model.binding_probability(environmental=environment,
+                                                                             superhelical=site_superhelical,
+                                                                             site=site,
+                                                                             enzyme_list=enzyme_list,
+                                                                             dt=dt)
+            else:
+                binding_probability = site.binding_model.binding_probability(environmental=environment,
+                                                                             superhelical=site_superhelical, dt=dt)
 
             # Decide if the enzyme will bind
             # -------------------------------------------------------------
