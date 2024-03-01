@@ -312,6 +312,7 @@ class RNAPStall(EffectModel):
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
+# TODO: Check that effect distributes supercoiling on both side (left and right)
 class TopoIUniform(EffectModel):
     """
      An EffectModel subclass that represents the uniform effect that topoisomerase I have on the DNA.
@@ -386,6 +387,7 @@ class TopoIUniform(EffectModel):
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
+# TODO: Check that effect distributes supercoiling on both side (left and right)
 class GyraseUniform(EffectModel):
     """
      An EffectModel subclass that represents the uniform effect that gyrase have on the DNA.
@@ -569,8 +571,7 @@ class GyraseEnergyPack(EffectModel):
         self.energy_pack = self.energy_pack - energy_spent
 
 
-
-
+# TODO: Check that effect distributes supercoiling on both side (left and right)
 # TODO: Comment and fix
 class TopoisomeraseLinearEffect(EffectModel):
 
@@ -611,6 +612,7 @@ class TopoisomeraseLinearEffect(EffectModel):
 
 
 # TODO: Make the random parameter an input.
+# TODO: Check that effect distributes supercoiling on both side (left and right)
 class TopoisomeraseLinearRandEffect(EffectModel):
 
     # def __init__(self, name, filename):
@@ -646,6 +648,105 @@ class TopoisomeraseLinearRandEffect(EffectModel):
 
         twist_left = 0.5 * self.k_cat * params.w0 * dt * (self.sigma0 - superhelical + random_addition)
         twist_right = twist_left
+
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+
+# TODO: Comment and fix
+# The function is : delta twist = kcat * w0 * (sigma0 - sigma) * dt
+# sigma0 marks the superhelical density in which the torque of DNA is too strong that it restores the superhelicity
+# in other words, gyrase cannot keep acting at that superhelicity
+class GyraseLinear(EffectModel):
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=False, **oparams):
+
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        # TODO: Check correct parametrization
+        if not oparams:
+            if filename is None:
+                self.k_cat = params.gyra_uniform_k_cat
+                self.sigma0 = -0.2  # TODO: I don't know why like this
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'k_cat' in mydata.columns:
+                    self.k_cat = mydata['k_cat'][0]
+                    self.sigma0 = mydata['sigma0'][0]
+                else:
+                    raise ValueError('Error, k_cat parameter missing in csv file for GyraseUniform')
+        else:
+            self.k_cat = float(oparams['k_cat'])
+            self.sigma0 = float(oparams['sigma0'])
+
+        self.oparams = {'k_cat': self.k_cat, 'sigma0': self.sigma0}  # Just in case
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+
+        position = 0.0
+        z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)  # Get the enzyme before
+        z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)  # Get the enzyme after z
+        total_twist = z_b.twist + z.twist  # Total twist in the region.
+        # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
+        superhelical = total_twist / (params.w0 * (z_a.position - z_b.position))
+
+        # Total twist added by the molecule
+        twist_added = self.k_cat * params.w0 * dt * (self.signa0 - superhelical)
+
+        # Total superhelicity in the region after the effect
+        total_superhelicity = (total_twist + twist_added) / (params.w0 * (z_a.position - z_b.position))
+
+        # The twist added is distributed so we have the same total superhelicity at both sides after the effect.
+        # delta twist = total_superhelicity * w0 * region_length - twist_before_effect
+        twist_left = total_superhelicity * params.w0 * abs(z.position - z_b.position) - z_b.twist
+        twist_right = total_superhelicity * params.w0 * abs(z_a.position - z.position) - z.twist
+
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+
+# TODO: Comment and fix
+# The function is : delta twist = -kcat * w0 * sigma * dt
+class TopoILinear(EffectModel):
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=False, **oparams):
+
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        # TODO: Check correct parametrization
+        if not oparams:
+            if filename is None:
+                self.k_cat = params.topoI_uniform_k_cat
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'k_cat' in mydata.columns:
+                    self.k_cat = mydata['k_cat'][0]
+                else:
+                    raise ValueError('Error, k_cat parameter missing in csv file for GyraseUniform')
+        else:
+            self.k_cat = float(oparams['k_cat'])
+
+        self.oparams = {'k_cat': self.k_cat}  # Just in case
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+
+        position = 0.0
+        z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)  # Get the enzyme before
+        z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)  # Get the enzyme after z
+        total_twist = z_b.twist + z.twist  # Total twist in the region.
+        # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
+        superhelical = total_twist / (params.w0 * (z_a.position - z_b.position))
+
+        # Total twist added by the molecule
+        twist_added = -self.k_cat * params.w0 * dt * superhelical
+
+        # Total superhelicity in the region after the effect
+        total_superhelicity = (total_twist + twist_added) / (params.w0 * (z_a.position - z_b.position))
+
+        # The twist added is distributed so we have the same total superhelicity at both sides after the effect.
+        # delta twist = total_superhelicity * w0 * region_length - twist_before_effect
+        twist_left = total_superhelicity * params.w0 * abs(z.position - z_b.position) - z_b.twist
+        twist_right = total_superhelicity * params.w0 * abs(z_a.position - z.position) - z.twist
 
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
@@ -993,6 +1094,10 @@ def assign_effect_model(model_name, oparams_file=None, **oparams):
         my_model = TopoisomeraseLinearEffect(filename=oparams_file, **oparams)
     elif model_name == 'TopoisomeraseLinearRandEffect':
         my_model = TopoisomeraseLinearRandEffect(filename=oparams_file, **oparams)
+    elif model_name == 'TopoILinear':
+        my_model = TopoILinear(filename=oparams_file, **oparams)
+    elif model_name == 'GyraseLinear':
+        my_model = GyraseLinear(filename=oparams_file, **oparams)
     elif model_name == 'TopoIContinuum':
         my_model = TopoIContinuum(filename=oparams_file, **oparams)
     elif model_name == 'GyraseContinuum':
