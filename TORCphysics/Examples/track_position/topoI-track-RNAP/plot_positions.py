@@ -22,7 +22,7 @@ height = 4
 names = ['RNAP', 'topoI', 'gyrase']
 colors_dict = {'RNAP': 'black', 'topoI': 'red', 'gyrase': 'cyan'}
 kwargs = {'linewidth': 2, 'ls': '-'}
-nbins = [30,60,60]
+nbins = [40,80,80]
 
 # Let's plot
 # ---------------------------------------------------------

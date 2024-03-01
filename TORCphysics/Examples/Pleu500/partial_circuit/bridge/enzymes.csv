@@ -1,0 +1,4 @@
+type,name,site,position,size,effective_size,twist,superhelical,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+origin,ori,ori,2535,500,500,0.0,0.0,,,,
+TF,lacI,lac1,5304,20,10,0.0,0.0,,,,
+TF,lacI,lac2,3168,20,10,0.0,0.0,,,,

@@ -8,7 +8,7 @@ from TORCphysics import parallelization_tools as pt
 
 # Parallelization conditions
 # --------------------------------------------------------------
-n_simulations = 20 #96 # 120
+n_simulations = 40 #96 # 120
 
 # Circuit initial conditions
 # --------------------------------------------------------------
