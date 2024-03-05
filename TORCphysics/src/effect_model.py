@@ -691,7 +691,7 @@ class GyraseLinear(EffectModel):
         superhelical = total_twist / (params.w0 * (z_a.position - z_b.position))
 
         # Total twist added by the molecule
-        twist_added = self.k_cat * params.w0 * dt * (self.signa0 - superhelical)
+        twist_added = self.k_cat * params.w0 * dt * (self.sigma0 - superhelical)
 
         # Total superhelicity in the region after the effect
         total_superhelicity = (total_twist + twist_added) / (params.w0 * (z_a.position - z_b.position))
@@ -749,6 +749,65 @@ class TopoILinear(EffectModel):
         twist_right = total_superhelicity * params.w0 * abs(z_a.position - z.position) - z.twist
 
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+# TODO: Comment and fix
+# The function is : delta twist = angular_vel0 * dt - k_DNA * w0 * sigma * dt*dt
+# k_DNA = acceleration at which supercoils are being removed (bp/sec^2) -
+#   This parameter is related with the torque of DNA
+class TopoISimpleTorque(EffectModel):
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=False, **oparams):
+
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        # TODO: Check correct parametrization
+        if not oparams:
+            if filename is None:
+                self.k_DNA = 5.0
+                self.drag_constant = 0.0
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'k_DNA' in mydata.columns:
+                    self.k_DNA = mydata['k_DNA'][0]
+                else:
+                    raise ValueError('Error, k_DNA parameter missing in csv file for TopoISimpleTorque')
+        else:
+            self.k_DNA = float(oparams['k_DNA'])
+            self.drag_constant = float(oparams['drag_constant'])
+
+        self.angular_velocity = 0.0  # Angular velocity
+        self.oparams = {'k_DNA': self.k_DNA, 'drag_constant': self.drag_constant}  # Just in case
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+
+        position = 0.0
+        z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)  # Get the enzyme before
+        z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)  # Get the enzyme after z
+        total_twist = z_b.twist + z.twist  # Total twist in the region.
+        # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
+        superhelical = total_twist / (params.w0 * (z_a.position - z_b.position))
+
+        # Total twist added by the molecule
+#        twist_added = self.angular_velocity * dt - self.k_DNA * params.w0 * superhelical * dt * dt
+        twist_added = (self.angular_velocity * dt - self.k_DNA * params.w0 * superhelical * dt * dt
+                       - self.drag_constant * self.angular_velocity * dt)
+
+        # Total superhelicity in the region after the effect
+        total_superhelicity = (total_twist + twist_added) / (params.w0 * (z_a.position - z_b.position))
+
+        # The twist added is distributed so we have the same total superhelicity at both sides after the effect.
+        # delta twist = total_superhelicity * w0 * region_length - twist_before_effect
+        twist_left = total_superhelicity * params.w0 * abs(z.position - z_b.position) - z_b.twist
+        twist_right = total_superhelicity * params.w0 * abs(z_a.position - z.position) - z.twist
+
+        self.update_angular_velocity(twist_added, dt)
+
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+    # delta_twist = change in twist
+    def update_angular_velocity(self, delta_twist, dt):
+        self.angular_velocity = delta_twist/dt
 
 
 class TopoIContinuum(EffectModel):
@@ -1098,6 +1157,8 @@ def assign_effect_model(model_name, oparams_file=None, **oparams):
         my_model = TopoILinear(filename=oparams_file, **oparams)
     elif model_name == 'GyraseLinear':
         my_model = GyraseLinear(filename=oparams_file, **oparams)
+    elif model_name == 'TopoISimpleTorque':
+        my_model = TopoISimpleTorque(filename=oparams_file, **oparams)
     elif model_name == 'TopoIContinuum':
         my_model = TopoIContinuum(filename=oparams_file, **oparams)
     elif model_name == 'GyraseContinuum':

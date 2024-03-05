@@ -31,12 +31,15 @@ frames = len(time)
 circuit_filename = 'circuit.csv'
 sites_filename = None  # 'sites_test.csv'
 enzymes_filename = None  # 'enzymes_test.csv'
-environment_filename = 'topoI_environment.csv'
-gyrase_environment_filename = 'gyrase_environment.csv'
+environment_filename = 'gyrase_environment.csv'
 
 # Experimental concentration of topoisomerases
 # gyrase_concentration = 44.6
-mol_concentration = 17.0
+mol_concentration = 44.6
+
+# Relaxed is the superhelical density when the DNA is relaxed
+relaxed_DNA = 0.01
+final_DNA = -0.1  # This is after the enzyme effect
 
 tm = 'stochastic'
 output_prefix = 'test0'
@@ -45,28 +48,33 @@ continuation = False
 mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 48 #120
-tests = 120  # number of tests for parametrization
+n_simulations = 60 #48 #120
+tests = 100  # number of tests for parametrization
 
 # Molecule/model to calibrate
 # -----------------------------------
-mol_name = 'topoI'
+mol_name = 'gyrase'
 mol_type = 'environmental'
-mol_binding_model_name = 'PoissonBinding'
-mol_effect_model_name = 'TopoisomeraseLinearEffect'
+mol_binding_model_name = 'GyraseRecognition'
+mol_effect_model_name = 'GyraseLinear'
 mol_unbinding_model_name = 'PoissonUnBinding'
-mol_sigma0 = 0.0
 
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------
-# TopoI ranges
+# Gyrase ranges
 file_out = mol_name + '_calibration'
-k_on_min = 0.0001
-k_on_max = 0.01
+k_on_min = 0.001
+k_on_max = 0.1
 k_off_min = 0.01
 k_off_max = 1.0
 k_cat_min = 5.0  # Ranges to vary k_cat
 k_cat_max = 20.0
+sigma0_min = -0.3
+sigma0_max = 0.0
+width_min = 0.0  # 0.001
+width_max = 1.0
+threshold_min = 0.0  # 0.001
+threshold_max = 1.0
 
 # Optimization functions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -90,9 +98,9 @@ def objective_function(params):
     name = mol_name
     object_type = mol_type
     binding_model_name = mol_binding_model_name
-    binding_oparams = {'k_on': params['k_on']}
+    binding_oparams = {'k_on': params['k_on'], 'width': params['width'], 'threshold': params['threshold']}
     effect_model_name = mol_effect_model_name
-    effect_oparams = {'k_cat': params['k_cat'], 'sigma0': mol_sigma0}
+    effect_oparams = {'k_cat': params['k_cat'], 'sigma0': params['sigma0']}
     unbinding_model_name = mol_unbinding_model_name
     unbinding_oparams = {'k_off': params['k_off']}
     concentration = mol_concentration  # / mol_concentration  # Because this is the reference.
@@ -120,14 +128,17 @@ def objective_function(params):
 # Kinetics: SDNA + TopoI -> SDNA-TopoI -> RDNA + TopoI
 # Product = Fluorescent or Relaxed DNA
 # Substrate = Concentration of Supercoiled DNAs
-initial_sigma = -.047
-final_sigma = 0.0
-initial_product = 0.0
-# initial_substrate = .7
-initial_substrates = [0.7]  # [0.35, 0.7, 1.1, 1.8, 2.1]
+# Kinetics: SDNA + TopoI -> SDNA-TopoI -> RDNA + TopoI
+# Product = Fluorescent or Relaxed DNA
+# Substrate = Concentration of Supercoiled DNAs
+initial_sigma = final_DNA  # Is actually the other way around, but there's an error somewhere but I'm lazy to find it
+final_sigma = relaxed_DNA  # 0.0
+initial_product = 4.0
+initial_substrate = .75
+initial_substrates = [0.75]
 enzyme_concentration = mol_concentration
-K_M = 1.5
-k_cat = .0023  # 0.003
+K_M = 2.7
+k_cat = .0011
 v_max = k_cat * enzyme_concentration
 exp_substrates = []
 exp_products = []
@@ -137,9 +148,10 @@ for count, initial_substrate in enumerate(initial_substrates):
     # ----------------------------------
     substrate, product = tct.integrate_MM(vmax=v_max, KM=K_M, substrate0=initial_substrate, product0=initial_product,
                                           frames=frames, dt=dt)
+
     # Sigma deduction
     # ----------------------------------
-    superhelical = tct.rescale_product_to_sigma(product, initial_sigma, final_sigma)
+    superhelical = tct.rescale_product_to_sigma(substrate, initial_sigma, final_sigma)
 
     # Collect results
     exp_substrates.append(substrate)
@@ -148,10 +160,15 @@ for count, initial_substrate in enumerate(initial_substrates):
 
 # Optimization
 # ==================================================================================================================
+initial_sigma = final_sigma
+
 space = {
     'k_cat': hp.uniform('k_cat', k_cat_min, k_cat_max),
     'k_on': hp.uniform('k_on', k_on_min, k_on_max),
-    'k_off': hp.uniform('k_off', k_off_min, k_off_max)
+    'k_off': hp.uniform('k_off', k_off_min, k_off_max),
+    'sigma0': hp.uniform('sigma0', sigma0_min, sigma0_max),
+    'width': hp.uniform('width', width_min, width_max),
+    'threshold': hp.uniform('threshold', threshold_min, threshold_max)
 }
 
 # Save the current standard output

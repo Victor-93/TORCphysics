@@ -38,6 +38,9 @@ gyrase_environment_filename = 'gyrase_environment.csv'
 # gyrase_concentration = 44.6
 mol_concentration = 17.0
 
+relaxed_DNA = 0.0
+supercoiled_DNA = -0.1
+
 tm = 'stochastic'
 output_prefix = 'test0'
 series = True
@@ -45,34 +48,31 @@ continuation = False
 mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 48 #120
-tests = 96  # number of tests for parametrization
+n_simulations = 60 #48 #120
+tests = 100  # number of tests for parametrization
 
 # Molecule/model to calibrate
 # -----------------------------------
 mol_name = 'topoI'
 mol_type = 'environmental'
 mol_binding_model_name = 'TopoIRecognition'
-mol_effect_model_name = 'TopoisomeraseLinearEffect'
+mol_effect_model_name = 'TopoILinear'
 mol_unbinding_model_name = 'PoissonUnBinding'
-mol_sigma0 = 0.0
 
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------
 # TopoI ranges
 file_out = mol_name + '_calibration'
-#k_on_min = 0.0001
-k_on_min = 0.001
+k_on_min = 0.0001
 k_on_max = 0.01
 k_off_min = 0.01
 k_off_max = 1.0
 k_cat_min = 5.0  # Ranges to vary k_cat
 k_cat_max = 20.0
-
-width_min = 0.0001
-width_max = 0.01
-threshold_min = -0.01 #-.05#-0.05
-threshold_max = 0.0#-0.001
+width_min = 0.001
+width_max = 0.05
+threshold_min = -0.05
+threshold_max = -0.001
 
 # Optimization functions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ def objective_function(params):
     binding_model_name = mol_binding_model_name
     binding_oparams = {'k_on': params['k_on'], 'width': params['width'], 'threshold': params['threshold']}
     effect_model_name = mol_effect_model_name
-    effect_oparams = {'k_cat': params['k_cat'], 'sigma0': mol_sigma0}
+    effect_oparams = {'k_cat': params['k_cat']}
     unbinding_model_name = mol_unbinding_model_name
     unbinding_oparams = {'k_off': params['k_off']}
     concentration = mol_concentration  # / mol_concentration  # Because this is the reference.
@@ -126,8 +126,8 @@ def objective_function(params):
 # Kinetics: SDNA + TopoI -> SDNA-TopoI -> RDNA + TopoI
 # Product = Fluorescent or Relaxed DNA
 # Substrate = Concentration of Supercoiled DNAs
-initial_sigma = -.047
-final_sigma = 0.0
+initial_sigma = supercoiled_DNA#-.047
+final_sigma = relaxed_DNA
 initial_product = 0.0
 # initial_substrate = .7
 initial_substrates = [0.7]  # [0.35, 0.7, 1.1, 1.8, 2.1]

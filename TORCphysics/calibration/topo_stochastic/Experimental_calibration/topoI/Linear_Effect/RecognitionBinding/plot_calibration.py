@@ -32,24 +32,26 @@ gyrase_environment_filename = 'gyrase_environment.csv'
 gyrase_concentration = 44.6
 topoI_concentration = 17.0
 
+relaxed_DNA = 0.0
+supercoiled_DNA = -0.1
+
 # Simulations conditions
 output_prefix = 'test0'
 series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 48 #120
+n_simulations = 60 #48 #120
 # Molecule/model to calibrate/test
 # -----------------------------------
 # Topo I
 topoI_name = 'topoI'
 topoI_type = 'environmental'
 topoI_binding_model_name = 'TopoIRecognition'
-topoI_effect_model_name = 'TopoisomeraseLinearEffect'
+topoI_effect_model_name = 'TopoILinear'
 #topoI_effect_model_name = 'TopoisomeraseLinearRandEffect'
 topoI_unbinding_model_name = 'PoissonUnBinding'
 topoI_calibration_file = 'topoI_calibration.csv'
-topoI_sigma0 = 0.0
 
 # FIGURE
 # -----------------------------------
@@ -83,10 +85,9 @@ def topoI_objective_function(params):
     name = topoI_name
     object_type = topoI_type
     binding_model_name = topoI_binding_model_name
-    binding_oparams = {'k_on': float(params['k_on'][0]), 'width': float(params['width'][0]),
-                       'threshold': float(params['threshold'][0])}
+    binding_oparams = {'k_on': float(params['k_on'][0]), 'width': float(params['width'][0]), 'threshold': float(params['threshold'][0])}
     effect_model_name = topoI_effect_model_name
-    effect_oparams = {'k_cat': float(params['k_cat'][0]), 'sigma0': topoI_sigma0}
+    effect_oparams = {'k_cat': float(params['k_cat'][0])}
     unbinding_model_name = topoI_unbinding_model_name
     unbinding_oparams = {'k_off': float(params['k_off'][0])}
     concentration = topoI_concentration
@@ -116,8 +117,8 @@ def topoI_objective_function(params):
 # Kinetics: SDNA + TopoI -> SDNA-TopoI -> RDNA + TopoI
 # Product = Fluorescent or Relaxed DNA
 # Substrate = Concentration of Supercoiled DNAs
-initial_sigma = -.047
-final_sigma = 0.0
+initial_sigma = supercoiled_DNA
+final_sigma = relaxed_DNA
 initial_product = 0.0
 initial_substrates = [0.7]  #  [0.35, 0.7, 1.1, 1.8, 2.1]
 enzyme_concentration = topoI_concentration
@@ -133,13 +134,13 @@ for count, initial_substrate in enumerate(initial_substrates):
     ax = axs[0]
     substrate, product = tct.integrate_MM(vmax=v_max, KM=K_M, substrate0=initial_substrate, product0=initial_product,
                                           frames=frames, dt=dt)
-    ax.plot(time, product, lw=lw, color=experiment_color)
+    ax.plot(time, product, lw=lw, color=experiment_color, label='exp')
 
     # Sigma deduction
     # ----------------------------------
     ax = axs[1]
     superhelical = tct.rescale_product_to_sigma(product, initial_sigma, final_sigma)
-    ax.plot(time, superhelical, lw=lw, color=experiment_color)
+    ax.plot(time, superhelical, lw=lw, color=experiment_color, label='exp')
 
     # Collect
     exp_substrates.append(substrate)
@@ -156,7 +157,7 @@ objective, simulation_superhelicals = topoI_objective_function(params=params)
 ax = axs[1]
 for count, initial_substrate in enumerate(initial_substrates):
     superhelical = simulation_superhelicals[count]
-    ax.plot(time, superhelical, '--', lw=lw, color=model_color)
+    ax.plot(time, superhelical, '--', lw=lw, color=model_color, label=r'sim $\epsilon={}$'.format(objective))
 
 
 
@@ -165,13 +166,17 @@ ax = axs[0]
 ax.set_xlabel('time (s)')
 ax.set_ylabel('Relaxed DNA (nM)')
 ax.grid(True)
+ax.legend(loc='best')
+
 
 ax = axs[1]
 ax.set_xlabel('time (s)')
 ax.set_ylabel('Superhelical response')
 ax.grid(True)
+ax.legend(loc='best')
 
-axs[0].set_title('Topoisomerase I')
+
+axs[0].set_title('Topoisomerase I: Recognition + Linear')
 
 plt.savefig(file_out+'.png')
 plt.savefig(file_out+'.pdf')

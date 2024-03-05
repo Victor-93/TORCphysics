@@ -38,6 +38,9 @@ gyrase_environment_filename = 'gyrase_environment.csv'
 # gyrase_concentration = 44.6
 mol_concentration = 17.0
 
+relaxed_DNA = 0.0
+supercoiled_DNA = -0.1
+
 tm = 'stochastic'
 output_prefix = 'test0'
 series = True
@@ -45,34 +48,29 @@ continuation = False
 mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 120
-tests = 120  # number of tests for parametrization
+n_simulations = 60 #48 #120
+tests = 100  # number of tests for parametrization
 
 # Molecule/model to calibrate
 # -----------------------------------
 mol_name = 'topoI'
 mol_type = 'environmental'
-#  mol_binding_model_name = 'TopoIRecognition'
 mol_binding_model_name = 'PoissonBinding'
-mol_effect_model_name = 'TopoisomeraseLinearEffect'
+mol_effect_model_name = 'TopoISimpleTorque'
 mol_unbinding_model_name = 'PoissonUnBinding'
-mol_sigma0 = 0.0
 
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------
 # TopoI ranges
 file_out = mol_name + '_calibration'
-k_on_min = 0.001
+k_on_min = 0.0001
 k_on_max = 0.01
 k_off_min = 0.01
 k_off_max = 1.0
-k_cat_min = 5.0  # Ranges to vary k_cat
-k_cat_max = 20.0
-
-width_min = 0.001
-width_max = 0.05
-threshold_min = -0.05
-threshold_max = -0.001
+k_DNA_min = 1.0  # Ranges to vary k_DNA
+k_DNA_max = 20.0
+drag_constant_min = 0
+drag_constant_max = 1
 
 # Optimization functions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -96,9 +94,10 @@ def objective_function(params):
     name = mol_name
     object_type = mol_type
     binding_model_name = mol_binding_model_name
-    binding_oparams = {'k_on': params['k_on'], 'width': params['width'], 'threshold': params['threshold']}
+    binding_oparams = {'k_on': params['k_on']}
     effect_model_name = mol_effect_model_name
-    effect_oparams = {'k_cat': params['k_cat'], 'sigma0': mol_sigma0}
+#    effect_oparams = {'k_DNA': params['k_DNA']}
+    effect_oparams = {'k_DNA': params['k_DNA'], 'drag_constant': params['drag_constant']}
     unbinding_model_name = mol_unbinding_model_name
     unbinding_oparams = {'k_off': params['k_off']}
     concentration = mol_concentration  # / mol_concentration  # Because this is the reference.
@@ -126,15 +125,15 @@ def objective_function(params):
 # Kinetics: SDNA + TopoI -> SDNA-TopoI -> RDNA + TopoI
 # Product = Fluorescent or Relaxed DNA
 # Substrate = Concentration of Supercoiled DNAs
-initial_sigma = -.047
-final_sigma = 0.0
+initial_sigma = supercoiled_DNA#-.047
+final_sigma = relaxed_DNA
 initial_product = 0.0
 # initial_substrate = .7
 initial_substrates = [0.7]  # [0.35, 0.7, 1.1, 1.8, 2.1]
 enzyme_concentration = mol_concentration
 K_M = 1.5
-k_cat = .0023  # 0.003
-v_max = k_cat * enzyme_concentration
+k_DNA = .0023  # 0.003
+v_max = k_DNA * enzyme_concentration
 exp_substrates = []
 exp_products = []
 exp_superhelicals = []
@@ -155,11 +154,10 @@ for count, initial_substrate in enumerate(initial_substrates):
 # Optimization
 # ==================================================================================================================
 space = {
-    'k_cat': hp.uniform('k_cat', k_cat_min, k_cat_max),
+    'k_DNA': hp.uniform('k_DNA', k_DNA_min, k_DNA_max),
+    'drag_constant': hp.uniform('drag_constant', drag_constant_min, drag_constant_max),
     'k_on': hp.uniform('k_on', k_on_min, k_on_max),
-    'k_off': hp.uniform('k_off', k_off_min, k_off_max),
-    'width': hp.uniform('width', width_min, width_max),
-    'threshold': hp.uniform('threshold', threshold_min, threshold_max)
+    'k_off': hp.uniform('k_off', k_off_min, k_off_max)
 }
 
 # Save the current standard output
