@@ -39,8 +39,12 @@ for i, name in enumerate(names_genes):
 
     sum_ini = np.zeros_like(sum_simu_array)
     for k in range(1, len(time)):
-        sum_ini[k] = np.sum(sum_simu_array[0:k])
+        sum_ini[k] = np.sum(sum_simu_array[0:k+1])
 
+
+    a = sum_ini[-1]
+    t2 = time[-1]
+    print(a, t2, a/t2)
     #curve = np.log(sum_ini / time)
     curve = sum_ini/(time*n_simulations)
 
@@ -85,7 +89,7 @@ for i, name in enumerate(names):
     else:
         ctitle = name
     ax.set_title(ctitle, fontsize=15)
-    ax.set_xlim(-0.07, 0.01)
+    ax.set_xlim(-0.15, 0.1)
 
 
 plt.savefig('comp_feed-supercoiling_distribution.png')

@@ -20,7 +20,7 @@ output_prefix = 'nobridge'
 frames = 50000
 series = True
 continuation = False
-dt = 0.25
+dt = 0.5
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation, dt)
 

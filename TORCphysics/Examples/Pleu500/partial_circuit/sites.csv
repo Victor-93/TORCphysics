@@ -1,5 +1,5 @@
 type,name,start,end,k_on,binding_model,binding_oparams
-gene,tetA,85,1276,0.01,PoissonBinding,none
+gene,tetA,85,1276,0.03,PoissonBinding,none
 gene,mKalama1,5103,4383,0.001,MaxMinPromoterBinding,../mKalama1_response.csv
 origin,ori,2535,3123,0.0,,
 lacOP,lac1,5304,5324,0.01,,
