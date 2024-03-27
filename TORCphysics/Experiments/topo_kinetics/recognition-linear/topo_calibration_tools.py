@@ -129,39 +129,45 @@ def both_T_G_to_sigma(Relaxed, Relaxed_final, sigma0, sigmaf):
     return sigma
 
 
-# global_dict = Dict with global simulation conditions
+# This function will run objective functions for different systems with different conditions.
+# The final objective function will be the sum of all objective functions.
+# global_dict_list = List of dictionaries with global simulation conditions
 # variations_list = A list with a list of variations to implement to the enzymes, environmentals or sites.
-# initial_substrates = A list with DNA DNA concentration
-# exp_superhelicals = list with values of experimental superhelical densities
-# n_simulations = how many simulations to launch.
-def run_objective_function(global_dict, variations_list, exp_superhelical, n_simulations):
+# exp_superhelicals = list with arrays of superhelical densities for each system/experiment
+# n_simulations = how many simulations to launch per system.
+def run_objective_function(global_dict_list, variations_list, exp_superhelicals, n_simulations):
+
+    n_systems = len(global_dict_list)  # number of systems.
+
     # Let's run experiments for the substrate concentrations
     my_objective = 0.0
     simulation_superhelicals = []
-    global_dict['DNA_concentration'] = 1  # DNA concentration - Doesn't affect
 
-    # Let's create an Item to pass the conditions to the simulation
-    Item = {'global_conditions': global_dict, 'variations': variations_list}
+    for n in range(n_systems):
 
-    # But we actually need a list of items, so the pool can pass each item to the function
-    Items = []
-    for simulation_number in range(n_simulations):
-        g_dict = dict(global_dict)
-        g_dict['n_simulations'] = simulation_number
-        Item = {'global_conditions': g_dict, 'variations': variations_list}
+        # We need a list of items, so the pool can pass each item to the function
+        Items = []
+        for simulation_number in range(n_simulations):
+            g_dict = dict(global_dict_list[n])
+            g_dict['n_simulations'] = simulation_number
+            Item = {'global_conditions': g_dict, 'variations': variations_list[n]}
+            Items.append(Item)
 
-        Items.append(Item)
+        # Create a multiprocessing pool
+        pool = multiprocessing.Pool()
+        pool_results = pool.map(pt.single_simulation_calibration_w_supercoiling, Items)
 
-    # Create a multiprocessing pool
-    pool = multiprocessing.Pool()
-    pool_results = pool.map(pt.single_simulation_calibration_w_supercoiling, Items)
+        # Process superhelical densities to calculate objective function
+        my_supercoiling = np.zeros((g_dict['frames'], n_simulations))
+        for i, sigma in enumerate(pool_results):
+            my_supercoiling[:, i] = sigma[:-1]
 
-    my_supercoiling = np.zeros((global_dict['frames'], n_simulations))
-    for i, sigma in enumerate(pool_results):
-        my_supercoiling[:, i] = sigma[:-1]
-    mea = np.mean(my_supercoiling, axis=1)
-    my_objective += np.sum(np.square(np.mean(my_supercoiling, axis=1) - exp_superhelical))
-    simulation_superhelicals.append(mea)
+        mea = np.mean(my_supercoiling, axis=1)
+        current_objective = np.sum(np.square(np.mean(my_supercoiling, axis=1) - exp_superhelicals[n]))
 
-    my_objective = my_objective + 0.0
+        # Save average superhelical densities
+        simulation_superhelicals.append(mea)
+
+        #print('system', n, 'simulation', simulation_number, 'my_objective', my_objective)
+        my_objective = my_objective + current_objective
     return my_objective, simulation_superhelicals

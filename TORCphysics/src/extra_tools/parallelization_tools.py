@@ -200,7 +200,7 @@ def single_simulation_calibration_w_supercoiling(item):
                 if environmental.name == variation['name']:
                     my_object = environmental
                     # And let's modify concentration
-                    my_object.concentration = variation['concentration'] * global_dict['DNA_concentration']
+                    my_object.concentration = variation['concentration']  # * global_dict['DNA_concentration']
                     # Here, we are multiplying
                     # [E] * [S], so the rate would be something like k = k_on * [E] * [S] * f(sigma),
                     # where [E] is the enzyme concentration, [S] the substrate concentration which in this case is the
