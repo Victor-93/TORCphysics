@@ -10,22 +10,17 @@ import sys
 # This is just a test to reproduce the global supercoiling response curves from the paper:
 # Kinetic Study of DNA Topoisomerases by Supercoiling-Dependent Fluorescence Quenching
 
-# We now have estimations of the initial and final superhelical densities.
-# For now, let's not consider ATP.
-# Let's run examples of the actual calibration. Remember that in your simulation, you need to consider the
-# density of the plasmid concentration as well, so you have many concentrations to test.
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Initial conditions
 # ----------------------------------------------------------------------------------------------------------------------
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
-dt = 0.5
+dt = 0.25
 initial_time = 0
 final_time = 600
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
+file_out = 'calibration'
 
 # For the simulation
 circuit_filename = 'circuit.csv'
@@ -34,22 +29,32 @@ enzymes_filename = None  # 'enzymes_test.csv'
 environment_filename = 'topoI_environment.csv'
 gyrase_environment_filename = 'gyrase_environment.csv'
 
-# Experimental concentration of topoisomerases
-# gyrase_concentration = 44.6
-mol_concentration = 17.0
+# Concentrations in nM
+DNA_concentration = 0.75
+gyrase_concentration = 44.6
+topoI_concentration = 17.0
 
-relaxed_DNA = 0.0
-supercoiled_DNA = -0.1
+# MM kinetics
+K_M_topoI = 1.5
+k_cat_topoI = .0023
+v_max_topoI = k_cat_topoI * topoI_concentration
+K_M_gyrase = 2.7
+k_cat_gyrase = .0011
+v_max_gyrase = k_cat_gyrase * gyrase_concentration
 
-tm = 'stochastic'
+# Superhelical values (sigma) for each case
+sigma_0_topo = -0.075  # Approximately -20 supercoils according the paper
+sigma_0_gyrase = 0.0  # We suppose this one.
+sigma_f_gyrase = -0.1  # We also assume this one, which is the maximum at which gyrase acts.
+# At this value the torque is too strong.
+
 output_prefix = 'test0'
 series = True
 continuation = False
-mm = 'uniform'
 
 # For parallelization and calibration
-n_simulations = 60 #48 #120
-tests = 100  # number of tests for parametrization
+n_simulations = 6#60 #48 #120
+tests = 5#100  # number of tests for parametrization
 
 # Molecule/model to calibrate
 # -----------------------------------
@@ -58,6 +63,7 @@ mol_type = 'environmental'
 mol_binding_model_name = 'TopoIRecognition'
 mol_effect_model_name = 'TopoILinear'
 mol_unbinding_model_name = 'PoissonUnBinding'
+mol_concentration = topoI_concentration
 
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------
@@ -79,8 +85,7 @@ threshold_max = -0.001
 # This one runs the objective function in parallel. It returns the objective function as well as the mean superhelical
 # density for each substrate concentration
 
-
-def objective_function(params):
+def objective_function_topoI(params):
     # We need to prepare the inputs.
 
     # Global dictionary
@@ -112,48 +117,47 @@ def objective_function(params):
     my_objective, simulation_superhelicals = tct.run_objective_function(global_dict=global_dict,
                                                                         variations_list=[topo_variation],
                                                                         initial_substrates=initial_substrates,
-                                                                        exp_superhelicals=exp_superhelicals,
+                                                                        exp_superhelicals=exp_sigma,
                                                                         n_simulations=n_simulations)
     return my_objective
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 # Process
 # ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-# Experimental evaluation
 # ==================================================================================================================
-# Kinetics: SDNA + TopoI -> SDNA-TopoI -> RDNA + TopoI
-# Product = Fluorescent or Relaxed DNA
-# Substrate = Concentration of Supercoiled DNAs
-initial_sigma = supercoiled_DNA#-.047
-final_sigma = relaxed_DNA
-initial_product = 0.0
-# initial_substrate = .7
-initial_substrates = [0.7]  # [0.35, 0.7, 1.1, 1.8, 2.1]
-enzyme_concentration = mol_concentration
-K_M = 1.5
-k_cat = .0023  # 0.003
-v_max = k_cat * enzyme_concentration
-exp_substrates = []
-exp_products = []
-exp_superhelicals = []
-for count, initial_substrate in enumerate(initial_substrates):
-    # Substrates and products
-    # ----------------------------------
-    substrate, product = tct.integrate_MM(vmax=v_max, KM=K_M, substrate0=initial_substrate, product0=initial_product,
-                                          frames=frames, dt=dt)
-    # Sigma deduction
-    # ----------------------------------
-    superhelical = tct.rescale_product_to_sigma(product, initial_sigma, final_sigma)
+# ==================================================================================================================
+# TOPO I !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# ==================================================================================================================
+# ==================================================================================================================
 
-    # Collect results
-    exp_substrates.append(substrate)
-    exp_products.append(product)
-    exp_superhelicals.append(superhelical)
+# Build experimental curve for TOPO I
+# -----------------------------------------------------
+# Kinetics: Supercoiled_DNA + TopoI -> Supercoiled_DNA-TopoI -> Relaxed_DNA + TopoI
+# Product = Relaxed DNA
+# Substrate = Concentration of Supercoiled DNAs; which initially is the same as the DNA concentration
 
+# Integrate MM kinetics
+# ------------------------------------------
+# Initially, there's no relaxed DNA, and all the supercoiled DNA concentration corresponds to the plasmid conc.
+supercoiled_DNA, relaxed_DNA = tct.integrate_MM_topoI(vmax=v_max_topoI, KM=K_M_topoI,
+                                                      Supercoiled_0=DNA_concentration, Relaxed_0=0.0,
+                                                      frames=frames, dt=dt)
+# Translate to superhelical density
+# ------------------------------------------
+exp_sigma = tct.topoI_to_sigma(Relaxed=relaxed_DNA, DNA_concentration=DNA_concentration, sigma0=sigma_0_topo)
+
+
+# TODO: This is wrong, the objective function needs to consider the three experiments, topo I alone, Gyrase alone,
+#       and both enzymes acting together.
+# TODO: Calculate exp_sigma for the three cases
+# TODO: Create optimization space that varies both topo I and Gyrase params
+# TODO:  Create objective function that sums ob_topo + ob_gyrase + ob_both
 # Optimization
-# ==================================================================================================================
+# -----------------------------------------------------
 space = {
     'k_cat': hp.uniform('k_cat', k_cat_min, k_cat_max),
     'k_on': hp.uniform('k_on', k_on_min, k_on_max),
