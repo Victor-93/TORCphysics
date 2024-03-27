@@ -33,7 +33,7 @@ dt = .25
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation, dt, tm, mm)
 
-output = 'animation'
+output = 'animation_ON'
 out_format = '.gif'
 
 vs.create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format,

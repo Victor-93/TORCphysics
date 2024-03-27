@@ -1,0 +1,23 @@
+27/03/2024
+
+Here, we want to calibrate using the same Linear effect model and using Fenfei's paper (kinetic study)
+
+Calibration method:
+* Models will be calibrated just using a particular substrate concentration [S], and the code will be independent of this
+  variable
+* The calibration consists in a 3 curve fittings:
+  1.- Gyrase has to approximate the kinetic curve
+  2.- Topo I has to approximate to its corresponding kinetic curve
+  3.- Kinetic curve will be created combining both Gyrase and topo I, and the simulation has to approximate that curve.
+* This means that topo I and Gyrase will be calibrated at the same time.
+* A random search algorithm will be employed
+
+TopoI:
+* Binding model = Recognition Binding
+* Effect model = Linear effect
+* Unbinding model = Poisson unbinding
+
+Gyrase:
+* Binding model = Recognition Binding
+* Effect model = Linear effect
+* Unbinding model = Poisson unbinding
