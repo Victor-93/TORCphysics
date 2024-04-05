@@ -15,7 +15,7 @@ import sys
 # ----------------------------------------------------------------------------------------------------------------------
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
-dt = 0.5
+dt = 0.25
 initial_time = 0
 final_time = 600
 time = np.arange(initial_time, final_time + dt, dt)
@@ -52,8 +52,8 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 10  # 60 #48 #120
-tests = 10  # 100  # number of tests for parametrization
+n_simulations = 60  # 60 #48 #120
+tests = 200 #10  # 100  # number of tests for parametrization
 
 # Models to calibrate to calibrate
 # -----------------------------------
@@ -315,3 +315,25 @@ with open(output_file_path, 'w') as f:
 
 best_df = pd.DataFrame.from_dict([best])  # TODO: fix this because it doesn't save the letters
 best_df.to_csv(file_out + '.csv', index=False, sep=',')
+
+# Let's save it for each enzyme
+topo_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold'])
+topo_df['k_on'] =best_df['k_on_topoI']
+topo_df['k_off'] = best_df['k_off_topoI']
+topo_df['k_cat'] = best_df['k_cat_topoI']
+topo_df['width'] = best_df['width_topoI']
+topo_df['threshold'] = best_df['threshold_topoI']
+#topo_df.loc[0] = [best_df['k_on_topoI'], best_df['k_off_topoI'], best_df['k_cat_topoI'],
+#                  best_df['width_topoI'], best_df['threshold_topoI']]
+topo_df.to_csv('calibration_topoI.csv', index=False, sep=',')
+
+gyrase_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold', 'sigma0'])
+gyrase_df['k_on'] =best_df['k_on_gyrase']
+gyrase_df['k_off'] = best_df['k_off_gyrase']
+gyrase_df['k_cat'] = best_df['k_cat_gyrase']
+gyrase_df['width'] = best_df['width_gyrase']
+gyrase_df['threshold'] = best_df['threshold_gyrase']
+gyrase_df['sigma0'] = best_df['sigma0_gyrase']
+#gyrase_df.loc[0] = [best_df['k_on_gyrase'], best_df['k_off_gyrase'], best_df['k_cat_gyrase'],
+#                    best_df['width_gyrase'], best_df['threshold_gyrase'], best_df['sigma0_gyrase']]
+gyrase_df.to_csv('calibration_gyrase.csv', index=False, sep=',')
