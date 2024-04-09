@@ -1,2 +1,2 @@
 name,structure,size,twist,superhelical,sequence
-test_circuit_linear,linear,6000,0.0,-0.06,none
+test1,circle,6000,0.0,-0.1,none

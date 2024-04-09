@@ -119,10 +119,10 @@ class TestWorkflows(TestCase):
         # Test 5. Environment and sites with k_on=1, hence probability 1; returns list with enzymes.
         # ---------------------------------------------------------------
         print('test5')
-        s1.binding_model = bm.PoissonBinding(**{'k_on': 1})
-        s2.binding_model = bm.PoissonBinding(**{'k_on': 1})
-        s3.binding_model = bm.PoissonBinding(**{'k_on': 1})
-        s4.binding_model = bm.PoissonBinding(**{'k_on': 1})
+        s1.binding_model = bm.PoissonBinding(**{'k_on': .2})
+        s2.binding_model = bm.PoissonBinding(**{'k_on': .2})
+        s3.binding_model = bm.PoissonBinding(**{'k_on': .2})
+        s4.binding_model = bm.PoissonBinding(**{'k_on': .2})
         site_list = [s0, s1, s2, s3, s4]
         e1 = Environment(e_type='RNAP', name='test1', site_list=site_list, concentration=10.0,
                          size=60, effective_size=30, site_type='gene1',

@@ -1,0 +1,5 @@
+type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams,
+NAP,lacI1,lacOP,0,50,30,none,,,,PoissonUnBinding,
+NAP,lacI2,lacOP,0.0,50,50,none,,,,PoissonUnBinding,
+topo,topoX1,DNA,0.0,120,100,PoissonBinding,,,,PoissonUnBinding,
+topo,topoX2,DNA,0.0,120,100,PoissonBinding,,,,PoissonUnBinding,

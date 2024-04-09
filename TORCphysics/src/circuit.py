@@ -451,11 +451,13 @@ class Circuit:
         else:  # linear
             self.twist = sum(enzyme.twist for enzyme in self.enzyme_list)
 
+    # TODO: Think about what we called global superhelical density.
     # And updates the global superhelical density
     # Important, assumes that global twist is updated
     def update_global_superhelical(self):
         if self.get_num_enzymes() > 2:
-            self.superhelical = self.twist / (params.w0 * (self.size - sum(enzyme.size for enzyme in self.enzyme_list)))
+            # self.superhelical = self.twist / (params.w0 * (self.size - sum(enzyme.size for enzyme in self.enzyme_list)))
+            self.superhelical = self.twist / (params.w0 * self.size)
         else:
             self.superhelical = self.twist / (params.w0 * self.size)
 
@@ -641,10 +643,18 @@ class Circuit:
             # bound region.
             # new_twist_left = region_twist * ((new_length_left + 0.5 * new_enzyme.size) / region_length)
             # new_twist_right = region_twist * ((new_length_right + 0.5 * new_enzyme.size) / region_length)
-            new_twist_left = region_superhelical * region_length * new_length_left * params.w0 / (
-                    new_length_left + new_length_right)
-            new_twist_right = region_superhelical * region_length * new_length_right * params.w0 / (
-                    new_length_left + new_length_right)
+
+            # I had this before the update, but I'm not sure if I was right
+            # ----------------------------------------------------------------------------------------------------------
+            # new_twist_left = region_superhelical * region_length * new_length_left * params.w0 / (
+            #       new_length_left + new_length_right)
+            # new_twist_right = region_superhelical * region_length * new_length_right * params.w0 / (
+            #        new_length_left + new_length_right)
+
+            # This is from the new update and it seems simpler
+            # ----------------------------------------------------------------------------------------------------------
+            new_twist_left = region_twist * new_length_left / (new_length_left + new_length_right)
+            new_twist_right = region_twist - new_twist_left
             # new_superhelical_left = new_twist_left / (params.w0*new_length_left)
             # new_superhelical_right = new_twist_right / (params.w0 * new_length_right)
 

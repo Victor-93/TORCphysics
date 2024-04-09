@@ -4,6 +4,8 @@ from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
 import pandas as pd
 
+error = 0.00000000001
+
 
 # TODO: Sort output names of tests
 # TODO: Queria ver como puedo definir los bare DNA sites. Pensaba que anadiendo un global en el sites haria las cosas
@@ -90,94 +92,463 @@ class TestCircuit(TestCase):
         tm = 'continuum'
         mm = 'uniform'
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt, tm, mm)
+                             output_prefix, frames, series, continuation, dt)
         my_circuit.environmental_list[0].concentration = 0
         my_circuit.environmental_list[1].concentration = 0
         print(my_circuit.environmental_list)
         for site in my_circuit.site_list:  # I'll increase the rates
             # site.k_min = site.k_min * 100
-            site.k_min = site.k_min * 0
+            site.k_min = site.k_on * 0
         print(my_circuit.site_list[2].name)
-        my_circuit.site_list[2].k_min = 0.01
+        my_circuit.site_list[2].k_on = 0.01
         # Let's make the rates
         my_circuit.run()
         print(0)
 
-    # TODO: test fake ends - circular and linear. No enzymes, 1 enzyme, 2 enzymes
     # Tests the positions of the fake enzymes
     def test_fake_ends(self):
         # CIRCULAR
         # -----------------------------------------------------------------------------------------
         # Empty case
-        circuit_filename = 'test_inputs/test_circuit_circular.csv'
-        sites_filename = 'test_inputs/sites_1_gene.csv'
-        enzymes_filename = 'test_inputs/empty_enzymes.csv'
-        environment_filename = 'test_inputs/RNAP_environment.csv'
+        circuit_filename = '../test_inputs/test_circuit_circular.csv'
+        sites_filename = '../test_inputs/sites_1_gene.csv'
+        enzymes_filename = '../test_inputs/empty_enzymes.csv'
+        environment_filename = '../test_inputs/RNAP_environment.csv'
         output_prefix = 'output'
         frames = 5
         series = True
         continuation = False
-        tm = 'continuum'
-        mm = 'uniform'
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt, tm, mm)
+                             output_prefix, frames, series, continuation, dt)
         self.assertEqual(my_circuit.enzyme_list[0].position, 0, "Wrong position of left fake enzyme")
         self.assertEqual(my_circuit.enzyme_list[-1].position, my_circuit.size + 1,
                          "Wrong position of right fake enzyme")
 
         # One Enzyme bound
-        enzymes1_filename = 'test_inputs/enzymes_1.csv'
+        enzymes1_filename = '../test_inputs/enzymes_1.csv'
         my_circuit_1 = Circuit(circuit_filename, sites_filename, enzymes1_filename, environment_filename,
-                               output_prefix, frames, series, continuation, dt, tm, mm)
+                               output_prefix, frames, series, continuation, dt)
         enzyme1 = my_circuit_1.enzyme_list[1]
         #        self.assertEqual(my_circuit_1.enzyme_list[0].position, 1 + enzyme1.position + enzyme1.size - my_circuit_1.size,
         #                         "Wrong position of left fake enzyme")
-        self.assertEqual(my_circuit_1.enzyme_list[0].position, enzyme1.position + enzyme1.size - my_circuit_1.size,
+        self.assertEqual(my_circuit_1.enzyme_list[0].position,
+                         enzyme1.position + enzyme1.effective_size - my_circuit_1.size,
                          "Wrong position of left fake enzyme")
         self.assertEqual(my_circuit_1.enzyme_list[-1].position, enzyme1.position + my_circuit_1.size,
                          "Wrong position of right fake enzyme")
 
         # Two Enzymes bound
-        enzymes2_filename = 'test_inputs/enzymes_2.csv'
+        enzymes2_filename = '../test_inputs/enzymes_2.csv'
         my_circuit_2 = Circuit(circuit_filename, sites_filename, enzymes2_filename, environment_filename,
-                               output_prefix, frames, series, continuation, dt, tm, mm)
+                               output_prefix, frames, series, continuation, dt)
         enzyme1 = my_circuit_2.enzyme_list[1]
         enzyme2 = my_circuit_2.enzyme_list[2]
         #        self.assertEqual(my_circuit_2.enzyme_list[0].position, 1 + enzyme2.position + enzyme2.size - my_circuit_2.size,
         #                         "Wrong position of left fake enzyme")
-        self.assertEqual(my_circuit_2.enzyme_list[0].position, enzyme2.position + enzyme2.size - my_circuit_2.size,
+        self.assertEqual(my_circuit_2.enzyme_list[0].position,
+                         enzyme2.position + enzyme2.effective_size - my_circuit_2.size,
                          "Wrong position of left fake enzyme")
         self.assertEqual(my_circuit_2.enzyme_list[-1].position, enzyme1.position + my_circuit_2.size,
                          "Wrong position of right fake enzyme")
         # LINEAR
         # -----------------------------------------------------------------------------------------
-        circuit_filename_linear = 'test_inputs/test_circuit_linear.csv'
+        circuit_filename_linear = '../test_inputs/test_circuit_linear.csv'
         # No enzymes
         my_circuit_linear = Circuit(circuit_filename_linear, sites_filename, enzymes_filename, environment_filename,
-                                    output_prefix, frames, series, continuation, dt, tm, mm)
+                                    output_prefix, frames, series, continuation, dt)
         self.assertEqual(my_circuit_linear.enzyme_list[0].position, 0, "Wrong position of left fake enzyme")
         self.assertEqual(my_circuit_linear.enzyme_list[-1].position, my_circuit_linear.size + 1,
                          "Wrong position of right fake enzyme")
         # 1 enzyme
         my_circuit_linear1 = Circuit(circuit_filename_linear, sites_filename, enzymes1_filename, environment_filename,
-                                     output_prefix, frames, series, continuation, dt, tm, mm)
+                                     output_prefix, frames, series, continuation, dt, )
         self.assertEqual(my_circuit_linear1.enzyme_list[0].position, 0, "Wrong position of left fake enzyme")
         self.assertEqual(my_circuit_linear1.enzyme_list[-1].position, my_circuit_linear1.size + 1,
                          "Wrong position of right fake enzyme")
         # 2 enzymes
         my_circuit_linear2 = Circuit(circuit_filename_linear, sites_filename, enzymes2_filename, environment_filename,
-                                     output_prefix, frames, series, continuation, dt, tm, mm)
+                                     output_prefix, frames, series, continuation, dt, )
         self.assertEqual(my_circuit_linear2.enzyme_list[0].position, 0, "Wrong position of left fake enzyme")
         self.assertEqual(my_circuit_linear2.enzyme_list[-1].position, my_circuit_linear2.size + 1,
                          "Wrong position of right fake enzyme")
 
+    def test_add_enzyme(self):
+
+        # Test 1: Linear test with single enzyme.
+        # ----------------------------------------------------------------------------
+        print("Test 1.0- Linear DNA with new enzyme")
+
+        circuit_filename = 'circuit_linear.csv'
+        sites_filename = 'sites.csv'
+        enzymes_filename = 'enzymes.csv'
+        environment_filename = 'environment_simple.csv'
+        output_prefix = ''
+        frames = 1000
+        series = True
+        continuation = False
+        dt = 1
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt)
+        site = my_circuit.site_list[4]
+
+        n0 = len(my_circuit.enzyme_list) - 2  # Initial number of bound enzymes
+        twist0 = my_circuit.twist  # Initial twist
+        sigma0 = my_circuit.superhelical  #and supercoiling
+
+        #for enzyme in my_circuit.enzyme_list:
+        #    print(enzyme.name, enzyme.twist, enzyme.superhelical)
+
+        # create new enzymes
+        enzyme1 = Enzyme(e_type='RNAP', name='test1', site=site, position=4000,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        new_enzymes = [enzyme1]
+
+        my_circuit.add_new_enzymes(new_enzymes)
+
+        n_enzymes = len(my_circuit.enzyme_list) - 2
+
+        my_circuit.update_global_twist()
+        my_circuit.update_global_superhelical()
+
+        dsigma = abs(sigma0 - my_circuit.superhelical)
+        dtwist = abs(twist0 - my_circuit.twist)
+        self.assertGreater(n_enzymes, n0)  # Check there are more enzymes
+        self.assertLessEqual(dsigma, error, "Superhelical changed")
+        self.assertLessEqual(dtwist, error, "Twist changed")
+
+
+        # Test 1.1: Linear test with multiple enzyme.
+        # ----------------------------------------------------------------------------
+        print("Test 1.1.- Linear DNA with multiple enzymes")
+
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt)
+        site = my_circuit.site_list[4]
+
+        n0 = len(my_circuit.enzyme_list) - 2  # Initial number of bound enzymes
+        twist0 = my_circuit.twist  # Initial twist
+        sigma0 = my_circuit.superhelical  # and supercoiling
+
+        # create new enzymes
+        enzyme1 = Enzyme(e_type='RNAP', name='test1', site=site, position=4000,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        enzyme2 = Enzyme(e_type='RNAP', name='test2', site=site, position=4300,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        new_enzymes = [enzyme1, enzyme2]
+
+        my_circuit.add_new_enzymes(new_enzymes)
+
+        n_enzymes = len(my_circuit.enzyme_list) - 2
+
+        my_circuit.update_global_twist()
+        my_circuit.update_global_superhelical()
+
+        dsigma = abs(sigma0 - my_circuit.superhelical)
+        dtwist = abs(twist0 - my_circuit.twist)
+        self.assertGreater(n_enzymes, n0)  # Check there are more enzymes
+        self.assertLessEqual(dsigma, error, "Superhelical changed")
+        self.assertLessEqual(dtwist, error, "Twist changed")
+
+        # Test 1.2: Linear test with no bound enzymes but multiple enzymes binding.
+        # ----------------------------------------------------------------------------
+        print("Test 1.2.- Linear DNA with no bound enzymes but multiple binding")
+        enzymes_filename = '../test_inputs/empty_enzymes.csv'
+
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt)
+        site = my_circuit.site_list[4]
+
+        n0 = len(my_circuit.enzyme_list) - 2  # Initial number of bound enzymes
+        twist0 = my_circuit.twist  # Initial twist
+        sigma0 = my_circuit.superhelical  # and supercoiling
+
+        # create new enzymes
+        enzyme1 = Enzyme(e_type='RNAP', name='test1', site=site, position=4000,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        enzyme2 = Enzyme(e_type='RNAP', name='test2', site=site, position=4300,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        new_enzymes = [enzyme1, enzyme2]
+
+        my_circuit.add_new_enzymes(new_enzymes)
+
+        n_enzymes = len(my_circuit.enzyme_list) - 2
+
+        my_circuit.update_global_twist()
+        my_circuit.update_global_superhelical()
+
+        dsigma = abs(sigma0 - my_circuit.superhelical)
+        dtwist = abs(twist0 - my_circuit.twist)
+        self.assertGreater(n_enzymes, n0)  # Check there are more enzymes
+        self.assertLessEqual(dsigma, error, "Superhelical changed")
+        self.assertLessEqual(dtwist, error, "Twist changed")
+
+        # Test 2.1: Circular test with single enzyme.
+        # ----------------------------------------------------------------------------
+        print("Test 2.1.- Circular DNA with new enzyme")
+
+        circuit_filename = 'circuit.csv'
+        sites_filename = 'sites.csv'
+        enzymes_filename = 'enzymes.csv'
+        environment_filename = 'environment_simple.csv'
+        output_prefix = ''
+        frames = 1000
+        series = True
+        continuation = False
+        dt = 1
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt)
+        site = my_circuit.site_list[4]
+
+        n0 = len(my_circuit.enzyme_list) - 2  # Initial number of bound enzymes
+        twist0 = my_circuit.twist  # Initial twist
+        sigma0 = my_circuit.superhelical  #and supercoiling
+
+        # create new enzymes
+        enzyme1 = Enzyme(e_type='RNAP', name='test1', site=site, position=4000,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        new_enzymes = [enzyme1]
+
+        my_circuit.add_new_enzymes(new_enzymes)
+
+        n_enzymes = len(my_circuit.enzyme_list) - 2
+
+        my_circuit.update_global_twist()
+        my_circuit.update_global_superhelical()
+
+        dsigma = abs(sigma0 - my_circuit.superhelical)
+        dtwist = abs(twist0 - my_circuit.twist)
+        self.assertGreater(n_enzymes, n0)  # Check there are more enzymes
+        self.assertLessEqual(dsigma, error, "Superhelical changed")
+        self.assertLessEqual(dtwist, error, "Twist changed")
+
+        # Test 2.2: Circular test with single enzyme.
+        # ----------------------------------------------------------------------------
+        print("Test 2.2.- Circular DNA with multiple enzyme")
+
+        circuit_filename = 'circuit.csv'
+        sites_filename = 'sites.csv'
+        enzymes_filename = 'enzymes.csv'
+        environment_filename = 'environment_simple.csv'
+        output_prefix = ''
+        frames = 1000
+        series = True
+        continuation = False
+        dt = 1
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt)
+        site = my_circuit.site_list[4]
+
+        n0 = len(my_circuit.enzyme_list) - 2  # Initial number of bound enzymes
+        twist0 = my_circuit.twist  # Initial twist
+        sigma0 = my_circuit.superhelical  #and supercoiling
+
+        # create new enzymes
+        enzyme1 = Enzyme(e_type='RNAP', name='test1', site=site, position=4000,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        enzyme2 = Enzyme(e_type='RNAP', name='test2', site=site, position=4300,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        new_enzymes = [enzyme1, enzyme2]
+
+        my_circuit.add_new_enzymes(new_enzymes)
+
+        n_enzymes = len(my_circuit.enzyme_list) - 2
+
+        my_circuit.update_global_twist()
+        my_circuit.update_global_superhelical()
+
+        dsigma = abs(sigma0 - my_circuit.superhelical)
+        dtwist = abs(twist0 - my_circuit.twist)
+        self.assertGreater(n_enzymes, n0)  # Check there are more enzymes
+        self.assertLessEqual(dsigma, error, "Superhelical changed")
+        self.assertLessEqual(dtwist, error, "Twist changed")
+
+        # Test 2.3: Circular test with empty enzyme.csv but multiple enzymes binding.
+        # ----------------------------------------------------------------------------
+        print("Test 2.3.- Circular DNA with no bound enzymes but  multiple trying to bind")
+
+        circuit_filename = 'circuit.csv'
+        sites_filename = 'sites.csv'
+        enzymes_filename = '../test_inputs/empty_enzymes.csv'
+        environment_filename = 'environment_simple.csv'
+        output_prefix = ''
+        frames = 1000
+        series = True
+        continuation = False
+        dt = 1
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt)
+        site = my_circuit.site_list[4]
+
+        n0 = len(my_circuit.enzyme_list) - 2  # Initial number of bound enzymes
+        twist0 = my_circuit.twist  # Initial twist
+        sigma0 = my_circuit.superhelical  #and supercoiling
+
+        # create new enzymes
+        enzyme1 = Enzyme(e_type='RNAP', name='test1', site=site, position=4000,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        enzyme2 = Enzyme(e_type='RNAP', name='test2', site=site, position=4300,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        new_enzymes = [enzyme1, enzyme2]
+
+        my_circuit.add_new_enzymes(new_enzymes)
+
+        n_enzymes = len(my_circuit.enzyme_list) - 2
+
+        my_circuit.update_global_twist()
+        my_circuit.update_global_superhelical()
+
+        dsigma = abs(sigma0 - my_circuit.superhelical)
+        dtwist = abs(twist0 - my_circuit.twist)
+        self.assertGreater(n_enzymes, n0)  # Check there are more enzymes
+        self.assertLessEqual(dsigma, error, "Superhelical changed")
+        self.assertLessEqual(dtwist, error, "Twist changed")
+
+        # Check boundaries
+        self.assertEqual(my_circuit.enzyme_list[0].position,
+                         enzyme2.position + enzyme2.effective_size - my_circuit.size,
+                         "Wrong position of left fake enzyme")
+        self.assertEqual(my_circuit.enzyme_list[-1].position, enzyme1.position + my_circuit.size,
+                         "Wrong position of right fake enzyme")
+
+        # Test 2.4: Circular test with one bound enzyme and one new one binding on the left edge.
+        # ----------------------------------------------------------------------------
+        print("Test 2.4.- Circular DNA with no bound enzymes but one binding on the left edge.")
+
+        circuit_filename = 'circuit.csv'
+        sites_filename = 'sites.csv'
+        enzymes_filename = '1enzyme.csv'
+        environment_filename = 'environment_simple.csv'
+        output_prefix = ''
+        frames = 1000
+        series = True
+        continuation = False
+        dt = 1
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt)
+        site = my_circuit.site_list[4]
+
+        n0 = len(my_circuit.enzyme_list) - 2  # Initial number of bound enzymes
+        twist0 = my_circuit.twist  # Initial twist
+        sigma0 = my_circuit.superhelical  #and supercoiling
+
+        # create new enzymes
+        enzyme1 = Enzyme(e_type='RNAP', name='test1', site=site, position=2000,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        new_enzymes = [enzyme1]
+
+        my_circuit.add_new_enzymes(new_enzymes)
+
+        n_enzymes = len(my_circuit.enzyme_list) - 2
+
+        my_circuit.update_global_twist()
+        my_circuit.update_global_superhelical()
+
+        dsigma = abs(sigma0 - my_circuit.superhelical)
+        dtwist = abs(twist0 - my_circuit.twist)
+        self.assertGreater(n_enzymes, n0)  # Check there are more enzymes
+        self.assertLessEqual(dsigma, error, "Superhelical changed")
+        self.assertLessEqual(dtwist, error, "Twist changed")
+
+        # Check boundaries
+        self.assertEqual(my_circuit.enzyme_list[0].position,
+                         my_circuit.enzyme_list[2].position + my_circuit.enzyme_list[2].effective_size - my_circuit.size,
+                         "Wrong position of left fake enzyme")
+        self.assertEqual(my_circuit.enzyme_list[-1].position, enzyme1.position + my_circuit.size,
+                         "Wrong position of right fake enzyme")
+
+        # Test 2.5: Circular test with one bound enzyme and one new one binding on the right edge.
+        # ----------------------------------------------------------------------------
+        print("Test 2.5.- Circular DNA with no bound enzymes but one binding on the right edge.")
+
+        circuit_filename = 'circuit.csv'
+        sites_filename = 'sites.csv'
+        enzymes_filename = '1enzyme.csv'
+        environment_filename = 'environment_simple.csv'
+        output_prefix = ''
+        frames = 1000
+        series = True
+        continuation = False
+        dt = 1
+        my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+                             output_prefix, frames, series, continuation, dt)
+        site = my_circuit.site_list[4]
+
+        n0 = len(my_circuit.enzyme_list) - 2  # Initial number of bound enzymes
+        twist0 = my_circuit.twist  # Initial twist
+        sigma0 = my_circuit.superhelical  #and supercoiling
+
+        # create new enzymes
+        enzyme1 = Enzyme(e_type='RNAP', name='test1', site=site, position=4000,
+                         size=60, effective_size=30, twist=0.0,
+                         superhelical=0.0, effect_model=None,
+                         unbinding_model=None)
+        new_enzymes = [enzyme1]
+
+        my_circuit.add_new_enzymes(new_enzymes)
+
+        n_enzymes = len(my_circuit.enzyme_list) - 2
+
+        my_circuit.update_global_twist()
+        my_circuit.update_global_superhelical()
+
+        dsigma = abs(sigma0 - my_circuit.superhelical)
+        dtwist = abs(twist0 - my_circuit.twist)
+        self.assertGreater(n_enzymes, n0)  # Check there are more enzymes
+        self.assertLessEqual(dsigma, error, "Superhelical changed")
+        self.assertLessEqual(dtwist, error, "Twist changed")
+
+        # Check boundaries
+        self.assertEqual(my_circuit.enzyme_list[0].position,
+                         my_circuit.enzyme_list[2].position + my_circuit.enzyme_list[2].effective_size - my_circuit.size,
+                         "Wrong position of left fake enzyme")
+        self.assertEqual(my_circuit.enzyme_list[-1].position, my_circuit.enzyme_list[1].position + my_circuit.size,
+                         "Wrong position of right fake enzyme")
+
+
+
+    # TODO: Test for circular/linear.
+    #  Test for single/multiple enzymes.
+    #  Test when no enzymes are bound.
+    #  Test global supercoiling ok. Test enzyme is added/removed.
+    #  Test that twist is correctly partitioned.
+    #  Test that EXT positions are correct as well for circular DNA:
+    #   1.- When the new one binds to the left edge.
+    #   2.- And to the right.
+    #   3.- And when no enzymes are bound
+
+    def test_drop_enzyme(self):
+        s = 2
+
+    # TODO: These tests cannot run the current version of the circuit. They need to be updated.
     # TODO: test bind/unbind no topo - one gene, a RNAP binds, then unbinds and twist is conserved. - test with 2 genes
     def test_bind_unbind_1_RNAP_1_gene(self):
-        circuit_filename = 'test_inputs/test_circuit_circular.csv'
-        sites_filename = 'test_inputs/sites_1_gene.csv'
-        enzymes_filename = 'test_inputs/empty_enzymes.csv'
-        environment_filename = 'test_inputs/RNAP_environment.csv'
+        circuit_filename = '../test_inputs/test_circuit_circular.csv'
+        sites_filename = '../test_inputs/sites_1_gene.csv'
+        enzymes_filename = '../test_inputs/empty_enzymes.csv'
+        environment_filename = '../test_inputs/RNAP_environment.csv'
         output_prefix = 'output'
         frames = 500
         series = True
@@ -186,7 +557,7 @@ class TestCircuit(TestCase):
         mm = 'uniform'
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt, tm, mm)
+                             output_prefix, frames, series, continuation, dt, )
         # my_circuit.site_list[2].k_min = 0.0
         s0 = my_circuit.superhelical
 
@@ -255,7 +626,7 @@ class TestCircuit(TestCase):
         mm = 'uniform'
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt, tm, mm)
+                             output_prefix, frames, series, continuation, dt, )
         # my_circuit.site_list[2].k_min = 0.0
         s0 = my_circuit.superhelical
         t0 = my_circuit.twist
@@ -346,7 +717,7 @@ class TestCircuit(TestCase):
         mm = 'uniform'
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt, tm, mm)
+                             output_prefix, frames, series, continuation, dt, )
         # my_circuit.site_list[2].k_min = 0.0
         s0 = my_circuit.superhelical
         t0 = my_circuit.twist
@@ -429,7 +800,7 @@ class TestCircuit(TestCase):
         mm = 'uniform'
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt, tm, mm)
+                             output_prefix, frames, series, continuation, dt, )
         # my_circuit.site_list[2].k_min = 0.0
         s0 = my_circuit.superhelical
         t0 = my_circuit.twist
@@ -514,7 +885,7 @@ class TestCircuit(TestCase):
         mm = 'uniform'
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt, tm, mm)
+                             output_prefix, frames, series, continuation, dt, )
         # my_circuit.site_list[2].k_min = 0.0
         s0 = my_circuit.superhelical
         t0 = my_circuit.twist
@@ -620,7 +991,7 @@ class TestCircuit(TestCase):
         mm = 'uniform'
         dt = 10
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt, tm, mm)
+                             output_prefix, frames, series, continuation, dt, )
         # my_circuit.site_list[2].k_min = 0.0
         # This is similar to the Run function... but the idea is that we will control the rate
         for frame in range(1, frames + 1):
@@ -681,7 +1052,7 @@ class TestCircuit(TestCase):
         mm = 'uniform'
         dt = 1
         my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                             output_prefix, frames, series, continuation, dt, tm, mm)
+                             output_prefix, frames, series, continuation, dt, )
         my_circuit.site_list[1].k_min = 0.0
         for site in my_circuit.site_list:  # I'll increase the rates
             site.k_min = site.k_min * 0

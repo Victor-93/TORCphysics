@@ -704,6 +704,11 @@ class GyraseLinear(EffectModel):
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
+    def twist_added(self, superhelical, dt):
+        # Total twist added by the molecule
+        twist_added = self.k_cat * params.w0 * dt * (self.sigma0 - superhelical)
+        return twist_added
+
 # TODO: Comment and fix
 # The function is : delta twist = -kcat * w0 * sigma * dt
 class TopoILinear(EffectModel):
@@ -749,6 +754,11 @@ class TopoILinear(EffectModel):
         twist_right = total_superhelicity * params.w0 * abs(z_a.position - z.position) - z.twist
 
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+    def twist_added(self, superhelical, dt):
+        # Total twist added by the molecule
+        twist_added = -self.k_cat * params.w0 * dt * superhelical
+        return twist_added
 
 # TODO: Comment and fix
 # The function is : delta twist = angular_vel0 * dt - k_DNA * w0 * sigma * dt*dt

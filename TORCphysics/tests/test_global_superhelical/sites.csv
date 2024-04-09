@@ -1,2 +1,2 @@
 type,name,start,end,k_on,binding_model,binding_oparams
-gene,test1,1000,2000,0.02,PoissonBinding,none
+lacOP,lac1,3200,0.0,0.5,PoissonBinding,none

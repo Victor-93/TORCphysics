@@ -1,2 +1,2 @@
-name,structure,size,twist,superhelical
-test_circuit_circular,circle,6000,0.0,-0.06
+name,structure,size,twist,superhelical,sequence
+test_circuit_circular,circle,6000,0.0,-0.06,none

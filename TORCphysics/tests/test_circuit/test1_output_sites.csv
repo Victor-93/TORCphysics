@@ -1,7 +1,7 @@
 type,name,start,end,k_on,binding_model,binding_oparams
 DNA_topoI_stochastic,DNA_topoI_stochastic,1.0,6000.0,0.0,,
 DNA_gyra_stochastic,DNA_gyra_stochastic,1.0,6000.0,0.0,,
-DNA_topoI_stochastic,0,1.0,120.0,0.005,TopoIRecognition,
+DNA_topoI_stochastic,0,1.0,120.0,0.01,TopoIRecognition,
 DNA_gyra_stochastic,0,1.0,120.0,0.005,GyraseRecognition,
 EXT,EXT,1.0,6000.0,0.0,,
 gene,tetA,85.0,1276.0,0.02,PoissonBinding,

@@ -1,8 +1,8 @@
-type,name,site_type,concentration,k_on,k_off,k_cat,size,oparams
-topo,topoI,DNA,0.25,0.0,0.0,0.002,120,none
-topo,gyrase,DNA,0.25,0.0,0.0,0.002,120,none
-ATP,ATP,none,0.0,0.0,0.0,0.0,0.0,none
-NAP,lacI,lacOP,0.0,0.0,0.0,0.0,0.0,none
-RNAP,RNAP,gene,0.0,0.0,0.0,0.0,32,none
-topo,stopoI,DNA,0.25,0.0,0.0,0.002,120,topo_params.csv
-topo,sgyrase,DNA,0.25,0.0,0.0,0.002,120,gyrase_params.csv
+type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+topo,topoI_continuum,,0.025,0.0,0.0,,,TopoIContinuum,,,
+topo,gyra_continuum,,0.25,0.0,0.0,,,GyraseContinuum,,,
+ATP,ATP,none,0.0,0,0,,,,,,
+NAP,lacI,lacOP,0.0,0,0,,,,,,
+RNAP,RNAP,gene,0.2,50,32,none,none,RNAPUniform,none,RNAPSimpleUnbinding,none
+topo,topoI_stochastic,DNA,0.025,120,100,TopoIRecognition,,TopoIUniform,,PoissonUnBinding,
+topo,gyra_stochastic,DNA,0.25,120,100,GyraseRecognition,,GyraseUniform,,PoissonUnBinding,
