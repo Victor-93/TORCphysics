@@ -21,7 +21,7 @@ initial_time = 0
 final_time = 600
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'calibration'
+file_out = 'calibration_Poisson'
 
 # For the simulation
 circuit_filename = 'circuit.csv'
@@ -63,7 +63,7 @@ params_file = 'calibration.csv'
 # Topoisomerase I
 topoI_name = 'topoI'
 topoI_type = 'environmental'
-topoI_binding_model_name = 'TopoIRecognition'
+topoI_binding_model_name = 'PoissonBinding'
 topoI_effect_model_name = 'TopoILinear'
 topoI_unbinding_model_name = 'PoissonUnBinding'
 topoI_params = 'calibration_topoI.csv'
@@ -71,7 +71,7 @@ topoI_params = 'calibration_topoI.csv'
 # Gyrase
 gyrase_name = 'gyrase'
 gyrase_type = 'environmental'
-gyrase_binding_model_name = 'GyraseRecognition'
+gyrase_binding_model_name = 'PoissonBinding'
 gyrase_effect_model_name = 'GyraseLinear'
 gyrase_unbinding_model_name = 'PoissonUnBinding'
 gyrase_params = 'calibration_gyrase.csv'
@@ -128,8 +128,7 @@ def objective_function(params):
     name = topoI_name
     object_type = topoI_type
     binding_model_name = topoI_binding_model_name
-    binding_oparams = {'k_on': float(params['k_on_topoI'][0]), 'width': float(params['width_topoI'][0]),
-                       'threshold': float(params['threshold_topoI'][0])}
+    binding_oparams = {'k_on': float(params['k_on_topoI'][0])}
     effect_model_name = topoI_effect_model_name
     effect_oparams = {'k_cat': float(params['k_cat_topoI'][0])}
     unbinding_model_name = topoI_unbinding_model_name
@@ -146,8 +145,7 @@ def objective_function(params):
     name = gyrase_name
     object_type = gyrase_type
     binding_model_name = gyrase_binding_model_name
-    binding_oparams = {'k_on': float(params['k_on_gyrase'][0]), 'width': float(params['width_gyrase'][0]),
-                       'threshold': float(params['threshold_gyrase'][0])}
+    binding_oparams = {'k_on': float(params['k_on_gyrase'][0])}
     effect_model_name = gyrase_effect_model_name
     effect_oparams = {'k_cat': float(params['k_cat_gyrase'][0]), 'sigma0': float(params['sigma0_gyrase'][0])}
     unbinding_model_name = gyrase_unbinding_model_name

@@ -1,7 +1,8 @@
 import numpy as np
+from hyperopt import tpe, hp, fmin
 import pandas as pd
 import topo_calibration_tools as tct
-import matplotlib.pyplot as plt
+import sys
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -54,39 +55,43 @@ continuation = False
 
 # For parallelization and calibration
 n_simulations = 84  # 60 #48 #120
-
-# params_file
-params_file = 'calibration.csv'
+tests = 100  #400  # 10  # 100  # number of tests for parametrization
 
 # Models to calibrate to calibrate
 # -----------------------------------
 # Topoisomerase I
 topoI_name = 'topoI'
 topoI_type = 'environmental'
-topoI_binding_model_name = 'TopoIRecognition'
+topoI_binding_model_name = 'PoissonBinding'
 topoI_effect_model_name = 'TopoILinear'
 topoI_unbinding_model_name = 'PoissonUnBinding'
-topoI_params = 'calibration_topoI.csv'
 
 # Gyrase
 gyrase_name = 'gyrase'
 gyrase_type = 'environmental'
-gyrase_binding_model_name = 'GyraseRecognition'
+gyrase_binding_model_name = 'PoissonBinding'
 gyrase_effect_model_name = 'GyraseLinear'
 gyrase_unbinding_model_name = 'PoissonUnBinding'
-gyrase_params = 'calibration_gyrase.csv'
 
+# RANGES FOR RANDOM SEARCH
 # -----------------------------------
-# FIGURE Params
-# -----------------------------------
-width = 8
-height = 4
-lw = 3
-font_size = 12
-xlabel_size = 14
-title_size = 16
-experiment_color = 'blue'
-model_color = 'red'
+# TopoI ranges
+k_on_min_topoI = 0.001
+k_on_max_topoI = 0.1
+k_off_min_topoI = 0.01
+k_off_max_topoI = 1.0
+k_cat_min_topoI = 5.0  # Ranges to vary k_cat
+k_cat_max_topoI = 20.0
+
+# Gyrase ranges
+k_on_min_gyrase = 0.001
+k_on_max_gyrase = 0.1
+k_off_min_gyrase = 0.01
+k_off_max_gyrase = 1.0
+k_cat_min_gyrase = 5.0  # Ranges to vary k_cat
+k_cat_max_gyrase = 20.0
+sigma0_min_gyrase = -0.3
+sigma0_max_gyrase = 0.0
 
 
 # Optimization functions
@@ -128,12 +133,11 @@ def objective_function(params):
     name = topoI_name
     object_type = topoI_type
     binding_model_name = topoI_binding_model_name
-    binding_oparams = {'k_on': float(params['k_on_topoI'][0]), 'width': float(params['width_topoI'][0]),
-                       'threshold': float(params['threshold_topoI'][0])}
+    binding_oparams = {'k_on': params['k_on_topoI']}
     effect_model_name = topoI_effect_model_name
-    effect_oparams = {'k_cat': float(params['k_cat_topoI'][0])}
+    effect_oparams = {'k_cat': params['k_cat_topoI']}
     unbinding_model_name = topoI_unbinding_model_name
-    unbinding_oparams = {'k_off': float(params['k_off_topoI'][0])}
+    unbinding_oparams = {'k_off': params['k_off_topoI']}
     concentration = topoI_concentration  # / mol_concentration  # Because this is the reference.
 
     topoI_variation = {'name': name, 'object_type': object_type,
@@ -146,12 +150,11 @@ def objective_function(params):
     name = gyrase_name
     object_type = gyrase_type
     binding_model_name = gyrase_binding_model_name
-    binding_oparams = {'k_on': float(params['k_on_gyrase'][0]), 'width': float(params['width_gyrase'][0]),
-                       'threshold': float(params['threshold_gyrase'][0])}
+    binding_oparams = {'k_on': params['k_on_gyrase']}
     effect_model_name = gyrase_effect_model_name
-    effect_oparams = {'k_cat': float(params['k_cat_gyrase'][0]), 'sigma0': float(params['sigma0_gyrase'][0])}
+    effect_oparams = {'k_cat': params['k_cat_gyrase'], 'sigma0': params['sigma0_gyrase']}
     unbinding_model_name = gyrase_unbinding_model_name
-    unbinding_oparams = {'k_off': float(params['k_off_gyrase'][0])}
+    unbinding_oparams = {'k_off': params['k_off_gyrase']}
     concentration = gyrase_concentration  # / mol_concentration  # Because this is the reference.
 
     gyrase_variation = {'name': name, 'object_type': object_type,
@@ -178,12 +181,12 @@ def objective_function(params):
                                                                         variations_list=variations_list,
                                                                         exp_superhelicals=list_sigmas,
                                                                         n_simulations=n_simulations)
-    return my_objective, simulation_superhelicals
+    return my_objective
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-# Experimental curves
+# Process
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -245,57 +248,71 @@ sigmaf = sigma_0_topo * ratio
 both_sigma = tct.both_T_G_to_sigma(Relaxed=relaxed_DNA, Relaxed_final=relaxed_DNA[-1],
                                    sigma0=sigma_0_topo, sigmaf=sigmaf)
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Theoretical curves
-# ----------------------------------------------------------------------------------------------------------------------
+# Optimization
+# -----------------------------------------------------
+space = {
 
-params_dict = pd.read_csv(params_file).to_dict()
-objective, sim_superhelicals = objective_function(params=params_dict)
+    # Topo I params
+    'k_cat_topoI': hp.uniform('k_cat_topoI', k_cat_min_topoI, k_cat_max_topoI),
+    'k_on_topoI': hp.uniform('k_on_topoI', k_on_min_topoI, k_on_max_topoI),
+    'k_off_topoI': hp.uniform('k_off_topoI', k_off_min_topoI, k_off_max_topoI),
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Plot
-# ----------------------------------------------------------------------------------------------------------------------
+    # Gyrase params
+    'k_cat_gyrase': hp.uniform('k_cat_gyrase', k_cat_min_gyrase, k_cat_max_gyrase),
+    'k_on_gyrase': hp.uniform('k_on_gyrase', k_on_min_gyrase, k_on_max_gyrase),
+    'k_off_gyrase': hp.uniform('k_off_gyrase', k_off_min_gyrase, k_off_max_gyrase),
+    'sigma0_gyrase': hp.uniform('sigma0_gyrase', sigma0_min_gyrase, sigma0_max_gyrase)
+}
 
-# Create figure
-fig, axs = plt.subplots(3, 1, figsize=(width, 3 * height), tight_layout=True)
+# Save the current standard output
+original_stdout = sys.stdout
+# Define the file where you want to save the output
+output_file_path = file_out + '.info'
 
-# Prepare arrays to iterate
-exp_sigmas = [topoI_sigma, gyrase_sigma, both_sigma]
-titles = ['Topoisomerase I', 'Gyrase', ' Topoisomerase & Gyrase']
-outside_label = ['a)', 'b)', 'c)']
-# Plot
-# ------------------------------------------
-for n in range(3):
-    ax = axs[n]
-    sum_err = np.sum(np.square(sim_superhelicals[n] - exp_sigmas[n]))
+# Open the file in write mode
+with open(output_file_path, 'w') as f:
+    # Redirect the standard output to the file
+    sys.stdout = f
 
-    if n == 0:
-        ax.plot(time, exp_sigmas[n], lw=lw, color=experiment_color, label='kinetic')
-        ax.plot(time, sim_superhelicals[n], lw=lw, color=model_color, label='model')
-        ax.legend(loc='best', fontsize=font_size)
-    else:
-        ax.plot(time, exp_sigmas[n], lw=lw, color=experiment_color)
-        ax.plot(time, sim_superhelicals[n], lw=lw, color=model_color)
+    # Your code that prints to the screen
+    print("Hello, this is the info file for the calibration of Topo I and Gyrase Models.")
+    print("Topo I Binding Model = " + topoI_binding_model_name)
+    print("Topo I Effect Model = " + topoI_effect_model_name)
+    print("Topo I Unbinding Model = " + topoI_unbinding_model_name)
+    print("Gyrase Binding Model = " + gyrase_binding_model_name)
+    print("Gyrase Effect Model = " + gyrase_effect_model_name)
+    print("Gyrase Unbinding Model = " + gyrase_unbinding_model_name)
+    print('Ran ' + str(n_simulations) + ' simulations per test. ')
+    print('Number of tests = ' + str(tests))
 
-    ax.set_xlabel('Time (s)', fontsize=xlabel_size)
-    ax.set_ylabel('Superhelical density', fontsize=xlabel_size)
-    ax.grid(True)
-    ax.set_title(titles[n], fontsize=title_size)
+    best = fmin(
+        fn=objective_function,  # Objective Function to optimize
+        space=space,  # Hyperparameter's Search Space
+        algo=tpe.suggest,  # Optimization algorithm (representative TPE)
+        max_evals=tests  # Number of optimization attempts
+    )
 
-    # Add errors
-    # Create the label
-    formatted_sum_err = "{:.3g}".format(sum_err)  # Formatting to three significant figures
-    er_label = r'$\epsilon={}$'.format(formatted_sum_err)
-    text_x = 0.85
-    text_y = 0.5
-    # Add the text to the plot
-    ax.text(text_x, text_y, er_label, fontsize=font_size, transform=ax.transAxes,
-            bbox=dict(facecolor='gray', alpha=0.25))
+    print(" ")
+    print("Optimal parameters found from random search: ")
+    print(best)
 
-    # Add label outside the plot
-    ax.text(-0.1, 0.95, outside_label[n], transform=ax.transAxes,
-            fontsize=font_size*1.5, fontweight='bold', va='center', ha='center')
+best_df = pd.DataFrame.from_dict([best])
+best_df.to_csv(file_out + '.csv', index=False, sep=',')
 
-plt.savefig(file_out + '.png')
-plt.savefig(file_out + '.pdf')
-#plt.show()
+# Let's save it for each enzyme
+topo_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold'])
+topo_df['k_on'] = best_df['k_on_topoI']
+topo_df['k_off'] = best_df['k_off_topoI']
+topo_df['k_cat'] = best_df['k_cat_topoI']
+# topo_df.loc[0] = [best_df['k_on_topoI'], best_df['k_off_topoI'], best_df['k_cat_topoI'],
+#                  best_df['width_topoI'], best_df['threshold_topoI']]
+topo_df.to_csv('calibration_topoI.csv', index=False, sep=',')
+
+gyrase_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold', 'sigma0'])
+gyrase_df['k_on'] = best_df['k_on_gyrase']
+gyrase_df['k_off'] = best_df['k_off_gyrase']
+gyrase_df['k_cat'] = best_df['k_cat_gyrase']
+gyrase_df['sigma0'] = best_df['sigma0_gyrase']
+# gyrase_df.loc[0] = [best_df['k_on_gyrase'], best_df['k_off_gyrase'], best_df['k_cat_gyrase'],
+#                    best_df['width_gyrase'], best_df['threshold_gyrase'], best_df['sigma0_gyrase']]
+gyrase_df.to_csv('calibration_gyrase.csv', index=False, sep=',')

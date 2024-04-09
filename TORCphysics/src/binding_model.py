@@ -485,7 +485,7 @@ class TopoIRecognitionRNAPTracking(BindingModel):
             self.k_on = float(oparams['k_on'])
 
         self.RNAP_dist = 200.0  # in bp
-        self.fold_change = 20.0  # Fold change when RNAP is close
+        self.fold_change = 40.0  # Fold change when RNAP is close
         self.interacts = interacts
         self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
 

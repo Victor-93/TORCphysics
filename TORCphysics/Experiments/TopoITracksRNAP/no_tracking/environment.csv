@@ -1,0 +1,5 @@
+type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+RNAP,RNAP,gene,1.0,50,32,none,none,RNAPStall,none,RNAPSimpleUnbinding,none
+topo,topoI,DNA,17.0,120,100,TopoIRecognition,../calibration_topoI.csv,TopoILinear,../calibration_topoI.csv,PoissonUnBinding,../calibration_topoI.csv
+topo,gyrase,DNA,44.6,120,100,GyraseRecognition,../calibration_gyrase.csv,GyraseLinear,../calibration_gyrase.csv,PoissonUnBinding,../calibration_gyrase.csv
+lacI,lacI,lacOP,0.0,10,10,,,,,"",

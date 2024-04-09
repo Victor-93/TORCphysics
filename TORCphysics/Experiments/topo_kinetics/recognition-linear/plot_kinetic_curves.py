@@ -50,8 +50,8 @@ sigma_f_gyrase = -0.1  # We also assume this one, which is the maximum at which 
 # -----------------------------------
 # FIGURE
 # -----------------------------------
-width = 8
-height = 4
+width = 6
+height = 3
 lw = 3
 experiment_color = 'blue'
 model_color = 'red'
