@@ -19,7 +19,8 @@ import sys
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
 dt = 0.25
 initial_time = 0
-final_time = 600
+# Let's do it for 400s to add more weight to the curve and not the plateau
+final_time = 500 # 600
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 file_out = 'calibration'
