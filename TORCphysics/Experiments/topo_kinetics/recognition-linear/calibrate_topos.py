@@ -11,7 +11,8 @@ import sys
 # Kinetic Study of DNA Topoisomerases by Supercoiling-Dependent Fluorescence Quenching
 
 # TODO: Check the overflows in the binding and how much do they affect...
-
+# TODO: Maybe you can change the superhelical level that both enzymes maintain... maybe sigmaf=[-0.02,-0.04]
+# TODO: And do it over the same range of 500s or 400s for the poisson calibration
 # ----------------------------------------------------------------------------------------------------------------------
 # Initial conditions
 # ----------------------------------------------------------------------------------------------------------------------
