@@ -1,0 +1,10 @@
+Hello, this is the info file for the calibration of Topo I and Gyrase Models.
+Topo I Binding Model = TopoIRecognition
+Topo I Effect Model = TopoILinear
+Topo I Unbinding Model = PoissonUnBinding
+Gyrase Binding Model = GyraseRecognition
+Gyrase Effect Model = GyraseLinear
+Gyrase Unbinding Model = PoissonUnBinding
+Ran 4 simulations per test. 
+Number of tests = 10
+  0%|          | 0/10 [00:00<?, ?trial/s, best loss=?]  0%|          | 0/10 [07:14<?, ?trial/s, best loss=?]

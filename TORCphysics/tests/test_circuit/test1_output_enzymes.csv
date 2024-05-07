@@ -1,7 +1,6 @@
 type,name,site,position,size,effective_size,twist,superhelical,effect_model,effect_oparams,unbinding_model,unbinding_oparams
-EXT,EXT_L,EXT,-979.0,0.0,0.0,-743.9364320337723,-1.0190263813896625,,,,
-topo,gyra_stochastic,2,241.0,120.0,100.0,-1890.8506430145621,-3.6742457884705715,GyraseUniform,,PoissonUnBinding,
-topo,topoI_stochastic,10,1201.0,120.0,100.0,-1506.9992068453055,-1.4108610176764471,TopoIUniform,,PoissonUnBinding,
-NAP,ori_NAP,ori,3086.0,150.0,100.0,-330.9926118490909,-0.3188072957799069,,,,
-topo,topoI_stochastic,41,4921.0,120.0,100.0,-743.9364320337723,-1.0190263813896625,TopoIUniform,,PoissonUnBinding,
-EXT,EXT_R,EXT,6241.0,0.0,0.0,0.0,-0.01,,,,
+EXT,EXT_L,EXT,-1219.0,0.0,0.0,-1994.8619029486688,-0.8913549178395311,,,,
+topo,topoI_stochastic,21,2521.0,120.0,100.0,73.87497409143054,0.2654934551034132,TopoIUniform,,PoissonUnBinding,
+NAP,ori_NAP,ori,3086.0,150.0,100.0,-779.1864182618076,-0.8709828666171072,,,,
+topo,topoI_stochastic,39,4681.0,120.0,100.0,-1994.8619029486688,-0.8913549178395311,TopoIUniform,,PoissonUnBinding,
+EXT,EXT_R,EXT,8521.0,0.0,0.0,0.0,-0.01,,,,

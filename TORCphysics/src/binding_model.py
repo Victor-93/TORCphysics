@@ -406,14 +406,18 @@ class TopoIRecognition(BindingModel):
         """
 
         a = environmental.concentration * self.k_on
-        b = 1 + np.exp((superhelical - self.threshold) / self.width)
+        #b = 1 + np.exp((superhelical - self.threshold) / self.width)
+        #b = 1 + np.exp((superhelical + self.threshold) / self.width)
+        b1 = np.float128((superhelical + self.threshold) / self.width)
+        b = 1 + np.exp(b1)
         rate = a / b
         return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
 
     def rate_modulation(self, superhelical) -> float:
         # Note that is not multiplied by the concentration
         a = self.k_on
-        b = 1 + np.exp((superhelical - self.threshold) / self.width)
+        #b = 1 + np.exp((superhelical - self.threshold) / self.width)
+        b = 1 + np.exp((superhelical + self.threshold) / self.width)
         rate = a / b
         return rate
 
@@ -485,7 +489,7 @@ class TopoIRecognitionRNAPTracking(BindingModel):
             self.k_on = float(oparams['k_on'])
 
         self.RNAP_dist = 200.0  # in bp
-        self.fold_change = 40.0  # Fold change when RNAP is close
+        self.fold_change = 10#40.0  # Fold change when RNAP is close
         self.interacts = interacts
         self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
 
@@ -510,8 +514,11 @@ class TopoIRecognitionRNAPTracking(BindingModel):
 
         # Calculate rate based on superhelical density
         a = environmental.concentration * self.k_on
-        b = 1 + np.exp((superhelical - self.threshold) / self.width)
+        b1 = np.float128((superhelical + self.threshold) / self.width)
+        b = 1 + np.exp(b1)
         rate = a / b
+        # b = 1 + np.exp((superhelical - self.threshold) / self.width)
+
 
         # See if RNAP is in the vicinity and if yes, then the rate increases.
         # TODO:
@@ -546,7 +553,11 @@ class TopoIRecognitionRNAPTracking(BindingModel):
         # Check if rate is increased
         if RNAP_near:
             rate = rate * self.fold_change
-        return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+            #print('yes', probability *self.fold_change)
+        # else:
+            #print('no', probability)
+        probability = utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+        return probability
 
     def rate_modulation(self, superhelical) -> float:
         # Note that is not multiplied by the concentration
@@ -637,14 +648,37 @@ class GyraseRecognition(BindingModel):
         """
 
         a = environmental.concentration * self.k_on
-        b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
+        b1 = np.float128(-(superhelical + self.threshold) / self.width)
+        b = 1 + np.exp(b1)
+        # b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
+        #b = 1 + np.exp(-(superhelical + self.threshold) / self.width)
+        #sigma_cons = .5
+        #b = 1 + np.exp(-(superhelical + self.threshold) / self.width - sigma_cons) * np.exp(sigma_cons)
         rate = a / b
+        # Configure NumPy to suppress overflow warnings
+        #np.seterr(over='ignore')
+
+        #try:
+         #   # Your original expression
+         #   a = environmental.concentration * self.k_on
+         #   b1 = np.exp(-(superhelical + self.threshold) / self.width)
+        #    # b = 1 +
+            #rate = a / b
+        #except:
+        #    # Handle overflow condition
+        #    print('Overflow in GyraseRecognition, superhelical = ', superhelical)
+        #    rate = 0  # Or any other strategy you prefer
+        #    sys.exit()
+        #else:
+        #    b = 1 + b1
+        #    rate = a/b
         return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
 
     def rate_modulation(self, superhelical) -> float:
         # Note that is not multiplied by the concentration
         a = self.k_on
-        b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
+        # b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
+        b = 1 + np.exp(-(superhelical + self.threshold) / self.width)
         rate = a / b
         return rate
 

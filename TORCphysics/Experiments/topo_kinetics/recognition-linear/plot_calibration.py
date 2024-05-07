@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
 dt = 0.25
 initial_time = 0
-final_time = 600
+final_time = 400 #600
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 file_out = 'calibration'
@@ -43,9 +43,9 @@ k_cat_gyrase = .0011
 v_max_gyrase = k_cat_gyrase * gyrase_concentration
 
 # Superhelical values (sigma) for each case
-sigma_0_topo = -0.075  # Approximately -20 supercoils according the paper
+sigma_0_topo = -0.076  # Approximately -20 supercoils according the paper
 sigma_0_gyrase = 0.0  # We suppose this one.
-sigma_f_gyrase = -0.1  # We also assume this one, which is the maximum at which gyrase acts.
+sigma_f_gyrase = -0.11  # We also assume this one, which is the maximum at which gyrase acts.
 # At this value the torque is too strong.
 
 output_prefix = 'test0'
@@ -53,7 +53,7 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 84  # 60 #48 #120
+n_simulations = 40#84  # 60 #48 #120
 
 # params_file
 params_file = 'calibration.csv'

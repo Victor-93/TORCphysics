@@ -110,8 +110,8 @@ fig, axs = plt.subplots(2, 1, figsize=(width, 2 * height), tight_layout=True)#, 
 
 # Responses
 # -------------------------
-gyrase_bind_rate = bm.GyraseRecognition(filename=gyrase_params).rate_modulation(superhelical=sigma)
-topoI_bind_rate = bm.TopoIRecognition(filename=topoI_params).rate_modulation(superhelical=sigma)
+gyrase_bind_rate = gyrase_concentration * bm.GyraseRecognition(filename=gyrase_params).rate_modulation(superhelical=sigma)
+topoI_bind_rate = topoI_concentration * bm.TopoIRecognition(filename=topoI_params).rate_modulation(superhelical=sigma)
 axs[0].plot(sigma, gyrase_bind_rate, color=gyrase_color, lw=lw, label='Gyrase')
 axs[0].plot(sigma, topoI_bind_rate, color=topoI_color, lw=lw, label='Topo I')
 

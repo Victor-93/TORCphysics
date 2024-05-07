@@ -1,7 +1,7 @@
 import numpy as np
-from hyperopt import tpe, hp, fmin
+from hyperopt import tpe, hp, fmin, Trials
 import pandas as pd
-import topo_calibration_tools as tct
+from TORCphysics import topo_calibration_tools as tct
 import sys
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -10,8 +10,6 @@ import sys
 # This is just a test to reproduce the global supercoiling response curves from the paper:
 # Kinetic Study of DNA Topoisomerases by Supercoiling-Dependent Fluorescence Quenching
 
-# TODO: Check the overflows in the binding and how much do they affect...
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Initial conditions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -19,16 +17,16 @@ import sys
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
 dt = 0.25
 initial_time = 0
-final_time = 600
+final_time = 500 #600
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 file_out = 'calibration'
 
 # For the simulation
-circuit_filename = 'circuit.csv'
+circuit_filename = '../circuit.csv'
 sites_filename = None  # 'sites_test.csv'
 enzymes_filename = None  # 'enzymes_test.csv'
-environment_filename = 'environment.csv'
+environment_filename = '../environment.csv'
 
 # Concentrations in nM
 DNA_concentration = 0.75
@@ -44,9 +42,9 @@ k_cat_gyrase = .0011
 v_max_gyrase = k_cat_gyrase * gyrase_concentration
 
 # Superhelical values (sigma) for each case
-sigma_0_topo = -0.075  # Approximately -20 supercoils according the paper
+sigma_0_topo = -0.11  #-0.076  # Approximately -20 supercoils according the paper
 sigma_0_gyrase = 0.0  # We suppose this one.
-sigma_f_gyrase = -0.1  # We also assume this one, which is the maximum at which gyrase acts.
+sigma_f_gyrase = -0.11  # We also assume this one, which is the maximum at which gyrase acts.
 # At this value the torque is too strong.
 
 output_prefix = 'test0'
@@ -54,8 +52,8 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 84  # 60 #48 #120
-tests = 100  #400  # 10  # 100  # number of tests for parametrization
+n_simulations = 128#84  # 60 #48 #120
+tests = 7000#100  #400  # 10  # 100  # number of tests for parametrization
 
 # Models to calibrate to calibrate
 # -----------------------------------
@@ -80,7 +78,7 @@ k_on_min_topoI = 0.001
 k_on_max_topoI = 0.1
 k_off_min_topoI = 0.01
 k_off_max_topoI = 1.0
-k_cat_min_topoI = 5.0  # Ranges to vary k_cat
+k_cat_min_topoI = 0.0  # Ranges to vary k_cat
 k_cat_max_topoI = 20.0
 
 # Gyrase ranges
@@ -88,10 +86,10 @@ k_on_min_gyrase = 0.001
 k_on_max_gyrase = 0.1
 k_off_min_gyrase = 0.01
 k_off_max_gyrase = 1.0
-k_cat_min_gyrase = 5.0  # Ranges to vary k_cat
+k_cat_min_gyrase = 0.0  # Ranges to vary k_cat
 k_cat_max_gyrase = 20.0
-sigma0_min_gyrase = -0.3
-sigma0_max_gyrase = 0.0
+sigma0_min_gyrase = -0.15
+sigma0_max_gyrase = -0.07
 
 
 # Optimization functions
@@ -120,10 +118,16 @@ def objective_function(params):
                           'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma_0_gyrase,
                           'DNA_concentration': 0.0}
 
-    global_dict_both = {'circuit_filename': circuit_filename, 'sites_filename': sites_filename,
+    global_dict_both_sc = {'circuit_filename': circuit_filename, 'sites_filename': sites_filename,
                         'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
                         'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                         'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma_0_topo,
+                        'DNA_concentration': 0.0}
+
+    global_dict_both_rx = {'circuit_filename': circuit_filename, 'sites_filename': sites_filename,
+                        'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
+                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
+                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma_0_gyrase,
                         'DNA_concentration': 0.0}
 
     # Variation dictionaries
@@ -167,13 +171,16 @@ def objective_function(params):
     # ------------------------------------------
 
     # Global dictionaries
-    global_dict_list = [global_dict_topoI, global_dict_gyrase, global_dict_both]
+    global_dict_list = [global_dict_topoI, global_dict_gyrase, global_dict_both_sc, global_dict_both_rx]
 
     # List of lists of variations
-    variations_list = [[topoI_variation], [gyrase_variation], [topoI_variation, gyrase_variation]]
+    variations_list = [[topoI_variation], [gyrase_variation],
+                       [topoI_variation, gyrase_variation],
+                       [topoI_variation, gyrase_variation]
+                       ]
 
     # Arrays with global superhelical densities
-    list_sigmas = [topoI_sigma, gyrase_sigma, both_sigma]
+    list_sigmas = [topoI_sigma, gyrase_sigma, both_sigma_sc, both_sigma_rx]
 
     # Finally, run objective function. run_objective_function will process our conditions
     # ------------------------------------------
@@ -205,7 +212,11 @@ supercoiled_DNA, relaxed_DNA = tct.integrate_MM_topoI(vmax=v_max_topoI, KM=K_M_t
                                                       frames=frames, dt=dt)
 # Translate to superhelical density
 # ------------------------------------------
-topoI_sigma = tct.topoI_to_sigma(Relaxed=relaxed_DNA, DNA_concentration=DNA_concentration, sigma0=sigma_0_topo)
+# Note that this sigmaf is not at the end of the simulation, but the sigma at which there is 0 Relaxed DNA.
+sigma = tct.sigma_to_relaxed(Relaxed=relaxed_DNA,
+                             DNA_concentration=DNA_concentration,
+                             sigmaf=sigma_f_gyrase)
+topoI_sigma = sigma
 
 # -----------------------------------------------------
 # Build experimental curve for Gyrase
@@ -223,33 +234,50 @@ supercoiled_DNA, relaxed_DNA = tct.integrate_MM_gyrase(vmax=v_max_gyrase, KM=K_M
                                                        frames=frames, dt=dt)
 # Translate to superhelical density
 # ------------------------------------------
-gyrase_sigma = tct.gyrase_to_sigma(Relaxed=relaxed_DNA, DNA_concentration=DNA_concentration,
-                                   sigma0=sigma_0_gyrase, sigmaf=sigma_f_gyrase)
+sigma = tct.sigma_to_relaxed(Relaxed=relaxed_DNA,
+                             DNA_concentration=DNA_concentration,
+                             sigmaf=sigma_f_gyrase)
+gyrase_sigma = sigma
 
 # -----------------------------------------------------
-# Build experimental curve for system with both Topo I and Gyrase
+# Build experimental curve for system with both Topo I and Gyrase (from Sc state)
 # -----------------------------------------------------
 # Kinetics Gyrase: Relaxed_DNA + Gyrase -> Relaxed-Gyrase -> Supercoiled_DNA + Gyrase
 # Kinetics Topoisomerase: Supercoiled_DNA + TopoI -> Supercoiled_DNA-TopoI -> Relaxed_DNA + TopoI
 
 # Integrate MM kinetics
 # ------------------------------------------
-
-# Initially, there's no supercoiled DNA, and all of the relaxed DNA concentration corresponds
-# to the plasmid concentration.
 supercoiled_DNA, relaxed_DNA = tct.integrate_MM_both_T_G(vmax_topoI=v_max_topoI, vmax_gyrase=v_max_gyrase,
                                                          KM_topoI=K_M_topoI, KM_gyrase=K_M_gyrase,
                                                          Supercoiled_0=DNA_concentration, Relaxed_0=0.0,
                                                          frames=frames, dt=dt)
-ratio = relaxed_DNA[-1] / DNA_concentration
-sigmaf = sigma_0_topo * ratio
 # Translate to superhelical density
 # ------------------------------------------
-both_sigma = tct.both_T_G_to_sigma(Relaxed=relaxed_DNA, Relaxed_final=relaxed_DNA[-1],
-                                   sigma0=sigma_0_topo, sigmaf=sigmaf)
+sigma = tct.sigma_to_relaxed(Relaxed=relaxed_DNA,
+                             DNA_concentration=DNA_concentration,
+                             sigmaf=sigma_f_gyrase)
+both_sigma_sc = sigma
+
+# -----------------------------------------------------
+# Build experimental curve for system with both Topo I and Gyrase (from Rx state)
+# -----------------------------------------------------
+# Integrate MM kinetics
+# ------------------------------------------
+supercoiled_DNA, relaxed_DNA = tct.integrate_MM_both_T_G(vmax_topoI=v_max_topoI, vmax_gyrase=v_max_gyrase,
+                                                         KM_topoI=K_M_topoI, KM_gyrase=K_M_gyrase,
+                                                         Supercoiled_0=0.0, Relaxed_0=DNA_concentration,
+                                                         frames=frames, dt=dt)
+# Translate to superhelical density
+# ------------------------------------------
+sigma = tct.sigma_to_relaxed(Relaxed=relaxed_DNA,
+                             DNA_concentration=DNA_concentration,
+                             sigmaf=sigma_f_gyrase)
+both_sigma_rx = sigma
 
 # Optimization
 # -----------------------------------------------------
+trials = Trials()
+
 space = {
 
     # Topo I params
@@ -289,7 +317,9 @@ with open(output_file_path, 'w') as f:
         fn=objective_function,  # Objective Function to optimize
         space=space,  # Hyperparameter's Search Space
         algo=tpe.suggest,  # Optimization algorithm (representative TPE)
-        max_evals=tests  # Number of optimization attempts
+        max_evals=tests,  # Number of optimization attempts
+        trials = trials
+
     )
 
     print(" ")
@@ -299,8 +329,32 @@ with open(output_file_path, 'w') as f:
 best_df = pd.DataFrame.from_dict([best])
 best_df.to_csv(file_out + '.csv', index=False, sep=',')
 
+# Let's save trials info (params and loses)
+# --------------------------------------------------------------------------
+params_df = pd.DataFrame(columns=['test', 'loss', 'k_on_topoI', 'k_off_topoI', 'k_cat_topoI', 'k_on_gyrase', 'k_off_gyrase', 'k_cat_gyrase', 'sigma0_gyrase'])
+
+for n in range(tests):
+
+    tdi = trials.trials[n] # dictionary with results for test n
+    lo = trials.trials[n]['result']['loss'] # loss
+    va = trials.trials[n]['misc']['vals'] #values
+    # Add a new row using append method
+    new_row = pd.DataFrame({
+        'test': n, 'loss': lo,
+       'k_on_topoI': va['k_on_topoI'], 'k_off_topoI': va['k_off_topoI'], 'k_cat_topoI': va['k_cat_topoI'],
+       'k_on_gyrase': va['k_on_gyrase'], 'k_off_gyrase': va['k_off_gyrase'], 'k_cat_gyrase': va['k_cat_gyrase'],
+       'sigma0_gyrase': va['sigma0_gyrase']
+    })
+#    params_df.append(new_row, ignore_index=True)
+    params_df = pd.concat([params_df, new_row], ignore_index=True)
+
+params_df.to_csv('values.csv', index=False, sep=',')
+
+    #params_df = pd.concat([params_df, pd.DataFrame([new_row])], ignore_index=True)
+
 # Let's save it for each enzyme
-topo_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold'])
+topo_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat'])
+#topo_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold'])
 topo_df['k_on'] = best_df['k_on_topoI']
 topo_df['k_off'] = best_df['k_off_topoI']
 topo_df['k_cat'] = best_df['k_cat_topoI']
@@ -308,7 +362,8 @@ topo_df['k_cat'] = best_df['k_cat_topoI']
 #                  best_df['width_topoI'], best_df['threshold_topoI']]
 topo_df.to_csv('calibration_topoI.csv', index=False, sep=',')
 
-gyrase_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold', 'sigma0'])
+#gyrase_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold', 'sigma0'])
+gyrase_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'sigma0'])
 gyrase_df['k_on'] = best_df['k_on_gyrase']
 gyrase_df['k_off'] = best_df['k_off_gyrase']
 gyrase_df['k_cat'] = best_df['k_cat_gyrase']

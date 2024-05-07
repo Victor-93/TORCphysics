@@ -3,6 +3,8 @@ from TORCphysics import binding_model as bm
 from TORCphysics import effect_model as em
 from TORCphysics import unbinding_model as ubm
 import numpy as np
+import random
+import sys
 
 
 # TODO: Maybe later it can accept specific conditions
@@ -256,7 +258,8 @@ def single_simulation_return_dfs(item):
     my_circuit.log.name = my_circuit.name
 
     # And change the seed
-    my_circuit.seed = my_circuit.seed + item['n_simulations']  # random.randrange(sys.maxsize)
+    my_circuit.seed = my_circuit.seed + random.randrange(sys.maxsize+ item['n_simulations'] )  # random.randrange(sys.maxsize)
+#    my_circuit.seed = my_circuit.seed + item['n_simulations']  # random.randrange(sys.maxsize)
     my_circuit.rng = np.random.default_rng(my_circuit.seed)
 
     # Run simulation and collect dataframes

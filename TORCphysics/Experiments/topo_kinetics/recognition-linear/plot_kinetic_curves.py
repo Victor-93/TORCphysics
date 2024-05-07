@@ -1,7 +1,6 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-import topo_calibration_tools as tct
+from TORCphysics import topo_calibration_tools as tct
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -22,7 +21,7 @@ import topo_calibration_tools as tct
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
 dt = 0.25
 initial_time = 0
-final_time = 600
+final_time = 400
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 file_out = 'kinetic_curves'
@@ -41,21 +40,24 @@ k_cat_gyrase = .0011
 v_max_gyrase = k_cat_gyrase * gyrase_concentration
 
 # Superhelical values (sigma) for each case
-sigma_0_topo = -0.075  # Approximately -20 supercoils according the paper
-
+sigma_0_topo = -0.11 #-0.076  # Approximately -20 supercoils according the paper
 sigma_0_gyrase = 0.0  # We suppose this one.
-sigma_f_gyrase = -0.1  # We also assume this one, which is the maximum at which gyrase acts.
+sigma_f_gyrase = -0.11  # We also assume this one, which is the maximum at which gyrase acts.
 # At this value the torque is too strong.
 
 # -----------------------------------
 # FIGURE
 # -----------------------------------
-width = 6
-height = 3
+width = 8
+height = 4
 lw = 3
-experiment_color = 'blue'
-model_color = 'red'
-fig, axs = plt.subplots(3, 3, figsize=(3 * width, 3 * height), tight_layout=True)
+font_size = 12
+xlabel_size = 14
+title_size = 16
+topo_color = 'red'
+gyrase_color = 'blue'
+both_color = 'green'
+fig, axs = plt.subplots(3,  figsize=(width, 3 * height), tight_layout=True)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Process
@@ -67,6 +69,8 @@ fig, axs = plt.subplots(3, 3, figsize=(3 * width, 3 * height), tight_layout=True
 # Kinetics: Supercoiled_DNA + TopoI -> Supercoiled_DNA-TopoI -> Relaxed_DNA + TopoI
 # Product = Relaxed DNA
 # Substrate = Concentration of Supercoiled DNAs; which initially is the same as the DNA concentration
+mycolor = topo_color
+mylabel = 'Topo I'
 
 # Integrate MM kinetics
 # ------------------------------------------
@@ -76,13 +80,16 @@ supercoiled_DNA, relaxed_DNA = tct.integrate_MM_topoI(vmax=v_max_topoI, KM=K_M_t
                                                       frames=frames, dt=dt)
 # Translate to superhelical density
 # ------------------------------------------
-sigma = tct.topoI_to_sigma(Relaxed=relaxed_DNA, DNA_concentration=DNA_concentration, sigma0=sigma_0_topo)
+#sigma = tct.topoI_to_sigma(Relaxed=relaxed_DNA, DNA_concentration=DNA_concentration, sigma0=sigma_0_topo)
+sigma = tct.sigma_to_relaxed(Relaxed=relaxed_DNA,
+                             DNA_concentration=DNA_concentration,
+                             sigmaf=sigma_f_gyrase)
 
 # Plot data
 # ------------------------------------------
-axs[0, 0].plot(time, relaxed_DNA, lw=lw, color=experiment_color, label='exp')
-axs[0, 1].plot(time, supercoiled_DNA, lw=lw, color=experiment_color, label='exp')
-axs[0, 2].plot(time, sigma, lw=lw, color=experiment_color, label='exp')
+axs[0].plot(time, relaxed_DNA, lw=lw, color=mycolor, label=mylabel)
+axs[1].plot(time, supercoiled_DNA, lw=lw, color=mycolor, label=mylabel)
+axs[2].plot(time, sigma, lw=lw, color=mycolor, label=mylabel)
 
 # ==================================================================================================================
 # Build experimental curve for Gyrase
@@ -90,6 +97,8 @@ axs[0, 2].plot(time, sigma, lw=lw, color=experiment_color, label='exp')
 # Kinetics: Relaxed_DNA + Gyrase -> Relaxed-Gyrase -> Supercoiled_DNA + Gyrase
 # Product = Supercoiled DNA
 # Substrate = Relaxed DNA; which initially is the same as the DNA concentration
+mycolor = gyrase_color
+mylabel = 'Gyrase'
 
 # Integrate MM kinetics
 # ------------------------------------------
@@ -100,20 +109,26 @@ supercoiled_DNA, relaxed_DNA = tct.integrate_MM_gyrase(vmax=v_max_gyrase, KM=K_M
                                                        frames=frames, dt=dt)
 # Translate to superhelical density
 # ------------------------------------------
-sigma = tct.gyrase_to_sigma(Relaxed=relaxed_DNA, DNA_concentration=DNA_concentration,
-                            sigma0=sigma_0_gyrase, sigmaf=sigma_f_gyrase)
+#sigma = tct.gyrase_to_sigma(Relaxed=relaxed_DNA, DNA_concentration=DNA_concentration,
+#                            sigma0=sigma_0_gyrase, sigmaf=sigma_f_gyrase)
+sigma = tct.sigma_to_relaxed(Relaxed=relaxed_DNA,
+                             DNA_concentration=DNA_concentration,
+                             sigmaf=sigma_f_gyrase)
 
 # Plot data
 # ------------------------------------------
-axs[1, 0].plot(time, relaxed_DNA, lw=lw, color=experiment_color, label='exp')
-axs[1, 1].plot(time, supercoiled_DNA, lw=lw, color=experiment_color, label='exp')
-axs[1, 2].plot(time, sigma, lw=lw, color=experiment_color, label='exp')
+axs[0].plot(time, relaxed_DNA, lw=lw, color=mycolor, label=mylabel)
+axs[1].plot(time, supercoiled_DNA, lw=lw, color=mycolor, label=mylabel)
+axs[2].plot(time, sigma, lw=lw, color=mycolor, label=mylabel)
 
 # ==================================================================================================================
 # Build experimental curve for Gyrase and topo I acting on the DNA
 # ==================================================================================================================
 # Kinetics Gyrase: Relaxed_DNA + Gyrase -> Relaxed-Gyrase -> Supercoiled_DNA + Gyrase
 # Kinetics Topoisomerase: Supercoiled_DNA + TopoI -> Supercoiled_DNA-TopoI -> Relaxed_DNA + TopoI
+
+mycolor = both_color
+mylabel = 'Both'
 
 # Integrate MM kinetics
 # ------------------------------------------
@@ -127,45 +142,49 @@ supercoiled_DNA, relaxed_DNA = tct.integrate_MM_both_T_G(vmax_topoI=v_max_topoI,
 
 ratio = relaxed_DNA[-1]/DNA_concentration
 sigmaf = sigma_0_topo*ratio
+sigmaf = sigma_f_gyrase - sigma_f_gyrase * relaxed_DNA[-1]/DNA_concentration
 print(sigmaf)
 
 # Translate to superhelical density
 # ------------------------------------------
-sigma = tct.both_T_G_to_sigma(Relaxed=relaxed_DNA, Relaxed_final=relaxed_DNA[-1],
-                              sigma0=sigma_0_topo, sigmaf=sigmaf)
+sigma = tct.sigma_to_relaxed(Relaxed=relaxed_DNA,
+                             DNA_concentration=DNA_concentration,
+                             sigmaf=sigma_f_gyrase)
+#sigma = tct.both_T_G_to_sigma(Relaxed=relaxed_DNA, Relaxed_final=relaxed_DNA[-1],
+#                              sigma0=sigma_0_topo, sigmaf=sigmaf)
 
 # Plot data
 # ------------------------------------------
-axs[2, 0].plot(time, relaxed_DNA, lw=lw, color=experiment_color, label='exp')
-axs[2, 1].plot(time, supercoiled_DNA, lw=lw, color=experiment_color, label='exp')
-axs[2, 2].plot(time, sigma, lw=lw, color=experiment_color, label='exp')
+axs[0].plot(time, relaxed_DNA, lw=lw, color=mycolor, label=mylabel)
+axs[1].plot(time, supercoiled_DNA, lw=lw, color=mycolor, label=mylabel)
+axs[2].plot(time, sigma, lw=lw, color=mycolor, label=mylabel)
 
 
 # Sort labels
 # ==================================================================================================================
+outside_label = ['a)', 'b)', 'c)']
 for i in range(3):
 
-    axs[i, 0].set_ylabel('Relaxed DNA (nM)')
-    axs[i, 1].set_ylabel('Supercoiled DNA (nM)')
-    axs[i, 2].set_ylabel(r'$\sigma$')
+    axs[i].grid(True)
+    axs[i].set_xlabel('Time (s)', fontsize=xlabel_size)
 
-    for j in range(3):
-        axs[i, j].grid(True)
-        axs[i, j].set_xlabel('Time (s)')
-        if i == 0:
-            axs[0, j].set_title('Topoisomerase I')
-        if i == 1:
-            axs[1, j].set_title('Gyrase')
-        if i == 2:
-            axs[2, j].set_title('Both')
+    # Add label outside the plot
+    axs[i].text(-0.12, 0.99, outside_label[i], transform=axs[i].transAxes,
+            fontsize=font_size*1.5, fontweight='bold', va='center', ha='center')
 
-    axs[i,0].set_ylim(-.05,.8)
-    axs[i,1].set_ylim(-.05,.8)
+
+axs[0].set_ylabel('Relaxed DNA (nM)', fontsize=xlabel_size)
+axs[1].set_ylabel('Supercoiled DNA (nM)', fontsize=xlabel_size)
+axs[2].set_ylabel(r'Superhelical density', fontsize=xlabel_size)
+
+axs[0].set_ylim(-.05,.85)
+axs[1].set_ylim(-.05,.85)
+axs[2].set_ylim(-.12,.02)
+axs[2].legend(loc='best', fontsize=font_size)
     #axs[i,2].set_ylim(-.12,0.02)
 
-# for ax in axs:
-#    ax.set_grid(True)
-#    ax.set_xlabel('time (s)')
+fig.suptitle('Topoisomerases-Mediated DNA Relaxation and Supercoiling', fontsize=title_size)
+
 # Collect
 # exp_substrates.append(supercoiled_DNA)
 # exp_products.append(relaxed_DNA)

@@ -93,7 +93,7 @@ gyra_b_k_on = 0.005
 # TODO: UNBINDING MODEL PARAMETERS
 #  ---------------------------------------------------------------------------------------------------------------------
 # PoissonUnBinding
-k_off = 0.001  # default unbinding rate for any enzyme
+k_off = 0.01  # default unbinding rate for any enzyme
 
 # Houdagui et al. 2019 parameters for topo I activity (effect)
 topo_sam_width = 0.012  # effect width

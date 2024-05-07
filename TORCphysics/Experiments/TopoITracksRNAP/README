@@ -1,0 +1,31 @@
+24/04/2024
+Here, I will run the cases for the TORCPhysics paper.
+
+The idea is to develop a model where topoI tracks the RNAP.
+We have to demonstrate that this model reproduces experimental observations.
+
+Models to use
+-----------------------
+* track-stalling/ - Topo I tracking RNAP + RNAP stalling  - This is the principal one
+* track-uniform/ - Topo I tracking RNAP + RNAP uniform motion - programmed
+* notrack-stalling/ - Topo I Recognition + RNAP stalling
+* notrack-uniform/ - Topo I Recogntion + RNAP uniform motion - programmed!
+* noRNAP - Topo I recognition + RNAP does not binds (no transcription) - control - programmed!
+
+For all of these models, topoisomerases use  recognition models.
+
+Results strategy
+-------------------------
+The idea is to plot the enrichment or fold change when the gene or transcription is turned on.
+So we will have to first run a case where topo I and gyrase act on a piece of linear DNA and register their positions.
+Then, we run the systems for each case.
+And finally, we plot the enrichment compared to the controlled case (with no transcription).
+
+Process
+-------------------------
+1.- In each directory run run_simulation.py . Make sure that all directories have same simulation conditions, e.g.,
+    time-steps, frames, n_sims, topoisomerase concentrations.
+2.- Run plot_positions.py - It plots positions but it also extracts the densities and histograms.
+    Make sure all these files have the same box sizes.
+3.- Optional, run plot_densities.py - It plots the fitted densities (not normalized but actually counts)
+4.- Execute plot_results.py and this will generate the necesary curves.
