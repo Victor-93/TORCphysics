@@ -1,0 +1,4 @@
+type,name,site,position,size,effective_size,twist,superhelical,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+EXT,EXT_L,EXT,-1276.0,0.0,0.0,-55.28159297962953,-0.034001677305621536,,,,
+topo,topoI,24,1441.0,60.0,40.0,-55.28159297962953,-0.034001677305621536,TopoILinear,,PoissonUnBinding,
+EXT,EXT_R,EXT,4198.0,0.0,0.0,0.0,0.0,,,,

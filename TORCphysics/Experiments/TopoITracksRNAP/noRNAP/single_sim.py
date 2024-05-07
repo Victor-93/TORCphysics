@@ -5,6 +5,7 @@ import seaborn as sns
 # DESCRIPTION
 # ----------------------------------------------------------------------------------------------------------------------
 # We want to run a single simulation of the Pleu500 with stochastic topoisomerase activities
+# TODO: Investigate why topos only bind on the left
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Initial conditions
