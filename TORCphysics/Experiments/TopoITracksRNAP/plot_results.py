@@ -29,6 +29,7 @@ outside_label = ['a)', 'b)', 'c)']
 # ---------------------------------------------------------
 fig, axs = plt.subplots(3, figsize=(width, 3*height), tight_layout=True)
 
+
 # TODO: For the moment, for RNAP let's just plot the density, not the enrichment
 for i, ename in enumerate(enzyme_names):
     ax = axs[i]

@@ -50,7 +50,7 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 48#24#96#10#84  # 60 #48 #120
+n_simulations = 96#48#24#96#10#84  # 60 #48 #120
 
 # params_file
 params_file = 'calibration.csv'

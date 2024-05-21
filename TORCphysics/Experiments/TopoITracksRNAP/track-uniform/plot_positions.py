@@ -24,7 +24,9 @@ names = ['RNAP', 'topoI', 'gyrase']
 colors_dict = {'topoI': 'red', 'gyrase': 'cyan'}
 colors_dict = {'RNAP': 'black', 'topoI': 'red', 'gyrase': 'cyan'}
 kwargs = {'linewidth': 2, 'ls': '-'}
-nbins = [200, 166,62]
+#nbins = [200, 166,62]
+nbins = [40,166,62]
+
 
 # Let's plot
 # ---------------------------------------------------------

@@ -7,20 +7,28 @@ from TORCphysics import parallelization_tools as pt
 
 # Parallelization conditions
 # --------------------------------------------------------------
-n_simulations = 4#16#24#8 #96 # 120
+n_simulations = 24#8 #96 # 120
+
+# Simulation conditions
+# --------------------------------------------------------------
+dt = 0.25
+initial_time = 0
+final_time = 500
+time = np.arange(initial_time, final_time + dt, dt)
 
 # Circuit initial conditions
 # --------------------------------------------------------------
 circuit_filename = '../circuit.csv'
 sites_filename = None
 enzymes_filename = None
-environment_filename = 'environment_test.csv'
-# environment_filename = 'environment.csv'
+# environment_filename = 'environment_test.csv'
+environment_filename = 'environment.csv'
 output_prefix = 'noRNAP'
-frames = 500#1000#5000 #50000
+frames = len(time)
+#frames = 1000#5000 #50000
 series = True
 continuation = False
-dt = 1#0.5 #  0.25
+#dt = 0.25 #1#0.5 #  0.25
 
 # Prepare parallelization
 # --------------------------------------------------------------
@@ -43,7 +51,6 @@ pool_results = pool.map(pt.single_simulation_return_dfs, Items)
 
 # Process simulations outputs
 # --------------------------------------------------------------
-# Create a range of values for the 'frames' column
 frame_values = list(range(frames+1))
 
 # Calculate the corresponding time values using dt
@@ -60,7 +67,7 @@ for name in enzymes_names:
 
     # Prepare output dataframe
     position_output_df = time_df.copy()
-    #pos_out = np.empty(1)
+    pos_out = np.empty(1)
 
     # Extract info from dataframes
     for n, out_dict in enumerate(pool_results):

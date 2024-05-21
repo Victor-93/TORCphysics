@@ -7,7 +7,15 @@ from TORCphysics import parallelization_tools as pt
 
 # Parallelization conditions
 # --------------------------------------------------------------
-n_simulations = 10 #96 # 120
+n_simulations = 24#8 #96 # 120
+
+# Simulation conditions
+# --------------------------------------------------------------
+dt = 0.25
+initial_time = 0
+final_time = 500
+time = np.arange(initial_time, final_time + dt, dt)
+frames = len(time)
 
 # Circuit initial conditions
 # --------------------------------------------------------------
@@ -16,10 +24,10 @@ sites_filename = '../sites.csv'
 enzymes_filename = '../enzymes.csv'
 environment_filename = 'environment.csv'
 output_prefix = 'topoIRNAPtrack'
-frames = 5000 #50000
+#frames = 5000 #50000
 series = True
 continuation = False
-dt = 0.5 #  0.25
+#dt = 0.5 #  0.25
 
 # Prepare parallelization
 # --------------------------------------------------------------

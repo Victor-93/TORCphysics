@@ -468,6 +468,8 @@ class TopoIRecognitionRNAPTracking(BindingModel):
                 self.width = params.topo_b_w
                 self.threshold = params.topo_b_t
                 self.k_on = params.topo_b_k_on
+                self.RNAP_dist = 200.0  # in bp
+                self.fold_change = 10  # 40.0  # Fold change when RNAP is close
             else:
                 mydata = pd.read_csv(filename)
                 if 'k_on' in mydata.columns:
@@ -487,11 +489,14 @@ class TopoIRecognitionRNAPTracking(BindingModel):
             self.width = float(oparams['width'])
             self.threshold = float(oparams['threshold'])
             self.k_on = float(oparams['k_on'])
+            self.RNAP_dist = float(oparams['RNAP_dist'])
+            self.fold_change = float(oparams['fold_change'])
 
-        self.RNAP_dist = 200.0  # in bp
-        self.fold_change = 10#40.0  # Fold change when RNAP is close
+        # self.RNAP_dist = 200.0  # in bp
+        # self.fold_change = 10#40.0  # Fold change when RNAP is close
         self.interacts = interacts
-        self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
+        self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on,
+                        'RNAP_dist': self.RNAP_dist, 'fold_change': self.fold_change}  # Just in case
 
     # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
     def binding_probability(self, environmental, superhelical, site, enzyme_list, dt) -> float:

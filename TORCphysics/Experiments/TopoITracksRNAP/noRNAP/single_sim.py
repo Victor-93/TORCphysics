@@ -1,25 +1,32 @@
 from TORCphysics import Circuit
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
 # ----------------------------------------------------------------------------------------------------------------------
 # We want to run a single simulation of the Pleu500 with stochastic topoisomerase activities
 # TODO: Investigate why topos only bind on the left
-
+#  No le pongas tanto atencion a los ends, enfocate en el medio. Asegurate que todos tienen el mismo frames.
+#  Ve disenando tu experimento.
 # ----------------------------------------------------------------------------------------------------------------------
 # Initial conditions
 # ----------------------------------------------------------------------------------------------------------------------
+dt = 0.25
+initial_time = 0
+final_time = 500
+time = np.arange(initial_time, final_time + dt, dt)
+
 circuit_filename = '../circuit.csv'
 sites_filename = None
 enzymes_filename = None
 environment_filename = 'environment_test.csv'
 # environment_filename = 'environment.csv'
 output_prefix = 'noRNAP'
-frames = 1000#5000 #50000
+frames = len(time)#1000#5000 #50000
 series = True
 continuation = False
-dt = 2#0.5 #  0.25
+dt = .25#2#0.5 #  0.25
 
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
                      output_prefix, frames, series, continuation, dt)

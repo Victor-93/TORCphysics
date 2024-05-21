@@ -41,6 +41,7 @@ for i, name in enumerate(names):
     ax.set_ylabel('Density', fontsize=font_size)
     ax.set_xlabel(r'Position (bp)', fontsize=font_size)
     ax.set_title(name, fontsize=title_size)
+    ax.set_ylim([0, np.max(y)*1.1])
 
 
 plt.savefig('densities_count.png')

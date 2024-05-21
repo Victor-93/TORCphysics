@@ -1,2 +1,2 @@
 name,structure,size,twist,superhelical,sequence
-lineartest,circular,10000,0.0,-0.06,none
+linear,linear,10000,0.0,-0.06,none
