@@ -6,6 +6,7 @@ from TORCphysics import (Site, SiteFactory, Enzyme, EnzymeFactory, Environment,
                          EnvironmentFactory, Event, Log, params, utils)
 from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
+from TORCphysics import unbinding_model as ubm
 from TORCphysics import models_workflow as mw
 
 
@@ -976,3 +977,65 @@ class Circuit:
         # In case of RNAP
         #        elif 'RNAP' in environment.enzyme_type:
         #            environment.effect_oparams = {'velocity': params.v0, 'gamma': params.gamma}
+
+    # TODO: Document and test
+    def apply_local_variations(self, variations_list):
+
+        # Let's apply some local variations.
+        # Filter object to apply variations.
+        # -----------------------
+        for variation in variations_list:
+            # We need to filter and find our my_object, which is the name of the molecule/site that we will apply the
+            # variations
+            if variation['object_type'] == 'enzyme':
+                for enzyme in self.enzyme_list:
+                    if enzyme.name == variation['name']:
+                        my_object = enzyme
+            elif variation['object_type'] == 'environment' or variation['object_type'] == 'environmental':
+                for environmental in self.environmental_list:
+                    if environmental.name == variation['name']:
+                        my_object = environmental
+                        # And let's modify concentration if given
+                        if 'concentration' in variation:
+                            my_object.concentration = variation['concentration']
+
+            elif variation['object_type'] == 'site':
+                for site in self.site_list:
+                    if site.name == variation['name']:
+                        my_object = site
+            else:
+                raise ValueError('Error, object_type not recognised')
+
+            # Apply model variations
+            # Models
+            # -----------------------
+            # Binding Model
+            if 'binding_model_name' in variation and variation['binding_model_name'] is not None:
+                my_object.binding_model = bm.assign_binding_model(model_name=variation['binding_model_name'],
+                                                                  **variation['binding_oparams'])
+                my_object.binding_model_oparams = variation['binding_oparams']
+
+                # And Finally, if the object is an environmental that recognizes bare DNA,
+                # we have to update the sites (binding models)...
+                if variation['object_type'] == 'environment' or variation['object_type'] == 'environmental':
+                    if 'DNA' in my_object.site_type:
+                        for site in my_object.site_list:
+                            #if my_object.name in site.name and site.global_site == False:
+                            site.binding_model = bm.assign_binding_model(model_name=variation['binding_model_name'],
+                                                                         **variation['binding_oparams'])
+                            site.binding_model_oparams = variation['binding_oparams']
+
+            # Effect Model
+            if 'effect_model_name' in variation and variation['effect_model_name'] is not None:
+                my_object.effect_model = em.assign_effect_model(model_name=variation['effect_model_name'],
+                                                                **variation['effect_oparams'])
+                my_object.effect_model_oparams = variation['effect_oparams']
+
+            # Unbinding Model
+            if 'unbinding_model_name' in variation and variation['unbinding_model_name'] is not None:
+                my_object.unbinding_model = ubm.assign_unbinding_model(model_name=variation['unbinding_model_name'],
+                                                                       **variation['unbinding_oparams'])
+                my_object.unbinding_model_oparams = variation['unbinding_oparams']
+
+        # Sort list of enzymes and sites by position/start
+        # self.sort_lists()

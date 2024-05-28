@@ -29,3 +29,15 @@ Process
     Make sure all these files have the same box sizes.
 3.- Optional, run plot_densities.py - It plots the fitted densities (not normalized but actually counts)
 4.- Execute plot_results.py and this will generate the necesary curves.
+
+NEW Process
+-------------------------
+1.- Build reference density.
+  * Go to noRNAP
+  * Run run_simulation.py
+  * Run calculate_ref_density
+2.- Run calibration for a model
+  * Go to the model folder
+  * execute calibrate_tracking
+  * Make sure it has the same number of simulations than the reference.
+3.- Plot results - PENDING

@@ -475,15 +475,24 @@ class TopoIRecognitionRNAPTracking(BindingModel):
                 if 'k_on' in mydata.columns:
                     self.k_on = mydata['k_on'][0]
                 else:
-                    raise ValueError('Error, k_on parameter missing in csv file for TopoIRecognition')
+                    raise ValueError('Error, k_on parameter missing in csv file for TopoIRecognitionRNAPTracking')
                 if 'width' in mydata.columns:
                     self.width = mydata['width'][0]
                 else:
-                    raise ValueError('Error, width parameter missing in csv file for TopoIRecognition')
+                    raise ValueError('Error, width parameter missing in csv file for TopoIRecognitionRNAPTracking')
                 if 'threshold' in mydata.columns:
                     self.threshold = mydata['threshold'][0]
                 else:
-                    raise ValueError('Error, threshold parameter missing in csv file for TopoIRecognition')
+                    raise ValueError('Error, threshold parameter missing in csv file for TopoIRecognitionRNAPTracking')
+                if 'RNAP_dist' in mydata.columns:
+                    self.RNAP_dist = mydata['RNAP_dist'][0]
+                else:
+                    raise ValueError('Error, RNAP_dist parameter missing in csv file for TopoIRecognitionRNAPTracking')
+                if 'fold_change' in mydata.columns:
+                    self.fold_change = mydata['fold_change'][0]
+                else:
+                    raise ValueError('Error, fold_change parameter missing in csv file for TopoIRecognitionRNAPTracking')
+
         else:
             # No point testing or checking that we have these variables, as python gives error on its own.
             self.width = float(oparams['width'])

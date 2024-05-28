@@ -258,8 +258,9 @@ def single_simulation_return_dfs(item):
     my_circuit.log.name = my_circuit.name
 
     # And change the seed
-    my_circuit.seed = my_circuit.seed + random.randrange(sys.maxsize+ item['n_simulations'] )  # random.randrange(sys.maxsize)
-#    my_circuit.seed = my_circuit.seed + item['n_simulations']  # random.randrange(sys.maxsize)
+    my_circuit.seed = my_circuit.seed + random.randrange(
+        sys.maxsize + item['n_simulations'])  # random.randrange(sys.maxsize)
+    #    my_circuit.seed = my_circuit.seed + item['n_simulations']  # random.randrange(sys.maxsize)
     my_circuit.rng = np.random.default_rng(my_circuit.seed)
 
     # Run simulation and collect dataframes
@@ -267,3 +268,44 @@ def single_simulation_return_dfs(item):
     out_dict = {'enzymes_df': enzymes_df, 'sites_df': sites_df, 'environmental_df': environmental_df}
     return out_dict
     # return enzymes_df, sites_df, environmental_df
+
+
+# TODO: Document
+# This function is for running in parallel but returns the dataframes: sites_df, enzyme_df, environmental_df
+# It also applies variations in the form: {'global_conditions': global_dict, 'variations': variations_list}
+def single_simulation_w_variations_return_dfs(item):
+    # Retrieve
+    global_dict = item['global_conditions']
+    variations_list = item['variations']
+
+    my_circuit = Circuit(circuit_filename=global_dict['circuit_filename'], sites_filename=global_dict['sites_filename'],
+                         enzymes_filename=global_dict['enzymes_filename'],
+                         environment_filename=global_dict['environment_filename'],
+                         output_prefix=global_dict['output_prefix'], frames=global_dict['frames'],
+                         series=global_dict['series'], continuation=global_dict['continuation'],
+                         dt=global_dict['dt'])
+
+    my_circuit.name = my_circuit.name + '_' + str(global_dict['n_simulations'])
+    my_circuit.sites_dict_list[0]['name'] = my_circuit.name
+    my_circuit.log.name = my_circuit.name
+
+    # And change the seed
+    my_circuit.seed = my_circuit.seed + global_dict['n_simulations'] + random.randrange(sys.maxsize)
+    my_circuit.rng = np.random.default_rng(my_circuit.seed)
+
+    # Let's fix first initial supercoiling density and update all relevant parameters
+    if 'initial_sigma' in global_dict:  # Only do it if it's provided.
+        for enzyme in my_circuit.enzyme_list:
+            enzyme.superhelical = global_dict['initial_sigma']
+        my_circuit.update_twist()
+        my_circuit.update_supercoiling()
+        my_circuit.update_global_twist()
+        my_circuit.update_global_superhelical()
+
+    # And let's apply some local variations.
+    my_circuit.apply_local_variations(variations_list)
+
+    # Run simulation and collect dataframes
+    enzymes_df, sites_df, environmental_df = my_circuit.run_return_dfs()
+    out_dict = {'enzymes_df': enzymes_df, 'sites_df': sites_df, 'environmental_df': environmental_df}
+    return out_dict

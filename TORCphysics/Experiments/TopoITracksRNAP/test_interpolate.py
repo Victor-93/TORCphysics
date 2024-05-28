@@ -1,14 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+from scipy.interpolate import interp1d
+from scipy.stats import pearsonr
 
 # Description
 # ---------------------------------------------------------
 # I will process and analyse the simulations produced by the parallelization.
+# This time, we will extrapolate the results.
 
 # Inputs
 # ---------------------------------------------------------
-out = 'TopoIRNAPTracking'
+out = 'TopoIRNAPTracking-interpolated'
 
 # Figure initial conditions
 # ---------------------------------------------------------
@@ -25,11 +27,23 @@ kwargs = {'linewidth': 2, 'ls': '-'}
 enzyme_names = ['RNAP', 'topoI', 'gyrase']
 outside_label = ['a)', 'b)', 'c)']
 
+# Define ranges and x-axis for interpolation/plotting
+gene_start = 4000
+gene_end = 6000
+
+nbp = 10000
+
+x_spacing = 10
+
+# Define x-axes
+x_system = np.arange(1, nbp, x_spacing)
+x_gene = np.arange(gene_start, gene_end, x_spacing)
+
+
 # Let's plot
 # ---------------------------------------------------------
 fig, axs = plt.subplots(3, figsize=(width, 3*height), tight_layout=True)
 
-# TODO: For the moment, for RNAP let's just plot the density, not the enrichment
 for i, ename in enumerate(enzyme_names):
     ax = axs[i]
 
@@ -53,20 +67,43 @@ for i, ename in enumerate(enzyme_names):
 
         # Transform data: This says the enrichment, hopefully?
         if ename != 'RNAP':
+            xi = x_system
             y = dat_y / ref_y
         else:
+            # x_common = np.arange(min(x), max(x), x_spacing)
+            xi = x_gene
             y = dat_y
-        # print(ename, len(y))
 
-        if ename == 'RNAP':
-            RNAP_x = x
-            RNAP_y = y
+        #if ename == 'RNAP':
+        #    RNAP_x = x
+        #    RNAP_y = y
+        #if ename == 'topoI':
+        #    topo_x = x
+        #    topo_y = y
+
+        # Create interpolation function
+        interp_fun = interp1d(x,y,kind='linear', fill_value='extrapolate')  # everything default
+
+        # Get interpolated y-values
+        yi = interp_fun(xi)
+
         if ename == 'topoI':
-            topo_x = x
-            topo_y = y
+            y_topoI_compare = interp_fun(x_gene)
+        if ename == 'RNAP':
+            y_RNAP_compare = interp_fun(x_gene)
+
+        #    RNAP_x = x
+        #    RNAP_y = y
+        #if ename == 'topoI':
+        #    topo_x = x
+        #    topo_y = y
 
         # Plot results
-        ax.plot(x, y, lw=lw, color=colors_dict[name], label=name)
+        #ax.plot(x, y, lw=lw, color=colors_dict[name], label=name)
+        # Plot interpolated
+        ax.plot(xi, yi, '-', lw=lw, color=colors_dict[name], label=name)
+
+
 
     # Labels
     # ------------------------
@@ -85,7 +122,10 @@ for i, ename in enumerate(enzyme_names):
 
 axs[0].legend(loc='best', fontsize=font_size)
 
-plt.savefig(out+'.png')
-plt.savefig(out+'.pdf')
+# Calculate the Pearson correlation coefficient between the interpolated y-values
+correlation_coefficient, _ = pearsonr(y_topoI_compare, y_RNAP_compare)
+print(correlation_coefficient)
 
-
+plt.show()
+#plt.savefig(out+'.png')
+#plt.savefig(out+'.pdf')
