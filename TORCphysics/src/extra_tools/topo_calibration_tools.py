@@ -1,5 +1,6 @@
 import numpy as np
 import multiprocessing
+import multiprocessing.pool
 from TORCphysics import parallelization_tools as pt
 from scipy.stats import gaussian_kde
 from scipy.interpolate import interp1d
@@ -7,6 +8,57 @@ from scipy.stats import pearsonr
 from TORCphysics import Circuit
 import pandas as pd
 
+# Stuff added to make parallel / parallel processes
+# -----------------------------------------------------------------------------------
+class NoDaemonProcess(multiprocessing.Process):
+    # make 'daemon' attribute always return False
+    @property
+    def daemon(self):
+        return False
+
+    @daemon.setter
+    def daemon(self, val):
+        pass
+
+
+#class NoDaemonProcessPool(multiprocessing.pool.Pool):
+class MyPool(multiprocessing.pool.Pool):
+
+    def Process(self, *args, **kwds):
+        #proc = super(NoDaemonProcessPool, self).Process(*args, **kwds)
+        proc = super(MyPool, self).Process(*args, **kwds)
+        proc.__class__ = NoDaemonProcess
+
+        return proc
+
+#class NoDaemonProcess(multiprocessing.Process):
+#    # make 'daemon' attribute always return False
+#    def _get_daemon(self):
+#        return False
+#    def _set_daemon(self, value):
+#        pass
+#    daemon = property(_get_daemon, _set_daemon)
+
+# We sub-class multiprocessing.pool.Pool instead of multiprocessing.Pool
+# because the latter is only a wrapper function, not a proper class.
+#class MyPool(multiprocessing.pool.Pool):
+#    Process = NoDaemonProcess
+
+
+
+# Custom Pool class to allow nested parallelism
+#class NoDaemonProcess(multiprocessing.Process):
+#    # Make 'daemon' attribute always return False
+#    @property
+#    def daemon(self):
+#        return False#
+#
+#    @daemon.setter
+#    def daemon(self, value):
+#        pass
+
+#class NoDaemonPool(multiprocessing.pool.Pool):
+#    Process = NoDaemonProcess
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Description
@@ -419,24 +471,6 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
         hists_dict[names] = {'mean': None, 'std': None, 'bin_edges': None}
         FE_val[names] = {'mean': None, 'std': None}
 
-    # These six dictionaries will be part of our output dict - They include overalls plus STD
-    #    kde_gene_overall = {}
-    #    kde_gene_std = {}
-    #    kde_system_overall = {}
-    #    kde_system_std = {}
-    #    FE_curve_overall = {}
-    #    FE_curve_std = {}
-    #    hists_overall = {}
-    #    hists_std = {}
-    #    for names in enzymes_names:
-    #        kde_gene_overall[names] = None
-    #        kde_gene_std[names] = None
-    #        kde_system_overall[names] = None
-    ##       kde_system_std[names] = None
-    #       FE_curve_overall[names] = None
-    #       FE_curve_std[names] = None
-    #       hists_overall[names] = None
-    #       hists_std[names] = None
 
     # Let's prepare some data before running the parallelization
     # ------------------------------------------------------------------------------
@@ -457,12 +491,6 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
         g_dict['n_simulations'] = simulation_number
         Item = {'global_conditions': g_dict, 'variations': variations_list[0]}  #because is list 0
         Items.append(Item)
-
-    # TODO: AQUIMEQUDE
-    #  1.- Set up loop.  - DONE
-    #  2.- Write function sorts pool and gets: histograms, kdes, global, FE curve, FE, and CO - DONE
-    #  3.- Write process that gets overalls and STDs - DONE
-    #  4.- Test -DONE
 
     # Prepare dataframes to process parallel results
     # --------------------------------------------------------------
@@ -504,7 +532,7 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
 
         # Extract correlation
         # ------------------------------------------------------------------------------
-        c_df = pd.DataFrame({'set_' + str(n_set): ncorrelation})
+        c_df = pd.DataFrame({'set_' + str(n_set): [ncorrelation]})
         if n_set == 0:
             correlation_df = c_df.copy()
         else:
@@ -515,11 +543,12 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
         for i, name in enumerate(enzymes_names):
 
             # Put data in data frame
-            h_df = pd.DataFrame({'set_' + str(n_set): nhist[name]['count']})  # histogram counts
+            h_df = pd.DataFrame({'set_' + str(n_set): nhist[name]['counts']})  # histogram counts
             k_g_df = pd.DataFrame({'set_' + str(n_set): nkde_gene[name]})  # kde_gene
-            k_s_df = pd.DataFrame({'set_' + str(n_set): nkde_system[name]})   #kde_system
-            FE_df = pd.DataFrame({'set_' + str(n_set): nFE_curve[name]})  # FE curve
-            aFE_df = pd.DataFrame({'set_' + str(n_set): nFE_curve[name]})  # FE average value
+            if name != 'RNAP':
+                k_s_df = pd.DataFrame({'set_' + str(n_set): nkde_system[name]})   #kde_system
+                FE_df = pd.DataFrame({'set_' + str(n_set): nFE_curve[name]})  # FE curve
+                aFE_df = pd.DataFrame({'set_' + str(n_set): [nFE_val[name]]})  # FE average value
 
 
             # Append data frame to a bigger data frame that we will use to process info
@@ -527,18 +556,20 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
                 hist_df[name] = h_df.copy()
                 kde_gene_df[name] = k_g_df.copy()
 
+                hists_dict[name]['bin_edges'] = nhist[name]['bin_edges']  #Since we are here, let's do it now.
+
                 if name != 'RNAP':
                     kde_system_df[name] = k_s_df.copy()
                     FE_curve_df[name] = FE_df.copy()
                     mean_FE_df[name] = aFE_df.copy()
             else:
-                hist_df = pd.concat([hist_df, h_df], axis=1).reset_index(drop=True)
-                kde_gene_df = pd.concat([kde_gene_df, k_g_df], axis=1).reset_index(drop=True)
+                hist_df[name] = pd.concat([hist_df[name], h_df], axis=1).reset_index(drop=True)
+                kde_gene_df[name] = pd.concat([kde_gene_df[name], k_g_df], axis=1).reset_index(drop=True)
 
                 if name != 'RNAP':
-                    kde_system_df = pd.concat([kde_system_df, k_s_df], axis=1).reset_index(drop=True)
-                    FE_curve_df = pd.concat([FE_curve_df, FE_df], axis=1).reset_index(drop=True)
-                    mean_FE_df = pd.concat([mean_FE_df, aFE_df], axis=1).reset_index(drop=True)
+                    kde_system_df[name] = pd.concat([kde_system_df[name], k_s_df], axis=1).reset_index(drop=True)
+                    FE_curve_df[name] = pd.concat([FE_curve_df[name], FE_df], axis=1).reset_index(drop=True)
+                    mean_FE_df[name] = pd.concat([mean_FE_df[name], aFE_df], axis=1).reset_index(drop=True)
 
     pool.close()  # Close the pool
 
@@ -549,7 +580,6 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
         # All enzymes/environmentals have these
         hists_dict[name]['mean'] = hist_df[name].mean(axis=1).to_numpy()
         hists_dict[name]['std'] = hist_df[name].std(axis=1).to_numpy()
-        hists_dict[name]['bin_edges'] = h_df[name]['bin_edges']
         kde_gene[name]['mean'] = kde_gene_df[name].mean(axis=1).to_numpy()
         kde_gene[name]['std'] = kde_gene_df[name].std(axis=1).to_numpy()
 
@@ -576,6 +606,9 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
         np.corrcoef(kde_gene['topoI']['mean'][buf_size:-buf_size], kde_gene['RNAP']['mean'][buf_size:-buf_size]))
     overall_correlation = correlation_matrix[0,1]
 
+    # Let's calculate the correlation between the RNAP KDE and the reference RNA (experimental fitted to the TU)
+    correlation_matrix = np.corrcoef(kde_gene['RNAP']['mean'], reference_dict[0]['RNAP'])
+    RNAP_correlation = correlation_matrix[0,1]
 
     # Objective function
     #--------------------------------------------------------------------
@@ -585,16 +618,330 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
     target_FE = target_dict['target_FE']
 
     my_objective = (target_FE - FE_val['topoI']['mean']) ** 2 + (target_CO - overall_correlation) ** 2
+    my_objective = my_objective[0]
 
     # And prepare output dict
     #--------------------------------------------------------------------
-    results_dict = {'kde_gene': kde_gene, 'kde_system': kde_system, 'FE_curve': FE_curve, 'hists': hists_dict,
-                    'superhelical': global_supercoiling, 'FE_val': FE_val, 'correlation': correlation_sets}
+    results_dict = {'kde_gene': kde_gene, 'kde_system': kde_system, 'FE_curve': FE_curve, 'hists_dict': hists_dict,
+                    'superhelical_dict': global_supercoiling, 'FE_val': FE_val, 'correlation': correlation_sets,
+                    'RNAP_correlation': RNAP_correlation}
+
     # These outputs dict contains the values used in the calculation of the objective function, plus all the
     # additional results.
-    output_dict = {'FE': FE_val['topoI']['mean'], 'overall_correlation': overall_correlation, 'results': results_dict}
+    output_dict = {'FE': FE_val['topoI']['mean'], 'overall_correlation': overall_correlation, 'results': results_dict,
+                   'objective': my_objective}  # Let's also include the objective so we have all the info available.
 
     return my_objective, output_dict
+
+
+# This function is very similar than single_case_RNAPTracking_calibration_nsets_2scheme().
+# It also performs multiple sets of simulations to smooth the KDEs, but this time it uses a different
+# parallelization scheme (that's why is called *_2scheme).
+# Essentially, the scheme consists in creating two different parallelization Pools(), one outer and one inner.
+# In the outter pool, the number of n_sets are partitioned, and the number of n_workers are distributed to these
+# outer pools. Within each pool, an inner pool is created where it runs n_inner_workers simulations. This is done
+# n_subset times. So, in total, we run n_sets*n_subsets number of sets to smooth the KDEs.
+# The idea is that for each of these sets, we obtain histograms, kdes, global superhelical densities, FEs and CO.
+# KDEs are used to calculate a smooth KDE as well as histograms. From these overall KDEs the correlation between
+# topoI and RNAP are calculated, while the FE is calculated as the average of FEs across sets.
+# This because the FE do not vary greatly between sets of simulations, while the correlation does. This is the main
+# reason of why we calculate many KDEs to get the overalls.
+# FE = Fold enrichment
+# CO = Correlations
+# The results output include: overall histogram, KDEs, FE curves, and global superhelicals with their respective STDs.
+# It also includes averaged FEs and correlations, plus the Overall Correlation calculated from overall KDEs.
+# The objective function is minimized according the averaged FE of topo I, and the overall correlation.
+# global_dict_list should include the number of sets.
+# WARNING: It is very important that the number of n_workers is within the capabilities of your system.
+def single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variations_list, reference_dict, target_dict):
+
+    g_dict = dict(global_dict_list[0])  # Just one system
+    n_workers = g_dict['n_workers'] # Total number of workers (cpus)
+    n_sets = g_dict['n_sets'] # Number of outer sets
+    n_subsets = g_dict['n_subsets'] # Number of simulations per set
+    n_inner_workers = g_dict['n_inner_workers']  # Number of workers per inner pool
+
+    # Names to filter
+    enzymes_names = target_dict['enzymes_names']
+
+    # The these dicts include another dict with mean and STD columns - Everything is dictionary this time.
+    kde_gene = {}
+    kde_system = {}
+    FE_curve = {}
+    hists_dict = {}
+    FE_val = {}
+    correlation_sets = {'mean': None, 'std': None}
+    global_supercoiling = {'mean': None, 'std': None}
+
+    for names in enzymes_names:
+        kde_gene[names] = {'mean': None, 'std': None}
+        kde_system[names] = {'mean': None, 'std': None}
+        FE_curve[names] = {'mean': None, 'std': None}
+        hists_dict[names] = {'mean': None, 'std': None, 'bin_edges': None}
+        FE_val[names] = {'mean': None, 'std': None}
+
+
+    # Let's prepare some data before running the parallelization
+    # ------------------------------------------------------------------------------
+    # Let's load the circuit, so we can extract the information that we need in an automatic way
+    my_circuit = load_circuit(g_dict)
+
+    # Get target site
+    target_gene = [site for site in my_circuit.site_list if site.name == target_dict['target_gene']][0]
+    RNAP_env = [environment for environment in my_circuit.environmental_list if environment.name == 'RNAP'][0]
+
+    # Define x-axes
+    x_system = get_interpolated_x(1, my_circuit.size)
+    x_gene = get_interpolated_x(target_gene.start - RNAP_env.size, target_gene.end)
+
+    # Prepare dataframes to process parallel results
+    # --------------------------------------------------------------
+    # NOTE: We will collect all results in form of dataframes, then we will calculate the averages and STDs
+    hist_df = {}
+    kde_gene_df = {}
+    kde_system_df = {}
+    FE_curve_df = {}
+    mean_FE_df = {}
+    bin_edges  = {}
+    for p, name in enumerate(enzymes_names):
+        hist_df[name] = None
+        kde_gene_df[name] = None
+        kde_system_df[name] = None
+        FE_curve_df[name] = None
+        mean_FE_df[name] = None
+        bin_edges[name] = None
+
+    # Prepare items for parallelization
+    # --------------------------------------------------------------
+    # We need a list of items, so the pool can pass each item to the function
+    s = 0
+    Item_set = []
+    for n_set in range(n_sets):
+        Item_subset = []
+        for n_subset in range(n_subsets):
+            Items = []
+            for n_inner_worker in range(n_inner_workers):
+                g_dict['n_simulations'] = s   # This is the simulation number
+                Item = {'global_conditions': g_dict.copy(), 'variations': variations_list[0]}
+                Items.append(Item)
+                s += 1
+            Item_subset.append(Items)
+        Item_set.append(Item_subset)
+
+    processing_info_dict = {'circuit':my_circuit, 'target_dict': target_dict, 'reference_dict': reference_dict,
+                            'x_gene': x_gene, 'x_system': x_system}
+    # Launch parellelization scheme v2
+    # --------------------------------------------------------------
+
+    # Create a multiprocessing pool for the outer loop
+    pool = MyPool(n_sets)
+    Item_forpool = [(n_set, n_subsets, Item_set[n_set], n_inner_workers, processing_info_dict) for n_set in range(n_sets)]
+
+    results = pool.map(
+        process_set, Item_forpool)
+
+    pool.close()
+    #with NoDaemonPool(n_sets) as outer_pool:
+    # with multiprocessing.Pool(n_sets) as outer_pool:
+        # Run the outer loop in parallel
+    #    results = outer_pool.starmap(
+    #        process_set, [(n_set, n_subsets, Item_set, n_inner_workers, processing_info_dict) for n_set in range(n_sets)])
+
+
+    # Let's retrieve the results and organise them
+    # --------------------------------------------------------------
+    for j, processed_dict in enumerate(results):
+
+        if j == 0:
+            for i, name in enumerate(enzymes_names):
+                hist_df[name] = processed_dict['hist_df'][name].copy()
+                kde_gene_df[name] = processed_dict['kde_gene_df'][name].copy()
+                hists_dict[name]['bin_edges'] = processed_dict['bin_edges'][name]
+                if name != 'RNAP':
+                    kde_system_df[name] = processed_dict['kde_system_df'][name].copy()
+                    FE_curve_df[name] = processed_dict['FE_curve_df'][name].copy()
+                    mean_FE_df[name] = processed_dict['mean_FE_df'][name].copy()
+            superhelical_df = processed_dict['superhelical_df'].copy()
+            correlation_df = processed_dict['correlation_df'].copy()
+        else:
+            for i, name in enumerate(enzymes_names):
+                hist_df[name] = pd.concat([hist_df[name], processed_dict['hist_df'][name]], axis=1).reset_index(drop=True)
+                kde_gene_df[name] = pd.concat([kde_gene_df[name], processed_dict['kde_gene_df'][name]], axis=1).reset_index(drop=True)
+                if name != 'RNAP':
+                    kde_system_df[name] = pd.concat([kde_system_df[name],processed_dict['kde_system_df'][name]], axis=1).reset_index(drop=True)
+                    FE_curve_df[name] = pd.concat([FE_curve_df[name], processed_dict['FE_curve_df'][name]], axis=1).reset_index(drop=True)
+                    mean_FE_df[name] = pd.concat([mean_FE_df[name], processed_dict['mean_FE_df'][name]], axis=1).reset_index(drop=True)
+            superhelical_df = pd.concat([superhelical_df, processed_dict['superhelical_df']], axis=1).reset_index(drop=True)
+            correlation_df = pd.concat([correlation_df, processed_dict['correlation_df']], axis=1).reset_index(drop=True)
+
+    # Process data from the nsets and calculate overalls
+    # --------------------------------------------------------------
+    for i, name in enumerate(enzymes_names):
+
+        # All enzymes/environmentals have these
+        hists_dict[name]['mean'] = hist_df[name].mean(axis=1).to_numpy()
+        hists_dict[name]['std'] = hist_df[name].std(axis=1).to_numpy()
+        kde_gene[name]['mean'] = kde_gene_df[name].mean(axis=1).to_numpy()
+        kde_gene[name]['std'] = kde_gene_df[name].std(axis=1).to_numpy()
+
+        # RNAPs do not have fold-enrichment, only topos
+        if name != 'RNAP':
+            kde_system[name]['mean'] = kde_system_df[name].mean(axis=1).to_numpy()
+            kde_system[name]['std'] = kde_system_df[name].std(axis=1).to_numpy()
+            FE_curve[name]['mean'] = FE_curve_df[name].mean(axis=1).to_numpy()
+            FE_curve[name]['std'] = FE_curve_df[name].std(axis=1).to_numpy()
+            FE_val[name]['mean'] = mean_FE_df[name].mean(axis=1).to_numpy()
+            FE_val[name]['std'] = mean_FE_df[name].std(axis=1).to_numpy()
+
+    # Global supercoiling
+    global_supercoiling['mean'] = superhelical_df.mean(axis=1).to_numpy()
+    global_supercoiling['std'] = superhelical_df.std(axis=1).to_numpy()
+
+    # For the mean correlation between sets
+    correlation_sets['mean'] = correlation_df.mean(axis=1).to_numpy()
+    correlation_sets['std'] = correlation_df.std(axis=1).to_numpy()
+
+    # The overall correlation, calculated from the mean kdes
+    buf_size = 10  # Used in calculating correlation. Is the number of data points ignored at the ends
+    correlation_matrix = (
+        np.corrcoef(kde_gene['topoI']['mean'][buf_size:-buf_size], kde_gene['RNAP']['mean'][buf_size:-buf_size]))
+    overall_correlation = correlation_matrix[0,1]
+
+    # Let's calculate the correlation between the RNAP KDE and the reference RNA (experimental fitted to the TU)
+    correlation_matrix = np.corrcoef(kde_gene['RNAP']['mean'], reference_dict[0]['RNAP'])
+    RNAP_correlation = correlation_matrix[0,1]
+
+    # Objective function
+    #--------------------------------------------------------------------
+
+    # Retrieve the target correlation and target FE
+    target_CO = target_dict['target_CO']
+    target_FE = target_dict['target_FE']
+
+    my_objective = (target_FE - FE_val['topoI']['mean']) ** 2 + (target_CO - overall_correlation) ** 2
+    my_objective = my_objective[0]
+
+    # And prepare output dict
+    #--------------------------------------------------------------------
+    results_dict = {'kde_gene': kde_gene, 'kde_system': kde_system, 'FE_curve': FE_curve, 'hists_dict': hists_dict,
+                    'superhelical_dict': global_supercoiling, 'FE_val': FE_val, 'correlation': correlation_sets,
+                    'RNAP_correlation': RNAP_correlation}
+
+    # These outputs dict contains the values used in the calculation of the objective function, plus all the
+    # additional results.
+    output_dict = {'FE': FE_val['topoI']['mean'], 'overall_correlation': overall_correlation, 'results': results_dict,
+                   'objective': my_objective}  # Let's also include the objective so we have all the info available.
+
+    return my_objective, output_dict
+
+
+def process_set(item_pool):
+#    n_set, n_subsets, Items_subset, n_inner_workers, processing_info_dict
+    n_set = item_pool[0]
+    n_subsets = item_pool[1]
+    Items_subset = item_pool[2]
+    n_inner_workers = item_pool[3]
+    processing_info_dict = item_pool[4]
+
+    # Extract info we need for processing
+    # --------------------------------------------------------------
+    my_circuit = processing_info_dict['circuit']
+    target_dict = processing_info_dict['target_dict']
+    reference_dict = processing_info_dict['reference_dict']
+    x_gene = processing_info_dict['x_gene']
+    x_system = processing_info_dict['x_system']
+    enzymes_names = target_dict['enzymes_names']
+
+    # Prepare dataframes to process parallel results
+    # --------------------------------------------------------------
+    # NOTE: We will collect all results in form of dataframes, then we will calculate the averages and STDs
+    hist_df = {}
+    kde_gene_df = {}
+    kde_system_df = {}
+    FE_curve_df = {}
+    mean_FE_df = {}
+    bin_edges  = {}
+    for p, name in enumerate(enzymes_names):
+        hist_df[name] = None
+        kde_gene_df[name] = None
+        kde_system_df[name] = None
+        FE_curve_df[name] = None
+        mean_FE_df[name] = None
+        bin_edges[name] = None
+
+    # Create a multiprocessing pool for the inner loop
+    # with multiprocessing.Pool(n_inner_workers) as inner_pool:
+#    with NoDaemonPool(n_inner_workers) as inner_pool:
+
+    inner_pool = multiprocessing.Pool(n_inner_workers)
+
+    for n in range(n_subsets):
+
+        Items = Items_subset[n]
+        # Run simulations in parallel within this subset
+        pool_results = inner_pool.map(pt.single_simulation_w_variations_return_dfs, Items)
+
+        # Process and extract results for the set
+        nsupercoiling, nhist, nkde_gene, nkde_system, nFE_curve, nFE_val, ncorrelation = (
+            extract_RNAPTrackingInfo_from_pool(
+                pool_results, my_circuit, target_dict, reference_dict, x_gene, x_system))
+
+        # Extract Global superhelical density
+        # ------------------------------------------------------------------------------
+        s_df = pd.DataFrame({'set_' + str(n): nsupercoiling})
+        if n == 0:
+            superhelical_df = s_df.copy()
+        else:
+            superhelical_df = pd.concat([superhelical_df, s_df], axis=1).reset_index(drop=True)
+
+        # Extract correlation
+        # ------------------------------------------------------------------------------
+        c_df = pd.DataFrame({'set_' + str(n): [ncorrelation]})
+        if n == 0:
+            correlation_df = c_df.copy()
+        else:
+            correlation_df = pd.concat([correlation_df, c_df], axis=1).reset_index(drop=True)
+
+        # Extract rest of data
+        # ------------------------------------------------------------------------------
+        for i, name in enumerate(enzymes_names):
+
+            # Put data in data frame
+            h_df = pd.DataFrame({'set_' + str(n): nhist[name]['counts']})  # histogram counts
+            k_g_df = pd.DataFrame({'set_' + str(n): nkde_gene[name]})  # kde_gene
+            if name != 'RNAP':
+                k_s_df = pd.DataFrame({'set_' + str(n): nkde_system[name]})  # kde_system
+                FE_df = pd.DataFrame({'set_' + str(n): nFE_curve[name]})  # FE curve
+                aFE_df = pd.DataFrame({'set_' + str(n): [nFE_val[name]]})  # FE average value
+
+            # Append data frame to a bigger data frame that we will use to process info
+            if n == 0:
+                hist_df[name] = h_df.copy()
+                kde_gene_df[name] = k_g_df.copy()
+
+                bin_edges[name] = nhist[name]['bin_edges']  # Since we are here, let's do it now.
+
+                if name != 'RNAP':
+                    kde_system_df[name] = k_s_df.copy()
+                    FE_curve_df[name] = FE_df.copy()
+                    mean_FE_df[name] = aFE_df.copy()
+            else:
+                hist_df[name] = pd.concat([hist_df[name], h_df], axis=1).reset_index(drop=True)
+                kde_gene_df[name] = pd.concat([kde_gene_df[name], k_g_df], axis=1).reset_index(drop=True)
+
+                if name != 'RNAP':
+                    kde_system_df[name] = pd.concat([kde_system_df[name], k_s_df], axis=1).reset_index(drop=True)
+                    FE_curve_df[name] = pd.concat([FE_curve_df[name], FE_df], axis=1).reset_index(drop=True)
+                    mean_FE_df[name] = pd.concat([mean_FE_df[name], aFE_df], axis=1).reset_index(drop=True)
+
+
+    processed = {'hist_df': hist_df, 'kde_gene_df': kde_gene_df, 'kde_system_df': kde_system_df,
+                 'FE_curve_df': FE_curve_df, 'mean_FE_df': mean_FE_df, 'superhelical_df': superhelical_df,
+                 'correlation_df': correlation_df, 'bin_edges': bin_edges}
+    return processed
+
+
+
 
 
 # Extracts information from parallelization that returns dfs, so it can be used in calibrating Topo I RNAPTracking

@@ -40,4 +40,18 @@ NEW Process
   * Go to the model folder
   * execute calibrate_tracking
   * Make sure it has the same number of simulations than the reference.
-3.- Plot results - PENDING
+3.- Plot results
+
+PROCESS (nsets) - 28/05/2024
+-------------------------
+1.- Build reference density (as always)
+  * Go to noRNAP
+  * Run run_simulation.py
+  * Run calculate_ref_density
+ 2.- Run calibration for a model
+  * Go to the model folder
+  * execute calibrate_tracking_nsets
+  * Make sure it has the same number of simulations and frames than the reference.
+3.- Plot results
+  * Execute plot_calibration_nsets.py
+  * This script loads the pickle file outputed by calibrate_tracking_nsets.py

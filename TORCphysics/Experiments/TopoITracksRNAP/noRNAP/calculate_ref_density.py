@@ -19,7 +19,7 @@ from TORCphysics import topo_calibration_tools as tct
 # --------------------------------------------------------------
 dt = 0.25
 initial_time = 0
-final_time = 2000
+final_time = 1000
 time = np.arange(initial_time, final_time + dt, dt)
 
 # Circuit initial conditions

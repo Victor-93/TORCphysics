@@ -1313,7 +1313,14 @@ def Marko_torque(sigma):
 def velocity_2022SevierBioJ(z, torque):
     top = 2.0 * z.effect_model.velocity
     exp_arg = z.effect_model.kappa * (torque - z.effect_model.stall_torque)
-    down = 1.0 + np.exp(exp_arg)
+    exp_arg = np.float128(exp_arg)
+
+    # Define a maximum value for the argument to exp to prevent overflow
+    max_exp_arg = 709  # slightly below the overflow threshold for float64
+    # Clip the argument to the maximum value
+    exp_arg_clipped = np.clip(exp_arg, a_min=None, a_max=max_exp_arg)
+    #down = 1.0 + np.exp(exp_arg)
+    down = 1.0 + np.exp(exp_arg_clipped)
     velocity = top / down
     return velocity
 

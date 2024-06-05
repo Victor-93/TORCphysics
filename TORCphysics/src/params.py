@@ -66,7 +66,6 @@ sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall - Acco
 RNAP_kappa = 0.5  # 12pN^{-1} - According 2022SevierBioJ. This is a parameter used in calculating torque dependant
 # velocity.
 
-
 # TOPOISOMERASE I
 topo_b_k_off = 0.5
 
