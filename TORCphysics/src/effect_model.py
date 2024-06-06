@@ -727,7 +727,7 @@ class TopoILinear(EffectModel):
                 if 'k_cat' in mydata.columns:
                     self.k_cat = mydata['k_cat'][0]
                 else:
-                    raise ValueError('Error, k_cat parameter missing in csv file for GyraseUniform')
+                    raise ValueError('Error, k_cat parameter missing in csv file for TopoILinear')
         else:
             self.k_cat = float(oparams['k_cat'])
 

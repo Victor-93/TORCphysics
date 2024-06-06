@@ -8,14 +8,19 @@ from TORCphysics import parallelization_tools as pt
 # Parallelization conditions
 # --------------------------------------------------------------
 n_simulations = 12#96 # 120
+with_topoI = False
 
 # Circuit initial conditions
 # --------------------------------------------------------------
 circuit_filename = 'circuit.csv'
 sites_filename = 'sites.csv'
 enzymes_filename = '../enzymes.csv'
-environment_filename = '../environment.csv'
-output_prefix = 'WT_system'
+if with_topoI:
+    environment_filename = '../environment.csv'
+    output_prefix = 'WT_system'
+else:
+    environment_filename = '../environment_notopoI.csv'
+    output_prefix = 'notopoI_system'
 frames = 5000 #50000
 series = True
 continuation = False
@@ -52,7 +57,7 @@ time_values = [dt * frame for frame in frame_values]
 time_df = pd.DataFrame({'frames': frame_values, 'time': time_values})
 
 # Names to filter
-site_names = ['circuit', 'tetA', "mKalama1", 'mRaspberry', 'antitet', 'tetA']
+site_names = ['circuit', 'tetA', "mKalama1", 'mRaspberry', 'antitet', 'tetA', 'bla']
 enzyme_names = ['RNAP', 'topoI', 'gyrase']
 
 # And filter site results starting by name
@@ -95,13 +100,13 @@ for name in site_names:
         number_enzymes_df = pd.concat([number_enzymes_df, simulation_df], axis=1).reset_index(drop=True)
 
 
-    cout = 'superhelical_' + name + '_df.csv'
+    cout = output_prefix + '-superhelical_' + name + '_df.csv'
     superhelical_output_df.to_csv(cout, index=False, sep=',')
 
-    cout = 'binding_' + name + '_df.csv'
+    cout = output_prefix + '-binding_' + name + '_df.csv'
     binding_output_df.to_csv(cout, index=False, sep=',')
 
-    cout = 'N_enzymes_' + name + '_df.csv'
+    cout = output_prefix + '-N_enzymes_' + name + '_df.csv'
     number_enzymes_df.to_csv(cout, index=False, sep=',')
 
 
@@ -128,7 +133,7 @@ for name in enzyme_names:
         all_positions = np.concatenate([position, all_positions])
 
 
-    cout = 'positions_' + name + '.txt'
+    cout = output_prefix + '-positions_' + name + '.txt'
     np.savetxt(cout, all_positions)
 
 pool.close()

@@ -1,6 +1,7 @@
 type,name,start,end,k_on,binding_model,binding_oparams
-gene,tetA,85,1276,0.016,MaxMinPromoterBinding,antitet.csv
+gene,tetA,85,1276,0.016,MaxMinPromoterBinding,tetA.csv
 gene,antitet,85,1,0.016,MaxMinPromoterBinding,antitet.csv
 gene,mKalama1,5096,4383,0.001,MaxMinPromoterBinding,mKalama1.csv
 gene,mRaspberry,6011,5331,0.004,MaxMinPromoterBinding,mRaspberry.csv
+gene,bla,4174,3314,0.016,MaxMinPromoterBinding,bla.csv
 origin,ori,2530,3120,0.0,,

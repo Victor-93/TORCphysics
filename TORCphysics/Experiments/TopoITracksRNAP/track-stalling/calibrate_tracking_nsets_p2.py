@@ -29,10 +29,10 @@ import pickle
 #          So choose carefully n_workers and n_sets
 n_workers = 64#12  # Total number of workers (cpus)
 n_sets = 7#3  # Number of outer sets
-n_subsets = 4#7#2  # Number of simulations per set
+n_subsets = 5#7#2  # Number of simulations per set
 n_inner_workers = n_workers // (n_sets+1)  # Number of workers per inner pool
                                            # +1 because one worker is spent in creating the outer pool
-tests = 200  # number of tests for parametrization
+tests = 400  # number of tests for parametrization
 
 print('Doing parallelization process for:')
 print('n_workers', n_workers)
@@ -87,8 +87,8 @@ fold_change_max = 50
 
 # TARGETS FOR OPTIMIZATION
 # -----------------------------------
-target_FE = 1.38 #1.68  # Target fold-enrichment
-target_CO = 1.0  # Target correlation between topo I and RNAP densities.
+target_FE = 1.238 # 3rd System#1.38 #1.68  # Target fold-enrichment
+target_CO = 0.944 # 3rd System #1.0  # Target correlation between topo I and RNAP densities.
 x_spacing = 10.0  # The spacing I want at the moment of doing interpolation.
 
 # nbins is the number of bins to use when calculating the kde

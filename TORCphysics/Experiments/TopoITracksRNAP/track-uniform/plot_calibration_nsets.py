@@ -13,12 +13,14 @@ import pickle
 # Inputs
 # --------------------------------------------------------------
 pickle_file = 'calibration_RNAPTracking_nsets_p2.pkl'
+output_prefix = 'topoIRNAPtrack-uniform'
+title = 'TopoI-RNAP - uniform model'
 
 # Simulation conditions
 # --------------------------------------------------------------
 dt = 0.25
 initial_time = 0
-final_time = 500 # o 2000
+final_time = 1000 # o 2000
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 
@@ -28,7 +30,6 @@ circuit_filename = '../circuit.csv'
 sites_filename = '../sites.csv'
 enzymes_filename = None
 environment_filename = 'environment_calibration.csv'
-output_prefix = 'topoIRNAPtrack-uniform'
 series = True
 continuation = False
 
@@ -40,6 +41,8 @@ lw = 3
 font_size = 12
 xlabel_size = 14
 title_size = 16
+
+alpha=0.3
 
 names = ['RNAP', 'topoI', 'gyrase']
 colors_dict = {'RNAP': 'purple', 'topoI': 'red', 'gyrase': 'cyan'}
@@ -88,9 +91,19 @@ for p, name in enumerate(names):
     # Different process for RNAP or topos
     if name == 'RNAP':
         ax2 = ax.twinx()  # Different scale for RNAP
-        ax2.plot(x_gene, output['results']['kde_gene'][name]['mean'], colors_dict[name], lw=lw, label=name)
+        ax = ax2
+        x = x_gene
+        y = output['results']['kde_gene'][name]['mean']
+        ys = output['results']['kde_gene'][name]['std']
+        # ax2 = ax.twinx()
+        # ax2.plot(x_gene, output['results']['kde_gene'][name]['mean'], colors_dict[name], lw=lw, label=name)
     else:
-        ax.plot(x_system, output['results']['FE_curve'][name]['mean'], color=colors_dict[name], lw=lw, label=name)
+        x = x_system
+        y = output['results']['FE_curve'][name]['mean']
+        ys = output['results']['FE_curve'][name]['std']
+        # ax.plot(x_system, output['results']['FE_curve'][name]['mean'], color=colors_dict[name], lw=lw, label=name)
+    ax.plot(x, y, color=colors_dict[name], lw=lw, label=name)
+    ax.fill_between(x, y-ys, y+ys, color=colors_dict[name], alpha=alpha)
 
 # Labels
 # ------------------------
@@ -100,14 +113,16 @@ ax.set_xlabel(r'Position (bp)', fontsize=font_size)
 ax.set_xlim(0, my_circuit.size)
 ax.grid(True)
 ax.legend(loc='best', fontsize=font_size)
+fig.suptitle(title, fontsize=title_size)
 
 # Add FE and correlation labels
 # -------------------------------------
 FE = output['FE'][0]
 CO = output['overall_correlation']
+OB = output['objective']
 
 # Define the text to display
-textstr = f'FE={FE:.2f}, CO={CO:.2f}'
+textstr = f'FE={FE:.2f}, CO={CO:.2f}, OB={OB:.3f}'
 
 # Add the text box to the plot
 props = dict(boxstyle='round', facecolor='silver', alpha=0.5)
@@ -116,4 +131,26 @@ ax.text(0.05, 0.1, textstr, transform=ax.transAxes, fontsize=14,
 print('FE',FE)
 print('CO',CO)
 print('objective', output['objective'])
+print('RNAP_correlation', output['results']['RNAP_correlation'])
+plt.savefig(output_prefix+'-FE.png')
+
+# And plot superhelicals
+# ------------------------------------------------
+fig, ax = plt.subplots(1, figsize=(width, height), tight_layout=True)
+fig.suptitle(title, fontsize=title_size)
+
+xs = np.arange(initial_time, final_time + 2 * dt, dt)  # For plotting superhelical
+
+ax = ax
+y = output['results']['superhelical_dict']['mean'][:]
+ys = output['results']['superhelical_dict']['std'][:]
+y1 = y - ys
+y2 = y + ys
+
+ax.plot(xs, y, 'black', lw=lw)
+ax.fill_between(xs, y1, y2, color='black', alpha=alpha)
+ax.set_ylabel(r'Global $\sigma$', fontsize=font_size)
+ax.set_xlabel(r'Time (seconds)', fontsize=font_size)
+ax.grid(True)
+plt.savefig(output_prefix+'-supercoiling.png')
 plt.show()
