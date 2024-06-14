@@ -1,0 +1,13 @@
+13/06/2024
+
+The data collected here is from the paper:
+Assessing in vivo the impact of gene context on transcription through DNA supercoiling
+
+With authors: Ihab Boulas, Lisa Bruno, Sylvie Rimsky, Olivier Espeli, Ivan Junier, Olivier Rivoire
+
+* For the experimental data (weak.csv, medium.csv, strong.csv), I collected it from their data that they uploaded to
+github (in the Notebook folder).
+
+* For the biophysical model data, I reproduced it by running their codes (uploaded in their github page) using the
+same distances than experiments for the upstream barrier, and using the parameters reported in their paper for the
+weak, medium and strong promoter. The data collected is named as model_case-norm.csv, with case being = weak,medium,strong

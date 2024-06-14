@@ -1,0 +1,6 @@
+13/06/2024
+
+These data was obtained by running the SIST code in the promoter sequences from paper:
+Assessing in vivo the impact of gene context on transcription through DNA supercoiling
+
+The sequences were flanked by 250 fragments of G/C on each side, being each resulting sequence around ~550bp.

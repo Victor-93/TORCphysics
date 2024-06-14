@@ -1,0 +1,9 @@
+13/06/2024
+
+* junier_data/: Experimental data and data reproduced using biophysical model of paper:
+  Assessing in vivo the impact of gene context on transcription through DNA supercoiling
+  With authors: Ihab Boulas, Lisa Bruno, Sylvie Rimsky, Olivier Espeli, Ivan Junier, Olivier Rivoire
+
+* promoter_responses/: From that paper, I calculated opening curves (energy required for melting) using the SIST code.
+
+* torcphys/: Results using TORCPhysics models and parametrizaiton, using same system conditions (sizes)

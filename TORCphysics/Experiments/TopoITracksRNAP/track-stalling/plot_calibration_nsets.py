@@ -132,6 +132,7 @@ print('FE',FE)
 print('CO',CO)
 print('objective', output['objective'])
 print('RNAP_correlation', output['results']['RNAP_correlation'])
+plt.savefig(output_prefix+'-FE.pdf')
 plt.savefig(output_prefix+'-FE.png')
 
 # And plot superhelicals
