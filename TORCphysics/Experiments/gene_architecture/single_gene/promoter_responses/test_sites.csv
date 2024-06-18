@@ -1,0 +1,4 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+gene,weak,100,200,1,MaxMinPromoterBinding,weak.csv
+gene,medium,300,400,1,MaxMinPromoterBinding,medium.csv
+gene,strong,500,600,1,MaxMinPromoterBinding,strong.csv

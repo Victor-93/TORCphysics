@@ -1138,3 +1138,182 @@ def get_interpolated_x(start, end, x_spacing=10):
     x_interpolated = np.arange(start, end, x_spacing)
 
     return x_interpolated
+
+# This function processes the results from pool (pool_outputs), and given a list of site_names, it returns
+#  a dict of dictionaries with each entry being a DF with average values of
+#  superhelical, binding, unbinding and #enzymes.
+#  Given a list of enzyme_names, it returns a dictionary with numpy arrays of their KDEs.
+#  All these parameters are averaged values
+#  Outputs: sites_dict{'superhelical', 'binding', 'unbinding', '#enzymes' }.
+#           For each of the site_dataframes, columns have the form: site_name_mean, site_name_std; for the sites in
+#           site_names list
+#           enzymes_dict{'enzyme_names'} - each one containin a KDE  - Or maybe calculated after?
+def process_pools_get_avgs(pool_outputs, site_names, enzyme_names, my_circuit):
+
+    # Create a range of values for the 'frames' column
+    frame_values = list(range(my_circuit.frames + 1))
+
+    # Calculate the corresponding time values using dt
+    time_values = [my_circuit.dt * frame for frame in frame_values]
+
+    # Create a DataFrame with 'frames' and 'time' columns
+    time_df = pd.DataFrame({'frames': frame_values, 'time': time_values})
+
+    # Let's do it for sites first!
+    # ------------------------------------------------------------------------------
+    # Prepare output dataframe
+    superhelical_output_df = time_df.copy()
+    binding_output_df = time_df.copy()
+    unbinding_output_df = time_df.copy()
+    nenzymes_output_df = time_df.copy()
+
+    # And filter site results starting by name
+    for name in site_names:
+        for n, out_dict in enumerate(pool_outputs):
+
+            #Get output dfs
+            sites_df = out_dict['sites_df']
+
+            # Filter superhelical density
+            if name == 'circuit':
+                mask = sites_df['type'] == name
+            else:
+                mask = sites_df['name'] == name
+
+            # Collect measurements
+            # ------------------------------------------------------------------------------
+            superhelical = sites_df[mask]['superhelical'].to_numpy()
+            binding_event = sites_df[mask]['binding'].to_numpy()
+            unbinding_event = sites_df[mask]['unbinding'].to_numpy()
+            number_enzymes = sites_df[mask]['#enzymes'].to_numpy()
+
+            # Make them DFs and sort by simulation
+            superhelical = pd.DataFrame({'simulation_' + str(n): superhelical})
+            binding_event = pd.DataFrame({'simulation_' + str(n): binding_event})
+            unbinding_event = pd.DataFrame({'simulation_' + str(n): unbinding_event})
+            number_enzymes = pd.DataFrame({'simulation_' + str(n): number_enzymes})
+
+            if n == 0:
+                superhelical_df = superhelical.copy()
+                binding_event_df = binding_event.copy()
+                unbinding_event_df = unbinding_event.copy()
+                number_enzymes_df = number_enzymes.copy()
+            else:
+                superhelical_df = pd.concat([superhelical_df, superhelical], axis=1).reset_index(drop=True)
+                binding_event_df = pd.concat([binding_event_df, binding_event], axis=1).reset_index(drop=True)
+                unbinding_event_df = pd.concat([unbinding_event_df, unbinding_event], axis=1).reset_index(drop=True)
+                number_enzymes_df = pd.concat([number_enzymes_df, number_enzymes], axis=1).reset_index(drop=True)
+
+        # Calculate averages
+        # ------------------------------------------------------------------------------
+        #Superhelical
+        mean_df = superhelical_df.mean(axis=1).to_frame(name=name+'_mean')
+        std_df = superhelical_df.std(axis=1).to_frame(name=name+'_std')
+        superhelical_output_df =  pd.concat([superhelical_output_df, mean_df, std_df], axis=1)#.reset_index(True)
+
+        # Binding
+        mean_df = binding_event_df.mean(axis=1).to_frame(name=name+'_mean')
+        std_df = binding_event_df.std(axis=1).to_frame(name=name+'_std')
+        binding_output_df =  pd.concat([binding_output_df, mean_df, std_df], axis=1)#.reset_index(True)
+
+        # Unbinding
+        mean_df = unbinding_event_df.mean(axis=1).to_frame(name=name+'_mean')
+        std_df = unbinding_event_df.std(axis=1).to_frame(name=name+'_std')
+        unbinding_output_df = pd.concat([unbinding_output_df, mean_df, std_df], axis=1)
+
+        # #Enzymes
+        mean_df = number_enzymes_df.mean(axis=1).to_frame(name=name+'_mean')
+        std_df = number_enzymes_df.std(axis=1).to_frame(name=name+'_std')
+        nenzymes_output_df = pd.concat([nenzymes_output_df, mean_df, std_df], axis=1)
+
+    # And the sites_dict output dictionary!
+    sites_dict = {'superhelical': superhelical_output_df, 'binding': binding_output_df,
+                  'unbinding': unbinding_output_df, '#enzymes': nenzymes_output_df}
+
+    # For the enzymes.
+    # ------------------------------------------------------------------------------
+    enzymes_dict = {}
+    for name in enzyme_names:
+
+        all_positions = np.empty([1])
+
+        # Extract info from dataframes
+        for n, out_dict in enumerate(pool_outputs):
+            enzymes_df = out_dict['enzymes_df']
+
+            # Filter
+            mask = enzymes_df['name'] == name
+
+            # Position
+            # ------------------------------------------------------------------------------
+            position = enzymes_df[mask]['position'].to_numpy()
+
+            all_positions = np.concatenate([position, all_positions])
+
+
+        # number of bins for histogram - which we will not plot
+        nbins = calculate_number_nbins(my_circuit, name)
+
+        # Calculate histogram
+        counts, bin_edges = calculate_histogram(data=all_positions, nbins=nbins)
+
+        # Calculate KDE
+        kde_x, kde_y = calculate_KDE(data=all_positions, nbins=nbins, scaled=True)
+
+        enzymes_dict[name + '_counts'] = counts
+        enzymes_dict[name + '_bin_edges'] = bin_edges
+        enzymes_dict[name + '_kde_x'] = kde_x
+        enzymes_dict[name + '_kde_y'] = kde_y
+
+    return sites_dict, enzymes_dict
+
+
+# TODO: This function only calculates the susceptibilities given the results from Pool()
+# The production rate is calculated as: prod_rate = sum(unbinding_events)/total_time
+#  In other words, counts how many complete cycles or outputs were done on average per circuit in the total
+#  simulation time.
+# Inputs: sites_names = list with site names to calculate susceptibility from
+# Returns: Dictionary with susceptibilities, in the form {site_name: susceptibility}
+def process_pools_calculate_production_rate(pool_outputs, site_names, my_circuit):
+
+    total_time = my_circuit.dt * my_circuit.frames
+
+    production_dict = {}  # This is the output
+
+    # Calculation time!
+    # ------------------------------------------------------------------------------
+
+    # And filter site results starting by name
+    for name in site_names:
+        for n, out_dict in enumerate(pool_outputs):
+
+            #Get output dfs
+            sites_df = out_dict['sites_df']
+
+            # Filter superhelical density
+            if name == 'circuit':
+                mask = sites_df['type'] == name
+            else:
+                mask = sites_df['name'] == name
+
+            # Collect measurements
+            # ------------------------------------------------------------------------------
+            unbinding_event = sites_df[mask]['unbinding'].to_numpy()
+
+            # Make them DFs and sort by simulation
+            unbinding_event = pd.DataFrame({'simulation_' + str(n): unbinding_event})
+
+            if n == 0:
+                unbinding_event_df = unbinding_event.copy()
+            else:
+                unbinding_event_df = pd.concat([unbinding_event_df, unbinding_event], axis=1).reset_index(drop=True)
+
+        # Calculate averages
+        # ------------------------------------------------------------------------------
+        mean = unbinding_event_df.mean(axis=1).to_numpy()
+        prod_rate = sum(mean)/total_time
+
+        production_dict[name] = prod_rate
+
+    return production_dict
+
