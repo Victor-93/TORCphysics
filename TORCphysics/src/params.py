@@ -37,7 +37,7 @@ ATP_hydrolysis = 6.7  # kcal / mol
 # Elasticity parameters - from Marko's elasticity model
 # -----------------------------------------------------------
 P_length = 24.0  # nm - twist stiffness of plectonomic DNA - is it a persistence length?
-C_length = 100.0  # nm - twist persistence length
+C_length = 95.0#100.0  # nm - twist persistence length - 95nm used in Marko's paper
 A_length = 50.0  # nm - persistence length
 f_stretching = 1.0  # 0.15  # pN - stretching force of enzymes in vivo - this might not be correct, but it is in the range of
 # low forces in the Marko's elasticity model
@@ -59,8 +59,8 @@ sigma_p = (1 / p_stiffness) * np.sqrt(2 * p_stiffness * g_energy / (1 - p_stiffn
 # ---------------------------------------------------------------------------------------------------------------------
 # RNA Polymerase (RNAP)
 v0 = 30.0  # 60.0  # Velocity (bp/sec) of RNAPs
-gamma = 0.2 * w0  # How much supercoiling is injected per bp
-stall_torque = 12.0  # 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper.
+gamma = 0.2*w0#0.5 * w0  # How much supercoiling is injected per bp
+stall_torque = 12.0#12.0  # 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper.
 # 12pN*nm according 2022SevierBioJ
 sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall - According Gleng?
 RNAP_kappa = 0.5  # 12pN^{-1} - According 2022SevierBioJ. This is a parameter used in calculating torque dependant

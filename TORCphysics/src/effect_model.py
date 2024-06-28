@@ -1311,7 +1311,8 @@ def Marko_torque(sigma):
 #  and T_c = cutoff or stalling torque.
 #  This function is based on the 2022SevierBioJ paper
 def velocity_2022SevierBioJ(z, torque):
-    top = 2.0 * z.effect_model.velocity
+    # top = 2.0 * z.effect_model.velocity
+    top = z.effect_model.velocity
     exp_arg = z.effect_model.kappa * (torque - z.effect_model.stall_torque)
     exp_arg = np.float128(exp_arg)
 

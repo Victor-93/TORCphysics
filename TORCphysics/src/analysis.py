@@ -172,14 +172,15 @@ def calculate_steady_state_initiation_curve(y, time, ta, tb):
     for k in range(1, frames):
         sum_ini[k] = np.sum(y[0:k])
 
+    sum_ini_time = sum_ini / time
     if np.sum(sum_ini) <= 0.0:
         rate = 0.0000000001
     else:
-        log_sum_ini = np.log(sum_ini / time)
+        log_sum_ini = np.log(sum_ini_time)
         plateau = np.mean(log_sum_ini[ta:tb])
         rate = np.exp(plateau)
     curve = log_sum_ini
-    return curve, rate
+    return sum_ini_time, log_sum_ini, rate
 
 # TODO: Relative initiation rate is next, what is that?
 

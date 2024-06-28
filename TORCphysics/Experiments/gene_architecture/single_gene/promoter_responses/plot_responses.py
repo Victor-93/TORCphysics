@@ -36,7 +36,7 @@ kwargs = {'linewidth': 2, 'ls': '-'}
 # Plot responses
 # -------------------------------------
 fig, axs = plt.subplots(1, figsize=(width, height), tight_layout=True)
-fig.suptitle(my_circuit.name + ' rates')
+fig.suptitle(' rates')
 vs.plot_site_response_curves(my_circuit, axs=axs, colors=colors_dict, site_type='gene')
 plt.savefig('responses.png')
 plt.show()

@@ -4,8 +4,8 @@ import multiprocessing.pool
 from TORCphysics import parallelization_tools as pt
 from scipy.stats import gaussian_kde
 from scipy.interpolate import interp1d
-from scipy.stats import pearsonr
 from TORCphysics import Circuit
+from TORCphysics import analysis as ann
 import pandas as pd
 
 # Stuff added to make parallel / parallel processes
@@ -1278,6 +1278,8 @@ def process_pools_calculate_production_rate(pool_outputs, site_names, my_circuit
 
     total_time = my_circuit.dt * my_circuit.frames
 
+    time = np.arange(0, total_time + my_circuit.dt, my_circuit.dt)
+
     production_dict = {}  # This is the output
 
     # Calculation time!
@@ -1311,7 +1313,10 @@ def process_pools_calculate_production_rate(pool_outputs, site_names, my_circuit
         # Calculate averages
         # ------------------------------------------------------------------------------
         mean = unbinding_event_df.mean(axis=1).to_numpy()
-        prod_rate = sum(mean)/total_time
+
+        sum_time, log_sum, prod_rate = ann.calculate_steady_state_initiation_curve(mean, time, ta=int(my_circuit.frames / 2), tb=-1)
+
+        #prod_rate = sum(mean)/total_time
 
         production_dict[name] = prod_rate
 

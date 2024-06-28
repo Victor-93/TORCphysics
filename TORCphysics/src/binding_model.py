@@ -324,6 +324,132 @@ class MaxMinPromoterBinding(BindingModel):
         return rate
 
 
+class MaxMinPromoterBinding_cutoff(BindingModel):
+    """
+     A BindingModel subclass that calculates binding probabilities according a sigmoid response curve.
+     Similar to MaxMinPromoterBinding, this function calculates the binding probabilities using the same
+     model. However, the difference in this model is that it includes a cutoff parameter, which is a superhelical
+     density cutoff that inhibits transcription initiation. Excentially, if the local superhelical density is below
+     this cutoff, then the probability of transcription is set to the minimum rate (yes?).
+     This model represents the binding mechanism of supercoiling sensitive promoters, which openning curve usually
+     follows a sigmoidal response as function of the local supercoiling density. In this case, the binding rate varies
+     as a function of supercoiling
+
+     Attributes
+     ----------
+     k_min : float
+        Minimum rate (1/s) at which the enzymes bind.
+     k_max : float
+        Maximum rate (1/s) at which the enzymes bind.
+     threshold : float
+        The threshold of the sigmoid curve. This is a dimensionless parameter.
+     width : float
+        The width of the sigmoid curve. This is a dimensionless parameter.
+     cutoff : float
+        The cutoff parameter that indicates the range of superhelicity in which transcription initiation is
+        inhibited. This is a dimensionless parameter.
+     filename : str, optional
+        Path to the site csv file that parametrises the binding model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the binding model.
+    """
+
+    def __init__(self, filename=None, interacts=False, **oparams):
+
+        super().__init__(filename, **oparams)
+        if not oparams:
+            if filename is None:
+                self.width = .003
+                self.threshold = -.094
+                self.k_min = 0.001
+                self.k_max = 0.01
+                self.cutoff = -0.13
+            else:
+                mydata = pd.read_csv(filename)
+                if 'k_min' in mydata.columns:
+                    self.k_min = mydata['k_min'][0]
+                else:
+                    raise ValueError('Error, k_max parameter missing in csv file for MaxMinPromoterBinding_cutoff')
+                if 'k_max' in mydata.columns:
+                    self.k_max = mydata['k_max'][0]
+                else:
+                    raise ValueError('Error, k_max parameter missing in csv file for MaxMinPromoterBinding_cutoff')
+                if 'width' in mydata.columns:
+                    self.width = mydata['width'][0]
+                else:
+                    raise ValueError('Error, width parameter missing in csv file for MaxMinPromoterBinding_cutoff')
+                if 'threshold' in mydata.columns:
+                    self.threshold = mydata['threshold'][0]
+                else:
+                    raise ValueError('Error, threshold parameter missing in csv file for MaxMinPromoterBinding_cutoff')
+                if 'cutoff' in mydata.columns:
+                    self.cutoff = mydata['cutoff'][0]
+                else:
+                    raise ValueError('Error, cutoff parameter missing in csv file for MaxMinPromoterBinding_cutoff')
+        else:
+            self.width = float(oparams['width'])
+            self.cutoff = float(oparams['cutoff'])
+            self.threshold = float(oparams['threshold'])
+            self.k_min = float(oparams['k_min'])
+            self.k_max = float(oparams['k_max'])
+
+        self.interacts = interacts
+        # Just in case
+        self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_min': self.k_min, 'k_max': self.k_max,
+                        'cutoff': self.cutoff}
+
+        # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
+
+    def binding_probability(self, environmental, superhelical, dt) -> float:
+        """ Method for calculating the probability of binding according the MaxMinPromoterBinding_cutoff model.
+
+        Parameters
+        ----------
+        dt : float
+            Timestep in seconds (s).
+        environmental : Environment
+            The environmental molecule that is trying to bind the site.
+        superhelical : float
+            The local supercoiling region in the site.
+
+        Returns
+        ----------
+        probability : float
+            A number that indicates the probability of binding in the current timestep.
+        """
+
+        if superhelical < self.cutoff:
+            rate = self.k_min
+        else:
+            a = np.log(self.k_min / self.k_max)
+            b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
+            rate = self.k_max * np.exp(a / b)
+        return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+
+    def rate_modulation(self, superhelical) -> float:
+        """ Method for calculating the rate modulation as a functino of superhelical density for the
+        MaxMinPromoter model.
+
+        Parameters
+        ----------
+        dt : float
+            Timestep in seconds (s).
+        environmental : Environment
+            The environmental molecule that is trying to bind the site.
+        superhelical : float
+            The local supercoiling region in the site.
+
+        Returns
+        ----------
+        rate : float
+            Rate at which the environmentals bind given the local superhelical density
+        """
+
+        a = np.log(self.k_min / self.k_max)
+        b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
+        rate = self.k_max * np.exp(a / b)
+        return rate
+
 class TopoIRecognition(BindingModel):
     """
      A BindingModel subclass that calculates binding probabilities according a sigmoid recognition curve.
@@ -832,6 +958,8 @@ def assign_binding_model(model_name, oparams_file=None, **oparams):
         my_model = MeyerPromoterOpening(filename=oparams_file, **oparams)
     elif model_name == 'MaxMinPromoterBinding':
         my_model = MaxMinPromoterBinding(filename=oparams_file, **oparams)
+    elif model_name == 'MaxMinPromoterBinding_cutoff':
+        my_model = MaxMinPromoterBinding_cutoff(filename=oparams_file, **oparams)
     else:
         raise ValueError('Could not recognise binding model ' + model_name)
     return my_model

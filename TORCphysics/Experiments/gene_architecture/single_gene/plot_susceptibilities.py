@@ -60,17 +60,17 @@ fig, axs = plt.subplots(3, figsize=(width, 3*height), tight_layout=True, sharex=
 # Plot experimental curves
 axs[0].plot(weak_exp['distance'], weak_exp['Signal'], 's', ms=ms, color=exp_color)
 axs[1].plot(medium_exp['distance'], medium_exp['Signal'], 's', ms=ms, color=exp_color)
-axs[2].plot(strong_exp['distance'], strong_exp['Signal'], 's', ms=ms, color=exp_color)
+axs[2].plot(strong_exp['distance'], strong_exp['Signal'], 's', ms=ms, color=exp_color, label='experimental')
 
 # Plot biophysical model curves
 axs[0].plot(model_weak['distance'], model_weak['mean'], '--', color=model_color)
 axs[1].plot(model_medium['distance'], model_medium['mean'], '--', color=model_color)
-axs[2].plot(model_strong['distance'], model_strong['mean'], '--', color=model_color)
+axs[2].plot(model_strong['distance'], model_strong['mean'], '--', color=model_color, label='model')
 
 # Plot torcphys curves
 axs[0].plot(weak_torc['distance'], weak_torc['prod_rate']/weak_torc['prod_rate'][4], '-', color=torc_color)
 axs[1].plot(medium_torc['distance'], medium_torc['prod_rate']/medium_torc['prod_rate'][4], '-', color=torc_color)
-axs[2].plot(strong_torc['distance'], strong_torc['prod_rate']/strong_torc['prod_rate'][4], '-', color=torc_color)
+axs[2].plot(strong_torc['distance'], strong_torc['prod_rate']/strong_torc['prod_rate'][4], '-', color=torc_color, label='TORC')
 
 
 for i in range(3):
@@ -81,8 +81,9 @@ axs[0].set_ylabel('Weak promoter', fontsize=xlabel_size)
 axs[1].set_ylabel('Medium promoter', fontsize=xlabel_size)
 axs[2].set_ylabel('Strong promoter', fontsize=xlabel_size)
 axs[2].set_xlabel('Distance (bp)', fontsize=xlabel_size)
+axs[2].legend(loc='best', fontsize=font_size)
 
-#plt.savefig('junier.png')
+plt.savefig('susceptibility.png')
 #plt.savefig('junier.pdf')
 plt.show()
 

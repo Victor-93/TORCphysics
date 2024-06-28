@@ -6,7 +6,7 @@ from TORCphysics import parallelization_tools as pt
 from TORCphysics import topo_calibration_tools as tct
 
 
-# TODO: Create template circuit and sites. Change these conditions per system conditions. - You can create temporal
+#  Create template circuit and sites. Change these conditions per system conditions. - You can create temporal
 #       circuit and sites files per system. Then create new ones and overwrite.
 #       Run in parallel each of the systems.
 #       For each run, collect only data of interest (susceptibilities), or you could save as binary to study dynamics.
@@ -19,10 +19,12 @@ from TORCphysics import topo_calibration_tools as tct
 
 # Simulation conditions
 # --------------------------------------------------------------
+#binding_model='MaxMinPromoterBinding'
+binding_model='MaxMinPromoterBinding_cutoff'
 outputf='production_rates'
 dt = 0.25
 initial_time = 0
-final_time = 3600 #9000 ~2.5hrs
+final_time = 1000#3600 #9000 ~2.5hrs
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 
@@ -127,7 +129,7 @@ for i, upstream_distance in enumerate(weak_distances):
     start = upstream_distance
     end = upstream_distance + gene_length
     make_gene_site_csv(sites_filename, 'gene', 'reporter', start, end, 1,
-                       'MaxMinPromoterBinding', weak_response)
+                       binding_model, weak_response)
 
 
     # Prepare parallel inputs
@@ -176,7 +178,7 @@ for i, upstream_distance in enumerate(medium_distances):
     start = upstream_distance
     end = upstream_distance + gene_length
     make_gene_site_csv(sites_filename, 'gene', 'reporter', start, end, 1,
-                       'MaxMinPromoterBinding', medium_response)
+                       binding_model, medium_response)
 
     # Prepare parallel inputs
     # --------------------------------------------------------------
@@ -224,7 +226,7 @@ for i, upstream_distance in enumerate(strong_distances):
     start = upstream_distance
     end = upstream_distance + gene_length
     make_gene_site_csv(sites_filename, 'gene', 'reporter', start, end, 1,
-                       'MaxMinPromoterBinding', strong_response)
+                       binding_model, strong_response)
 
     # Prepare parallel inputs
     # --------------------------------------------------------------
