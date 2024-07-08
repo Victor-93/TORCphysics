@@ -23,13 +23,14 @@ import sys
 # **********************************************************************************************************************
 
 promoter_cases = ['weak']
-promoter_case = 'weak'
+response_multiplier = [1] #, 2, 4]  # Multiplier response, so we don't have to explore so many params
 
-# Junier experimental data - we only need distances for now.
-experimental_files = ['../../junier_data/' + promoter_case + '.csv']
+# Junier experimental data - we only need distances for now.for i, promoter_case in enumerate(promoter_cases):
+for pcase in promoter_cases:
+    experimental_files = ['../../junier_data/' + pcase + '.csv']
 
-# Promoter responses
-promoter_responses = ['../../promoter_responses/' + promoter_case + '.csv']
+    # Promoter responses
+    promoter_responses_files = ['../../promoter_responses/' + pcase + '.csv']
 
 info_file = 'genearc-v1'
 # Parallelization conditions
@@ -92,8 +93,12 @@ reporter_type = 'site'
 reporter_binding_model_name = 'MaxMinPromoterBinding'
 
 RNAP_name = 'RNAP'
-RNA_type = 'enzyme'
+RNAP_type = 'enzyme'
 RNAP_effect_model_name = 'RNAPStall'
+
+v0 = 30.0 # bps
+stall_torque = 12.0
+kappa = 0.5
 
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------
@@ -142,17 +147,17 @@ def objective_function(params, calibrating=True):
     #  If calibration=False, then return dfs and stuff like that? Yes!/
 
     big_global_list = []  # Each entry is a list of global dicts
-    big_variations_list = []
+    big_variation_list = []  # We have a variation for each promoter case (not distances).
     # We need globals, variations and references. References can be in experimental_curves
     # So we just need to build global and variations
     for i, promoter_case in enumerate(promoter_cases):
 
-        e_curve = experimental_curves[i]
         files = files_list[i]
         dists = distances[i]
+        presponse = promoter_responses[i]
+
 
         global_list = []
-        variation_list = []
 
         for j, upstream_distance in enumerate(dists):
             circuit_file = files[j]['circuit']
@@ -163,7 +168,7 @@ def objective_function(params, calibrating=True):
                            'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
                            'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                            'frames': frames, 'dt': dt,
-                           'n_inner_workers': n_inner_workers,
+                           'n_simulations': n_inner_workers,
                            'DNA_concentration': 0.0}
             global_list.append(global_dict)
 
@@ -173,66 +178,35 @@ def objective_function(params, calibrating=True):
         # Variation dictionaries
         # ------------------------------------------
         # Site
-        name = reporter_name
-        object_type = reporter_type
-        binding_model_name = reporter_binding_model_name
-        #    binding_oparams =
+        mult = response_multiplier[i]
+        binding_oparams = {'k_max':mult*params['k_max'], 'k_min':params['k_min'],
+                           'a':float(presponse['a']), 'b':float(presponse['b']),
+                           'threshold':float(presponse['threshold']), 'width':float(presponse['width'])}
 
-        RNAP_name = 'RNAP'            # Variation dictionaries
-            # ------------------------------------------
-            # Site
-            name = reporter_name
-            object_type = reporter_type
-            binding_model_name = reporter_binding_model_name
-            #    binding_oparams =
+        reporter_variation = {'name': reporter_name, 'object_type': reporter_type,
+                           'binding_model_name': reporter_binding_model_name, 'binding_oparams': binding_oparams}
 
-            RNAP_name = 'RNAP'
-            RNA_type = 'enzyme'
-            RNAP_effect_model_name = 'RNAPStall'
+        # RNAP
+        effect_oparams = {'velocity': v0, 'stall_torque': stall_torque, 'kappa': kappa,
+                          'gamma': params['gamma']}
 
-            # Topoisomerase I
-            name = topoI_name
-            object_type = topoI_type
-            binding_model_name = topoI_binding_model_name
-            binding_oparams = {'k_on': float(topoI_params['k_on'][0]), 'width': float(topoI_params['width'][0]),
-                               'threshold': float(topoI_params['threshold'][0]),
-                               'RNAP_dist': params['RNAP_dist'],
-                               'fold_change': params['fold_change']}
+        RNAP_variation = {'name': RNAP_name, 'object_type': RNAP_type,
+                              'effect_model_name': RNAP_effect_model_name, 'effect_oparams': effect_oparams}
 
-            topoI_variation = {'name': name, 'object_type': object_type,
-                               'binding_model_name': binding_model_name, 'binding_oparams': binding_oparams}
+        big_variation_list.append( [reporter_variation, RNAP_variation] )
 
-        RNA_type = 'enzyme'
-        RNAP_effect_model_name = 'RNAPStall'
-
-        # Topoisomerase I
-        name = topoI_name
-        object_type = topoI_type
-        binding_model_name = topoI_binding_model_name
-        binding_oparams = {'k_on': float(topoI_params['k_on'][0]), 'width': float(topoI_params['width'][0]),
-                           'threshold': float(topoI_params['threshold'][0]),
-                           'RNAP_dist': params['RNAP_dist'],
-                           'fold_change': params['fold_change']}
-
-        topoI_variation = {'name': name, 'object_type': object_type,
-                           'binding_model_name': binding_model_name, 'binding_oparams': binding_oparams}
-
+    # Info needed for the parallelization
     parallel_info = {'n_workers': n_workers, 'n_sets': n_sets,
-                     'n_subsets': n_subsets, 'n_inner_workers': n_inner_workers}'n_inner_workers': n_inner_workers
+                     'n_subsets': n_subsets, 'n_inner_workers': n_inner_workers}
 
 
-    # Create lists of conditions for each system
-    # ------------------------------------------
-
-
-    # Global dictionaries
-    global_dict_list = [global_dict]
-
-    # List of lists of variations
-    variations_list = [[topoI_variation]]
-
-    # Arrays with position densities to calculate fold change
-    list_reference = [reference_dict]
+    # TODO: Create tct function that does that parallelization with nsets.
+    #  It needs as inputs the
+    #  * big_global_list, big_variation_list, the experimental curves, distances, parallel info.
+    #  (maybe you can make the experimental curve just an array with values, not a df to make it
+    #  more versatile).
+    #  * You also need to make another function that processes the outputs, or maybe add a flag?
+    #    so you can return a dict with all the info (binding,unbinding,supercoiling (global and site), and kdes??)
 
     # Finally, run objective function.
     # ------------------------------------------
@@ -240,7 +214,6 @@ def objective_function(params, calibrating=True):
                                                                                        variations_list,
                                                                                        list_reference,
                                                                                        target_dict)
-
     #    return my_objective
     if calibrating:
         return my_objective
@@ -255,6 +228,7 @@ def objective_function(params, calibrating=True):
 experimental_curves = []
 distances = []
 files_list = []
+promoter_responses = []
 for i, promoter_case in enumerate(promoter_cases):
 
     exp_df = pd.read_csv(experimental_files[i])
@@ -285,16 +259,18 @@ for i, promoter_case in enumerate(promoter_cases):
         start = upstream_distance
         end = upstream_distance + gene_length
         make_gene_site_csv(sites_filename, 'gene', 'reporter', start, end, 1,
-                           'MaxMinPromoterBinding', promoter_responses[i])
+                           'MaxMinPromoterBinding', promoter_responses_files[i])
 
         flist['circuit'].append(circuit_filename)
         flist['sites'].append(sites_filename)
 
     files_list.append(flist)
 
+    presponse = pd.read_csv(promoter_responses_files[i]).to_dict()
+    promoter_responses.append(presponse)
 
-
-# Let's erase files
+# **********************************************************************************************************************
+# OPTIMIZATION# Let's erase files
 # ---------------------------------------------------------------------------
 for i, promoter_case in enumerate(promoter_cases):
 
@@ -306,8 +282,6 @@ for i, promoter_case in enumerate(promoter_cases):
         os.remove(files['sites'][j])
 
 
-# **********************************************************************************************************************
-# OPTIMIZATION
 # **********************************************************************************************************************
 # Optimization
 # -----------------------------------------------------
@@ -355,8 +329,31 @@ with open(output_file_path, 'w') as f:
 
 best_df = pd.DataFrame.from_dict([best])
 
+# Let's erase files
+# ---------------------------------------------------------------------------
+for i, promoter_case in enumerate(promoter_cases):
+
+    files = files_list[i]
+    dists = distances[i]
+
+    for j, upstream_distance in enumerate(dists):
+        os.remove(files['circuit'][j])
+        os.remove(files['sites'][j])
+
+
 # Create a multiprocessing pool
 pool = multiprocessing.Pool()
+# Let's erase files
+# ---------------------------------------------------------------------------
+for i, promoter_case in enumerate(promoter_cases):
+
+    files = files_list[i]
+    dists = distances[i]
+
+    for j, upstream_distance in enumerate(dists):
+        os.remove(files['circuit'][j])
+        os.remove(files['sites'][j])
+
 
 
 

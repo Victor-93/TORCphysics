@@ -10,7 +10,7 @@ from TORCphysics import analysis as ann
 # **********************************************************************************************************************
 n_simulations = 4 # 16
 
-idist = 11#11 #Which distance we want
+idist = 0#11 #Which distance we want
 promoter_case = 'weak'
 
 # Junier experimental data - we only need distances for now.
@@ -206,6 +206,7 @@ axs[1].text(0.5, 0.1, trate_prod, transform=axs[1].transAxes, fontsize=14,
 #axs[2].set_xlabel('Distance (bp)', fontsize=xlabel_size)
 #a#xs[2].legend(loc='best', fontsize=font_size)
 
+plt.savefig(promoter_case+'-dist-'+str(idist)+'.png')
 #plt.savefig('susceptibility.png')
 #plt.savefig('junier.pdf')
 plt.show()

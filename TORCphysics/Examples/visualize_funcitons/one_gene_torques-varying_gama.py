@@ -123,5 +123,7 @@ ax.set_xscale('log')
 ax.grid(True)
 ax.set_xlabel('upstream distance (bp)')
 ax.set_ylabel('stall time')
+plt.savefig('stall-time_gamma')
+
 
 plt.show()
