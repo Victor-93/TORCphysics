@@ -59,7 +59,7 @@ sigma_p = (1 / p_stiffness) * np.sqrt(2 * p_stiffness * g_energy / (1 - p_stiffn
 # ---------------------------------------------------------------------------------------------------------------------
 # RNA Polymerase (RNAP)
 v0 = 30.0  # 60.0  # Velocity (bp/sec) of RNAPs
-gamma = 0.2*w0#0.5 * w0  # How much supercoiling is injected per bp
+gamma = 0.1*w0#0.5 * w0  # How much supercoiling is injected per bp
 stall_torque = 12.0#12.0  # 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper.
 # 12pN*nm according 2022SevierBioJ
 sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall - According Gleng?

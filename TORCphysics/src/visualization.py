@@ -6,6 +6,9 @@ import matplotlib.patches as mpatches
 from TORCphysics import analysis as an
 from TORCphysics import effect_model as em
 from datetime import datetime
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+import os
+from TORCphysics.src import enzyme_shapes_dir
 
 # This module is produced to make one's life easier and be able to quickly process results.
 # With this module you can create animations,
@@ -15,7 +18,8 @@ width = 10
 height = 6
 
 # colors
-enzyme_colors = {'RNAP': 'white', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'green', 'lacI_bridge': 'red', 'ori': 'silver', 'topoI': 'red',
+enzyme_colors = {'RNAP': 'white', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'green', 'lacI_bridge': 'red', 'ori': 'silver',
+                 'topoI': 'red',
                  'gyrase': 'cyan'}
 
 gene_colour = '#4a86e8ff'  # 'blue'
@@ -26,13 +30,15 @@ topoI_colour = 'red'
 gyrase_colour = 'cyan'
 
 # Sizes
-enzyme_sizes = {'RNAP': 300, 'IHF': 500, 'FIS': 500, 'lacI': 250, 'lacI_bridge': 250, 'ori': 500, 'topoI': 500, 'gyrase': 500}
+enzyme_sizes = {'RNAP': 300, 'IHF': 500, 'FIS': 500, 'lacI': 250, 'lacI_bridge': 250, 'ori': 500, 'topoI': 500,
+                'gyrase': 500}
 DNA_lw = 12
 gene_lw = 5
 sigma_lw = 5
 
 # Shapes
-enzyme_shapes = {'RNAP': 'o', 'IHF': 'o', 'FIS': 'o', 'lacI': 's', 'lacI_bridge': 's', 'ori': 'h', 'topoI': 'X', 'gyrase': 'X'}
+enzyme_shapes = {'RNAP': 'o', 'IHF': 'o', 'FIS': 'o', 'lacI': 's', 'lacI_bridge': 's', 'ori': 'h', 'topoI': 'X',
+                 'gyrase': 'X'}
 
 # text size
 slabel = 20
@@ -41,6 +47,10 @@ object_text = 15  # NAPs, genes, etc...
 # Ranges
 sigma_a = -.4
 sigma_b = .4
+
+
+# Path to molecule/enzymes/effectors png files
+#effector_path = '../enzyme_shapes/'
 
 
 # TODO:
@@ -196,7 +206,7 @@ def plot_signal_profiles(my_circuit, sites_df, axs=None, ignore=None, colors=Non
     else:
         signals, names = an.build_signal_by_type(sites_df, site_type)
     time = np.arange(0, my_circuit.dt * len(signals[0]), my_circuit.dt)
-    y_0s = time*0.0
+    y_0s = time * 0.0
     for i, signal in enumerate(signals):
         name = names[i]
         if ignore is not None:
@@ -471,9 +481,9 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
     # SAVE OR SHOW
     # -----------------------------------
 
-    # writervideo = animation.FFMpegWriter(fps=60)
+    writervideo = animation.FFMpegWriter(fps=30)
     # writervideo = animation.FFMpegWriter()
-    writervideo = animation.PillowWriter(fps=60)
+    #writervideo = animation.PillowWriter(fps=60)
     ani.save(output_file, writer=writervideo)
     # ani.save(output, writer=writervideo)
     # ani.save(output_file, writer='ImageMagick', fps=30)
@@ -481,3 +491,237 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
     # ani.save(output_file, writer='HTMLwriter', fps=30)
     # ani.save(output_file, fps=30)
     # plt.show()
+
+
+# This function uses matplotlib ArtistAnimation instead of FuncAnimation. It also uses predifined png files to
+# represent enzymes
+
+def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out_format,
+                                   site_type=None, site_colours=None):
+    output_file = output + out_format
+    h = 1.5
+    dh = 0.5
+    gx = np.array([0, my_circuit.size])
+    gy = np.array([h, h])
+
+    fig, ax = plt.subplots(2, figsize=(width*1.2, height*1.2), gridspec_kw={'height_ratios': [1, 2], 'hspace': 0.2})
+
+    # Sizes
+    # -----------------------------------
+    ax[0].set_xlim(- 100, my_circuit.size + 100)
+    ax[0].set_ylim(0, 2)
+    ax[1].set_xlim(- 100, my_circuit.size + 100)
+    ax[1].set_ylim(sigma_a, sigma_b)
+
+    # labels and all that
+    # -----------------------------------
+    ax[0].grid(axis='x', zorder=1)
+    ax[0].tick_params(labelleft=False, bottom=False, top=False)
+    ax[1].grid(True, zorder=1)
+    ax[1].set_xlabel("DNA (bp)", fontsize=slabel)
+    ax[1].set_ylabel(r"$\sigma$", fontsize=slabel)
+
+    # -----------------------------------
+    # draw DNA
+    # -----------------------------------
+    ax[0].plot(gx, gy, lw=DNA_lw, color=DNA_colour, zorder=2)
+
+    # -----------------------------------
+    # Now draw genes
+    # -----------------------------------
+    for i, site in enumerate(my_circuit.site_list):
+        if site.site_type == 'EXT':
+            continue
+        if site_type is not None and site.site_type != site_type:  # Only site types
+            continue
+        if 'DNA_' in site.site_type:  # I'm trying to avoid bare DNA binding sites
+            continue
+
+        x1 = site.end
+        x0 = site.start
+        dx = x1 - x0
+        name = site.name
+        if site_colours is not None:
+            arrow = mpatches.FancyArrowPatch((x0, h), (x1, h), mutation_scale=25, color=site_colours[name], zorder=3,
+                                             lw=gene_lw)
+        else:
+            arrow = mpatches.FancyArrowPatch((x0, h), (x1, h), mutation_scale=25, color=gene_colour, zorder=3,
+                                             lw=gene_lw)
+        ax[0].add_patch(arrow)
+        if x0 < x1:
+            a = x0 + abs(dx / 2)
+        else:
+            a = x1 + abs(dx / 2)
+        ax[0].text(a, h - dh, name, fontsize=object_text)
+
+    # -----------------------------------
+    # Draw containers of mRNA
+    # -----------------------------------
+    for i, site in enumerate(my_circuit.site_list):
+        if site.site_type == 'EXT':
+            continue
+        if site_type is not None and site.site_type != site_type:  # Only site types
+            continue
+        if 'DNA_' in site.site_type:  # I'm trying to avoid bare DNA binding sites
+            continue
+
+        add_mRNA_container(ax=ax[0], my_circuit=my_circuit, site=site)
+
+    # Data preparation before animation
+    # -----------------------------------
+
+    # Calculate max number of transcripts:
+    # -----------------------------------
+    gene_names = []
+    for i, site in enumerate(my_circuit.site_list):
+        if site.site_type == 'gene':
+            gene_names.append(site.name)
+    max_mRNA = -1
+    for name in gene_names:
+        mask = sites_df['name'] == name
+        gene_df = sites_df[mask]
+        n_mRNA = gene_df['unbinding'].sum()
+        if n_mRNA > max_mRNA:
+            max_mRNA = n_mRNA
+
+    # Prepare df
+    # -----------------------------------
+    mask = sites_df['type'] == 'circuit'
+    n_enzymes_df = sites_df[mask]
+
+    # -----------------------------------
+    # THE ANIMATION
+    # -----------------------------------
+    # TODO: Figure a way of how to animate the container filling. You have to calculate the accumulated mRNA
+    #       as a function of time/frame. So, I think you have to use sites_df, and keep track of the unbinding of each
+    #       gene. Maybe you can directly calculate it with pandas, like a sum from 0 to a given frame. ask chatgpt
+
+    l = -1
+    animation_frames = []  # Here, we will append the plots on each frame
+    for k in range(my_circuit.frames):
+        n_enz = n_enzymes_df.iloc[k]['#enzymes'] + 2  # 2 for the EXT
+
+        # Add enzymes, collect sigma and positions
+        # -----------------------------------------------------------------------------------------
+        positions = []
+        sigma = []
+        molecule_drawings = []
+        for i in range(n_enz):
+            l = l + 1
+
+            positions.append(enzymes_df.iloc[l]['position'])
+            sigma.append(enzymes_df.iloc[l]['superhelical'])
+
+            name = enzymes_df.iloc[l]['name']
+            # Skip if EXT
+            if name == 'EXT_L' or name == 'EXT_R':
+                continue
+
+            # Add molecule drawings
+            # -----------------------------------------------------------------------------------------
+            x = enzymes_df.iloc[l]['position']
+            y = h
+
+            # Call create_enzyme_annotation
+            enzyme_annotation = create_enzyme_annotation(x, y, name)
+            molecule_drawings.append(ax[0].add_artist(enzyme_annotation))  # And append it
+
+        # Add superhelical density drawing
+        # -----------------------------------------------------------------------------------------
+        superhelical_drawings = []
+        for j in range(n_enz):
+
+            x1 = positions[j]
+            y1 = sigma[j]
+            y2 = sigma[j]
+            if j < n_enz - 1:
+                x2 = positions[j + 1]
+            if j == n_enz - 1:
+                x2 = my_circuit.size
+            superhelical_drawings.append(ax[1].plot([x1, x2], [y1, y2], c=sigma_colour, lw=sigma_lw)[0])
+
+        # Time drawing
+        # -----------------------------------------------------------------------------------------
+        time_text = datetime.fromtimestamp(k * my_circuit.dt - 3600).strftime('%H:%M:%S')
+        #        time_drawing = [ax[0].text(0.0, 1.1, time_text, transform=ax[0].transAxes, fontsize=slabel)[0]]
+        time_drawing = ax[0].text(0.0, 1.1, time_text, transform=ax[0].transAxes, fontsize=slabel)
+
+        # Join all animations
+        # -----------------------------------------------------------------------------------------
+        animation_frames.append(molecule_drawings + superhelical_drawings + [time_drawing])
+
+    # ------------------------------------------------------------
+    # ANIMATE
+    # ------------------------------------------------------------
+    ani = animation.ArtistAnimation(fig, animation_frames, interval=200, blit=True)
+
+    # SAVE
+    # -----------------------------------
+    writervideo = animation.FFMpegWriter(fps=30)
+    ani.save(output_file, writer=writervideo)
+
+
+# Given an enzyme_name, it attaches a png representation to an ax object given the x and y positions.
+# Note that the enzyme_name png representation (file) needs to be stored in effector_path
+def create_enzyme_annotation(x, y, enzyme_name):
+    image = enzyme_shapes_dir + '/' + enzyme_name + '.png'
+    image_path = image
+
+    #if os.path.exists(image):
+    #    im = OffsetImage(image, zoom=0.1)
+    #else:
+    #    raise ValueError('Effect png file does not exist:', image)
+    #enzyme_annotation = AnnotationBbox(im, (x, y), frameon=False)
+
+    if os.path.exists(image_path):
+        img = plt.imread(image_path)
+        im = OffsetImage(img, zoom=0.1)
+        enzyme_annotation = AnnotationBbox(im, (x, y), frameon=False)
+        # ax.add_artist(enzyme_annotation)
+    else:
+        raise ValueError(f"PNG file does not exist: {image_path}")
+    return enzyme_annotation
+
+
+# Adds cartoon of container, which fills according the number of n_mRNA relative to a maximum number of max_mRNA
+def add_mRNA_container(ax, my_circuit, site, site_color=None, n_mRNA=None, max_mRNA=None):
+    glass_w = my_circuit.size / 20.
+    glass_h = .75
+    glass_dup = .175
+    glass_dho = glass_w
+    y0 = 0.1
+
+    # Get start position of glass
+    if site.start < site.end:
+        x0 = site.start + (site.end - site.start) / 2.
+    else:
+        x0 = site.end + (site.start - site.end) / 2.
+
+    # Add empty glass; 3 lines + elipse
+    # Lines
+    #ax.plot([x0, x0], [glass_h, y0], '-k')
+    #ax.plot([x0, x0 + glass_w], [y0, y0], '-k')
+    #ax.plot([x0 + glass_w, x0 + glass_w], [y0, glass_h], '-k')
+    # Lit
+    lit_x = x0 + glass_dho / 2.
+
+    if max_mRNA is not None and n_mRNA is not None:
+        lit_h = glass_h * (n_mRNA/max_mRNA)
+        rec_h = glass_h * (n_mRNA/max_mRNA) - glass_dup / 2.
+    else:  # No mRNA yet
+        lit_h = glass_h
+        rec_h = glass_h - glass_dup / 2.
+
+    if site_color is None:
+        rectangle = mpatches.Rectangle([x0, y0], width=glass_w, height=rec_h, color=None, facecolor='white',
+                                       edgecolor='black')
+        lit = mpatches.Ellipse([lit_x, lit_h], width=glass_dho, height=glass_dup, color=None, facecolor='white',
+                               edgecolor='black')
+    else:
+        rectangle = mpatches.Rectangle([x0, y0], width=glass_w, height=rec_h, color=site_color, facecolor=site_color,
+                                       edgecolor='black', alpha=0.5)
+        lit = mpatches.Ellipse([lit_x, lit_h], width=glass_dho, height=glass_dup, color=site_color,
+                               facecolor=site_color, edgecolor='black', alpha=0.5)
+
+    ax.add_patch(rectangle)
+    ax.add_patch(lit)
