@@ -45,8 +45,8 @@ slabel = 20
 object_text = 15  # NAPs, genes, etc...
 
 # Ranges
-sigma_a = -.4
-sigma_b = .4
+sigma_a = -.3
+sigma_b = .2
 
 
 # Path to molecule/enzymes/effectors png files
@@ -504,7 +504,7 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out
     gx = np.array([0, my_circuit.size])
     gy = np.array([h, h])
 
-    fig, ax = plt.subplots(2, figsize=(width*1.2, height*1.2), gridspec_kw={'height_ratios': [1, 2], 'hspace': 0.2})
+    fig, ax = plt.subplots(2, figsize=(width * 1.2, height * 1.2), gridspec_kw={'height_ratios': [1, 2], 'hspace': 0.2})
 
     # Sizes
     # -----------------------------------
@@ -565,7 +565,10 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out
         if 'DNA_' in site.site_type:  # I'm trying to avoid bare DNA binding sites
             continue
 
-        add_mRNA_container(ax=ax[0], my_circuit=my_circuit, site=site)
+        rectangle, lit1, lit2 = create_mRNA_container(my_circuit=my_circuit, site=site)
+        ax[0].add_patch(rectangle)
+        ax[0].add_patch(lit1)
+        ax[0].add_patch(lit2)
 
     # Data preparation before animation
     # -----------------------------------
@@ -592,9 +595,6 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out
     # -----------------------------------
     # THE ANIMATION
     # -----------------------------------
-    # TODO: Figure a way of how to animate the container filling. You have to calculate the accumulated mRNA
-    #       as a function of time/frame. So, I think you have to use sites_df, and keep track of the unbinding of each
-    #       gene. Maybe you can directly calculate it with pandas, like a sum from 0 to a given frame. ask chatgpt
 
     l = -1
     animation_frames = []  # Here, we will append the plots on each frame
@@ -640,6 +640,36 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out
                 x2 = my_circuit.size
             superhelical_drawings.append(ax[1].plot([x1, x2], [y1, y2], c=sigma_colour, lw=sigma_lw)[0])
 
+        # Containers drawings
+        # -----------------------------------------------------------------------------------------
+        container_drawings = []
+        for i, site in enumerate(my_circuit.site_list):
+            if site.site_type == 'EXT':
+                continue
+            if site_type is not None and site.site_type != site_type:  # Only site types
+                continue
+            if 'DNA_' in site.site_type:  # I'm trying to avoid bare DNA binding sites
+                continue
+
+            # Calculate number of mRNA
+            mask = (sites_df['name'] == site.name) & (sites_df['frame'] <= k)
+            gene_df = sites_df[mask]
+            n_mRNA = gene_df['unbinding'].sum()
+
+            if n_mRNA < 1: continue # Skip if there are no mRNA yet
+
+            if site_colours is not None:
+                rectangle, lit1, lit2 = create_mRNA_container(my_circuit=my_circuit, site=site,
+                                                       site_color=site_colours[site.name],
+                                                       n_mRNA=n_mRNA, max_mRNA=max_mRNA)
+            else:
+                rectangle, lit1, lit2 = create_mRNA_container(my_circuit=my_circuit, site=site, site_color=gene_colour,
+                                                       n_mRNA=n_mRNA, max_mRNA=max_mRNA)
+
+            container_drawings.append(ax[0].add_patch(rectangle))
+            container_drawings.append(ax[0].add_patch(lit1))
+            container_drawings.append(ax[0].add_patch(lit2))
+
         # Time drawing
         # -----------------------------------------------------------------------------------------
         time_text = datetime.fromtimestamp(k * my_circuit.dt - 3600).strftime('%H:%M:%S')
@@ -648,7 +678,7 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out
 
         # Join all animations
         # -----------------------------------------------------------------------------------------
-        animation_frames.append(molecule_drawings + superhelical_drawings + [time_drawing])
+        animation_frames.append(molecule_drawings + superhelical_drawings + container_drawings + [time_drawing])
 
     # ------------------------------------------------------------
     # ANIMATE
@@ -657,7 +687,12 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out
 
     # SAVE
     # -----------------------------------
-    writervideo = animation.FFMpegWriter(fps=30)
+    #writervideo = animation.FFMpegWriter(fps=30)
+    #ani.save(output_file, writer=writervideo)
+
+    # Let's try to make it faster
+    # Using 'ultrafast' preset for faster encoding
+    writervideo = animation.FFMpegWriter(fps=30, codec='libx264', extra_args=['-preset', 'ultrafast'])
     ani.save(output_file, writer=writervideo)
 
 
@@ -684,7 +719,8 @@ def create_enzyme_annotation(x, y, enzyme_name):
 
 
 # Adds cartoon of container, which fills according the number of n_mRNA relative to a maximum number of max_mRNA
-def add_mRNA_container(ax, my_circuit, site, site_color=None, n_mRNA=None, max_mRNA=None):
+# Returns the rectangle and lit, which you'll need to add it outside the function
+def create_mRNA_container(my_circuit, site, site_color=None, n_mRNA=None, max_mRNA=None):
     glass_w = my_circuit.size / 20.
     glass_h = .75
     glass_dup = .175
@@ -706,8 +742,8 @@ def add_mRNA_container(ax, my_circuit, site, site_color=None, n_mRNA=None, max_m
     lit_x = x0 + glass_dho / 2.
 
     if max_mRNA is not None and n_mRNA is not None:
-        lit_h = glass_h * (n_mRNA/max_mRNA)
-        rec_h = glass_h * (n_mRNA/max_mRNA) - glass_dup / 2.
+        lit_h = glass_h * (n_mRNA / max_mRNA)
+        rec_h = glass_h * (n_mRNA / max_mRNA) - glass_dup / 2.
     else:  # No mRNA yet
         lit_h = glass_h
         rec_h = glass_h - glass_dup / 2.
@@ -715,13 +751,17 @@ def add_mRNA_container(ax, my_circuit, site, site_color=None, n_mRNA=None, max_m
     if site_color is None:
         rectangle = mpatches.Rectangle([x0, y0], width=glass_w, height=rec_h, color=None, facecolor='white',
                                        edgecolor='black')
-        lit = mpatches.Ellipse([lit_x, lit_h], width=glass_dho, height=glass_dup, color=None, facecolor='white',
+        lit1 = mpatches.Ellipse([lit_x, lit_h], width=glass_dho, height=glass_dup, color=None, facecolor='white',
                                edgecolor='black')
+        lit2 = mpatches.Ellipse([lit_x, y0], width=glass_dho, height=glass_dup, color=None, facecolor='white',
+                                edgecolor='black')
     else:
-        rectangle = mpatches.Rectangle([x0, y0], width=glass_w, height=rec_h, color=site_color, facecolor=site_color,
+        rectangle = mpatches.Rectangle([x0, y0], width=glass_w, height=rec_h, facecolor=site_color,
                                        edgecolor='black', alpha=0.5)
-        lit = mpatches.Ellipse([lit_x, lit_h], width=glass_dho, height=glass_dup, color=site_color,
+        lit1 = mpatches.Ellipse([lit_x, lit_h], width=glass_dho, height=glass_dup,
                                facecolor=site_color, edgecolor='black', alpha=0.5)
-
-    ax.add_patch(rectangle)
-    ax.add_patch(lit)
+        lit2 = mpatches.Ellipse([lit_x, y0], width=glass_dho, height=glass_dup,
+                            facecolor=site_color, edgecolor='black', alpha=0.5)
+    return rectangle, lit1, lit2
+    #ax.add_patch(rectangle)
+    #ax.add_patch(lit)

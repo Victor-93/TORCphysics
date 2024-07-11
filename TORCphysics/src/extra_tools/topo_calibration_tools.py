@@ -940,10 +940,6 @@ def process_set(item_pool):
                  'correlation_df': correlation_df, 'bin_edges': bin_edges}
     return processed
 
-
-
-
-
 # Extracts information from parallelization that returns dfs, so it can be used in calibrating Topo I RNAPTracking
 # pool_results = results from parallelization using pool.map
 # Returns:
@@ -1321,4 +1317,84 @@ def process_pools_calculate_production_rate(pool_outputs, site_names, my_circuit
         production_dict[name] = prod_rate
 
     return production_dict
+
+def gene_architecture_calibration_nsets(big_global_list, big_variation_list, experimental_curves, parallel_info, additional_results=False):
+
+    # Let's unpack the info
+    ncases = len(big_global_list)
+    n_sets = parallel_info['n_sets']
+    n_subsets = parallel_info['n_subsets']
+    n_inner_workers = parallel_info['n_inner_workers']
+    my_objective = 0
+    output_dict = {}
+
+    # Go through list of cases
+    # --------------------------------------------------------------
+    for icase in range(ncases):
+
+        global_list = big_global_list[icase]
+        variation_list = big_variation_list[icase]
+        exp_curve = experimental_curves[icase]
+
+        distances = exp_curve['distance']
+
+        # Prepare items for parallelization
+        # --------------------------------------------------------------
+        # We need a list of items, so the pool can pass each item to the function
+        # Even though all inner workers within the same n_set have the same global and variation conditions,
+        # We need each simulation to have their own ID (so they also have their own random seed)
+        s = 0
+        Item_set = []
+        for j in range(len(distances)):
+            g_dict = global_list[j]
+            Item_subset = []
+            for n_subset in range(n_subsets):
+                Items = []
+                for n_inner_worker in range(n_inner_workers):
+                    g_dict['n_simulations'] = s   # This is the simulation number
+                    Item = {'global_conditions': g_dict.copy(), 'variations': variation_list.copy()}
+                    Items.append(Item)
+                    s += 1
+                Item_subset.append(Items)
+            Item_set.append(Item_subset)
+
+        # In the future, maybe you need something like this so you get KDEs, etc...
+        #processing_info_dict = {'circuit':my_circuit, 'target_dict': target_dict, 'reference_dict': reference_dict,
+        #                        'x_gene': x_gene, 'x_system': x_system}
+        # Launch parellelization scheme
+        # --------------------------------------------------------------
+        # Create a multiprocessing pool for the outer loop
+        pool = MyPool(n_sets)
+        Item_forpool = [(n_subsets, Item_set[j], n_inner_workers) for j in range(len(distances))]
+        #Item_forpool = [(n_subsets, Item_set[j], n_inner_workers, processing_info_dict) for j in range(len(distances))]
+
+        results = pool.map(
+            gene_architecture_process_pool, Item_forpool)
+
+        pool.close()
+
+
+    #if additional_results - then calculate the additional outputs (KDEs, binding, unbinding, global supercoiling, local sigma, etc..)
+    # TODO: What outputs do we need? The scheme was to divide number of distances? No necesitamos batches o varios conjuntos para la misma distancia. Mas bien necesitamos que cada subset simule una distancia (tenemos varios subsets, 1 por distancia o par de distancias).
+    #  Outputs (dict): KDE (1): RNAP, topoI, gyrase , binding (all), unbinding (all), global supercoiling, local sigma, avg_prod_rate
+    #  Entonces, solo divide el trabajo para que se repartan las distancias y calcula el prod_rate
+    return my_objective, output_dict
+
+def gene_architecture_process_pool(item_pool):
+    n_subsets = item_pool[0]
+    Items_subset = item_pool[1]
+    n_inner_workers = item_pool[2]
+
+    # Create a multiprocessing pool for the inner loop
+    inner_pool = multiprocessing.Pool(n_inner_workers)
+
+    for n in range(n_subsets):
+
+        Items = Items_subset[n]
+        # Run simulations in parallel within this subset
+        pool_results = inner_pool.map(pt.single_simulation_w_variations_return_dfs, Items)
+
+        process =2
+
+    return process
 

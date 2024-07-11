@@ -14,7 +14,7 @@ import sys
 #  First, let's use the curve of the weak promoter
 #  Then we can integrate all 3 promoters
 #  Let's do it in batches or nsets to speed up the process. And keep the number of tests small?
-#  Let's start by varying gamma, k_max and k_min, and let's see what kind of behaviiours we get
+#  Let's start by varying gamma, k_max and k_min, and let's see what kind of behaviours we get
 
 # We want to calibrate the promoter responses (rate and threshold)
 
@@ -23,7 +23,7 @@ import sys
 # **********************************************************************************************************************
 
 promoter_cases = ['weak']
-response_multiplier = [1] #, 2, 4]  # Multiplier response, so we don't have to explore so many params
+response_multiplier = [1]  #, 2, 4]  # Multiplier response, so we don't have to explore so many params
 
 # Junier experimental data - we only need distances for now.for i, promoter_case in enumerate(promoter_cases):
 for pcase in promoter_cases:
@@ -42,12 +42,21 @@ n_simulations = 16  #12 # 16
 # So, n_sets = 6, n_subsets = 1 or 2, because if we have 64 workers and n_innerworkers = 9, then we'll have 9-18 simulations
 # per distance, which would be enough, right?
 
-n_workers = 12  #64#12  # Total number of workers (cpus)
+n_workers = 12  #64  # Total number of workers (cpus)
 n_sets = 6  # Number of outer sets
-n_subsets = 1  #5#7#2  # Number of simulations per set
 n_inner_workers = n_workers // (n_sets + 1)  # Number of workers per inner pool
+n_subsets = 1  #2  # Number of simulations per inner pool
 # +1 because one worker is spent in creating the outer pool
 tests = 2  # number of tests for parametrization
+
+# Basically, you make 'tests' number of tests. Then, according to the number of distances (12), you create a number
+# 'n_sets' of groups (or sets) to distribute the work. If you make 6 sets, then each set runs 2 different systems (distances)
+# For each set, you have n_inner_workers assign to run simulations. And each inner worker will ron 'n_subsets' number of simulations.
+# So is like:
+# Outer pool creates: n_sets
+# Inner pool distributed to: n_inner_workers
+# Each n_inner_worker performs: n_subsets simulations
+# Total number of simulations per test is: n_sets * n_subsets * n_inner_workers
 
 print('Doing parallelization process for:')
 print('n_workers', n_workers)
@@ -96,7 +105,7 @@ RNAP_name = 'RNAP'
 RNAP_type = 'enzyme'
 RNAP_effect_model_name = 'RNAPStall'
 
-v0 = 30.0 # bps
+v0 = 30.0  # bps
 stall_torque = 12.0
 kappa = 0.5
 
@@ -106,7 +115,7 @@ k_max_min = 0.01
 k_max_max = 0.1
 k_min_min = 0.001
 k_min_max = 0.01
-gamma_min = 0.0
+gamma_min = 0.01
 gamma_max = 1.0
 
 
@@ -156,15 +165,14 @@ def objective_function(params, calibrating=True):
         dists = distances[i]
         presponse = promoter_responses[i]
 
-
         global_list = []
 
         for j, upstream_distance in enumerate(dists):
-            circuit_file = files[j]['circuit']
-            site_file = files[j]['site']
+            circuit_file = files['circuit'][j]
+            site_file = files['sites'][j]
             # Global dictionaries
             # ------------------------------------------
-            global_dict = {'circuit_filename': circuit_filename, 'sites_filename': sites_filename,
+            global_dict = {'circuit_filename': circuit_file, 'sites_filename': site_file,
                            'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
                            'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                            'frames': frames, 'dt': dt,
@@ -172,33 +180,37 @@ def objective_function(params, calibrating=True):
                            'DNA_concentration': 0.0}
             global_list.append(global_dict)
 
-
         big_global_list.append(global_list)
 
         # Variation dictionaries
         # ------------------------------------------
         # Site
         mult = response_multiplier[i]
-        binding_oparams = {'k_max':mult*params['k_max'], 'k_min':params['k_min'],
-                           'a':float(presponse['a']), 'b':float(presponse['b']),
-                           'threshold':float(presponse['threshold']), 'width':float(presponse['width'])}
+        binding_oparams = {'k_max': mult * params['k_max'], 'k_min': params['k_min'],
+                           'a':presponse['a'], 'b': presponse['b'],
+                           'threshold': presponse['threshold'], 'width': presponse['width']}
 
         reporter_variation = {'name': reporter_name, 'object_type': reporter_type,
-                           'binding_model_name': reporter_binding_model_name, 'binding_oparams': binding_oparams}
+                              'binding_model_name': reporter_binding_model_name, 'binding_oparams': binding_oparams}
 
         # RNAP
         effect_oparams = {'velocity': v0, 'stall_torque': stall_torque, 'kappa': kappa,
                           'gamma': params['gamma']}
 
         RNAP_variation = {'name': RNAP_name, 'object_type': RNAP_type,
-                              'effect_model_name': RNAP_effect_model_name, 'effect_oparams': effect_oparams}
+                          'effect_model_name': RNAP_effect_model_name, 'effect_oparams': effect_oparams}
 
-        big_variation_list.append( [reporter_variation, RNAP_variation] )
+        big_variation_list.append([reporter_variation, RNAP_variation])
 
     # Info needed for the parallelization
     parallel_info = {'n_workers': n_workers, 'n_sets': n_sets,
                      'n_subsets': n_subsets, 'n_inner_workers': n_inner_workers}
 
+
+    # Finally, run objective function.
+    # ------------------------------------------
+    my_objective, output_dict = tct.gene_architecture_calibration_nsets(big_global_list, big_variation_list,
+                                                                        experimental_curves, parallel_info)
 
     # TODO: Create tct function that does that parallelization with nsets.
     #  It needs as inputs the
@@ -208,12 +220,6 @@ def objective_function(params, calibrating=True):
     #  * You also need to make another function that processes the outputs, or maybe add a flag?
     #    so you can return a dict with all the info (binding,unbinding,supercoiling (global and site), and kdes??)
 
-    # Finally, run objective function.
-    # ------------------------------------------
-    my_objective, output_dict = tct.single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list,
-                                                                                       variations_list,
-                                                                                       list_reference,
-                                                                                       target_dict)
     #    return my_objective
     if calibrating:
         return my_objective
@@ -266,21 +272,8 @@ for i, promoter_case in enumerate(promoter_cases):
 
     files_list.append(flist)
 
-    presponse = pd.read_csv(promoter_responses_files[i]).to_dict()
+    presponse = pd.read_csv(promoter_responses_files[i])#.to_dict()
     promoter_responses.append(presponse)
-
-# **********************************************************************************************************************
-# OPTIMIZATION# Let's erase files
-# ---------------------------------------------------------------------------
-for i, promoter_case in enumerate(promoter_cases):
-
-    files = files_list[i]
-    dists = distances[i]
-
-    for j, upstream_distance in enumerate(dists):
-        os.remove(files['circuit'][j])
-        os.remove(files['sites'][j])
-
 
 # **********************************************************************************************************************
 # Optimization
@@ -329,7 +322,8 @@ with open(output_file_path, 'w') as f:
 
 best_df = pd.DataFrame.from_dict([best])
 
-# Let's erase files
+# **********************************************************************************************************************
+# OPTIMIZATION# Let's erase files
 # ---------------------------------------------------------------------------
 for i, promoter_case in enumerate(promoter_cases):
 
@@ -340,6 +334,17 @@ for i, promoter_case in enumerate(promoter_cases):
         os.remove(files['circuit'][j])
         os.remove(files['sites'][j])
 
+
+# Let's erase files
+# ---------------------------------------------------------------------------
+for i, promoter_case in enumerate(promoter_cases):
+
+    files = files_list[i]
+    dists = distances[i]
+
+    for j, upstream_distance in enumerate(dists):
+        os.remove(files['circuit'][j])
+        os.remove(files['sites'][j])
 
 # Create a multiprocessing pool
 pool = multiprocessing.Pool()
@@ -353,9 +358,6 @@ for i, promoter_case in enumerate(promoter_cases):
     for j, upstream_distance in enumerate(dists):
         os.remove(files['circuit'][j])
         os.remove(files['sites'][j])
-
-
-
 
 # Process
 # --------------------------------------------------------------
