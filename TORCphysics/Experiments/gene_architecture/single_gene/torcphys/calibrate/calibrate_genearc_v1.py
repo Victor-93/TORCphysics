@@ -43,9 +43,9 @@ n_simulations = 16  #12 # 16
 # per distance, which would be enough, right?
 
 n_workers = 12  #64  # Total number of workers (cpus)
-n_sets = 4#6  # Number of outer sets
+n_sets = 4  #6  # Number of outer sets
 n_inner_workers = n_workers // (n_sets + 1)  # Number of workers per inner pool
-n_subsets = 2#1  #2  # Number of simulations per inner pool
+n_subsets = 2  #1  #2  # Number of simulations per inner pool
 # +1 because one worker is spent in creating the outer pool
 tests = 2  # number of tests for parametrization
 
@@ -69,10 +69,10 @@ print('Total number of actual workers:', n_sets * (1 + n_inner_workers))
 
 # Simulation conditions
 # --------------------------------------------------------------
-outputf = 'production_rates'
-dt = 5#2  #0.25
+file_out = 'genearc-v1'
+dt = 5  #2  #0.25
 initial_time = 0
-final_time = 5000#500  #20000#3600 #9000 ~2.5hrs
+final_time = 5000  #500  #20000#3600 #9000 ~2.5hrs
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 
@@ -145,11 +145,10 @@ def make_gene_site_csv(filename, stype, name, start, end, k_on, bmodel, paramsfi
 #-----------------------------------------------------------------------------------------------------------------------
 # If calibrating=True, then only the objective function is returned (used by hyperopt). If it is false, then it returns
 # the outputs
-def objective_function(params, calibrating=False):
+def objective_function(params, calibrating=True):
     # We need to prepare the inputs.
     # At the moment, we only have one system.
 
-    # TODO: This time we'll need to build the global dicts?
     #  Let's give the data necesary to the function, and it will do all on it's own.
     #  Here we need to just organize the inputs.
     #  We have 3, and 12
@@ -187,7 +186,7 @@ def objective_function(params, calibrating=False):
         # Site
         mult = response_multiplier[i]
         binding_oparams = {'k_max': mult * params['k_max'], 'k_min': params['k_min'],
-                           'a':presponse['a'].iloc[0], 'b': presponse['b'].iloc[0],
+                           'a': presponse['a'].iloc[0], 'b': presponse['b'].iloc[0],
                            'threshold': presponse['threshold'].iloc[0], 'width': presponse['width'].iloc[0]}
 
         reporter_variation = {'name': reporter_name, 'object_type': reporter_type,
@@ -206,7 +205,6 @@ def objective_function(params, calibrating=False):
     parallel_info = {'n_workers': n_workers, 'n_sets': n_sets,
                      'n_subsets': n_subsets, 'n_inner_workers': n_inner_workers}
 
-
     # Finally, run objective function.
     # ------------------------------------------
     if calibrating:
@@ -217,15 +215,7 @@ def objective_function(params, calibrating=False):
                                                                         experimental_curves, parallel_info,
                                                                         additional_results=additional_results)
 
-    # TODO: Create tct function that does that parallelization with nsets.
-    #  It needs as inputs the
-    #  * big_global_list, big_variation_list, the experimental curves, distances, parallel info.
-    #  (maybe you can make the experimental curve just an array with values, not a df to make it
-    #  more versatile).
-    #  * You also need to make another function that processes the outputs, or maybe add a flag?
-    #    so you can return a dict with all the info (binding,unbinding,supercoiling (global and site), and kdes??)
-
-    #    return my_objective
+    # Return objective
     if calibrating:
         return my_objective
     else:
@@ -277,7 +267,7 @@ for i, promoter_case in enumerate(promoter_cases):
 
     files_list.append(flist)
 
-    presponse = pd.read_csv(promoter_responses_files[i])#.to_dict()
+    presponse = pd.read_csv(promoter_responses_files[i])  #.to_dict()
     promoter_responses.append(presponse)
 
 # **********************************************************************************************************************
@@ -327,19 +317,63 @@ with open(output_file_path, 'w') as f:
 
 best_df = pd.DataFrame.from_dict([best])
 
+# Save model!
+# --------------------------------------------------------------------------
+# Let's sort params we are not calibrating but are included in the models we are trying to calibrate
+
+# Site
+a = presponse['a'].iloc[0]
+b = presponse['b'].iloc[0]
+threshold = presponse['threshold'].iloc[0]
+width = presponse['width'].iloc[0]
+
+# RNAP - we already have everything
+
+# This one will have all the values of gene architecture (SITE + RNAP) - luckly they don't have same params names!
+complete_df = pd.DataFrame(columns=['k_max', 'k_min', 'a', 'b', 'width', 'threshold',
+                                    'velocity', 'stall_torque', 'kappa', 'gamma'])
+complete_df['k_max'] = best_df['k_max']
+complete_df['k_min'] = best_df['k_min']
+complete_df['gamma'] = best_df['gamma']
+complete_df['a'] = a
+complete_df['b'] = b
+complete_df['width'] = width
+complete_df['threshold'] = threshold
+complete_df['velocity'] = v0
+complete_df['stall_torque'] = stall_torque
+complete_df['kappa'] = kappa
+complete_df.to_csv(file_out + '.csv', index=False, sep=',')
+
+# Let's save trials info (params and loses)
+# --------------------------------------------------------------------------
+# params_df = pd.DataFrame(columns=['test', 'loss', 'RNAP_dist', 'fold_change'])
+params_df = pd.DataFrame(columns=['test', 'loss', 'k_max', 'k_min'])
+
+for n in range(tests):
+    tdi = trials.trials[n]  # dictionary with results for test n
+    lo = trials.trials[n]['result']['loss']  # loss
+    va = trials.trials[n]['misc']['vals']  #values
+    # Add a new row using append method
+    new_row = pd.DataFrame({
+        'test': n, 'loss': lo,
+        'k_max': va['k_max'], 'k_min': va['k_min'], 'gamma': va['gamma'],
+        'a': a, 'b': b, 'width': width, 'threshold': threshold,
+        'velocity': v0, 'stall_torque': stall_torque, 'kappa': kappa
+    })
+    #    params_df.append(new_row, ignore_index=True)
+    params_df = pd.concat([params_df, new_row], ignore_index=True)
+
+params_df.to_csv(file_out + '-values.csv', index=False, sep=',')
+
+# Let's run the function once more with the best params to produce the data so we can then just plot it.
+# --------------------------------------------------------------------------
+objective, output = objective_function(params=best, calibrating=False)
+
+# Save the dictionary to a file
+with open(file_out + '.pkl', 'wb') as file:
+    pickle.dump(output, file)
+
 # **********************************************************************************************************************
-# OPTIMIZATION# Let's erase files
-# ---------------------------------------------------------------------------
-for i, promoter_case in enumerate(promoter_cases):
-
-    files = files_list[i]
-    dists = distances[i]
-
-    for j, upstream_distance in enumerate(dists):
-        os.remove(files['circuit'][j])
-        os.remove(files['sites'][j])
-
-
 # Let's erase files
 # ---------------------------------------------------------------------------
 for i, promoter_case in enumerate(promoter_cases):
@@ -350,64 +384,3 @@ for i, promoter_case in enumerate(promoter_cases):
     for j, upstream_distance in enumerate(dists):
         os.remove(files['circuit'][j])
         os.remove(files['sites'][j])
-
-# Create a multiprocessing pool
-pool = multiprocessing.Pool()
-# Let's erase files
-# ---------------------------------------------------------------------------
-for i, promoter_case in enumerate(promoter_cases):
-
-    files = files_list[i]
-    dists = distances[i]
-
-    for j, upstream_distance in enumerate(dists):
-        os.remove(files['circuit'][j])
-        os.remove(files['sites'][j])
-
-# Process
-# --------------------------------------------------------------
-circuit_name = promoter_case
-production_rates = []
-for i, upstream_distance in enumerate(distances):
-
-    # Build circuit csv
-    # --------------------------------------------------------------
-    circuit_size = upstream_distance + gene_length + downstream_distance
-    make_linear_circuit_csv(circuit_filename, circuit_size, sigma0, circuit_name)
-
-    # Site csv
-    # --------------------------------------------------------------
-    start = upstream_distance
-    end = upstream_distance + gene_length
-    make_gene_site_csv(sites_filename, 'gene', 'reporter', start, end, 1,
-                       'MaxMinPromoterBinding', promoter_response)
-
-    # Prepare parallel inputs
-    # --------------------------------------------------------------
-
-    global_dict = {'circuit_filename': circuit_filename, 'sites_filename': sites_filename,
-                   'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
-                   'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
-                   'frames': frames, 'dt': dt, 'n_simulations': n_simulations}
-
-    Items = []
-    for simulation_number in range(n_simulations):
-        g_dict = dict(global_dict)
-        g_dict['n_simulations'] = simulation_number
-        Items.append(g_dict)
-
-    # Run simulation in parallel returning dfs.
-    # --------------------------------------------------------------
-    pool_results = pool.map(pt.single_simulation_return_dfs, Items)
-
-    # --------------------------------------------------------------
-    my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                         output_prefix, frames, series, continuation, dt)
-    production_rate_dict = tct.process_pools_calculate_production_rate(pool_results, ['reporter'], my_circuit)
-    production_rates.append(production_rate_dict['reporter'])
-
-prod_rates = {}
-prod_rates['prod_rate'] = production_rates
-prod_rates['distance'] = distances
-prod_rates = pd.DataFrame.from_dict(prod_rates)
-prod_rates.to_csv(outputf + '-' + circuit_name + '.csv', index=False)

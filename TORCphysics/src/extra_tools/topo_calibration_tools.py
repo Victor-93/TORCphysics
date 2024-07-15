@@ -1330,11 +1330,16 @@ def gene_architecture_calibration_nsets(big_global_list, big_variation_list, exp
     n_sets = parallel_info['n_sets']
     n_subsets = parallel_info['n_subsets']
     n_inner_workers = parallel_info['n_inner_workers']
-    my_objective = 0
-    output_dict = {}
+    objective = 0  # Total objective function
+    output_list = []  # This list will be made out of a list of cases, each case is made of  a dict with
+    # objective and data keys. In data, it gives a list of dicts, each one containing the distance, and the results
 
     # Go through list of cases
     # --------------------------------------------------------------
+    # Create a multiprocessing pool for the outer loop
+    pool = MyPool(n_sets)  # I do it now so I don't have to open it for every case
+
+    # Go through each case
     for icase in range(ncases):
 
         global_list = big_global_list[icase]
@@ -1382,19 +1387,36 @@ def gene_architecture_calibration_nsets(big_global_list, big_variation_list, exp
 
         # Launch parellelization scheme
         # --------------------------------------------------------------
-        # Create a multiprocessing pool for the outer loop
-        pool = MyPool(n_sets)
         Item_forpool = [(n_subsets, n_inner_workers, Item_set[j], processing_dict_list[j]) for j in
                         range(len(distances))]
-        #Item_forpool = [(n_subsets, Item_set[j], n_inner_workers, processing_info_dict) for j in range(len(distances))]
 
         results = pool.map(
             gene_architecture_run_pool, Item_forpool)
 
-        pool.close()
+        # Process and calculate objective
+        # --------------------------------------------------------------
+        prod_rates = [result['prod_rate'][0] for result in results]
+        susceptibility = prod_rates / prod_rates[4]
 
-    #if additional_results - then calculate the additional outputs (KDEs, binding, unbinding, global supercoiling, local sigma, etc..)
-    return my_objective, output_dict
+        my_objective = np.sum((exp_curve['Signal'] - susceptibility) ** 2)  # This is the objective of the icase
+        objective += my_objective  # This is the total objective
+
+        # Prepare output - We will just add the distance
+        out_list = []  # output for the icase
+        for i, result in enumerate(results):
+            out_dict = {}
+            out_dict['distance'] = distances[i]
+            out_dict['result'] = result
+            #out_dict['objective'] = my_objective  # Save the objective of the current case
+            out_list.append(out_dict)
+        # output_list.append(out_list)
+        output_list.append({'objective': my_objective, 'data': out_list})
+
+    # Close pool
+    # --------------------------------------------------------------
+    pool.close()
+
+    return objective, output_list
 
 
 def gene_architecture_run_pool(item_pool):
@@ -1403,6 +1425,9 @@ def gene_architecture_run_pool(item_pool):
     Items_subset = item_pool[2]  # Conditions
     processing_dict = item_pool[3]
     additional_results = processing_dict['additional_results']
+
+    # Our output will be a dictionary
+    output = {}
 
     # Total number of simulations ran are n_subsets * n_inner_workers
 
@@ -1446,12 +1471,10 @@ def gene_architecture_run_pool(item_pool):
 
     # Additional results -------------------------
     if additional_results:
-        additional_dict = {}
-        ares = [result[1] for result in output_pools] # The dict returned by gene_architecture_process_pool
+        ares = [result[1] for result in output_pools]  # The dict returned by gene_architecture_process_pool
 
         # Procesing DFs and calculating mean,std
         for key in ['global_superhelical', 'local_superhelical', 'binding', 'unbinding']:
-
             # Extract the NumPy arrays from each dictionary
             arrays = [d[key] for d in ares]
 
@@ -1463,20 +1486,36 @@ def gene_architecture_run_pool(item_pool):
             std_array = np.std(stacked_arrays, axis=0)
 
             # And add it to the dict
-            additional_dict[key] = np.array([mean_array, std_array])
+            output[key] = np.array([mean_array, std_array])
 
         # Now for the KDEs
-        arrays = [d['KDE'] for d in ares] # We have all the KDEs
+        kde_dict = {}
+        arrays = [d['KDE'] for d in ares]  # We have all the KDEs
         for name in ['RNAP', 'topoI', 'gyrase']:
-            q=2
+            # Extract KDE (kde_y) from the molecule with "name"
+            arrays_kde_y = [d[name]['kde_y'] for d in arrays]  # We collects all KDE_y of name
 
-    else:
-        additional_dict = None
+            # Stack the arrays into a 2D NumPy array
+            stacked_arrays = np.vstack(arrays_kde_y)
 
+            # Calculate the mean and standard deviation along the first axis
+            mean_array = np.mean(stacked_arrays, axis=0)
+            std_array = np.std(stacked_arrays, axis=0)
+
+            kde_y = np.array([mean_array, std_array])
+            kde_x = arrays[0][name]['kde_x']
+
+            # And add it to the dict
+            kde_dict[name] = {'kde_y': kde_y, 'kde_x': kde_x}
+
+        # And add it to our
+        output['KDE'] = kde_dict
+
+    output['prod_rate'] = prod_rate
     # process_pools_genearch(pool_list, processing_dict)
 
     # In the meantime, let's just return the production rate
-    return prod_rate, additional_dict
+    return output
 
 
 # This one processes the outputs of the pool (used in the gene architecture experiment).
@@ -1502,7 +1541,7 @@ def gene_architecture_process_pool(item_pool):
     total_time = my_circuit.dt * my_circuit.frames
 
     # Ranges used for calculating unbinding events
-    a = 0 #int(my_circuit.frames / 2)
+    a = 0  #int(my_circuit.frames / 2)
     b = -1
 
     # Get unbinding event
@@ -1511,10 +1550,11 @@ def gene_architecture_process_pool(item_pool):
     unbinding_event = sites_df[mask]['unbinding'].to_numpy()
 
     # Calculate production rate (prod_rate)
-    prod_rate = np.sum(unbinding_event[a:b]) / total_time #/ 2
+    prod_rate = np.sum(unbinding_event[a:b]) / total_time  #/ 2
     #production_rate_dict = process_pools_calculate_production_rate([pool_result], [site_name], my_circuit)
     #production_rate = production_rate_dict[site_name]
 
+    additional_dict = None
     # Let's do the processing
     if additional_results:
 
@@ -1556,8 +1596,9 @@ def gene_architecture_process_pool(item_pool):
                 [environmental for environmental in my_circuit.environmental_list if environmental.name == name][
                     0]
             if name == 'RNAP':
-                size = abs(my_environmental.site_list[0].start - my_environmental.size - my_environmental.site_list[0].end)
-                nbins = int(size / my_environmental.size)  # because genes are smaller
+                size = abs(
+                    my_environmental.site_list[0].start - my_environmental.size - my_environmental.site_list[0].end)
+                # nbins = int(size / my_environmental.size)  # because genes are smaller
                 nbins = 90  # Maybe check the one up
                 x = x_gene
             else:
@@ -1578,7 +1619,4 @@ def gene_architecture_process_pool(item_pool):
         # And to the additional results dict
         additional_dict['KDE'] = kde_dict
 
-    else:
-        additiona_dict = None
-
-    return prod_rate, additiona_dict
+    return prod_rate, additional_dict
