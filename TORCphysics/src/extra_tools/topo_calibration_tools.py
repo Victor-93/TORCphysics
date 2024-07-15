@@ -1603,7 +1603,7 @@ def gene_architecture_process_pool(item_pool):
                 x = x_gene
             else:
                 nbins = int(
-                    my_circuit.size / my_environmental.size)  # number of bins. - note that this only applies for topos
+                    1.5*my_circuit.size / my_environmental.size)  # number of bins. - note that this only applies for topos
 
                 x = x_system
 

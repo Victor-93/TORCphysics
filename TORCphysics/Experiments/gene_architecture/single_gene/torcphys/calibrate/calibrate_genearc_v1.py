@@ -9,13 +9,6 @@ from hyperopt import tpe, hp, fmin, Trials
 import os
 import sys
 
-# TODO: We want to make a protocol where we calibrate some parameters:
-#  Which will be the gamma injection of RNAP. And the promoter response k_max/k_min.
-#  First, let's use the curve of the weak promoter
-#  Then we can integrate all 3 promoters
-#  Let's do it in batches or nsets to speed up the process. And keep the number of tests small?
-#  Let's start by varying gamma, k_max and k_min, and let's see what kind of behaviours we get
-
 # We want to calibrate the promoter responses (rate and threshold)
 
 # **********************************************************************************************************************
@@ -43,11 +36,11 @@ n_simulations = 16  #12 # 16
 # per distance, which would be enough, right?
 
 n_workers = 12  #64  # Total number of workers (cpus)
-n_sets = 4  #6  # Number of outer sets
+n_sets = 4  #4  # Number of outer sets
 n_inner_workers = n_workers // (n_sets + 1)  # Number of workers per inner pool
 n_subsets = 2  #1  #2  # Number of simulations per inner pool
 # +1 because one worker is spent in creating the outer pool
-tests = 2  # number of tests for parametrization
+tests = 2 # 100  # number of tests for parametrization
 
 # Basically, you make 'tests' number of tests. Then, according to the number of distances (12), you create a number
 # 'n_sets' of groups (or sets) to distribute the work. If you make 6 sets, then each set runs 2 different systems (distances)
@@ -70,9 +63,9 @@ print('Total number of actual workers:', n_sets * (1 + n_inner_workers))
 # Simulation conditions
 # --------------------------------------------------------------
 file_out = 'genearc-v1'
-dt = 5  #2  #0.25
+dt = 5 #0.25
 initial_time = 0
-final_time = 5000  #500  #20000#3600 #9000 ~2.5hrs
+final_time = 5000  #30000 ~8.3hrs
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 
