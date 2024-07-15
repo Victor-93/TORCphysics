@@ -43,9 +43,9 @@ n_simulations = 16  #12 # 16
 # per distance, which would be enough, right?
 
 n_workers = 12  #64  # Total number of workers (cpus)
-n_sets = 6  # Number of outer sets
+n_sets = 4#6  # Number of outer sets
 n_inner_workers = n_workers // (n_sets + 1)  # Number of workers per inner pool
-n_subsets = 1  #2  # Number of simulations per inner pool
+n_subsets = 2#1  #2  # Number of simulations per inner pool
 # +1 because one worker is spent in creating the outer pool
 tests = 2  # number of tests for parametrization
 
@@ -70,9 +70,9 @@ print('Total number of actual workers:', n_sets * (1 + n_inner_workers))
 # Simulation conditions
 # --------------------------------------------------------------
 outputf = 'production_rates'
-dt = 2  #0.25
+dt = 5#2  #0.25
 initial_time = 0
-final_time = 500  #20000#3600 #9000 ~2.5hrs
+final_time = 5000#500  #20000#3600 #9000 ~2.5hrs
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 
@@ -102,7 +102,7 @@ reporter_type = 'site'
 reporter_binding_model_name = 'MaxMinPromoterBinding'
 
 RNAP_name = 'RNAP'
-RNAP_type = 'enzyme'
+RNAP_type = 'environmental'
 RNAP_effect_model_name = 'RNAPStall'
 
 v0 = 30.0  # bps
@@ -145,7 +145,7 @@ def make_gene_site_csv(filename, stype, name, start, end, k_on, bmodel, paramsfi
 #-----------------------------------------------------------------------------------------------------------------------
 # If calibrating=True, then only the objective function is returned (used by hyperopt). If it is false, then it returns
 # the outputs
-def objective_function(params, calibrating=True):
+def objective_function(params, calibrating=False):
     # We need to prepare the inputs.
     # At the moment, we only have one system.
 
@@ -187,8 +187,8 @@ def objective_function(params, calibrating=True):
         # Site
         mult = response_multiplier[i]
         binding_oparams = {'k_max': mult * params['k_max'], 'k_min': params['k_min'],
-                           'a':presponse['a'], 'b': presponse['b'],
-                           'threshold': presponse['threshold'], 'width': presponse['width']}
+                           'a':presponse['a'].iloc[0], 'b': presponse['b'].iloc[0],
+                           'threshold': presponse['threshold'].iloc[0], 'width': presponse['width'].iloc[0]}
 
         reporter_variation = {'name': reporter_name, 'object_type': reporter_type,
                               'binding_model_name': reporter_binding_model_name, 'binding_oparams': binding_oparams}
@@ -209,8 +209,13 @@ def objective_function(params, calibrating=True):
 
     # Finally, run objective function.
     # ------------------------------------------
+    if calibrating:
+        additional_results = False
+    else:
+        additional_results = True
     my_objective, output_dict = tct.gene_architecture_calibration_nsets(big_global_list, big_variation_list,
-                                                                        experimental_curves, parallel_info)
+                                                                        experimental_curves, parallel_info,
+                                                                        additional_results=additional_results)
 
     # TODO: Create tct function that does that parallelization with nsets.
     #  It needs as inputs the

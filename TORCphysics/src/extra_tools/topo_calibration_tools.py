@@ -8,6 +8,7 @@ from TORCphysics import Circuit
 from TORCphysics import analysis as ann
 import pandas as pd
 
+
 # Stuff added to make parallel / parallel processes
 # -----------------------------------------------------------------------------------
 class NoDaemonProcess(multiprocessing.Process):
@@ -31,6 +32,7 @@ class MyPool(multiprocessing.pool.Pool):
 
         return proc
 
+
 #class NoDaemonProcess(multiprocessing.Process):
 #    # make 'daemon' attribute always return False
 #    def _get_daemon(self):
@@ -43,7 +45,6 @@ class MyPool(multiprocessing.pool.Pool):
 # because the latter is only a wrapper function, not a proper class.
 #class MyPool(multiprocessing.pool.Pool):
 #    Process = NoDaemonProcess
-
 
 
 # Custom Pool class to allow nested parallelism
@@ -471,7 +472,6 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
         hists_dict[names] = {'mean': None, 'std': None, 'bin_edges': None}
         FE_val[names] = {'mean': None, 'std': None}
 
-
     # Let's prepare some data before running the parallelization
     # ------------------------------------------------------------------------------
     # Let's load the circuit, so we can extract the information that we need in an automatic way
@@ -546,10 +546,9 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
             h_df = pd.DataFrame({'set_' + str(n_set): nhist[name]['counts']})  # histogram counts
             k_g_df = pd.DataFrame({'set_' + str(n_set): nkde_gene[name]})  # kde_gene
             if name != 'RNAP':
-                k_s_df = pd.DataFrame({'set_' + str(n_set): nkde_system[name]})   #kde_system
+                k_s_df = pd.DataFrame({'set_' + str(n_set): nkde_system[name]})  #kde_system
                 FE_df = pd.DataFrame({'set_' + str(n_set): nFE_curve[name]})  # FE curve
                 aFE_df = pd.DataFrame({'set_' + str(n_set): [nFE_val[name]]})  # FE average value
-
 
             # Append data frame to a bigger data frame that we will use to process info
             if n_set == 0:
@@ -604,11 +603,11 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
     buf_size = 10  # Used in calculating correlation. Is the number of data points ignored at the ends
     correlation_matrix = (
         np.corrcoef(kde_gene['topoI']['mean'][buf_size:-buf_size], kde_gene['RNAP']['mean'][buf_size:-buf_size]))
-    overall_correlation = correlation_matrix[0,1]
+    overall_correlation = correlation_matrix[0, 1]
 
     # Let's calculate the correlation between the RNAP KDE and the reference RNA (experimental fitted to the TU)
     correlation_matrix = np.corrcoef(kde_gene['RNAP']['mean'], reference_dict[0]['RNAP'])
-    RNAP_correlation = correlation_matrix[0,1]
+    RNAP_correlation = correlation_matrix[0, 1]
 
     # Objective function
     #--------------------------------------------------------------------
@@ -654,11 +653,10 @@ def single_case_RNAPTracking_calibration_nsets(global_dict_list, variations_list
 # global_dict_list should include the number of sets.
 # WARNING: It is very important that the number of n_workers is within the capabilities of your system.
 def single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variations_list, reference_dict, target_dict):
-
     g_dict = dict(global_dict_list[0])  # Just one system
-    n_workers = g_dict['n_workers'] # Total number of workers (cpus)
-    n_sets = g_dict['n_sets'] # Number of outer sets
-    n_subsets = g_dict['n_subsets'] # Number of simulations per set
+    n_workers = g_dict['n_workers']  # Total number of workers (cpus)
+    n_sets = g_dict['n_sets']  # Number of outer sets
+    n_subsets = g_dict['n_subsets']  # Number of simulations per set
     n_inner_workers = g_dict['n_inner_workers']  # Number of workers per inner pool
 
     # Names to filter
@@ -679,7 +677,6 @@ def single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variati
         FE_curve[names] = {'mean': None, 'std': None}
         hists_dict[names] = {'mean': None, 'std': None, 'bin_edges': None}
         FE_val[names] = {'mean': None, 'std': None}
-
 
     # Let's prepare some data before running the parallelization
     # ------------------------------------------------------------------------------
@@ -702,7 +699,7 @@ def single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variati
     kde_system_df = {}
     FE_curve_df = {}
     mean_FE_df = {}
-    bin_edges  = {}
+    bin_edges = {}
     for p, name in enumerate(enzymes_names):
         hist_df[name] = None
         kde_gene_df[name] = None
@@ -721,21 +718,22 @@ def single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variati
         for n_subset in range(n_subsets):
             Items = []
             for n_inner_worker in range(n_inner_workers):
-                g_dict['n_simulations'] = s   # This is the simulation number
+                g_dict['n_simulations'] = s  # This is the simulation number
                 Item = {'global_conditions': g_dict.copy(), 'variations': variations_list[0]}
                 Items.append(Item)
                 s += 1
             Item_subset.append(Items)
         Item_set.append(Item_subset)
 
-    processing_info_dict = {'circuit':my_circuit, 'target_dict': target_dict, 'reference_dict': reference_dict,
+    processing_info_dict = {'circuit': my_circuit, 'target_dict': target_dict, 'reference_dict': reference_dict,
                             'x_gene': x_gene, 'x_system': x_system}
     # Launch parellelization scheme v2
     # --------------------------------------------------------------
 
     # Create a multiprocessing pool for the outer loop
     pool = MyPool(n_sets)
-    Item_forpool = [(n_set, n_subsets, Item_set[n_set], n_inner_workers, processing_info_dict) for n_set in range(n_sets)]
+    Item_forpool = [(n_set, n_subsets, Item_set[n_set], n_inner_workers, processing_info_dict) for n_set in
+                    range(n_sets)]
 
     results = pool.map(
         process_set, Item_forpool)
@@ -743,10 +741,9 @@ def single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variati
     pool.close()
     #with NoDaemonPool(n_sets) as outer_pool:
     # with multiprocessing.Pool(n_sets) as outer_pool:
-        # Run the outer loop in parallel
+    # Run the outer loop in parallel
     #    results = outer_pool.starmap(
     #        process_set, [(n_set, n_subsets, Item_set, n_inner_workers, processing_info_dict) for n_set in range(n_sets)])
-
 
     # Let's retrieve the results and organise them
     # --------------------------------------------------------------
@@ -765,14 +762,21 @@ def single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variati
             correlation_df = processed_dict['correlation_df'].copy()
         else:
             for i, name in enumerate(enzymes_names):
-                hist_df[name] = pd.concat([hist_df[name], processed_dict['hist_df'][name]], axis=1).reset_index(drop=True)
-                kde_gene_df[name] = pd.concat([kde_gene_df[name], processed_dict['kde_gene_df'][name]], axis=1).reset_index(drop=True)
+                hist_df[name] = pd.concat([hist_df[name], processed_dict['hist_df'][name]], axis=1).reset_index(
+                    drop=True)
+                kde_gene_df[name] = pd.concat([kde_gene_df[name], processed_dict['kde_gene_df'][name]],
+                                              axis=1).reset_index(drop=True)
                 if name != 'RNAP':
-                    kde_system_df[name] = pd.concat([kde_system_df[name],processed_dict['kde_system_df'][name]], axis=1).reset_index(drop=True)
-                    FE_curve_df[name] = pd.concat([FE_curve_df[name], processed_dict['FE_curve_df'][name]], axis=1).reset_index(drop=True)
-                    mean_FE_df[name] = pd.concat([mean_FE_df[name], processed_dict['mean_FE_df'][name]], axis=1).reset_index(drop=True)
-            superhelical_df = pd.concat([superhelical_df, processed_dict['superhelical_df']], axis=1).reset_index(drop=True)
-            correlation_df = pd.concat([correlation_df, processed_dict['correlation_df']], axis=1).reset_index(drop=True)
+                    kde_system_df[name] = pd.concat([kde_system_df[name], processed_dict['kde_system_df'][name]],
+                                                    axis=1).reset_index(drop=True)
+                    FE_curve_df[name] = pd.concat([FE_curve_df[name], processed_dict['FE_curve_df'][name]],
+                                                  axis=1).reset_index(drop=True)
+                    mean_FE_df[name] = pd.concat([mean_FE_df[name], processed_dict['mean_FE_df'][name]],
+                                                 axis=1).reset_index(drop=True)
+            superhelical_df = pd.concat([superhelical_df, processed_dict['superhelical_df']], axis=1).reset_index(
+                drop=True)
+            correlation_df = pd.concat([correlation_df, processed_dict['correlation_df']], axis=1).reset_index(
+                drop=True)
 
     # Process data from the nsets and calculate overalls
     # --------------------------------------------------------------
@@ -805,11 +809,11 @@ def single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variati
     buf_size = 10  # Used in calculating correlation. Is the number of data points ignored at the ends
     correlation_matrix = (
         np.corrcoef(kde_gene['topoI']['mean'][buf_size:-buf_size], kde_gene['RNAP']['mean'][buf_size:-buf_size]))
-    overall_correlation = correlation_matrix[0,1]
+    overall_correlation = correlation_matrix[0, 1]
 
     # Let's calculate the correlation between the RNAP KDE and the reference RNA (experimental fitted to the TU)
     correlation_matrix = np.corrcoef(kde_gene['RNAP']['mean'], reference_dict[0]['RNAP'])
-    RNAP_correlation = correlation_matrix[0,1]
+    RNAP_correlation = correlation_matrix[0, 1]
 
     # Objective function
     #--------------------------------------------------------------------
@@ -836,7 +840,7 @@ def single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variati
 
 
 def process_set(item_pool):
-#    n_set, n_subsets, Items_subset, n_inner_workers, processing_info_dict
+    #    n_set, n_subsets, Items_subset, n_inner_workers, processing_info_dict
     n_set = item_pool[0]
     n_subsets = item_pool[1]
     Items_subset = item_pool[2]
@@ -860,7 +864,7 @@ def process_set(item_pool):
     kde_system_df = {}
     FE_curve_df = {}
     mean_FE_df = {}
-    bin_edges  = {}
+    bin_edges = {}
     for p, name in enumerate(enzymes_names):
         hist_df[name] = None
         kde_gene_df[name] = None
@@ -871,7 +875,7 @@ def process_set(item_pool):
 
     # Create a multiprocessing pool for the inner loop
     # with multiprocessing.Pool(n_inner_workers) as inner_pool:
-#    with NoDaemonPool(n_inner_workers) as inner_pool:
+    #    with NoDaemonPool(n_inner_workers) as inner_pool:
 
     inner_pool = multiprocessing.Pool(n_inner_workers)
 
@@ -934,11 +938,11 @@ def process_set(item_pool):
                     FE_curve_df[name] = pd.concat([FE_curve_df[name], FE_df], axis=1).reset_index(drop=True)
                     mean_FE_df[name] = pd.concat([mean_FE_df[name], aFE_df], axis=1).reset_index(drop=True)
 
-
     processed = {'hist_df': hist_df, 'kde_gene_df': kde_gene_df, 'kde_system_df': kde_system_df,
                  'FE_curve_df': FE_curve_df, 'mean_FE_df': mean_FE_df, 'superhelical_df': superhelical_df,
                  'correlation_df': correlation_df, 'bin_edges': bin_edges}
     return processed
+
 
 # Extracts information from parallelization that returns dfs, so it can be used in calibrating Topo I RNAPTracking
 # pool_results = results from parallelization using pool.map
@@ -949,7 +953,6 @@ def process_set(item_pool):
 #     aFE_dict = dict of averaged fold-enrichment in the gene region.
 #     hists_dict = dict of histograms
 def extract_RNAPTrackingInfo_from_pool(pool_results, my_circuit, target_dict, reference_dict, x_gene, x_system):
-
     # Prepare output dicts
     # ------------------------------------------------------------------------------
 
@@ -1037,10 +1040,10 @@ def extract_RNAPTrackingInfo_from_pool(pool_results, my_circuit, target_dict, re
 
     return superhelical_mean, hists_dict, kde_gene, kde_system, FE_dict, aFE_dict, correlation
 
+
 # This calculates the mean of y within the ranges z[0] and z[-1] but y is paired with x in the form of [x,y].
 # We use this function to calculate the Fold-enrichment of topo I within the gene region specified by the ends of z.
 def calculate_mean_y_a_b(y, x, z):
-
     # Find the index of the value in x that is closest to z[0]
     a = np.abs(x - z[0]).argmin()
 
@@ -1054,6 +1057,7 @@ def calculate_mean_y_a_b(y, x, z):
     # Calculate the mean of y in the range [a, b]
     mean_y = np.mean(y[a:b + 1])
     return mean_y
+
 
 # This function just loads the circuit from the global dict and returns the circuit (without running it).
 # I put as a function so in case you just need to process the circuit to extract some global data, you don't
@@ -1135,6 +1139,7 @@ def get_interpolated_x(start, end, x_spacing=10):
 
     return x_interpolated
 
+
 # This function processes the results from pool (pool_outputs), and given a list of site_names, it returns
 #  a dict of dictionaries with each entry being a DF with average values of
 #  superhelical, binding, unbinding and #enzymes.
@@ -1145,7 +1150,6 @@ def get_interpolated_x(start, end, x_spacing=10):
 #           site_names list
 #           enzymes_dict{'enzyme_names'} - each one containin a KDE  - Or maybe calculated after?
 def process_pools_get_avgs(pool_outputs, site_names, enzyme_names, my_circuit):
-
     # Create a range of values for the 'frames' column
     frame_values = list(range(my_circuit.frames + 1))
 
@@ -1203,23 +1207,23 @@ def process_pools_get_avgs(pool_outputs, site_names, enzyme_names, my_circuit):
         # Calculate averages
         # ------------------------------------------------------------------------------
         #Superhelical
-        mean_df = superhelical_df.mean(axis=1).to_frame(name=name+'_mean')
-        std_df = superhelical_df.std(axis=1).to_frame(name=name+'_std')
-        superhelical_output_df =  pd.concat([superhelical_output_df, mean_df, std_df], axis=1)#.reset_index(True)
+        mean_df = superhelical_df.mean(axis=1).to_frame(name=name + '_mean')
+        std_df = superhelical_df.std(axis=1).to_frame(name=name + '_std')
+        superhelical_output_df = pd.concat([superhelical_output_df, mean_df, std_df], axis=1)  #.reset_index(True)
 
         # Binding
-        mean_df = binding_event_df.mean(axis=1).to_frame(name=name+'_mean')
-        std_df = binding_event_df.std(axis=1).to_frame(name=name+'_std')
-        binding_output_df =  pd.concat([binding_output_df, mean_df, std_df], axis=1)#.reset_index(True)
+        mean_df = binding_event_df.mean(axis=1).to_frame(name=name + '_mean')
+        std_df = binding_event_df.std(axis=1).to_frame(name=name + '_std')
+        binding_output_df = pd.concat([binding_output_df, mean_df, std_df], axis=1)  #.reset_index(True)
 
         # Unbinding
-        mean_df = unbinding_event_df.mean(axis=1).to_frame(name=name+'_mean')
-        std_df = unbinding_event_df.std(axis=1).to_frame(name=name+'_std')
+        mean_df = unbinding_event_df.mean(axis=1).to_frame(name=name + '_mean')
+        std_df = unbinding_event_df.std(axis=1).to_frame(name=name + '_std')
         unbinding_output_df = pd.concat([unbinding_output_df, mean_df, std_df], axis=1)
 
         # #Enzymes
-        mean_df = number_enzymes_df.mean(axis=1).to_frame(name=name+'_mean')
-        std_df = number_enzymes_df.std(axis=1).to_frame(name=name+'_std')
+        mean_df = number_enzymes_df.mean(axis=1).to_frame(name=name + '_mean')
+        std_df = number_enzymes_df.std(axis=1).to_frame(name=name + '_std')
         nenzymes_output_df = pd.concat([nenzymes_output_df, mean_df, std_df], axis=1)
 
     # And the sites_dict output dictionary!
@@ -1246,7 +1250,6 @@ def process_pools_get_avgs(pool_outputs, site_names, enzyme_names, my_circuit):
 
             all_positions = np.concatenate([position, all_positions])
 
-
         # number of bins for histogram - which we will not plot
         nbins = calculate_number_nbins(my_circuit, name)
 
@@ -1271,7 +1274,6 @@ def process_pools_get_avgs(pool_outputs, site_names, enzyme_names, my_circuit):
 # Inputs: sites_names = list with site names to calculate susceptibility from
 # Returns: Dictionary with susceptibilities, in the form {site_name: susceptibility}
 def process_pools_calculate_production_rate(pool_outputs, site_names, my_circuit):
-
     total_time = my_circuit.dt * my_circuit.frames
 
     time = np.arange(0, total_time + my_circuit.dt, my_circuit.dt)
@@ -1310,7 +1312,8 @@ def process_pools_calculate_production_rate(pool_outputs, site_names, my_circuit
         # ------------------------------------------------------------------------------
         mean = unbinding_event_df.mean(axis=1).to_numpy()
 
-        sum_time, log_sum, prod_rate = ann.calculate_steady_state_initiation_curve(mean, time, ta=int(my_circuit.frames / 2), tb=-1)
+        sum_time, log_sum, prod_rate = ann.calculate_steady_state_initiation_curve(mean, time,
+                                                                                   ta=int(my_circuit.frames / 2), tb=-1)
 
         #prod_rate = sum(mean)/total_time
 
@@ -1318,8 +1321,10 @@ def process_pools_calculate_production_rate(pool_outputs, site_names, my_circuit
 
     return production_dict
 
-def gene_architecture_calibration_nsets(big_global_list, big_variation_list, experimental_curves, parallel_info, additional_results=False):
 
+# TODO: Do a bit of cleaning
+def gene_architecture_calibration_nsets(big_global_list, big_variation_list, experimental_curves, parallel_info,
+                                        additional_results=False):
     # Let's unpack the info
     ncases = len(big_global_list)
     n_sets = parallel_info['n_sets']
@@ -1345,56 +1350,235 @@ def gene_architecture_calibration_nsets(big_global_list, big_variation_list, exp
         # We need each simulation to have their own ID (so they also have their own random seed)
         s = 0
         Item_set = []
+        processing_dict_list = []  # This dict will help us process the outputs
         for j in range(len(distances)):
             g_dict = global_list[j]
             Item_subset = []
             for n_subset in range(n_subsets):
                 Items = []
                 for n_inner_worker in range(n_inner_workers):
-                    g_dict['n_simulations'] = s   # This is the simulation number
+                    g_dict['n_simulations'] = s  # This is the simulation number
                     Item = {'global_conditions': g_dict.copy(), 'variations': variation_list.copy()}
                     Items.append(Item)
                     s += 1
                 Item_subset.append(Items)
             Item_set.append(Item_subset)
 
-        # In the future, maybe you need something like this so you get KDEs, etc...
-        #processing_info_dict = {'circuit':my_circuit, 'target_dict': target_dict, 'reference_dict': reference_dict,
-        #                        'x_gene': x_gene, 'x_system': x_system}
+            # Sort the processing info
+            # --------------------------------------------------
+            my_circuit = load_circuit(g_dict)
+
+            # Get target site
+            target_gene = [site for site in my_circuit.site_list if site.name == 'reporter'][0]
+            RNAP_env = [environment for environment in my_circuit.environmental_list if environment.name == 'RNAP'][0]
+
+            # Define x-axes
+            x_system = get_interpolated_x(1, my_circuit.size)
+            x_gene = get_interpolated_x(target_gene.start - RNAP_env.size, target_gene.end)
+
+            p_dict = {'circuit': my_circuit, 'x_gene': x_gene, 'x_system': x_system, 'site_name': 'reporter',
+                      'additional_results': additional_results}
+            processing_dict_list.append(p_dict)
+
         # Launch parellelization scheme
         # --------------------------------------------------------------
         # Create a multiprocessing pool for the outer loop
         pool = MyPool(n_sets)
-        Item_forpool = [(n_subsets, Item_set[j], n_inner_workers) for j in range(len(distances))]
+        Item_forpool = [(n_subsets, n_inner_workers, Item_set[j], processing_dict_list[j]) for j in
+                        range(len(distances))]
         #Item_forpool = [(n_subsets, Item_set[j], n_inner_workers, processing_info_dict) for j in range(len(distances))]
 
         results = pool.map(
-            gene_architecture_process_pool, Item_forpool)
+            gene_architecture_run_pool, Item_forpool)
 
         pool.close()
 
-
     #if additional_results - then calculate the additional outputs (KDEs, binding, unbinding, global supercoiling, local sigma, etc..)
-    # TODO: What outputs do we need? The scheme was to divide number of distances? No necesitamos batches o varios conjuntos para la misma distancia. Mas bien necesitamos que cada subset simule una distancia (tenemos varios subsets, 1 por distancia o par de distancias).
-    #  Outputs (dict): KDE (1): RNAP, topoI, gyrase , binding (all), unbinding (all), global supercoiling, local sigma, avg_prod_rate
-    #  Entonces, solo divide el trabajo para que se repartan las distancias y calcula el prod_rate
     return my_objective, output_dict
 
-def gene_architecture_process_pool(item_pool):
-    n_subsets = item_pool[0]
-    Items_subset = item_pool[1]
-    n_inner_workers = item_pool[2]
 
+def gene_architecture_run_pool(item_pool):
+    n_subsets = item_pool[0]  # This is how many sets of simulations are run
+    n_inner_workers = item_pool[1]  # Number of workers
+    Items_subset = item_pool[2]  # Conditions
+    processing_dict = item_pool[3]
+    additional_results = processing_dict['additional_results']
+
+    # Total number of simulations ran are n_subsets * n_inner_workers
+
+    # Run inner parallelization
+    # ---------------------------------------------------------
     # Create a multiprocessing pool for the inner loop
     inner_pool = multiprocessing.Pool(n_inner_workers)
 
+    pool_list = []  # This collects all the results.
     for n in range(n_subsets):
-
         Items = Items_subset[n]
         # Run simulations in parallel within this subset
         pool_results = inner_pool.map(pt.single_simulation_w_variations_return_dfs, Items)
 
-        process =2
+        pool_list += pool_results
 
-    return process
+    processing_items = []
+    for pool_results in pool_list:
+        processing_items.append((pool_results, processing_dict))
 
+    # Process results with another parallelization process
+    # ---------------------------------------------------------
+    # Let's calculate one of each, and do the average and get std
+    output_pools = inner_pool.map(gene_architecture_process_pool, processing_items)
+
+    # Get averages and stds
+    # ---------------------------------------------------------
+
+    # Production rate -------------------------
+    # Extract prod_rate values from the output_pools list
+    prod_rates = [result[0] for result in output_pools]
+
+    # Convert to a NumPy array
+    prod_rates_array = np.array(prod_rates)
+
+    # Calculate mean and standard deviation
+    mean_prod_rate = np.mean(prod_rates_array)
+    std_prod_rate = np.std(prod_rates_array)
+
+    prod_rate = np.array([mean_prod_rate, std_prod_rate])
+
+    # Additional results -------------------------
+    if additional_results:
+        additional_dict = {}
+        ares = [result[1] for result in output_pools] # The dict returned by gene_architecture_process_pool
+
+        # Procesing DFs and calculating mean,std
+        for key in ['global_superhelical', 'local_superhelical', 'binding', 'unbinding']:
+
+            # Extract the NumPy arrays from each dictionary
+            arrays = [d[key] for d in ares]
+
+            # Stack the arrays into a 2D NumPy array
+            stacked_arrays = np.vstack(arrays)
+
+            # Calculate the mean and standard deviation along the first axis
+            mean_array = np.mean(stacked_arrays, axis=0)
+            std_array = np.std(stacked_arrays, axis=0)
+
+            # And add it to the dict
+            additional_dict[key] = np.array([mean_array, std_array])
+
+        # Now for the KDEs
+        arrays = [d['KDE'] for d in ares] # We have all the KDEs
+        for name in ['RNAP', 'topoI', 'gyrase']:
+            q=2
+
+    else:
+        additional_dict = None
+
+    # process_pools_genearch(pool_list, processing_dict)
+
+    # In the meantime, let's just return the production rate
+    return prod_rate, additional_dict
+
+
+# This one processes the outputs of the pool (used in the gene architecture experiment).
+# Returns: production rate (prod_rate), and accordition additional_results, it get's the following outputs:
+# If additional_results: False, we only return production rates (prod_rate), defined as the number of
+# transcripts divided by the elapsed time
+# If additional_results: True, returns KDEs of RNAP, topoI and gyrase. It also returns global superhelical level,
+# and local superhelical level at site, as well as the binding and unbinding arrays at the site
+def gene_architecture_process_pool(item_pool):
+    # Unpack item_pool
+    pool_result = item_pool[0]  # These are the df's produced by TORCphysics
+    processing_dict = item_pool[1]
+
+    # Unpack processing dict
+    additional_results = processing_dict['additional_results']
+    my_circuit = processing_dict['circuit']
+    x_gene = processing_dict['x_gene']
+    x_system = processing_dict['x_system']
+    site_name = processing_dict['site_name']
+
+    # Let's calculate the production rate
+    # -----------------------------------------------------------------------------------------------------------------
+    total_time = my_circuit.dt * my_circuit.frames
+
+    # Ranges used for calculating unbinding events
+    a = 0 #int(my_circuit.frames / 2)
+    b = -1
+
+    # Get unbinding event
+    sites_df = pool_result['sites_df']
+    mask = sites_df['name'] == site_name
+    unbinding_event = sites_df[mask]['unbinding'].to_numpy()
+
+    # Calculate production rate (prod_rate)
+    prod_rate = np.sum(unbinding_event[a:b]) / total_time #/ 2
+    #production_rate_dict = process_pools_calculate_production_rate([pool_result], [site_name], my_circuit)
+    #production_rate = production_rate_dict[site_name]
+
+    # Let's do the processing
+    if additional_results:
+
+        additional_dict = {}
+        # Collect measurements
+        # ------------------------------------------------------------------------------
+        # Site measurements
+        local_superhelical = sites_df[mask]['superhelical'].to_numpy()
+        binding_event = sites_df[mask]['binding'].to_numpy()
+
+        # Global measurements
+        mask_circuit = sites_df['type'] == 'circuit'
+        global_superhelical = sites_df[mask_circuit]['superhelical'].to_numpy()
+
+        additional_dict['global_superhelical'] = global_superhelical
+        additional_dict['local_superhelical'] = local_superhelical
+        additional_dict['binding'] = binding_event
+        additional_dict['unbinding'] = unbinding_event
+
+        # Collect measurements
+        # ------------------------------------------------------------------------------
+        # For the enzymes.
+        # ------------------------------------------------------------------------------
+        kde_dict = {}
+        for name in ['RNAP', 'topoI', 'gyrase']:
+
+            # Unpack
+            enzymes_df = pool_result['enzymes_df']
+
+            # Filter
+            mask = enzymes_df['name'] == name
+
+            # Position
+            # ------------------------------------------------------------------------------
+            position = enzymes_df[mask]['position'].to_numpy()
+
+            # number of bins for histogram - which we will not plot
+            my_environmental = \
+                [environmental for environmental in my_circuit.environmental_list if environmental.name == name][
+                    0]
+            if name == 'RNAP':
+                size = abs(my_environmental.site_list[0].start - my_environmental.size - my_environmental.site_list[0].end)
+                nbins = int(size / my_environmental.size)  # because genes are smaller
+                nbins = 90  # Maybe check the one up
+                x = x_gene
+            else:
+                nbins = int(
+                    my_circuit.size / my_environmental.size)  # number of bins. - note that this only applies for topos
+
+                x = x_system
+
+            # Calculate KDE
+            kde_x, kde_y = calculate_KDE(data=position, nbins=nbins, scaled=True)
+
+            kde_y = get_interpolated_kde(kde_x, kde_y, x)
+            kde_x = x
+
+            # Add it to the kde_dict
+            kde_dict[name] = {'kde_y': kde_y, 'kde_x': kde_x}
+
+        # And to the additional results dict
+        additional_dict['KDE'] = kde_dict
+
+    else:
+        additiona_dict = None
+
+    return prod_rate, additiona_dict
