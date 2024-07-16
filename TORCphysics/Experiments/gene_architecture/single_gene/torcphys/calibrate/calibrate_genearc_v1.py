@@ -63,7 +63,7 @@ print('Total number of actual workers:', n_sets * (1 + n_inner_workers))
 # Simulation conditions
 # --------------------------------------------------------------
 file_out = 'genearc-v1'
-dt = 5 #0.25
+dt = 0.25
 initial_time = 0
 final_time = 5000  #30000 ~8.3hrs
 time = np.arange(initial_time, final_time + dt, dt)
