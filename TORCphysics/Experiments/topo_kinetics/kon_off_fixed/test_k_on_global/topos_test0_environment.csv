@@ -1,3 +1,0 @@
-type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
-topo,gyrase,DNA_gyrase,44.6,160.0,140.0,PoissonBinding,calibration_gyrase.csv,GyraseLinear,calibration_gyrase.csv,PoissonUnBinding,calibration_gyrase.csv
-topo,topoI,DNA_topoI,17.0,60.0,40.0,PoissonBinding,calibration_topoI.csv,TopoILinear,calibration_topoI.csv,PoissonUnBinding,calibration_topoI.csv
