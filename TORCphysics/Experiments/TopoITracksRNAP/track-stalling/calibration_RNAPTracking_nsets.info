@@ -1,0 +1,8 @@
+Hello, this is the info file for the calibration of Topo I Tracking RNAP.
+Topo I Binding Model = TopoIRecognitionRNAPTracking
+Ran 12 simulations per test. 
+Number of tests = 2
+  0%|          | 0/2 [00:00<?, ?trial/s, best loss=?] 50%|█████     | 1/2 [00:15<00:15, 15.69s/trial, best loss: 1.6260987761622692]100%|██████████| 2/2 [00:32<00:00, 16.18s/trial, best loss: 1.6175229879009356]100%|██████████| 2/2 [00:32<00:00, 16.10s/trial, best loss: 1.6175229879009356]
+ 
+Optimal parameters found from random search: 
+{'RNAP_dist': 407.50385947544004, 'fold_change': 32.12452673655856}

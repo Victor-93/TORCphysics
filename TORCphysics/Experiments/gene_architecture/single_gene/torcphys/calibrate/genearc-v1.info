@@ -1,0 +1,9 @@
+Hello, this is the info file for the calibration of gene architecture.
+n_workers 12
+n_sets 4
+n_subsets 2
+n_inner_workers 2
+hyperopt tests 2
+Total number of simulations per test: 16
+Total number of actual workers: 12
+  0%|          | 0/2 [00:00<?, ?trial/s, best loss=?]  0%|          | 0/2 [01:30<?, ?trial/s, best loss=?]

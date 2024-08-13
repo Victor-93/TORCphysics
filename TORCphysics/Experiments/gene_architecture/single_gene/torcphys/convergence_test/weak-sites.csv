@@ -1,0 +1,2 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+gene,reporter,3250,4150,1,MaxMinPromoterBinding,../../promoter_responses/weak.csv
