@@ -15,7 +15,7 @@ import sys
 # ----------------------------------------------------------------------------------------------------------------------
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
-dt = 0.25
+dt = 1.0 #0.25
 initial_time = 0
 final_time = 500 #600
 time = np.arange(initial_time, final_time + dt, dt)
@@ -26,7 +26,8 @@ file_out = 'calibration'
 circuit_filename = '../circuit.csv'
 sites_filename = None  # 'sites_test.csv'
 enzymes_filename = None  # 'enzymes_test.csv'
-environment_filename = '../environment.csv'
+#environment_filename = '../environment.csv'
+environment_filename = '../environment_small.csv'
 
 # Concentrations in nM
 DNA_concentration = 0.75
@@ -52,8 +53,8 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 128#84  # 60 #48 #120
-tests = 7000#100  #400  # 10  # 100  # number of tests for parametrization
+n_simulations = 1000#128#84  # 60 #48 #120
+tests = 4000#7000#100  #400  # 10  # 100  # number of tests for parametrization
 
 # Models to calibrate to calibrate
 # -----------------------------------
@@ -74,16 +75,21 @@ gyrase_unbinding_model_name = 'PoissonUnBinding'
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------
 # TopoI ranges
-k_on_min_topoI = 0.001
-k_on_max_topoI = 0.1
+# I think this means that, in the max k_on rate, 1 topo binds every second, and in the minimum, one topo binds every
+# ~ 100 seconds; this for the whole circuit. - This for the small environment (realistic).
+# The true k_on of the whole circuit depends on the size of the plasmid, the size of the enzyme, and the concentration.
+k_on_min_topoI = 0.0000042 #0.001
+k_on_max_topoI = 0.00042 #0.1
 k_off_min_topoI = 0.01
 k_off_max_topoI = 1.0
 k_cat_min_topoI = 0.0  # Ranges to vary k_cat
 k_cat_max_topoI = 20.0
 
 # Gyrase ranges
-k_on_min_gyrase = 0.001
-k_on_max_gyrase = 0.1
+# For gyrase, the k_on of gyrase for the whole circuit is similar to the topoI, which goes from 1 bind every second
+# to 1 event every 100 seconds
+k_on_min_gyrase = 0.0000024#0.001
+k_on_max_gyrase = 0.00024#0.1
 k_off_min_gyrase = 0.01
 k_off_max_gyrase = 1.0
 k_cat_min_gyrase = 0.0  # Ranges to vary k_cat

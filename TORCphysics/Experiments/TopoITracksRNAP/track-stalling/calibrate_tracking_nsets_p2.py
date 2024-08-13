@@ -45,8 +45,10 @@ print('Total number of actual workers:', n_sets * (1 + n_inner_workers))
 
 # Simulation conditions
 # --------------------------------------------------------------
-file_out = 'calibration_RNAPTracking_nsets_p2'
-dt = 0.25
+#file_out = 'calibration_RNAPTracking_nsets_p2'
+file_out = 'calibration_RNAPTracking_nsets_p2_small_dt1'
+#dt = 0.25
+dt = 1.0 #0.25
 initial_time = 0
 final_time = 500
 time = np.arange(initial_time, final_time + dt, dt)
@@ -63,7 +65,8 @@ reference_RNAP = '../RNAP_TU.txt'
 circuit_filename = '../circuit.csv'
 sites_filename = '../sites.csv'
 enzymes_filename = None  #'../enzymes.csv'
-environment_filename = 'environment.csv'
+#environment_filename = 'environment.csv'
+environment_filename = 'environment_small.csv'
 output_prefix = 'topoIRNAPtrack-stalling'
 series = True
 continuation = False
@@ -76,7 +79,8 @@ continuation = False
 topoI_name = 'topoI'
 topoI_type = 'environmental'
 topoI_binding_model_name = 'TopoIRecognitionRNAPTracking'
-topoI_params_csv = '../calibration_topoI.csv'  # These are parameters for the Recognition curve
+#topoI_params_csv = '../calibration_topoI.csv'  # These are parameters for the Recognition curve
+topoI_params_csv = '../calibration_topoI_small_dt1.csv'  # These are parameters for the Recognition curve
 
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------

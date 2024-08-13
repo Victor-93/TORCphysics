@@ -293,8 +293,8 @@ class RNAPStall(EffectModel):
         position = z.direction * velocity * dt
 
         # Injects twist: denatures w = gamma*velocity*dt base-pairs
-        twist_left = -z.direction * z.effect_model.gamma * velocity * dt
-        twist_right = z.direction * z.effect_model.gamma * velocity * dt
+        twist_left = -z.direction * z.effect_model.gamma * params.w0 * velocity * dt
+        twist_right = z.direction * z.effect_model.gamma * params.w0 * velocity * dt
 
         # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid
         # clashing
@@ -1210,8 +1210,8 @@ def uniform_motion(z, dt):
     position = direction * velocity * dt
 
     # Injects twist: denatures w = gamma*velocity*dt base-pairs
-    twist_left = -direction * gamma * velocity * dt
-    twist_right = direction * gamma * velocity * dt
+    twist_left = -direction * gamma * params.w0 * velocity * dt
+    twist_right = direction * gamma * params.w0 * velocity * dt
     return position, twist_left, twist_right
 
 

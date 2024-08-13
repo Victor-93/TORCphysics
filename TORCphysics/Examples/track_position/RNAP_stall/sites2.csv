@@ -1,5 +1,0 @@
-type,name,start,end,k_on,binding_model,binding_oparams
-gene,tetA,2000,4000,0.02,PoissonBinding,none
-origin,ori,3085,0.0,0.0,,
-lacOP,lac1,3167,0.0,0.01,PoissonBinding,none
-lacOP,lac2,4500,0.0,0.01,PoissonBinding,none

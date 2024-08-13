@@ -13,18 +13,19 @@ import matplotlib.pyplot as plt
 # ----------------------------------------------------------------------------------------------------------------------
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
-dt = 0.25
+dt = 1.0 #0.25
 initial_time = 0
 final_time = 500
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'calibration'
+file_out = 'calibration_small_dt1'
 
 # For the simulation
 circuit_filename = 'circuit.csv'
 sites_filename = None  # 'sites_test.csv'
 enzymes_filename = None  # 'enzymes_test.csv'
-environment_filename = 'environment.csv'
+#environment_filename = 'environment.csv'
+environment_filename = 'environment_small.csv'
 
 # Concentrations in nM
 DNA_concentration = 0.75
@@ -53,7 +54,7 @@ continuation = False
 n_simulations = 96#48#24#96#10#84  # 60 #48 #120
 
 # params_file
-params_file = 'calibration.csv'
+params_file = 'calibration_small_dt1.csv'
 
 # Models to calibrate to calibrate
 # -----------------------------------
@@ -283,15 +284,14 @@ both_sigma_rx = sigma
 # ----------------------------------------------------------------------------------------------------------------------
 
 # Recognition binding
-params_file = 'recognition-linear/calibration.csv'
-#params_file = 'recognition-linear/sigma0/calibration.csv'
-#params_file = 'recognition-linear/thres-width_sigma0/calibration.csv'
+#params_file = 'recognition-linear/calibration.csv'
+params_file = 'recognition-linear/calibration_small_dt1.csv'
 params_dict = pd.read_csv(params_file).to_dict()
 rec_objective, rec_sim_superhelicals = objective_function(params=params_dict)
 
 # Poisson binding
-params_file = 'poisson-linear/calibration.csv'
-#params_file = 'poisson-linear/sigma0/calibration.csv'
+#params_file = 'poisson-linear/calibration.csv'
+params_file = 'poisson-linear/calibration_small_dt1.csv'
 topoI_binding_model_name = 'PoissonBinding'
 gyrase_binding_model_name = 'PoissonBinding'
 params_dict = pd.read_csv(params_file).to_dict()

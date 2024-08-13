@@ -15,19 +15,21 @@ import sys
 # ----------------------------------------------------------------------------------------------------------------------
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
-dt = 0.25
+dt = 1.0  #0.25
 initial_time = 0
 # Let's do it for 400s to add more weight to the curve and not the plateau
-final_time = 500 #500 # 600
+final_time = 500  #500 # 600
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'calibration'
+#file_out = 'calibration'
+file_out = 'calibration2'  #It is called 2 this time
 
 # For the simulation
 circuit_filename = '../circuit.csv'
 sites_filename = None  # 'sites_test.csv'
 enzymes_filename = None  # 'enzymes_test.csv'
-environment_filename = '../environment.csv'
+#environment_filename = '../environment.csv'
+environment_filename = '../environment_small.csv'
 
 # Concentrations in nM
 DNA_concentration = 0.75
@@ -53,8 +55,8 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 128  # 60 #48 #120
-tests = 1100 #400  # 10  # 100  # number of tests for parametrization
+n_simulations = 100#128  # 60 #48 #120
+tests = 4000 #1100  #400  # 10  # 100  # number of tests for parametrization
 
 # Models to calibrate to calibrate
 # -----------------------------------
@@ -75,30 +77,36 @@ gyrase_unbinding_model_name = 'PoissonUnBinding'
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------
 # TopoI ranges
-k_on_min_topoI = 0.001
-k_on_max_topoI = 0.1
+# I think this means that, in the max k_on rate, 1 topo binds every second, and in the minimum, one topo binds every
+# ~ 100 seconds; this for the whole circuit. - This for the small environment (realistic).
+# The true k_on of the whole circuit depends on the size of the plasmid, the size of the enzyme, and the concentration.
+k_on_min_topoI = 0.0000042 #0.001
+k_on_max_topoI = 0.00042 #0.1
 k_off_min_topoI = 0.01
 k_off_max_topoI = 1.0
 k_cat_min_topoI = 0.0  # Ranges to vary k_cat
 k_cat_max_topoI = 20.0
 width_min_topoI = 0.001
-width_max_topoI = 0.3#0.05
-threshold_min_topoI = -0.3 # 0.001  #-0.05
-threshold_max_topoI = 0.3 #0.05  #-0.001
+width_max_topoI = 0.3  #0.05
+threshold_min_topoI = -0.3  # 0.001  #-0.05
+threshold_max_topoI = 0.3  #0.05  #-0.001
 
 # Gyrase ranges
-k_on_min_gyrase = 0.001
-k_on_max_gyrase = 0.1
+# For gyrase, the k_on of gyrase for the whole circuit is similar to the topoI, which goes from 1 bind every second
+# to 1 event every 100 seconds
+k_on_min_gyrase = 0.0000024#0.001
+k_on_max_gyrase = 0.00024#0.1
 k_off_min_gyrase = 0.01
 k_off_max_gyrase = 1.0
 k_cat_min_gyrase = 0.0  # Ranges to vary k_cat
 k_cat_max_gyrase = 20.0
-sigma0_min_gyrase = -.15 #-0.3
-sigma0_max_gyrase = -0.07 #0.0
+sigma0_min_gyrase = -.15  #-0.3
+sigma0_max_gyrase = -0.07  #0.0
 width_min_gyrase = 0.001
-width_max_gyrase = 0.3 #.05  # 1.0
+width_max_gyrase = 0.3  #.05  # 1.0
 threshold_min_gyrase = -0.3  #0.0 #0.001
-threshold_max_gyrase =  0.3  # 0.1  # 1.0
+threshold_max_gyrase = 0.3  # 0.1  # 1.0
+
 
 # Optimization functions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -127,16 +135,16 @@ def objective_function(params):
                           'DNA_concentration': 0.0}
 
     global_dict_both_sc = {'circuit_filename': circuit_filename, 'sites_filename': sites_filename,
-                        'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
-                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
-                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma_0_topo,
-                        'DNA_concentration': 0.0}
+                           'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
+                           'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
+                           'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma_0_topo,
+                           'DNA_concentration': 0.0}
 
     global_dict_both_rx = {'circuit_filename': circuit_filename, 'sites_filename': sites_filename,
-                        'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
-                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
-                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma_0_gyrase,
-                        'DNA_concentration': 0.0}
+                           'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
+                           'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
+                           'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma_0_gyrase,
+                           'DNA_concentration': 0.0}
 
     # Variation dictionaries
     # ------------------------------------------
@@ -332,7 +340,7 @@ with open(output_file_path, 'w') as f:
         space=space,  # Hyperparameter's Search Space
         algo=tpe.suggest,  # Optimization algorithm (representative TPE)
         max_evals=tests,  # Number of optimization attempts
-        trials = trials
+        trials=trials
     )
 
     print(" ")
@@ -352,10 +360,9 @@ params_df = pd.DataFrame(columns=['test', 'loss',
                                   'width_gyrase', 'threshold_gyrase', 'sigma0_gyrase'])
 
 for n in range(tests):
-
-    tdi = trials.trials[n] # dictionary with results for test n
-    lo = trials.trials[n]['result']['loss'] # loss
-    va = trials.trials[n]['misc']['vals'] #values
+    tdi = trials.trials[n]  # dictionary with results for test n
+    lo = trials.trials[n]['result']['loss']  # loss
+    va = trials.trials[n]['misc']['vals']  #values
     # Add a new row using append method
     new_row = pd.DataFrame({
         'test': n, 'loss': lo,
@@ -365,11 +372,10 @@ for n in range(tests):
         'width_gyrase': va['width_gyrase'], 'threshold_gyrase': va['threshold_gyrase'],
         'sigma0_gyrase': va['sigma0_gyrase']
     })
-#    params_df.append(new_row, ignore_index=True)
+    #    params_df.append(new_row, ignore_index=True)
     params_df = pd.concat([params_df, new_row], ignore_index=True)
 
 params_df.to_csv('values.csv', index=False, sep=',')
-
 
 # Let's save it for each enzyme
 topo_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold'])

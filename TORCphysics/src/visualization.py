@@ -9,6 +9,7 @@ from datetime import datetime
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import os
 from TORCphysics.src import enzyme_shapes_dir
+import random
 
 # This module is produced to make one's life easier and be able to quickly process results.
 # With this module you can create animations,
@@ -570,6 +571,42 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out
         ax[0].add_patch(lit1)
         ax[0].add_patch(lit2)
 
+    # -----------------------------------
+    # Draw enzyme labels
+    # -----------------------------------
+    y0 = 0.95#1.5#-.5
+    text_y_offset= 0.03
+    x =  .3 #10.0
+    dx = .1 #1000 #0.5
+    soom = 0.1
+    #aax = ax.flat[0]
+    for environmental in my_circuit.environmental_list:
+        print(environmental.name)
+
+        # Load image
+        image = enzyme_shapes_dir + '/' + environmental.name + '.png'
+        image_path = image
+
+        if os.path.exists(image_path):
+            img = plt.imread(image_path)
+            im = OffsetImage(img, zoom=soom)
+
+            # Annotate
+            enzyme_annotation = AnnotationBbox(im, (x, y0), frameon=False,
+                                               xycoords='figure fraction')
+            fig.add_artist(enzyme_annotation)
+
+            # Add text below the enzyme image
+            text = f"{environmental.name}"
+            ax[0].text(x, y0 - text_y_offset, text, ha='center', va='top', transform=fig.transFigure, fontsize=slabel*.75)
+
+        else:
+            raise ValueError(f"PNG file does not exist: {image_path}")
+
+        x+=dx
+        soom+=0.01
+
+
     # Data preparation before animation
     # -----------------------------------
 
@@ -698,9 +735,17 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out
 
 # Given an enzyme_name, it attaches a png representation to an ax object given the x and y positions.
 # Note that the enzyme_name png representation (file) needs to be stored in effector_path
-def create_enzyme_annotation(x, y, enzyme_name):
+def create_enzyme_annotation(x, y, enzyme_name):  # , transform=None):
     image = enzyme_shapes_dir + '/' + enzyme_name + '.png'
     image_path = image
+
+    soom = 0.1
+    # Calculate the 5% range of the original number
+    variation = 0.05 * soom
+    # Generate a random number between -5% and +5%
+    random_variation = random.uniform(0, variation)
+    # Add the random variation to the original number
+    soom += random_variation
 
     #if os.path.exists(image):
     #    im = OffsetImage(image, zoom=0.1)
@@ -710,7 +755,10 @@ def create_enzyme_annotation(x, y, enzyme_name):
 
     if os.path.exists(image_path):
         img = plt.imread(image_path)
-        im = OffsetImage(img, zoom=0.1)
+        im = OffsetImage(img, zoom=soom)
+        #if transform is not None:
+        #    enzyme_annotation = AnnotationBbox(im, (x, y), frameon=False, transform=transform)
+        #else:
         enzyme_annotation = AnnotationBbox(im, (x, y), frameon=False)
         # ax.add_artist(enzyme_annotation)
     else:

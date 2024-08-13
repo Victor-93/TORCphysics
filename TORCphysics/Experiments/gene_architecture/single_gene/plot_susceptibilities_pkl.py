@@ -176,7 +176,7 @@ fig.suptitle('test promoter')
 # rates
 # --------------------------------------------------------------
 # Plot torcphys curves
-#axs.plot(prod_rates[0], prod_rates[1]/prod_rates[1][4], '-o', color=torc_color)
+#axs[0].plot(prod_rates[0], prod_rates[1]/prod_rates[1][4], '-o', color=torc_color)
 axs[0].plot(prod_rates[0], prod_rates[1], '-o', color=torc_color)
 axs[0].fill_between(prod_rates[0], prod_rates[1] - prod_rates[2], prod_rates[1] + prod_rates[2], color=torc_color,
                     alpha=0.5)
@@ -190,6 +190,7 @@ indexes = [0, 4, 8, -3, -1]
 ax = axs[1]
 for count, index in enumerate(indexes):
     axs[0].plot(prod_rates[0][index], prod_rates[1][index], 'o', ms=10, color=colors[count])
+    #axs[0].plot(prod_rates[0][index], prod_rates[1][index]/prod_rates[1][4], 'o', ms=10, color=colors[count])
     ax.plot(kde_x, RNAP_kdes[index][0], color=colors[count])
     #ax.fill_between(kde_x,
     #                RNAP_kdes[index][0] + RNAP_kdes[index][1],
@@ -213,7 +214,7 @@ axs[1].grid(True)
 axs[1].set_ylabel('Density', fontsize=xlabel_size)
 axs[1].set_xlabel('gene length (%)', fontsize=xlabel_size)
 
-sigma_a = -.08
+sigma_a = -.1
 sigma_b = 0.04
 axs[2].grid(True)
 axs[2].set_ylabel('Global superhelical level', fontsize=xlabel_size)
@@ -226,7 +227,8 @@ axs[3].set_xlabel('upstream distance (bp)', fontsize=xlabel_size)
 axs[3].set_ylim(sigma_a, sigma_b)
 
 #axs.legend(loc='best', fontsize=font_size)
-
 #plt.savefig('susceptibility.png')
+
 #plt.savefig('junier.pdf')
-plt.show()
+#plt.show()
+plt.savefig('pkl.png')

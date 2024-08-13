@@ -1,0 +1,6 @@
+These results are for calibrating the stochastic topoisomerase models.
+Each folder corresponds to a different model.
+Calibration is based on experimental study: Kinetic Study of DNA Topoisomerases by Supercoiling-Dependent Fluorescence Quenching
+
+environment_small.csv - corresponds to topo I and gyrase smaller sizes, which are based on crystollographic structures.
+In that sense, this evironment is more realistic.
