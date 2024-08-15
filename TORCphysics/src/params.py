@@ -54,6 +54,14 @@ sigma_s = (1 / cs_energy) * np.sqrt(2 * p_stiffness * g_energy / (1 - p_stiffnes
 # |sigma| > |sigma_p| - > only writhe exists
 sigma_p = (1 / p_stiffness) * np.sqrt(2 * p_stiffness * g_energy / (1 - p_stiffness / cs_energy))
 
+# From Forquet, R., et al. (2022). Quantitative contribution of the spacer length in the supercoiling-sensitivity of bacterial promoters. Nucleic Acids Research, 50(13), 7287–7297. https://doi.org/10.1093/nar/gkac579
+k_twist_kBT = 71.4 # kBT *rad^{-2} - In the paper it says that it is rads, but shouldn't it be degrees? I'll have to check
+                   # This expression is in kBT units
+k_twist_pN_nm = 71.4 * kBT_pN_nm # And now multiplied by kBT but in pN nm units.
+twist_deg = 34.3 # B-DNA twist in degrees
+spacer_factor = 15.0 # Effective energy used to scale down the geometric modulation of binding rate according the
+                     # spacer length. We chose this factor as it limits the binding at hyper superhelical values.
+
 # ---------------------------------------------------------------------------------------------------------------------
 # SPECIFIC ENZYME PARAMETERS
 # ---------------------------------------------------------------------------------------------------------------------

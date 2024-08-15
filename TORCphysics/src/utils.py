@@ -26,6 +26,19 @@ topo_t = params.topo_b_t
 gyra_w = params.gyra_b_w
 gyra_t = params.gyra_b_t
 
+# TODO: Test and document
+# n = spacer length ( dimension less)
+# superhelical = local superhelical density
+# twist_o = optimal twist angle for RNAP binding (degrees)
+# NOTES: 1.- averaged B-DNA twist angle (twist_deg) is also in degrees.
+#        2.- Output is in kBT units
+# TODO: This equation and parameters are taken from the NAR paper Forquet, R., et al. (2022).
+#  But the units are a bit confusin. the twist angle are in degrees, but the stiffness constant in radians.
+def spacer_length_free_energy(n, superhelical, twist_o):
+    a = twist_o/n - params.twist_deg * (1.0+superhelical)
+    spacer_energy = 0.5 * n * params.k_twist_kBT * a**2
+    return spacer_energy
+
 
 # TODO: Test and document
 # Calculates the energy spent of going from state 1 with superhelical 1 to state 2 with superhelical2.
