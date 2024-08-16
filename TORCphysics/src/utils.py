@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from TORCphysics import params
+import sys
 
 # TODO: Decide which of these parameters you need
 # All parameters are already in the params module, but I prefer to have them here with more simple names:
@@ -25,6 +26,66 @@ topo_w = params.topo_b_w
 topo_t = params.topo_b_t
 gyra_w = params.gyra_b_w
 gyra_t = params.gyra_b_t
+
+# Having RNAP molecule z and a list of enzymes z_list on the DNA, it calculates the updated position and the
+# twist induced on both sides of z (left and right) according a mechanical model where the RNAP can stall
+# according the balance of torques.
+def RNAP_stall_mec_model(z, z_list, dt):
+    # Get enzymes on the right and left
+    z_right = [e for e in z_list if e.position > z.position][0]  # after - On the right
+    z_left = [e for e in z_list if e.position < z.position][-1]  # before - On the left
+
+    # First, we need to calculate the Torque acting on our RNAP.
+    # Calculate torques and determine if the RNAP will stall
+    torque_right = Marko_torque(z.superhelical)  # Torque on the right
+    torque_left = Marko_torque(z_left.superhelical)  # Torque on the left
+
+    if z.direction > 0:  # Moving to the right
+        torque = torque_right - torque_left
+    else:  # Moving to the left
+        torque = torque_left - torque_right
+
+    velocity = velocity_2022SevierBioJ(z, torque)
+
+    position = z.direction * velocity * dt
+
+    # Injects twist: denatures w = gamma*velocity*dt base-pairs
+    twist_left = -z.direction * z.effect_model.gamma * params.w0 * velocity * dt
+    twist_right = z.direction * z.effect_model.gamma * params.w0 * velocity * dt
+
+    # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid
+    # clashing
+    if z.direction > 0:  # Moving to the right
+        if z_right.position - (z.position + position) <= 0:
+            position = 0.0
+            twist_left = 0.0
+            twist_right = 0.0
+    else:  # Moves to the left
+        if z_left.position - (z.position + position) >= 0:
+            position = 0.0
+            twist_left = 0.0
+            twist_right = 0.0
+
+    return position, twist_left, twist_right
+
+# Having the case of E1___E____E2, being the E's the enzymes in a region, calculate the twist and superhelical
+# density surrounding enzyme E. This function is useful for calculating the effects of topoisomerase or enzymes
+# that act on regions.
+def get_superhelical_in_region(z, z_list):
+    z_b = get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)  # Get the enzyme before
+    z_a = get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)  # Get the enzyme after z
+    total_twist = z_b.twist + z.twist  # Total twist in the region.
+    # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
+    superhelical = total_twist / (params.w0 * (z_a.position - z_b.position))
+    return superhelical, total_twist
+
+
+# Sidmoid function used for modulating the rate in the thermodynamic model of strand separation.
+# This function is taken from Houdagui et al. 2019
+# The parameter SM_m is an effective thermal energy (1/SM_m). Basically, it used to limit the negative exponential
+# to values from 0 to 1, so the rate can follow the same shape as the free energy of melting.
+def opening_function(superhelical, threshold, width):
+    return params.SM_m / (1.0 + np.exp(-(superhelical - threshold) / width))
 
 # TODO: Test and document
 # n = spacer length ( dimension less)
@@ -353,3 +414,37 @@ def read_fasta(file_name):
     sequence = ''.join(lines)  # And join all lines to obtain sequence
     fasta_file.close()
     return sequence
+
+# Torque calculated using Marko's elasticity model
+def Marko_torque(sigma):
+    if np.abs(sigma) <= np.abs(params.sigma_s):
+        torque = sigma * params.cs_energy / params.w0
+    elif abs(params.sigma_s) < abs(sigma) < abs(params.sigma_p):
+        torque = np.sqrt(
+            2 * params.p_stiffness * params.g_energy / (1 - params.p_stiffness / params.cs_energy)) / params.w0_nm
+    elif abs(sigma) > abs(params.sigma_p):
+        torque = sigma * params.p_stiffness / params.w0
+    else:
+        print('Error in Marko_torque function')
+        sys.exit()
+    return torque
+
+
+#  The velocity has the form: v = vmax/ (1+e^{k(T_0 - T_c)} )
+#  where vmax = maximum velocity, k = torque parameter, T_0 = Torque acting on enzyme
+#  and T_c = cutoff or stalling torque.
+#  This function is based on the 2022SevierBioJ paper
+def velocity_2022SevierBioJ(z, torque):
+    # top = 2.0 * z.effect_model.velocity
+    top = z.effect_model.velocity
+    exp_arg = z.effect_model.kappa * (torque - z.effect_model.stall_torque)
+    exp_arg = np.float128(exp_arg)
+
+    # Define a maximum value for the argument to exp to prevent overflow
+    max_exp_arg = 709  # slightly below the overflow threshold for float64
+    # Clip the argument to the maximum value
+    exp_arg_clipped = np.clip(exp_arg, a_min=None, a_max=max_exp_arg)
+    #down = 1.0 + np.exp(exp_arg)
+    down = 1.0 + np.exp(exp_arg_clipped)
+    velocity = top / down
+    return velocity

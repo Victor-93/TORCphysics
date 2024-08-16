@@ -3,6 +3,7 @@ from TORCphysics import params, utils
 import pandas as pd
 from abc import ABC, abstractmethod
 import sys
+import random
 
 # TODO: Decide which of these parameters you need
 # All parameters are already in the params module, but I prefer to have them here with more simple names:
@@ -231,6 +232,171 @@ class RNAPUniform(EffectModel):
                 twist_right = 0.0
 
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+class RNAPStagesStall(EffectModel):
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=False, **oparams):
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        # TODO: Vamos a primero visualizar la funcion que queremos, luego la programos aqui.
+        #       Pero primero veamos los parametros.
+        self.state = 'Closed_complex' # Or Open_complex, or Elongation
+        # Closed complex <-> Open complex -> elongation
+        # We start in the closed complex state. It can transition to open complex with rate k_oc.
+        # It can reverse from open complex to closed with rate k_cc.
+        # Then, if in open complex state, it can initiate elongation with rate k_ini. Once the RNAP is in the
+        # elongation state, it won't transition to other state until it unbinds. It may stall though.
+        if not oparams:
+            if filename is None:
+                # Closed complex
+                self.k_closed = 0.02  # 0.01~100secs Goes from open complex to closed complex
+
+                # Open complex
+                self.k_open = 0.05  # Goes from closed complex to opean complex
+                self.width = .003   # Width and threshold give the shape to the melting energy
+                self.threshold = -.04
+
+                # Initiation (start of elongation)
+                self.k_ini = 0.1
+
+                # Elongation params
+                self.velocity = params.v0  # Medium velocity
+                self.gamma = params.gamma
+                self.stall_torque = params.stall_torque
+                self.kappa = params.RNAP_kappa
+
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                # Closed complex
+                if 'k_closed' in mydata.columns:
+                    self.k_closed = mydata['k_closed'][0]
+                else:
+                    raise ValueError('Error, k_closed parameter missing in csv file for RNAPStagesStall')
+
+                # Open complex
+                if 'k_open' in mydata.columns:
+                    self.k_open = mydata['k_open'][0]
+                else:
+                    raise ValueError('Error, k_open parameter missing in csv file for RNAPStagesStall')
+                if 'width' in mydata.columns:
+                    self.width = mydata['width'][0]
+                else:
+                    raise ValueError('Error, width parameter missing in csv file for RNAPStagesStall')
+                if 'threshold' in mydata.columns:
+                    self.threshold = mydata['threshold'][0]
+                else:
+                    raise ValueError('Error, threshold parameter missing in csv file for RNAPStagesStall')
+
+                        # Initiation
+                if 'k_ini' in mydata.columns:
+                    self.k_ini = mydata['k_ini'][0]
+                else:
+                    raise ValueError('Error, k_ini parameter missing in csv file for RNAPStagesStall')
+
+                # Elongation
+                if 'velocity' in mydata.columns:
+                    self.velocity = mydata['velocity'][0]
+                else:
+                    raise ValueError('Error, velocity parameter missing in csv file for RNAPStagesStall')  # ', filename)
+                if 'gamma' in mydata.columns:
+                    self.gamma = mydata['gamma'][0]
+                else:
+                    raise ValueError('Error, gamma parameter missing in csv file for RNAPStagesStall')  #: ', filename)
+        else:
+
+            # Closed complex
+            self.k_closed = float(oparams['k_closed'])
+
+            # Open complex
+            self.k_open = float(oparams['k_open'])
+            self.width = float(oparams['width'])
+            self.threshold = float(oparams['threshold'])
+
+            # Initiation (start of elongation)
+            self.k_ini = float(oparams['k_ini'])
+
+            # Elongation
+            self.velocity = float(oparams['velocity'])
+            self.gamma = float(oparams['gamma'])
+            self.stall_torque = float(oparams['stall_torque'])
+            self.kappa = float(oparams['kappa'])
+
+        self.oparams = {'k_closed': self.k_closed,
+                        'k_open': self.k_open, 'width': self.width, 'threshold': self.threshold,
+                        'k_ini': self.k_ini, 'velocity': self.velocity, 'gamma': self.gamma,
+                        'kappa': self.kappa, 'stall_torque': self.stall_torque}  # Just in case
+
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+
+        # TODO: Just figure out how you treat the twist leak, does the RNAP always forms a barrier in all stages?
+        #  I was thinking that maybe in the closed complex it leaks the twist, but in the open it doesn't.
+        # TODO: Create example of the model.
+        # TODO: Twist leak: In the closed_complex state, the RNAP acts as a barrier? Or does it leaks superhelical density?
+        #  Maybe we should assume that it leaks with certain rate?
+        # TODO: Twist leak2: In the open_complex state, it starts acting as a barrier?
+        # Everything 0 for now
+        position = 0.0
+        twist_left = 0.0
+        twist_right = 0.0
+        # Closed complex
+        # -------------------------------------------------
+        # If we are in the closed_complex state, then it can either transition to the open complex state
+        # or unbind. But the unbinding_model is in charge of the unbinding condition. So here, we just test if
+        # it transitions to the open complex state.
+        # Superhelical density for openning the DNA. It is the superhelical density acting on the region
+        if self.state == 'Closed_complex':
+
+            # Get superhelical density in the region
+            superhelical_region, twist_region = utils.get_superhelical_in_region(z, z_list)
+            # Calculate the opening function U (it is not actually the energy because it is scaled with an effective
+            # energy)
+            U = utils.opening_function(superhelical_region, self.threshold, self.width)
+
+            rate = self.k_open * np.exp(-U)
+            probability =  utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+
+            # TODO: We have a rng problem! I define it outside this funciton, in the main code (circuit).
+            #  Maybe I should pass the rng to here as well, so we always use the same seed?
+            # Generate a random number between 0 and 1 to help us decide if it'll form the open complex
+            random_number = random.random()
+            if random_number <= probability:
+                self.state = 'Open_complex'  # TRANSITIONS TO OPEN COMPLEX!
+
+            return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+        # Open complex
+        # -------------------------------------------------
+        # Posibilities, it either transitions to closed complex, stays as an open complex or transitions to elongation.
+        if self.state == 'Open_complex':
+            # Calculate probabilities as Poisson processes
+            p_closed = utils.Poisson_process(self.k_closed, dt) # probability of forming closed complex
+            p_init = utils.Poisson_process(self.k_ini, dt)  # probability of elongation initiation
+            # p_open = 1 - (p_closed + p_init)  # Probability of staying as open complex
+
+            if p_closed + p_init >= 1.0:  # Check that probabilities make sense
+                raise ValueError('Error. p_closed + p_init should be less than 1 in RNAPStagesStall.')
+
+            # Generate a random number between 0 and 1 to help us decide if it'll transition or not
+            random_number = random.random()
+            if random_number < p_closed:
+                self.state = 'Closed_complex'  # TRANSITIONS TO CLOSED COMPLEX
+            elif p_closed <= random_number < p_closed + p_init:
+                self.state = 'Elongation'
+            # Else, do nothing... it stays as an open complex
+
+            return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+        # Elongation
+        # -------------------------------------------------
+        if self.state == 'Elongation':
+            # Elongation
+            position, twist_left, twist_right = utils.RNAP_stall_mec_model(z, z_list, dt)
+            return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+        if self.state not in ['Closed_complex', 'Open_complex', 'Elongation']:
+            raise ValueError('Error. Unknown state in RNAPStagesStall.')
 
 
 # TODO: Document the RNAPStall model. It is a model with velocity but no torques.

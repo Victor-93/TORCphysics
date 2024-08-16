@@ -358,7 +358,7 @@ class SpacerBinding(BindingModel):
         self.scaling_factor = 0.0 # For now, it will be corrected later
         if not oparams:
             if filename is None:
-                self.k_on = params.k_on
+                self.k_on = 0.05 # 0.05~ 20secs, let's assume that it is fast
                 self.spacer = 17
                 self.superhelical_op = -0.06 #optimal superhelical density for binding
             else:
