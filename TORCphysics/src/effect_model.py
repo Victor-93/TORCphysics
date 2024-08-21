@@ -330,16 +330,13 @@ class RNAPStagesStall(EffectModel):
 
     def calculate_effect(self, index, z, z_list, dt) -> Effect:
 
-        # TODO: Just figure out how you treat the twist leak, does the RNAP always forms a barrier in all stages?
-        #  I was thinking that maybe in the closed complex it leaks the twist, but in the open it doesn't.
-        # TODO: Create example of the model.
-        # TODO: Twist leak: In the closed_complex state, the RNAP acts as a barrier? Or does it leaks superhelical density?
-        #  Maybe we should assume that it leaks with certain rate?
-        # TODO: Twist leak2: In the open_complex state, it starts acting as a barrier?
+        # At the moment, the closed_complex and open complex do not form topological barriers, only at the
+        # elongation state the RNAP acts as a barrier.
+
         # Everything 0 for now
         position = 0.0
-        twist_left = 0.0
-        twist_right = 0.0
+        # twist_left = 0.0
+        # twist_right = 0.0
         # Closed complex
         # -------------------------------------------------
         # If we are in the closed_complex state, then it can either transition to the open complex state
@@ -347,6 +344,8 @@ class RNAPStagesStall(EffectModel):
         # it transitions to the open complex state.
         # Superhelical density for openning the DNA. It is the superhelical density acting on the region
         if self.state == 'Closed_complex':
+
+            # z.name = 'RNAP_' + self.state
 
             # Get superhelical density in the region
             superhelical_region, twist_region = utils.get_superhelical_in_region(z, z_list)
@@ -364,12 +363,18 @@ class RNAPStagesStall(EffectModel):
             if random_number <= probability:
                 self.state = 'Open_complex'  # TRANSITIONS TO OPEN COMPLEX!
 
+            # Finally, calculate change in twist givenn the fact that it doesn't form a barrier
+            twist_left, twist_right = instant_twist_transfer(z, z_list)
+
             return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
         # Open complex
         # -------------------------------------------------
         # Posibilities, it either transitions to closed complex, stays as an open complex or transitions to elongation.
         if self.state == 'Open_complex':
+
+            # z.name = 'RNAP_' + self.state
+
             # Calculate probabilities as Poisson processes
             p_closed = utils.Poisson_process(self.k_closed, dt) # probability of forming closed complex
             p_init = utils.Poisson_process(self.k_ini, dt)  # probability of elongation initiation
@@ -386,11 +391,17 @@ class RNAPStagesStall(EffectModel):
                 self.state = 'Elongation'
             # Else, do nothing... it stays as an open complex
 
+            # And calculate change in twist given the fact that it doesn't form a barrier
+            twist_left, twist_right = instant_twist_transfer(z, z_list)
+
             return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
         # Elongation
         # -------------------------------------------------
         if self.state == 'Elongation':
+
+            # z.name = 'RNAP_' + self.state
+
             # Elongation
             position, twist_left, twist_right = utils.RNAP_stall_mec_model(z, z_list, dt)
             return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
@@ -1319,6 +1330,8 @@ def assign_effect_model(model_name, oparams_file=None, **oparams):
     """
     if model_name == 'RNAPUniform':
         my_model = RNAPUniform(filename=oparams_file, **oparams)
+    elif model_name == 'RNAPStagesStall':
+        my_model = RNAPStagesStall(filename=oparams_file, **oparams)
     elif model_name == 'RNAPStall':
         my_model = RNAPStall(filename=oparams_file, **oparams)
     elif model_name == 'TopoIUniform':
@@ -1491,6 +1504,30 @@ def velocity_2022SevierBioJ(z, torque):
     velocity = top / down
     return velocity
 
+
 # ---------------------------------------------------------------------------------------------------------------------
 # USEFUL FUNCTIONS
 # ---------------------------------------------------------------------------------------------------------------------
+# Having an enzyme E sourrounded by a molecules L and R, on the left and right respectively (L____E____R),
+# calculate the change in twist on the left and right sides of E given the fact that enzyme E completely
+# leaks the twist on both sides (it doesn't form a topological barrier).
+def instant_twist_transfer(z,z_list):
+    # Get enzyme before z (z_b, on the left) and enzyme after z (z_a, on the right)
+    z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)
+    z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)
+    # Total twist trapped in the region
+    total_twist = z_b.twist + z.twist
+    # Calculate lengths
+    total_length = utils.calculate_length(z_b, z_a) # Twist from barrier on the left to barrier on the right
+    length_left = utils.calculate_length(z_b, z)
+    length_right = utils.calculate_length(z, z_a)
+    # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
+    total_superhelical = total_twist / (params.w0 * total_length)
+    # Partitionate the twist
+    twist_left = total_superhelical * params.w0 * length_left  # these are the twist that each side should have
+    twist_right = total_superhelical * params.w0 * length_right
+    # And calculate the actual change in twist
+    dtwist_left = twist_left - z_b.twist
+    dtwist_right = twist_right - z.twist
+    return dtwist_left, dtwist_right
+

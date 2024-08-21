@@ -21,7 +21,10 @@ height = 6
 # colors
 enzyme_colors = {'RNAP': 'white', 'IHF': 'yellow', 'FIS': 'red', 'lacI': 'green', 'lacI_bridge': 'red', 'ori': 'silver',
                  'topoI': 'red',
-                 'gyrase': 'cyan'}
+                 'gyrase': 'cyan',
+                 'RNAP_Closed_complex': 'gray', 'RNAP_Open_complex': 'green', 'RNAP_Elongation': 'white'}
+
+
 
 gene_colour = '#4a86e8ff'  # 'blue'
 DNA_colour = 'black'  # '#999999ff' #'gray'
@@ -32,14 +35,16 @@ gyrase_colour = 'cyan'
 
 # Sizes
 enzyme_sizes = {'RNAP': 300, 'IHF': 500, 'FIS': 500, 'lacI': 250, 'lacI_bridge': 250, 'ori': 500, 'topoI': 500,
-                'gyrase': 500}
+                'gyrase': 500,
+                'RNAP_Closed_complex': 500, 'RNAP_Open_complex': 500, 'RNAP_Elongation': 500}
 DNA_lw = 12
 gene_lw = 5
 sigma_lw = 5
 
 # Shapes
 enzyme_shapes = {'RNAP': 'o', 'IHF': 'o', 'FIS': 'o', 'lacI': 's', 'lacI_bridge': 's', 'ori': 'h', 'topoI': 'X',
-                 'gyrase': 'X'}
+                 'gyrase': 'X',
+                 'RNAP_Closed_complex': 'o', 'RNAP_Open_complex': 'o', 'RNAP_Elongation': 'o'}
 
 # text size
 slabel = 20

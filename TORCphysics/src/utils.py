@@ -448,3 +448,4 @@ def velocity_2022SevierBioJ(z, torque):
     down = 1.0 + np.exp(exp_arg_clipped)
     velocity = top / down
     return velocity
+

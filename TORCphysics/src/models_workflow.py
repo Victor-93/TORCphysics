@@ -117,7 +117,10 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
                 # Those will be added in the circuit module
                 enzyme = Enzyme(e_type=environment.enzyme_type, name=environment.name, site=site, position=position,
                                 size=environment.size, effective_size=environment.effective_size, twist=0.0,
-                                superhelical=0.0, effect_model=environment.effect_model,
+                                superhelical=0.0,
+                                effect_model_name=environment.effect_model_name,
+                                effect_model_oparams=environment.effect_model_oparams,
+                                # effect_model=environment.effect_model,
                                 unbinding_model=environment.unbinding_model)
                 new_enzymes.append(enzyme)
 
