@@ -838,6 +838,17 @@ def single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variati
 
     return my_objective, output_dict
 
+# It is like the function single_case_RNAPTracking_calibration_nsets_2scheme but adds to the objective function the
+# correlation between the RNAP KDE and the RNAP reference signal (from ChIP-Seq)
+def single_case_RNAPTracking_calibration_nsets_2scheme_plus_RNAP(global_dict_list, variations_list,
+                                                                 reference_dict, target_dict):
+    my_objective, output_dict = single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variations_list,
+                                                                               reference_dict, target_dict)
+    RNAP_correlation = output_dict['results']['RNAP_correlation']
+    target_RNAP_CO = target_dict['target_RNAP_CO']
+    RNAP_objective = (target_RNAP_CO - RNAP_correlation) ** 2
+    my_objective = my_objective + RNAP_objective
+    return my_objective, output_dict
 
 def process_set(item_pool):
     #    n_set, n_subsets, Items_subset, n_inner_workers, processing_info_dict
@@ -1077,7 +1088,7 @@ def load_circuit(global_dict):
 # for all cases.
 # my_circuit is the circuit, and name is the environmental name, e.g., topoI, gyrase, RNAP
 def calculate_number_nbins(my_circuit, name):
-    factor = .5
+    factor = .2
     gene_factor = .5  #.4#.2#.35
     # Get environmental object
     my_environmental = [environmental for environmental in my_circuit.environmental_list if environmental.name == name][

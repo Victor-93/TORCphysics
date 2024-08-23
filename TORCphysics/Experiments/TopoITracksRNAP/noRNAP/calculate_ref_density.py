@@ -17,9 +17,9 @@ from TORCphysics import topo_calibration_tools as tct
 
 # Simulation conditions - Even though we won't run the simulation again
 # --------------------------------------------------------------
-dt = 0.25
+dt = 1.0 #0.25
 initial_time = 0
-final_time = 1000
+final_time = 1000 #2000#500 #1000
 time = np.arange(initial_time, final_time + dt, dt)
 
 # Circuit initial conditions
@@ -27,7 +27,7 @@ time = np.arange(initial_time, final_time + dt, dt)
 circuit_filename = '../circuit.csv'
 sites_filename = None
 enzymes_filename = None
-environment_filename = 'environment.csv'
+environment_filename = 'environment_small.csv'
 output_prefix = 'noRNAP'
 frames = len(time)
 series = True

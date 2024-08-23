@@ -288,7 +288,7 @@ class RNAPStagesStall(EffectModel):
                 else:
                     raise ValueError('Error, threshold parameter missing in csv file for RNAPStagesStall')
 
-                        # Initiation
+                # Initiation
                 if 'k_ini' in mydata.columns:
                     self.k_ini = mydata['k_ini'][0]
                 else:

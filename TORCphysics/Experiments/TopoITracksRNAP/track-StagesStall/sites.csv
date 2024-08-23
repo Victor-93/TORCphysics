@@ -1,0 +1,2 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+gene,reporter,2000,4000,0.01666,SpacerBinding,none

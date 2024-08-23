@@ -7,13 +7,13 @@ from TORCphysics import parallelization_tools as pt
 
 # Parallelization conditions
 # --------------------------------------------------------------
-n_simulations = 8#64#120 #60#48 #24#8 #96 # 120
+n_simulations = 8#8#64#120 #60#48 #24#8 #96 # 120
 
 # Simulation conditions
 # --------------------------------------------------------------
-dt = 0.25
+dt = 1.0 #0.25
 initial_time = 0
-final_time = 1000#2000#500
+final_time = 1000 #1000#2000#500
 time = np.arange(initial_time, final_time + dt, dt)
 
 # Circuit initial conditions
@@ -22,7 +22,7 @@ circuit_filename = '../circuit.csv'
 sites_filename = None
 enzymes_filename = None
 # environment_filename = 'environment_test.csv'
-environment_filename = 'environment.csv'
+environment_filename = 'environment_small.csv'
 output_prefix = 'noRNAP'
 frames = len(time)
 #frames = 1000#5000 #50000
