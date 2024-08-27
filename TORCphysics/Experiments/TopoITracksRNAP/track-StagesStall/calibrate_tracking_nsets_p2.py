@@ -27,12 +27,12 @@ import pickle
 #       In total, the number of simulations launched is n_subset * n_sets * n_inner_workers
 # WARNING: It is very important that the number of n_workers is within the capabilities of your system.
 #          So choose carefully n_workers and n_sets
-n_workers = 12#64#12  # Total number of workers (cpus)
-n_sets = 3#7#3  # Number of outer sets
-n_subsets = 2#5#7#2  # Number of simulations per set
+n_workers = 16#12#64#12  # Total number of workers (cpus)
+n_sets = 1#3#7#3  # Number of outer sets
+n_subsets = 5#2#5#7#2  # Number of simulations per set
 n_inner_workers = n_workers // (n_sets+1)  # Number of workers per inner pool
                                            # +1 because one worker is spent in creating the outer pool
-tests = 2 #400  # number of tests for parametrization
+tests = 4 #400  # number of tests for parametrization
 
 print('Doing parallelization process for:')
 print('n_workers', n_workers)
@@ -49,7 +49,7 @@ file_out = 'calibration_RNAPTracking_nsets_p2_small_dt1'
 #dt = 0.25
 dt = 1.0 #0.25
 initial_time = 0
-final_time = 500
+final_time = 1000#500
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 

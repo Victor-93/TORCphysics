@@ -5,6 +5,7 @@ from TORCphysics import Circuit
 import matplotlib.pyplot as plt
 import pickle
 
+# TODO: Once you have your "true" calibration results, modify the script to load them.
 # Description
 # --------------------------------------------------------------
 # Following the calibration process by executing calibrate_tracking_nsets_p2.py for both the stalling and uniform
@@ -12,10 +13,14 @@ import pickle
 
 # Inputs
 # --------------------------------------------------------------
-pickle_files = ['track-uniform/calibration_RNAPTracking_nsets_p2.pkl',
-                'track-stalling/calibration_RNAPTracking_nsets_p2.pkl']
-output_prefix = 'topoIRNAPtracking'
-title = ['Uniform model', 'Stall model']
+#pickle_files = ['track-uniform/calibration_RNAPTracking_nsets_p2.pkl',
+#                'track-stalling/calibration_RNAPTracking_nsets_p2.pkl',
+#                'track-StagesStall/calibration_RNAPTracking_nsets_p2_small_dt1.pkl',]
+pickle_files = ['track-StagesStall/calibration_RNAPTracking_nsets_p2_small_dt1.pkl',
+                'track-StagesStall/calibration_RNAPTracking_nsets_p2_small_dt1.pkl']
+output_prefix = 'test-RNAPStages-topoIRNAPtracking'
+#title = ['Uniform model', 'Stall model']
+title = ['Extended','Extended' ]
 
 
 # Simulation conditions
@@ -31,7 +36,8 @@ frames = len(time)
 circuit_filename = 'circuit.csv'
 sites_filename = 'sites.csv'
 enzymes_filename = None
-environment_filename = 'environment.csv'
+#environment_filename = 'environment.csv'
+environment_filename = 'environment_small.csv'
 series = True
 continuation = False
 
@@ -121,7 +127,7 @@ for n, pickle_file in enumerate(pickle_files):
     ax.set_xlabel(r'Position (bp)', fontsize=font_size)
     ax.set_xlim(0, my_circuit.size)
     ax.grid(True)
-    ax.set_ylim(.5,1.5)
+    #ax.set_ylim(.5,1.5)
     ax.set_xlim(0, my_circuit.size)
     ax.set_title(title[n], fontsize=font_size)
     # fig.suptitle(title[n], fontsize=title_size)
@@ -134,9 +140,10 @@ for n, pickle_file in enumerate(pickle_files):
     FE = output['FE'][0]
     CO = output['overall_correlation']
     OB = output['objective']
+    RNAP_CO = output['results']['RNAP_correlation']
 
     # Define the text to display
-    textstr = f'FE={FE:.2f}, CO={CO:.2f}, OB={OB:.2e}'
+    textstr = f'FE={FE:.2f}, RCO={RNAP_CO:.2f}, CO={CO:.2f}, OB={OB:.2e}'
 
     # Add the text box to the plot
     props = dict(boxstyle='round', facecolor='silver', alpha=0.5)
@@ -147,5 +154,7 @@ for n, pickle_file in enumerate(pickle_files):
     print('CO',CO)
     print('objective', output['objective'])
     print('RNAP_correlation', output['results']['RNAP_correlation'])
-plt.savefig(output_prefix+'-FE.png')
-plt.savefig(output_prefix+'-FE.pdf')
+
+plt.show()
+#plt.savefig(output_prefix+'-FE.png')
+#plt.savefig(output_prefix+'-FE.pdf')
