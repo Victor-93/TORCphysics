@@ -233,6 +233,10 @@ class RNAPUniform(EffectModel):
 
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
+# TODO: Think about this effect! The width, threshold, and the rates should be related to the sites! Not the
+#       RNAP... In other words, this effect should be communicated or linked with a site. Think about how can
+#       you link models or something like that.
+#       Once you fix this, you might want to update the calibration files.
 class RNAPStagesStall(EffectModel):
 
     # def __init__(self, name, filename):
@@ -777,13 +781,15 @@ class TopoisomeraseLinearEffect(EffectModel):
     def calculate_effect(self, index, z, z_list, dt) -> Effect:
 
         position = 0.0
-        z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)  # Get the enzyme before
-        z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)  # Get the enzyme after z
+        z_b = utils.get_enzyme_before_position(position=z.position - 5, enzyme_list=z_list)  # Get the enzyme before
+        z_a = utils.get_enzyme_after_position(position=z.position + 5, enzyme_list=z_list)  # Get the enzyme after z
+
         total_twist = z_b.twist + z.twist  # Total twist in the region.
         # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
         superhelical = total_twist / (params.w0 * (z_a.position - z_b.position))
         twist_left = 0.5 * self.k_cat * params.w0 * dt * (self.sigma0 - superhelical)
         twist_right = twist_left
+
 
         return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
@@ -861,8 +867,8 @@ class GyraseLinear(EffectModel):
     def calculate_effect(self, index, z, z_list, dt) -> Effect:
 
         position = 0.0
-        z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)  # Get the enzyme before
-        z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)  # Get the enzyme after z
+        z_b = utils.get_enzyme_before_position(position=z.position - 5, enzyme_list=z_list)  # Get the enzyme before
+        z_a = utils.get_enzyme_after_position(position=z.position + 5, enzyme_list=z_list)  # Get the enzyme after z
         total_twist = z_b.twist + z.twist  # Total twist in the region.
         # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
         superhelical = total_twist / (params.w0 * (z_a.position - z_b.position))
@@ -913,8 +919,8 @@ class TopoILinear(EffectModel):
     def calculate_effect(self, index, z, z_list, dt) -> Effect:
 
         position = 0.0
-        z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)  # Get the enzyme before
-        z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)  # Get the enzyme after z
+        z_b = utils.get_enzyme_before_position(position=z.position - 5, enzyme_list=z_list)  # Get the enzyme before
+        z_a = utils.get_enzyme_after_position(position=z.position + 5, enzyme_list=z_list)  # Get the enzyme after z
         total_twist = z_b.twist + z.twist  # Total twist in the region.
         # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
         superhelical = total_twist / (params.w0 * (z_a.position - z_b.position))

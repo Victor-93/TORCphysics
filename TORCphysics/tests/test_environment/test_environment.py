@@ -161,7 +161,7 @@ class TestEnvironment(TestCase):
         csv_environment = EnvironmentFactory(filename=environment_file, site_list=site_list)
         self.assertEqual(len(csv_environment.get_environment_list()), 3)  # All loaded correctly
         self.assertEqual(csv_environment.environment_list[0].unbinding_model, None)  # Check specifics...
-        self.assertEqual(csv_environment.environment_list[1].unbinding_model.k_off, 0.001)
+        self.assertEqual(csv_environment.environment_list[1].unbinding_model.k_off, 0.01)
         self.assertEqual(csv_environment.environment_list[2].unbinding_model.k_off, 2.5)
 
     # Reads environment csv with an incorrect model name. It tests that the error is raised
@@ -208,7 +208,7 @@ class TestEnvironment(TestCase):
         manual_environment.environment_list.append(e_Name_oparams)
         manual_environment.environment_list.append(e_wrong)
         self.assertEqual(len(manual_environment.get_environment_list()), 4)
-        self.assertEqual(manual_environment.environment_list[0].unbinding_model.k_off, 0.001)
+        self.assertEqual(manual_environment.environment_list[0].unbinding_model.k_off, 0.01)
         self.assertEqual(manual_environment.environment_list[1].unbinding_model.k_off, 10.0)
         self.assertEqual(manual_environment.environment_list[2].unbinding_model.k_off, 10.0)
         self.assertEqual(manual_environment.environment_list[3].unbinding_model, None)

@@ -264,6 +264,7 @@ space = {
     'RNAP_dist': hp.uniform('RNAP_dist', RNAP_dist_min, RNAP_dist_max),
     'fold_change': hp.uniform('fold_change', fold_change_min, fold_change_max),
 
+    # RNAP params
     'spacer_kon': hp.uniform('spacer_kon', spacer_kon_min, spacer_kon_max),
 
     'k_closed': hp.uniform('k_closed', k_closed_min, k_closed_max),

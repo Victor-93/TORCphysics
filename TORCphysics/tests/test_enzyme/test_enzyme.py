@@ -110,7 +110,7 @@ class TestEnzyme(TestCase):
         csv_enzyme = EnzymeFactory(filename=enzyme_file, site_list=site_list1)
         self.assertEqual(len(csv_enzyme.get_enzyme_list()), 3)  # All loaded correctly
         self.assertEqual(csv_enzyme.enzyme_list[0].unbinding_model, None)  # Check specifics...
-        self.assertEqual(csv_enzyme.enzyme_list[1].unbinding_model.k_off, 0.001)
+        self.assertEqual(csv_enzyme.enzyme_list[1].unbinding_model.k_off, 0.01)
         self.assertEqual(csv_enzyme.enzyme_list[2].unbinding_model.k_off, 2.5)
 
     # Reads enzyme csv with an incorrect model name. It tests that the error is raised. This for effect model
@@ -155,7 +155,7 @@ class TestEnzyme(TestCase):
         manual_enzyme.enzyme_list.append(enzyme4)
 
         self.assertEqual(len(manual_enzyme.get_enzyme_list()), 4)
-        self.assertEqual(manual_enzyme.enzyme_list[0].unbinding_model.k_off, 0.001)
+        self.assertEqual(manual_enzyme.enzyme_list[0].unbinding_model.k_off, 0.01)
         self.assertEqual(manual_enzyme.enzyme_list[1].unbinding_model.k_off, 10.0)
         self.assertEqual(manual_enzyme.enzyme_list[2].unbinding_model.k_off, 10.0)
         self.assertEqual(manual_enzyme.enzyme_list[3].unbinding_model, None)

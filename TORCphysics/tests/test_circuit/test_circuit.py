@@ -333,7 +333,7 @@ class TestCircuit(TestCase):
         self.assertLessEqual(dsigma, error, "Superhelical changed")
         self.assertLessEqual(dtwist, error, "Twist changed")
 
-        # Test 2.2: Circular test with single enzyme.
+        # Test 2.2: Circular test with multiple enzyme.
         # ----------------------------------------------------------------------------
         print("Test 2.2.- Circular DNA with multiple enzyme")
 

@@ -426,7 +426,8 @@ def Marko_torque(sigma):
         torque = sigma * params.p_stiffness / params.w0
     else:
         print('Error in Marko_torque function')
-        sys.exit()
+        torque = 0.0
+        # sys.exit()
     return torque
 
 

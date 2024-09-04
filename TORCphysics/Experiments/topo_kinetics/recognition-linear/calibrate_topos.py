@@ -1,8 +1,10 @@
+import sys
+# sys.path.append("/nobackup/phyvve/") # For arc4
+# sys.path.append("/users/ph1vvb")  # For stanage
 import numpy as np
 from hyperopt import tpe, hp, fmin, Trials
 import pandas as pd
 from TORCphysics import topo_calibration_tools as tct
-import sys
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -15,14 +17,16 @@ import sys
 # ----------------------------------------------------------------------------------------------------------------------
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
-dt = 1.0  #0.25
+dt = 1.0
+#dt = 0.5
+#dt = 0.25
 initial_time = 0
 # Let's do it for 400s to add more weight to the curve and not the plateau
 final_time = 500  #500 # 600
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 #file_out = 'calibration'
-file_out = 'calibration2'  #It is called 2 this time
+file_out = 'calibration_dt' + str(dt)
 
 # For the simulation
 circuit_filename = '../circuit.csv'
@@ -55,8 +59,12 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 100#128  # 60 #48 #120
-tests = 4000 #1100  #400  # 10  # 100  # number of tests for parametrization
+# n_simulations = 12 # For testing
+# tests = 5 # For testing
+n_simulations = 100 # For stanage
+tests = 10000  # For calibrating - dt = 1.0
+#tests = 8000   # For calibrating - dt = 0.5
+#tests = 6000   # For calibrating - dt = 0.25
 
 # Models to calibrate to calibrate
 # -----------------------------------
@@ -81,7 +89,7 @@ gyrase_unbinding_model_name = 'PoissonUnBinding'
 # ~ 100 seconds; this for the whole circuit. - This for the small environment (realistic).
 # The true k_on of the whole circuit depends on the size of the plasmid, the size of the enzyme, and the concentration.
 k_on_min_topoI = 0.0000042 #0.001
-k_on_max_topoI = 0.00042 #0.1
+k_on_max_topoI = 4*0.00042 #0.1
 k_off_min_topoI = 0.01
 k_off_max_topoI = 1.0
 k_cat_min_topoI = 0.0  # Ranges to vary k_cat
@@ -95,7 +103,7 @@ threshold_max_topoI = 0.3  #0.05  #-0.001
 # For gyrase, the k_on of gyrase for the whole circuit is similar to the topoI, which goes from 1 bind every second
 # to 1 event every 100 seconds
 k_on_min_gyrase = 0.0000024#0.001
-k_on_max_gyrase = 0.00024#0.1
+k_on_max_gyrase = 4*0.00024#0.1
 k_off_min_gyrase = 0.01
 k_off_max_gyrase = 1.0
 k_cat_min_gyrase = 0.0  # Ranges to vary k_cat
@@ -375,7 +383,7 @@ for n in range(tests):
     #    params_df.append(new_row, ignore_index=True)
     params_df = pd.concat([params_df, new_row], ignore_index=True)
 
-params_df.to_csv('values.csv', index=False, sep=',')
+params_df.to_csv(file_out+'_values.csv', index=False, sep=',')
 
 # Let's save it for each enzyme
 topo_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold'])
@@ -384,7 +392,7 @@ topo_df['k_off'] = best_df['k_off_topoI']
 topo_df['k_cat'] = best_df['k_cat_topoI']
 topo_df['width'] = best_df['width_topoI']
 topo_df['threshold'] = best_df['threshold_topoI']
-topo_df.to_csv('calibration_topoI.csv', index=False, sep=',')
+topo_df.to_csv(file_out+'_topoI.csv', index=False, sep=',')
 
 gyrase_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold', 'sigma0'])
 gyrase_df['k_on'] = best_df['k_on_gyrase']
@@ -393,4 +401,4 @@ gyrase_df['k_cat'] = best_df['k_cat_gyrase']
 gyrase_df['width'] = best_df['width_gyrase']
 gyrase_df['threshold'] = best_df['threshold_gyrase']
 gyrase_df['sigma0'] = best_df['sigma0_gyrase']
-gyrase_df.to_csv('calibration_gyrase.csv', index=False, sep=',')
+gyrase_df.to_csv(file_out+'_gyrase.csv', index=False, sep=',')

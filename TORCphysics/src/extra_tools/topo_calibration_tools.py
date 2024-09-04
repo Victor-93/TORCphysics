@@ -239,6 +239,10 @@ def run_objective_function(global_dict_list, variations_list, exp_superhelicals,
         # Save average superhelical densities
         simulation_superhelicals.append(mea)
 
+        if variations_list[n][0]['name'] == 'gyrase':
+            a=2
+            b=a+3
+
         #print('system', n, 'simulation', simulation_number, 'my_objective', my_objective)
         my_objective = my_objective + current_objective
     return my_objective, simulation_superhelicals
@@ -1410,6 +1414,103 @@ def gene_architecture_calibration_nsets(big_global_list, big_variation_list, exp
         susceptibility = prod_rates / prod_rates[4]
 
         my_objective = np.sum((exp_curve['Signal'] - susceptibility) ** 2)  # This is the objective of the icase
+        objective += my_objective  # This is the total objective
+
+        # Prepare output - We will just add the distance
+        out_list = []  # output for the icase
+        for i, result in enumerate(results):
+            out_dict = {}
+            out_dict['distance'] = distances[i]
+            out_dict['result'] = result
+            #out_dict['objective'] = my_objective  # Save the objective of the current case
+            out_list.append(out_dict)
+        # output_list.append(out_list)
+        output_list.append({'objective': my_objective, 'data': out_list})
+
+    # Close pool
+    # --------------------------------------------------------------
+    pool.close()
+
+    return objective, output_list
+
+# Basically, it is the same as gene_architecture_calibration_nsets but uses the inferred rates instead of the
+# susceptibility (it is too noisy). This also comes with the advantage that we can calibrate the three promoters
+# independently.
+def gene_architecture_calibration_nsets_rates(big_global_list, big_variation_list, experimental_curves, parallel_info,
+                                              additional_results=False):
+    # Let's unpack the info
+    ncases = len(big_global_list)
+    n_sets = parallel_info['n_sets']
+    n_subsets = parallel_info['n_subsets']
+    n_inner_workers = parallel_info['n_inner_workers']
+    objective = 0  # Total objective function
+    output_list = []  # This list will be made out of a list of cases, each case is made of  a dict with
+    # objective and data keys. In data, it gives a list of dicts, each one containing the distance, and the results
+
+    # Go through list of cases
+    # --------------------------------------------------------------
+    # Create a multiprocessing pool for the outer loop
+    pool = MyPool(n_sets)  # I do it now so I don't have to open it for every case
+
+    # Go through each case
+    for icase in range(ncases):
+
+        global_list = big_global_list[icase]
+        variation_list = big_variation_list[icase]
+        exp_curve = experimental_curves[icase]
+
+        distances = exp_curve['distance']
+
+        # Prepare items for parallelization
+        # --------------------------------------------------------------
+        # We need a list of items, so the pool can pass each item to the function
+        # Even though all inner workers within the same n_set have the same global and variation conditions,
+        # We need each simulation to have their own ID (so they also have their own random seed)
+        s = 0
+        Item_set = []
+        processing_dict_list = []  # This dict will help us process the outputs
+        for j in range(len(distances)):
+            g_dict = global_list[j]
+            Item_subset = []
+            for n_subset in range(n_subsets):
+                Items = []
+                for n_inner_worker in range(n_inner_workers):
+                    g_dict['n_simulations'] = s  # This is the simulation number
+                    Item = {'global_conditions': g_dict.copy(), 'variations': variation_list.copy()}
+                    Items.append(Item)
+                    s += 1
+                Item_subset.append(Items)
+            Item_set.append(Item_subset)
+
+            # Sort the processing info
+            # --------------------------------------------------
+            my_circuit = load_circuit(g_dict)
+
+            # Get target site
+            target_gene = [site for site in my_circuit.site_list if site.name == 'reporter'][0]
+            RNAP_env = [environment for environment in my_circuit.environmental_list if environment.name == 'RNAP'][0]
+
+            # Define x-axes
+            x_system = get_interpolated_x(1, my_circuit.size)
+            x_gene = get_interpolated_x(target_gene.start - RNAP_env.size, target_gene.end)
+
+            p_dict = {'circuit': my_circuit, 'x_gene': x_gene, 'x_system': x_system, 'site_name': 'reporter',
+                      'additional_results': additional_results}
+            processing_dict_list.append(p_dict)
+
+        # Launch parellelization scheme
+        # --------------------------------------------------------------
+        Item_forpool = [(n_subsets, n_inner_workers, Item_set[j], processing_dict_list[j]) for j in
+                        range(len(distances))]
+
+        results = pool.map(
+            gene_architecture_run_pool, Item_forpool)
+
+        # Process and calculate objective
+        # --------------------------------------------------------------
+        prod_rates = [result['prod_rate'][0] for result in results]
+
+        my_objective = np.sum((exp_curve['Signal'] - prod_rates) ** 2)  # This is the objective of the icase
         objective += my_objective  # This is the total objective
 
         # Prepare output - We will just add the distance

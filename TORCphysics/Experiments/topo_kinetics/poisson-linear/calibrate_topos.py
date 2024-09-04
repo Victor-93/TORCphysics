@@ -1,8 +1,9 @@
+import sys
+#sys.path.append("/nobackup/phyvve/") # For arc4
 import numpy as np
 from hyperopt import tpe, hp, fmin, Trials
 import pandas as pd
 from TORCphysics import topo_calibration_tools as tct
-import sys
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -20,7 +21,7 @@ initial_time = 0
 final_time = 500 #600
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'calibration'
+file_out = 'calibration_' + str(dt)
 
 # For the simulation
 circuit_filename = '../circuit.csv'
@@ -354,7 +355,7 @@ for n in range(tests):
 #    params_df.append(new_row, ignore_index=True)
     params_df = pd.concat([params_df, new_row], ignore_index=True)
 
-params_df.to_csv('values.csv', index=False, sep=',')
+params_df.to_csv(file_out+'_values.csv', index=False, sep=',')
 
     #params_df = pd.concat([params_df, pd.DataFrame([new_row])], ignore_index=True)
 
@@ -366,7 +367,8 @@ topo_df['k_off'] = best_df['k_off_topoI']
 topo_df['k_cat'] = best_df['k_cat_topoI']
 # topo_df.loc[0] = [best_df['k_on_topoI'], best_df['k_off_topoI'], best_df['k_cat_topoI'],
 #                  best_df['width_topoI'], best_df['threshold_topoI']]
-topo_df.to_csv('calibration_topoI.csv', index=False, sep=',')
+#topo_df.to_csv('calibration_topoI.csv', index=False, sep=',')
+topo_df.to_csv(file_out+'_topoI.csv', index=False, sep=',')
 
 #gyrase_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'width', 'threshold', 'sigma0'])
 gyrase_df = pd.DataFrame(columns=['k_on', 'k_off', 'k_cat', 'sigma0'])
@@ -376,4 +378,5 @@ gyrase_df['k_cat'] = best_df['k_cat_gyrase']
 gyrase_df['sigma0'] = best_df['sigma0_gyrase']
 # gyrase_df.loc[0] = [best_df['k_on_gyrase'], best_df['k_off_gyrase'], best_df['k_cat_gyrase'],
 #                    best_df['width_gyrase'], best_df['threshold_gyrase'], best_df['sigma0_gyrase']]
-gyrase_df.to_csv('calibration_gyrase.csv', index=False, sep=',')
+#gyrase_df.to_csv('calibration_gyrase.csv', index=False, sep=',')
+gyrase_df.to_csv(file_out+'_gyrase.csv', index=False, sep=',')

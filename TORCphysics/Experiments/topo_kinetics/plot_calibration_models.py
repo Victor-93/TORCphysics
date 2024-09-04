@@ -18,7 +18,8 @@ initial_time = 0
 final_time = 500
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'calibration_small_dt1'
+file_out = 'calibration_small_dt'+str(dt)
+#file_out = 'calibration_small_dt1'
 
 # For the simulation
 circuit_filename = 'circuit.csv'
@@ -51,10 +52,12 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 96#48#24#96#10#84  # 60 #48 #120
+n_simulations = 12#96#48#24#96#10#84  # 60 #48 #120
 
 # params_file
-params_file = 'calibration_small_dt1.csv'
+#topo_params_file = 'calibration_dt'+str(dt)+'.csv'
+#recognition_params_file = 'calibration2.csv'
+recognition_params_file = 'calibration_dt'+str(dt)+'.csv'
 
 # Models to calibrate to calibrate
 # -----------------------------------
@@ -285,7 +288,8 @@ both_sigma_rx = sigma
 
 # Recognition binding
 #params_file = 'recognition-linear/calibration.csv'
-params_file = 'recognition-linear/calibration_small_dt1.csv'
+#params_file = 'recognition-linear/calibration_small_dt1.csv'
+params_file = 'recognition-linear/'+recognition_params_file
 params_dict = pd.read_csv(params_file).to_dict()
 rec_objective, rec_sim_superhelicals = objective_function(params=params_dict)
 
@@ -361,6 +365,6 @@ for n in range(4):
 
     ax.legend(loc='best', fontsize=font_size)
 
-plt.savefig(file_out + '.png')
-plt.savefig(file_out + '.pdf')
-#plt.show()
+#plt.savefig(file_out + '.png')
+#plt.savefig(file_out + '.pdf')
+plt.show()

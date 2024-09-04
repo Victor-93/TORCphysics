@@ -674,15 +674,16 @@ class Circuit:
                     # Check if this is how I can update a property in the enzymes - I think it does!
                     #                    enzyme_before.twist = new_twist_left
                     self.enzyme_list[0].twist = new_twist_left
-                    self.enzyme_list[self.get_num_enzymes() - 2].twist = new_twist_left
-                    # self.enzyme_list[-1].twist = new_twist_left
+                    # self.enzyme_list[self.get_num_enzymes() - 2].twist = new_twist_left  # Before update
+                    self.enzyme_list[-2].twist = new_twist_left # Should be same as the one up?
                     new_enzyme.twist = new_twist_right
 
+
                 # There is one EXT at the right
-                elif enzyme_before.name != 'EXT_L' and enzyme_before.name == 'EXT_R':
+                elif enzyme_before.name != 'EXT_L' and enzyme_after.name == 'EXT_R':
                     enzyme_before.twist = new_twist_left
-                    self.enzyme_list[0] = new_twist_right
-                    self.enzyme_list[-2] = new_twist_right
+                    self.enzyme_list[0].twist = new_twist_right
+                    # self.enzyme_list[-2] = new_twist_right
                     new_enzyme.twist = new_twist_right
 
                 # In any other case where there's no neighbour boundaries
@@ -1013,6 +1014,7 @@ class Circuit:
             if 'binding_model_name' in variation and variation['binding_model_name'] is not None:
                 my_object.binding_model = bm.assign_binding_model(model_name=variation['binding_model_name'],
                                                                   **variation['binding_oparams'])
+                my_object.binding_model_name = variation['binding_model_name']
                 my_object.binding_model_oparams = variation['binding_oparams']
 
                 # And Finally, if the object is an environmental that recognizes bare DNA,
@@ -1023,19 +1025,23 @@ class Circuit:
                             #if my_object.name in site.name and site.global_site == False:
                             site.binding_model = bm.assign_binding_model(model_name=variation['binding_model_name'],
                                                                          **variation['binding_oparams'])
+                            site.binding_model_name = variation['binding_model_name']
                             site.binding_model_oparams = variation['binding_oparams']
 
             # Effect Model
             if 'effect_model_name' in variation and variation['effect_model_name'] is not None:
                 my_object.effect_model = em.assign_effect_model(model_name=variation['effect_model_name'],
                                                                 **variation['effect_oparams'])
+                my_object.effect_model_name = variation['effect_model_name']
                 my_object.effect_model_oparams = variation['effect_oparams']
 
             # Unbinding Model
             if 'unbinding_model_name' in variation and variation['unbinding_model_name'] is not None:
                 my_object.unbinding_model = ubm.assign_unbinding_model(model_name=variation['unbinding_model_name'],
                                                                        **variation['unbinding_oparams'])
+                my_object.unbinding_model_name = variation['unbinding_model_name']
                 my_object.unbinding_model_oparams = variation['unbinding_oparams']
+
 
         # Sort list of enzymes and sites by position/start
         # self.sort_lists()
