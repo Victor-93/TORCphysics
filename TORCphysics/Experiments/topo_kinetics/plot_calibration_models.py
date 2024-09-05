@@ -52,7 +52,7 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 12#96#48#24#96#10#84  # 60 #48 #120
+n_simulations = 100#12#96#48#24#96#10#84  # 60 #48 #120
 
 # params_file
 #topo_params_file = 'calibration_dt'+str(dt)+'.csv'
@@ -365,6 +365,6 @@ for n in range(4):
 
     ax.legend(loc='best', fontsize=font_size)
 
-#plt.savefig(file_out + '.png')
-#plt.savefig(file_out + '.pdf')
+plt.savefig(file_out + '.png')
+plt.savefig(file_out + '.pdf')
 plt.show()

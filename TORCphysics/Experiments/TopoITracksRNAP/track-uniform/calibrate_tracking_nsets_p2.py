@@ -29,13 +29,19 @@ import pickle
 #       In total, the number of simulations launched is n_subset * n_sets * n_inner_workers
 # WARNING: It is very important that the number of n_workers is within the capabilities of your system.
 #          So choose carefully n_workers and n_sets
-n_workers = 64#12  # Total number of workers (cpus)
-n_sets = 7#3  # Number of outer sets
-n_subsets = 5#7#2  # Number of simulations per set
+#n_workers = 16 # Total number of workers (cpus) - For us testing in this machine
+n_workers = 64 # For stanage
+#n_sets = 1 #7  # Number of outer sets
+n_sets = 7 # - For stange
+n_subsets =   4   # Number of simulations per set - One KDE for each n_subset within the n_set
+                  # As it says upthere, there are in total n_subsets * n_sets number of KDEs per test
+                  # A number of n_inner_workers parallel simulations are launch to calculate each individual KDE.
 n_inner_workers = n_workers // (n_sets+1)  # Number of workers per inner pool
                                            # +1 because one worker is spent in creating the outer pool
-
-tests = 400  #60  # number of tests for parametrization
+                                           # I think this number of n_inner_workers is the number of parallel simulations
+                                           # ran that are used to calculate each individual KDE.
+#tests = 4 #400  # number of tests for parametrization
+tests = 2000 # - For stanage
 
 print('Doing parallelization process for:')
 print('n_workers', n_workers)
@@ -48,12 +54,14 @@ print('Total number of actual workers:', n_sets * (1 + n_inner_workers))
 
 # Simulation conditions
 # --------------------------------------------------------------
-file_out = 'calibration_RNAPTracking_nsets_p2_small_dt1'
-dt = 1.0#0.25
+dt = 1.0
+#dt = 0.5
+#dt = 0.25
 initial_time = 0
-final_time = 1000#500
+final_time = 1000
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
+file_out = 'calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)
 
 # Reference - It is the reference density of topos when there is no gene that we will use to calculate the
 #             fold enrichment.
@@ -64,11 +72,10 @@ reference_RNAP = '../RNAP_TU.txt'
 # Circuit initial conditions
 # --------------------------------------------------------------
 circuit_filename = '../circuit.csv'
-sites_filename = '../sites.csv'
+sites_filename = 'sites.csv'
 enzymes_filename = None  #'../enzymes.csv'
-environment_filename = 'environment.csv'
-environment_filename = 'environment_small.csv'
-output_prefix = 'topoIRNAPtrack-uniform'
+environment_filename = 'environment_dt'+str(dt)+'.csv'
+output_prefix = 'topoIRNAPtrack-StagesStall_dt'+str(dt)
 series = True
 continuation = False
 
@@ -80,8 +87,8 @@ continuation = False
 topoI_name = 'topoI'
 topoI_type = 'environmental'
 topoI_binding_model_name = 'TopoIRecognitionRNAPTracking'
-#topoI_params_csv = '../calibration_topoI.csv'  # These are parameters for the Recognition curve
-topoI_params_csv = '../calibration_topoI_small_dt1.csv'  # These are parameters for the Recognition curve
+topoI_params_csv = '../calibration_dt'+str(dt)+'_topoI.csv'
+
 
 
 # RANGES FOR RANDOM SEARCH
@@ -183,7 +190,7 @@ for name in target_dict['enzymes_names']:  # Reference topos
 
     # Load reference file
     if name != 'RNAP':
-        kde_ref = np.loadtxt(reference_path + 'reference_' + name + '.txt')
+        kde_ref = np.loadtxt(reference_path + 'reference_' + name + '_dt'+str(dt)+'.txt')
 
         # And get interpolated data - I do it here, so we don't have to do it again in the parallelization and save some
         # time. It is saved to the reference_dict by the way

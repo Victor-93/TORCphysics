@@ -263,10 +263,9 @@ def single_simulation_calibration_w_supercoiling(item):
     #my_circuit.sort_lists()
     # I commented out all of this on 04/09/2024 -----------------------------
 
-    #AQUIMEQUEDE: checa que gyrase lo loadit correcto
-    if variations_list[0]['name'] == 'gyrase':
-        a=2
-        b=2+a
+    #if variations_list[0]['name'] == 'gyrase':
+    #    a=2
+    #    b=2+a
 
     # Finally, run simulation
     supercoiling = my_circuit.run_return_global_supercoiling()

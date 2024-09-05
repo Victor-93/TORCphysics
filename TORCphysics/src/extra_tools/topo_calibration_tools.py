@@ -1092,8 +1092,8 @@ def load_circuit(global_dict):
 # for all cases.
 # my_circuit is the circuit, and name is the environmental name, e.g., topoI, gyrase, RNAP
 def calculate_number_nbins(my_circuit, name):
-    factor = .2
-    gene_factor = .5  #.4#.2#.35
+    factor = 0.25
+    gene_factor = 1#.5  #.4#.2#.35
     # Get environmental object
     my_environmental = [environmental for environmental in my_circuit.environmental_list if environmental.name == name][
         0]

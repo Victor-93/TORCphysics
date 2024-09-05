@@ -1,6 +1,5 @@
 type,name,site,position,size,effective_size,twist,superhelical,effect_model,effect_oparams,unbinding_model,unbinding_oparams
-EXT,EXT_L,EXT,-1219.0,0.0,0.0,-1994.8619029486688,-0.8913549178395311,,,,
-topo,topoI_stochastic,21,2521.0,120.0,100.0,73.87497409143054,0.2654934551034132,TopoIUniform,,PoissonUnBinding,
-NAP,ori_NAP,ori,3086.0,150.0,100.0,-779.1864182618076,-0.8709828666171072,,,,
-topo,topoI_stochastic,39,4681.0,120.0,100.0,-1994.8619029486688,-0.8913549178395311,TopoIUniform,,PoissonUnBinding,
-EXT,EXT_R,EXT,8521.0,0.0,0.0,0.0,-0.01,,,,
+EXT,EXT_L,EXT,-2814.0,0.0,0.0,-730.9394185837691,-0.39983388755070043,,,,
+topo,topoI_stochastic,2,241.0,120.0,100.0,-649.0268410853421,-0.39512066104172217,TopoIUniform,,PoissonUnBinding,
+NAP,ori_NAP,ori,3086.0,150.0,100.0,-730.9394185837691,-0.39983388755070043,,,,
+EXT,EXT_R,EXT,6241.0,0.0,0.0,0.0,-0.01,,,,

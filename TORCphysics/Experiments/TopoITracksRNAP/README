@@ -23,7 +23,8 @@ And finally, we plot the enrichment compared to the controlled case (with no tra
 
 Process
 -------------------------
-1.- In each directory run run_simulation.py . Make sure that all directories have same simulation conditions, e.g.,
+1.- In each directory run run_simulation.py . Make sure that all directories hav
+e same simulation conditions, e.g.,
     time-steps, frames, n_sims, topoisomerase concentrations.
 2.- Run plot_positions.py - It plots positions but it also extracts the densities and histograms.
     Make sure all these files have the same box sizes.

@@ -44,4 +44,5 @@ for i, name in enumerate(names):
     ax.set_ylim([0, np.max(y)*1.1])
 
 
-plt.savefig('densities_count.png')
+plt.show()
+#plt.savefig('densities_count.png')

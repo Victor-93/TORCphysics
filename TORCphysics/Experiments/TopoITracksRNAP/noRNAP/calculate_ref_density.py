@@ -17,9 +17,10 @@ from TORCphysics import topo_calibration_tools as tct
 
 # Simulation conditions - Even though we won't run the simulation again
 # --------------------------------------------------------------
-dt = 1.0 #0.25
+#dt = 1.0
+dt = 0.5
 initial_time = 0
-final_time = 1000 #2000#500 #1000
+final_time = 200 #2000#500 #1000 - doesn't matter much
 time = np.arange(initial_time, final_time + dt, dt)
 
 # Circuit initial conditions
@@ -27,7 +28,7 @@ time = np.arange(initial_time, final_time + dt, dt)
 circuit_filename = '../circuit.csv'
 sites_filename = None
 enzymes_filename = None
-environment_filename = 'environment_small.csv'
+environment_filename = 'environment_dt'+str(dt)+'.csv'
 output_prefix = 'noRNAP'
 frames = len(time)
 series = True
@@ -60,7 +61,7 @@ for p, name in enumerate(names):
     nbins = tct.calculate_number_nbins(my_circuit, name)
 
     # Load data
-    x = np.loadtxt('position_'+name+'.txt')
+    x = np.loadtxt('position_'+name+'_dt'+str(dt)+'.txt')
     x = x[~np.isnan(x)]  # Just in case to remove nans
 
     # Plot histogram
@@ -87,7 +88,7 @@ for p, name in enumerate(names):
     kde = np.column_stack((kde_x, kde_y))
 
     # Save the combined array to a text file
-    np.savetxt('reference_'+name+'.txt', kde)
+    np.savetxt('reference_'+name+'_dt'+str(dt)+'.txt', kde)
 
 plt.show()
 

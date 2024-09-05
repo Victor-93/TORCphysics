@@ -79,7 +79,8 @@ for p, name in enumerate(names):
     #ax.set_ylim(0,np.max(kde_y))
     #ax.set_xlim(0, 10000)
 
-plt.savefig(out+'.png')
-plt.savefig(out+'.pdf')
+plt.show()
+#plt.savefig(out+'.png')
+#plt.savefig(out+'.pdf')
 
 

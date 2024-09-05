@@ -11,33 +11,28 @@ import pickle
 # Following the calibration process by executing calibrate_tracking_nsets_p2.py for both the stalling and uniform
 # models, here I plot their results
 
-# Inputs
-# --------------------------------------------------------------
-#pickle_files = ['track-uniform/calibration_RNAPTracking_nsets_p2.pkl',
-#                'track-stalling/calibration_RNAPTracking_nsets_p2.pkl',
-#                'track-StagesStall/calibration_RNAPTracking_nsets_p2_small_dt1.pkl',]
-pickle_files = ['track-StagesStall/calibration_RNAPTracking_nsets_p2_small_dt1.pkl',
-                'track-StagesStall/calibration_RNAPTracking_nsets_p2_small_dt1.pkl']
-output_prefix = 'test-RNAPStages-topoIRNAPtracking'
-#title = ['Uniform model', 'Stall model']
-title = ['Extended','Extended' ]
-
-
 # Simulation conditions
 # --------------------------------------------------------------
-dt = 0.25
+dt = 1.0
 initial_time = 0
-final_time = 1000 # o 2000
+final_time = 200 # 500
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
+
+# Inputs
+# --------------------------------------------------------------
+
+pickle_files = ['track-uniform/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl',
+                'track-StagesStall/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl']
+output_prefix = 'test-RNAPStages-topoIRNAPtracking'
+title = ['Uniform model', 'Stall model']
 
 # Circuit initial conditions
 # --------------------------------------------------------------
 circuit_filename = 'circuit.csv'
 sites_filename = 'sites.csv'
 enzymes_filename = None
-#environment_filename = 'environment.csv'
-environment_filename = 'environment_small.csv'
+environment_filename = 'environment_dt'+str(dt)+'.csv'
 series = True
 continuation = False
 

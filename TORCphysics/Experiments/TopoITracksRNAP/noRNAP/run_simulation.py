@@ -4,16 +4,17 @@ import pandas as pd
 from TORCphysics import parallelization_tools as pt
 
 # Be sure to copy the topoisomerases csv files here!
-
 # Parallelization conditions
 # --------------------------------------------------------------
 n_simulations = 8#8#64#120 #60#48 #24#8 #96 # 120
 
 # Simulation conditions
 # --------------------------------------------------------------
-dt = 1.0 #0.25
+#dt = 1.0 #0.25
+dt = 0.5
+#dt = 0.25
 initial_time = 0
-final_time = 1000 #1000#2000#500
+final_time = 1000#500
 time = np.arange(initial_time, final_time + dt, dt)
 
 # Circuit initial conditions
@@ -21,14 +22,11 @@ time = np.arange(initial_time, final_time + dt, dt)
 circuit_filename = '../circuit.csv'
 sites_filename = None
 enzymes_filename = None
-# environment_filename = 'environment_test.csv'
-environment_filename = 'environment_small.csv'
+environment_filename = 'environment_dt'+str(dt)+'.csv'
 output_prefix = 'noRNAP'
 frames = len(time)
-#frames = 1000#5000 #50000
 series = True
 continuation = False
-#dt = 0.25 #1#0.5 #  0.25
 
 # Prepare parallelization
 # --------------------------------------------------------------
@@ -53,7 +51,7 @@ pool_results = pool.map(pt.single_simulation_return_dfs, Items)
 # --------------------------------------------------------------
 frame_values = list(range(frames+1))
 
-# Calculate the corresponding time values using dt
+# Calculate the corresponding time values using dtposition_output
 time_values = [dt * frame for frame in frame_values]
 
 # Create a DataFrame with 'frames' and 'time' columns
@@ -85,7 +83,7 @@ for name in enzymes_names:
         # simulation_df = pd.DataFrame({'simulation_'+str(n): position})
         # position_output_df = pd.concat([position_output_df, simulation_df], axis=1).reset_index(drop=True)
 
-    cout = 'position_' + name + '.txt'
+    cout = 'position_' + name + '_dt'+str(dt)+'.txt'
     np.savetxt(cout, pos_out)
 
 #    cout = 'position_' + name + '_df.csv'
