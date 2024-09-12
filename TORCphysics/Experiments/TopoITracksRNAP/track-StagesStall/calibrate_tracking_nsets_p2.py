@@ -7,6 +7,7 @@ from TORCphysics import topo_calibration_tools as tct
 from TORCphysics import Circuit, params
 import pickle
 
+# TODO: ESCRIBE k_cat y k_off en el output de topo
 # Description
 # --------------------------------------------------------------
 # Following same logic than calibrate_tracking_nsets, this script runs the calibration using the function:

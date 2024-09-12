@@ -18,7 +18,8 @@ from TORCphysics import topo_calibration_tools as tct
 # Simulation conditions - Even though we won't run the simulation again
 # --------------------------------------------------------------
 #dt = 1.0
-dt = 0.5
+#dt = 0.5
+dt = 0.25
 initial_time = 0
 final_time = 200 #2000#500 #1000 - doesn't matter much
 time = np.arange(initial_time, final_time + dt, dt)

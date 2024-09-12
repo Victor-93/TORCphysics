@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+# sys.path.append("/users/ph1vvb")
 from TORCphysics import topo_calibration_tools as tct
 from TORCphysics import params
 import pickle
@@ -19,9 +20,13 @@ import sys
 # Inputs/Initial conditions - At least the ones you need to change before each run
 # **********************************************************************************************************************
 
-#promoter_cases = ['weak']
+promoter_cases = ['weak']
 #promoter_cases = ['medium']
-promoter_cases = ['strong']
+#promoter_cases = ['strong']
+
+dt=0.5
+initial_time = 0
+final_time = 3000#5000  #30000 ~8.3hrs
 
 # Junier experimental data - we only need distances for now.for i, promoter_case in enumerate(promoter_cases):
 experimental_files = []
@@ -32,12 +37,10 @@ for pcase in promoter_cases:
     # Promoter responses
     promoter_responses_files.append('../../promoter_responses/' + pcase + '.csv')
 
-info_file = 'Stages-' + promoter_cases[0] + '_dt1'
+#info_file = 'Stages-' + promoter_cases[0] + '_dt1'
+info_file = 'Stages-' + promoter_cases[0] + '_dt' + str(dt)
 file_out = info_file
 
-dt = 1.0 #0.25
-initial_time = 0
-final_time = 2000#5000  #30000 ~8.3hrs
 
 # Parallelization conditions
 # --------------------------------------------------------------
@@ -46,12 +49,12 @@ final_time = 2000#5000  #30000 ~8.3hrs
 # So, n_sets = 6, n_subsets = 1 or 2, because if we have 64 workers and n_innerworkers = 9, then we'll have 9-18 simulations
 # per distance, which would be enough, right?
 
-n_workers = 12  #64  # Total number of workers (cpus)
-n_sets = 4  #4  # Number of outer sets
+n_workers = 12#64#12  #64  # Total number of workers (cpus)
+n_sets = 4#6#4  #4  # Number of outer sets
 n_inner_workers = n_workers // (n_sets + 1)  # Number of workers per inner pool
 n_subsets = 2 #1  #2  # Number of simulations per inner pool
 # +1 because one worker is spent in creating the outer pool
-tests = 10 # 100  # number of tests for parametrization
+tests = 2#10 #100  # number of tests for parametrization
 
 # Basically, you make 'tests' number of tests. Then, according to the number of distances (12), you create a number
 # 'n_sets' of groups (or sets) to distribute the work. If you make 6 sets, then each set runs 2 different systems (distances)
@@ -92,11 +95,13 @@ output_prefix = 'single_gene'  #Although we won't use it
 series = True
 continuation = False
 enzymes_filename = None
-environment_filename = 'environment_small.csv'
+environment_filename = 'environment_dt'+str(dt)+'.csv'
+RNAP_filename = '../../RNAP-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.csv'
 
 # Load the promoter response
 # -----------------------------------
 presponse = pd.read_csv(promoter_responses_files[0])
+RNAPresponse = pd.read_csv(RNAP_filename) # And RNAP
 
 # Models to calibrate
 # -----------------------------------
@@ -108,15 +113,15 @@ reporter_oparams = {'superhelical_op': -0.06, 'spacer': 17}  # Parameters for th
 # I believe that the three promoters (weak, medium & strong) have a spacer length of 17 nt.
 
 # RNAP
-k_ini = 0.2 # TODO: Modify this once you find out in the RNAPTrack parametrization
-gamma = 0.8 #  And this one as well
+#k_ini = 0.2 # TODO: Modify this once you find out in the RNAPTrack parametrization
+#gamma = 0.8 #  And this one as well
 RNAP_name = 'RNAP'
 RNAP_type = 'environmental'
 RNAP_effect_model_name = 'RNAPStagesStall'
 RNAP_unbinding_model_name = 'RNAPStagesSimpleUnbinding'
-RNAP_oparams = {'width': presponse['width'], 'threshold': presponse['threshold'], # This is related to the site...
+RNAP_oparams = {'width': presponse['width'].iloc[0], 'threshold': presponse['threshold'].iloc[0], # This is related to the site...
                 'velocity': params.v0, 'kappa': params.RNAP_kappa, 'stall_torque': params.stall_torque,
-                'gamma':gamma, 'k_ini':k_ini}
+                'gamma':RNAPresponse['gamma'].iloc[0], 'k_ini':RNAPresponse['k_ini'].iloc[0]}
 
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------

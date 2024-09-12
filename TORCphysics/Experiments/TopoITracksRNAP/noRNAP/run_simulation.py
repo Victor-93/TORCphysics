@@ -11,8 +11,8 @@ n_simulations = 8#8#64#120 #60#48 #24#8 #96 # 120
 # Simulation conditions
 # --------------------------------------------------------------
 #dt = 1.0 #0.25
-dt = 0.5
-#dt = 0.25
+#dt = 0.5
+dt = 0.25
 initial_time = 0
 final_time = 1000#500
 time = np.arange(initial_time, final_time + dt, dt)

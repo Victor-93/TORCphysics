@@ -417,15 +417,15 @@ def read_fasta(file_name):
 
 # Torque calculated using Marko's elasticity model
 def Marko_torque(sigma):
-    if np.abs(sigma) <= np.abs(params.sigma_s):
+    if abs(sigma) <= abs(params.sigma_s):
         torque = sigma * params.cs_energy / params.w0
     elif abs(params.sigma_s) < abs(sigma) < abs(params.sigma_p):
         torque = np.sqrt(
             2 * params.p_stiffness * params.g_energy / (1 - params.p_stiffness / params.cs_energy)) / params.w0_nm
-    elif abs(sigma) > abs(params.sigma_p):
+    elif abs(sigma) >= abs(params.sigma_p):
         torque = sigma * params.p_stiffness / params.w0
     else:
-        print('Error in Marko_torque function')
+        #print('Error in Marko_torque function')
         torque = 0.0
         # sys.exit()
     return torque

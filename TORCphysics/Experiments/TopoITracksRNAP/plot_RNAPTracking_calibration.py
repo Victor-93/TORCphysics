@@ -13,7 +13,7 @@ import pickle
 
 # Simulation conditions
 # --------------------------------------------------------------
-dt = 1.0
+dt = 0.5
 initial_time = 0
 final_time = 200 # 500
 time = np.arange(initial_time, final_time + dt, dt)
@@ -94,6 +94,7 @@ for n, pickle_file in enumerate(pickle_files):
     with open(pickle_file, 'rb') as file:
         output = pickle.load(file)
 
+
     for p, name in enumerate(names):
 
         ax = axs[n]
@@ -114,6 +115,7 @@ for n, pickle_file in enumerate(pickle_files):
             # ax.plot(x_system, output['results']['FE_curve'][name]['mean'], color=colors_dict[name], lw=lw, label=name)
         ax.plot(x, y, color=colors_dict[name], lw=lw, label=name)
         ax.fill_between(x, y-ys, y+ys, color=colors_dict[name], alpha=alpha)
+        print(pickle_file, name, np.mean(y))
 
     # Labels
     # ------------------------

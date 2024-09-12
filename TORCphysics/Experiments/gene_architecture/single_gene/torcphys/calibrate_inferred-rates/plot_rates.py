@@ -7,12 +7,14 @@ import pickle
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
 promoter_cases = ['weak', 'medium', 'strong']
+dt=0.5
 
 experimental_files = []
 calibration_files = []
 for pcase in promoter_cases:
     experimental_files.append('../../junier_data/inferred-rate_' + pcase + '.csv')
-    calibration_files.append('Stages-'+pcase+'_dt1.pkl')
+    #calibration_files.append('Stages-'+pcase+'_dt1.pkl')
+    calibration_files.append('Stages-'+pcase+'_dt'+str(dt)+'.pkl')
 
 # Plotting params
 #-----------------------------------------------------------------------------------------------------------------------
