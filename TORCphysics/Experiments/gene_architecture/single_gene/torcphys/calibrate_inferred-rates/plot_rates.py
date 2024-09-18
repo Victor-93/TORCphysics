@@ -7,7 +7,7 @@ import pickle
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
 promoter_cases = ['weak', 'medium', 'strong']
-dt=0.5
+dt=1.0#0.5
 
 experimental_files = []
 calibration_files = []
@@ -50,10 +50,10 @@ def get_prod_rates(results_list):
         #rates_array = np.array(case_re)
 
         # Calculate mean and standard deviation
-        mean = np.mean(rates_array)
-        std = np.std(rates_array)
-        #y[j] = mean
-        #ys[j] = std
+        mean = rates_array[0]
+        std = rates_array[1]
+        #mean = np.mean(rates_array)
+        #std = np.std(rates_array)
         y.append(mean)
         ys.append(std)
 
@@ -89,7 +89,9 @@ for i, rate_array in enumerate(rates):
     ys = rate_array[2]
 
     axs[i].plot(x, y, model_ls, lw=lw, color=colors[i])
+    axs[i].fill_between(x, y-ys, y+ys, lw=lw, color=colors[i], alpha=0.2)
     axs[3].plot(x, y, model_ls, lw=lw, color=colors[i])     # Last one
+    #axs[3].fill_between(x, y-ys, y+ys, lw=lw, color=colors[i], alpha=0.1)
 
     # Load experimental and plot
     exp = pd.read_csv(experimental_files[i]) # read

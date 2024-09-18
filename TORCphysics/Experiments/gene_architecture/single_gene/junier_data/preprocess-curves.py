@@ -35,7 +35,7 @@ factors = [weak_F, medium_F, strong_F]
 k_weak = 0.02#0.02 # 0.02 ~ 2 transcripts per 100s, or 1 transcript every 50seconds
 
 # Output parms
-out_prefix = 'inferred-rate_'
+out_prefix = 'inferred-rate_kw'+str(k_weak)+'_'
 
 # Plotting params
 width = 8

@@ -24,6 +24,8 @@ promoter_cases = ['weak']
 #promoter_cases = ['medium']
 #promoter_cases = ['strong']
 
+k_weak = 0.005 # This is the one inferred from the experiment
+
 dt=0.5
 initial_time = 0
 final_time = 3000#5000  #30000 ~8.3hrs
@@ -32,13 +34,14 @@ final_time = 3000#5000  #30000 ~8.3hrs
 experimental_files = []
 promoter_responses_files = []
 for pcase in promoter_cases:
-    experimental_files.append('../../junier_data/inferred-rate_' + pcase + '.csv')
+    experimental_files.append('../../junier_data/inferred-rate_kw' + str(k_weak) + '_'+ pcase + '.csv')
 
     # Promoter responses
     promoter_responses_files.append('../../promoter_responses/' + pcase + '.csv')
 
 #info_file = 'Stages-' + promoter_cases[0] + '_dt1'
-info_file = 'Stages-' + promoter_cases[0] + '_dt' + str(dt)
+info_file = 'Stages-' + promoter_cases[0] + '-kw' + str(k_weak) + '_dt' + str(dt)
+
 file_out = info_file
 
 

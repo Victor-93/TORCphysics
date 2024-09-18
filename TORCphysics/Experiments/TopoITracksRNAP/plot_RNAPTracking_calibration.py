@@ -13,7 +13,7 @@ import pickle
 
 # Simulation conditions
 # --------------------------------------------------------------
-dt = 0.5
+dt = 1.0 #0.5
 initial_time = 0
 final_time = 200 # 500
 time = np.arange(initial_time, final_time + dt, dt)
@@ -22,8 +22,11 @@ frames = len(time)
 # Inputs
 # --------------------------------------------------------------
 
-pickle_files = ['track-uniform/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl',
-                'track-StagesStall/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl']
+pickle_files = [
+    'track-uniform/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl',
+    #'track-uniform/calibration_RNAPTracking_nsets_p2_small_dt0.5.pkl',
+    'track-StagesStall/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
+]
 output_prefix = 'test-RNAPStages-topoIRNAPtracking'
 title = ['Uniform model', 'Stall model']
 

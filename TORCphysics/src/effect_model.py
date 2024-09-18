@@ -414,6 +414,139 @@ class RNAPStagesStall(EffectModel):
             raise ValueError('Error. Unknown state in RNAPStagesStall.')
 
 
+# It is like the previous one but I call it v2. I should update the one above, but I'm using it on other scripts atm.
+# Anyway, it doesn't hurt, I'll have to update it later or erase it since this is the improved version.
+# This function communicates with the site, and should load the params related with the site from the site model itself.
+class RNAPStagesStallv2(EffectModel):
+
+    # def __init__(self, name, filename):
+    def __init__(self, filename=None, continuum=False, **oparams):
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        self.state = 'Closed_complex' # Or Open_complex, or Elongation
+        # Closed complex <-> Open complex -> elongation
+        # We start in the closed complex state. It can transition to open complex with rate k_oc.
+        # It can reverse from open complex to closed with rate k_cc.
+        # Then, if in open complex state, it can initiate elongation with rate k_ini. Once the RNAP is in the
+        # elongation state, it won't transition to other state until it unbinds. It may stall though.
+        if not oparams:
+            if filename is None:
+                # Elongation params
+                self.velocity = params.v0  # Medium velocity
+                self.gamma = params.gamma
+                self.stall_torque = params.stall_torque
+                self.kappa = params.RNAP_kappa
+
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+
+                # Elongation
+                if 'velocity' in mydata.columns:
+                    self.velocity = mydata['velocity'][0]
+                else:
+                    raise ValueError('Error, velocity parameter missing in csv file for RNAPStagesStallv2')  # ', filename)
+                if 'gamma' in mydata.columns:
+                    self.gamma = mydata['gamma'][0]
+                else:
+                    raise ValueError('Error, gamma parameter missing in csv file for RNAPStagesStallv2')  #: ', filename)
+        else:
+
+            # Elongation
+            self.velocity = float(oparams['velocity'])
+            self.gamma = float(oparams['gamma'])
+            self.stall_torque = float(oparams['stall_torque'])
+            self.kappa = float(oparams['kappa'])
+
+        self.oparams = {'velocity': self.velocity, 'gamma': self.gamma,
+                        'kappa': self.kappa, 'stall_torque': self.stall_torque}
+
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+
+        # At the moment, the closed_complex and open complex do not form topological barriers, only at the
+        # elongation state the RNAP acts as a barrier.
+
+        # Everything 0 for now
+        position = 0.0
+
+        # Load params from site:
+        k_open = z.site.binding_model.k_open
+        k_closed = z.site.binding_model.k_closed
+        k_ini = z.site.binding_model.k_ini
+        width = z.site.binding_model.width
+        threshold = z.site.binding_model.threshold
+
+        # Closed complex
+        # -------------------------------------------------
+        # If we are in the closed_complex state, then it can either transition to the open complex state
+        # or unbind. But the unbinding_model is in charge of the unbinding condition. So here, we just test if
+        # it transitions to the open complex state.
+        # Superhelical density for openning the DNA. It is the superhelical density acting on the region
+        if self.state == 'Closed_complex':
+
+            # Get superhelical density in the region
+            superhelical_region, twist_region = utils.get_superhelical_in_region(z, z_list)
+            # Calculate the opening function U (it is not actually the energy because it is scaled with an effective
+            # energy)
+            U = utils.opening_function(superhelical_region, threshold, width)
+
+            rate = k_open * np.exp(-U)
+            probability =  utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+
+            # TODO: We have a rng problem! I define it outside this funciton, in the main code (circuit).
+            #  Maybe I should pass the rng to here as well, so we always use the same seed?
+            # Generate a random number between 0 and 1 to help us decide if it'll form the open complex
+            random_number = random.random()
+            if random_number <= probability:
+                self.state = 'Open_complex'  # TRANSITIONS TO OPEN COMPLEX!
+
+            # Finally, calculate change in twist givenn the fact that it doesn't form a barrier
+            twist_left, twist_right = instant_twist_transfer(z, z_list)
+
+            return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+        # Open complex
+        # -------------------------------------------------
+        # Posibilities, it either transitions to closed complex, stays as an open complex or transitions to elongation.
+        if self.state == 'Open_complex':
+
+            # z.name = 'RNAP_' + self.state
+
+            # Calculate probabilities as Poisson processes
+            p_closed = utils.Poisson_process(k_closed, dt) # probability of forming closed complex
+            p_init = utils.Poisson_process(k_ini, dt)  # probability of elongation initiation
+            # p_open = 1 - (p_closed + p_init)  # Probability of staying as open complex
+
+            if p_closed + p_init >= 1.0:  # Check that probabilities make sense
+                raise ValueError('Error. p_closed + p_init should be less than 1 in RNAPStagesStall.')
+
+            # Generate a random number between 0 and 1 to help us decide if it'll transition or not
+            random_number = random.random()
+            if random_number < p_closed:
+                self.state = 'Closed_complex'  # TRANSITIONS TO CLOSED COMPLEX
+            elif p_closed <= random_number < p_closed + p_init:
+                self.state = 'Elongation'
+            # Else, do nothing... it stays as an open complex
+
+            # And calculate change in twist given the fact that it doesn't form a barrier
+            twist_left, twist_right = instant_twist_transfer(z, z_list)
+
+            return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+        # Elongation
+        # -------------------------------------------------
+        if self.state == 'Elongation':
+
+            # z.name = 'RNAP_' + self.state
+
+            # Elongation
+            position, twist_left, twist_right = utils.RNAP_stall_mec_model(z, z_list, dt)
+            return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+        if self.state not in ['Closed_complex', 'Open_complex', 'Elongation']:
+            raise ValueError('Error. Unknown state in RNAPStagesStallv2.')
+
+
 # TODO: Document the RNAPStall model. It is a model with velocity but no torques.
 # TODO: Test this function
 class RNAPStall(EffectModel):
@@ -1218,6 +1351,228 @@ class GyraseContinuum(EffectModel):
         twist_right = utils.calculate_twist_from_sigma(z, z_n, supercoiling_removed)
         return Effect(index=index, position=0.0, twist_left=0.0, twist_right=twist_right)
 
+# TODO: Document and test
+class LacIPoissonBridging(EffectModel):
+
+    def __init__(self, filename=None, continuum=False, **oparams):
+
+        super().__init__(filename, continuum, **oparams)  # name  # Call the base class constructor
+
+        self.state = 'UNLOOPED'  # State of the bridge. OFF = No Bridge, ON = Bridge
+        self.bound_with = None  # This is the enzyme that the bridge is bound with
+
+        if not oparams:
+            if filename is None:
+
+                self.k_bridge_on = 0.02  # Rate at which bridge forms
+                self.k_bridge_off = 0.001  # Rate at which bridge separates
+                self.leakege = 0.01  # Percentage of twist injected (when not bridged)
+
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+
+                if 'k_bridge_on' in mydata.columns:
+                    self.k_bridge_on = mydata['k_bridge_on'][0]
+                else:
+                    raise ValueError('Error, k_bridge_on parameter missing in csv file for LacIPoissonBridging')
+                if 'k_bridge_off' in mydata.columns:
+                    self.k_bridge_off = mydata['k_bridge_off'][0]
+                else:
+                    raise ValueError('Error, k_bridge_off parameter missing in csv file for LacIPoissonBridging')
+                if 'leakage' in mydata.columns:
+                    self.leakege = mydata['leakage'][0]
+                else:
+                    raise ValueError('Error, leakage parameter missing in csv file for LacIPoissonBridging')
+
+        else:
+            self.k_bridge_on = float(oparams['k_bridge_on'])
+            self.k_bridge_off = float(oparams['k_bridge_off'])
+            self.leakage = float(oparams['leakage'])
+
+
+        self.oparams = {'k_bridge_on': self.k_bridge_on, 'k_bridge_off': self.k_bridge_off,
+                        'leakage': self.leakage}
+
+    def calculate_effect(self, index, z, z_list, dt) -> Effect:
+
+        # TODO: We have to find a way to avoid doing the same bridge calculation for the two enzymes that
+        #  form the bridge - IDEA JUSTUNLOOPED => UNLOOPED AND SKIP EVERYTHING
+        #  JUSTLOOPED -> LOOPED
+
+        # Everything 0 for now.
+        position = 0.0
+
+        rng = np.random.default_rng(random.randrange(sys.maxsize))
+
+        # Bridge is formed
+        # -----------------------------------------------------------------
+        if self.state == 'LOOPED':
+
+            # Let's calculate the probability of breaking the bridge
+            # -----------------------------------------------------------------
+            undo_bridge = self.bridge_break(z=z, z_list=z_list, dt=dt, rng=rng)
+
+            # And let's see what will happen to the bridge
+            # -----------------------------------------------------------------
+            # If it the bridge will undo, then update the state and twist leaks.
+            if undo_bridge:
+                twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
+                return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+            # If the bridge remains, then nothing happens and not twist leaks.
+            else:
+                twist_left = 0.0
+                twist_right = 0.0
+                return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+        # If the bridge was formed in the current time-step due to the other protein effect model
+        # -----------------------------------------------------------------
+        if self.state == 'JUST_LOOPED':
+            twist_left = 0.0
+            twist_right = 0.0
+            return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+        # If the bridge was broken in the current time-step due to the other protein effect model
+        # -----------------------------------------------------------------
+        if self.state == 'JUST_UNLOOPED':
+            twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
+            return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+        # If bridge is not formed
+        # -----------------------------------------------------------------
+        if self.state == 'UNLOOPED':
+
+            # Let's calculate the probability of forming the bridge
+            # -----------------------------------------------------------------
+            do_bridge = self.bridge_formation(z, z_list, dt, rng)  # This function also updates the state!
+
+            # And let's see what will happen to the bridge
+            # -----------------------------------------------------------------
+            # If it the bridge will be formed, no twist leaks. The state was already updated previously
+            if do_bridge:
+                twist_left = 0.0
+                twist_right = 0.0
+                return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+            # If the bridge does not form, then the state is not updated and twist leaks.
+            else:
+                twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
+                return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+        if self.state not in ['LOOPED', 'JUST_LOOPED', 'UNLOOPED', 'JUST_UNLOOPED']:
+            raise ValueError('Error. Unknown state in LacIPoissonBridging.')
+
+    def bridge_formation(self, z, z_list, dt, rng):
+
+        # Here, we assume that the bridge is not formed, and we calculate the probability of forming it.
+
+        # First, let's see if there are enzymes of the same type on the enzyme list z_list.
+        # -----------------------------------------------------------------
+        other_e = [enzyme for enzyme in z_list if enzyme.enzyme_type == z.enzyme_type and enzyme.position != z.position]
+
+        # If there aren't other lacI bound, then don't do anything.
+        if len(other_e) == 0:
+            do_bridge = False
+            return do_bridge
+
+        # If there are other lacI's or candidates for bridging, then let's calculate the probability of
+        # forming the bridge
+        # -----------------------------------------------------------------
+        probability = utils.Poisson_process(rate=self.k_bridge_on, dt=dt)
+
+        urandom = rng.uniform()  # we need a random number
+
+        if urandom <= probability:  # and decide if the bridge will form
+            do_bridge = True
+        else:
+            do_bridge = False
+
+        # If the bridge will be formed, select one of the other candidate enzymes other_e to form the bridge
+        # and update the state
+        if do_bridge:
+            # Pick a candidate enzyme with uniform distribution
+            random_enzyme = random.choice(other_e)
+
+            # Link and update
+            self.bound_with = random_enzyme
+            self.state = 'LOOPED'
+            # Let's cheat a bit so we can plot the animation and be able to see the site
+            # TODO: I think this function is still a bit wrong as sometimes it gives me a double bridge...
+            z.name = 'lacI_bridge'
+
+            # Then for the other enzyme
+            random_enzyme.effect_model.bound_width = z
+            random_enzyme.name = 'lacI_bridge'
+            if z.position < random_enzyme.position:  # This helps us to avoid doing calculations twice and
+                                                     # introducing additional probabilities.
+                                                     # It depends on the position because effect models are iterated
+                                                     # by position, so the one further away will repeat it.
+                random_enzyme.effect_model.state = 'JUST_LOOPED'
+            else:
+                random_enzyme.effect_model.state = 'LOOPED'
+
+        return do_bridge
+
+    def bridge_break(self, z, z_list, dt, rng):
+
+        # Here, we assume that the bridge is formed, and we calculate the probability of breaking it.
+
+        # Let's calculate the probability of breaking the bridge
+        # -----------------------------------------------------------------
+        probability = utils.Poisson_process(rate=self.k_bridge_off, dt=dt)
+
+        urandom = rng.uniform()  # we need a random number
+
+        if urandom <= probability:  # and decide if the bridge will disappear
+            undo_bridge = True
+        else:
+            undo_bridge = False
+
+        # If the bridge breaks, then update the state
+        # -----------------------------------------------------------------
+        if undo_bridge:
+            # First for the linked enzyme; lets unliked it to this one
+            self.bound_with.effect_model.bound_width = None
+            self.bound_with.name = 'lacI'
+            if z.position < self.bound_with.position:  # This helps us to avoid doing calculations twice and
+                                                       # introducing additional probabilities.
+                                                       # It depends on the position because effect models are iterated
+                                                       # by position, so the one further away will repeat it.
+                self.bound_with.effect_model.state = 'JUST_UNLOOPED'
+            else:
+                self.bound_with.effect_model.state = 'UNLOOPED'
+
+            # Then unlink and update our enzyme
+            self.bound_with = None
+            self.state = 'UNLOOPED'
+            z.name = 'lacI'
+
+
+        return undo_bridge
+
+    def leak_twist(self, z, z_list, dt):
+
+        # get enzyme on the left of z
+        # z_left = utils.get_enzyme_before_position(position=z.position, enzyme_list=z_list)
+        # For some reason it fails.... and I have to do the -d. I'll have to check this in the future.
+        # If I don't do this, it gives me the incorrect enzyme (it actually gives me the same...)
+        d = 0.002
+        z_left = [enzyme for enzyme in z_list if enzyme.position <= z.position - d][-1]
+
+        # If the superhelical density on the left is higher than the one on the right, then share a bit...
+        if abs(z_left.superhelical) > abs(z.superhelical):
+            twist_left = -z_left.twist * self.leakage * dt
+            twist_right = -twist_left
+        elif abs(z_left.superhelical) < abs(z.superhelical):
+            twist_right = -z.twist * self.leakage * dt
+            twist_left = -twist_right
+        # Or if something else happens, don't do anything
+        else:
+            twist_right = 0.0
+            twist_left = 0.0
+
+        return twist_left, twist_right
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # UTILITY FUNCTIONS
@@ -1338,6 +1693,8 @@ def assign_effect_model(model_name, oparams_file=None, **oparams):
         my_model = RNAPUniform(filename=oparams_file, **oparams)
     elif model_name == 'RNAPStagesStall':
         my_model = RNAPStagesStall(filename=oparams_file, **oparams)
+    elif model_name == 'RNAPStagesStallv2':
+        my_model = RNAPStagesStallv2(filename=oparams_file, **oparams)
     elif model_name == 'RNAPStall':
         my_model = RNAPStall(filename=oparams_file, **oparams)
     elif model_name == 'TopoIUniform':
@@ -1358,6 +1715,8 @@ def assign_effect_model(model_name, oparams_file=None, **oparams):
         my_model = TopoIContinuum(filename=oparams_file, **oparams)
     elif model_name == 'GyraseContinuum':
         my_model = GyraseContinuum(filename=oparams_file, **oparams)
+    elif model_name == 'LacIPoissonBridging':
+        my_model = LacIPoissonBridging(filename=oparams_file, **oparams)
     else:
         raise ValueError('Could not recognise effect model ' + model_name)
     return my_model

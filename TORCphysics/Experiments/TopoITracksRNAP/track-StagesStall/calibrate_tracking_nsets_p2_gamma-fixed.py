@@ -27,10 +27,10 @@ import pickle
 #       In total, the number of simulations launched is n_subset * n_sets * n_inner_workers
 # WARNING: It is very important that the number of n_workers is within the capabilities of your system.
 #          So choose carefully n_workers and n_sets
-#n_workers = 16 # Total number of workers (cpus) - For us testing in this machine
-n_workers = 64 # For stanage
-#n_sets = 1 #7  # Number of outer sets
-n_sets = 7 # - For stange
+n_workers = 16 # Total number of workers (cpus) - For us testing in this machine
+#n_workers = 64 # For stanage
+n_sets = 1 #7  # Number of outer sets
+#n_sets = 7 # - For stange
 n_subsets = 4   # Number of simulations per set - One KDE for each n_subset within the n_set
                   # As it says upthere, there are in total n_subsets * n_sets number of KDEs per test
                   # A number of n_inner_workers parallel simulations are launch to calculate each individual KDE.
@@ -38,8 +38,8 @@ n_inner_workers = n_workers // (n_sets+1)  # Number of workers per inner pool
                                            # +1 because one worker is spent in creating the outer pool
                                            # I think this number of n_inner_workers is the number of parallel simulations
                                            # ran that are used to calculate each individual KDE.
-#tests = 4 #400  # number of tests for parametrization
-tests = 2000 # - For stanage
+tests = 4 #400  # number of tests for parametrization
+#tests = 2000 # - For stanage
 
 print('Doing parallelization process for:')
 print('n_workers', n_workers)
@@ -53,13 +53,12 @@ print('Total number of actual workers:', n_sets * (1 + n_inner_workers))
 # Simulation conditions
 # --------------------------------------------------------------
 dt = 1.0
-#dt = 0.5
-#dt = 0.25
+gamma=0.25
 initial_time = 0
 final_time = 1000
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)
+file_out = 'calibration_RNAPTracking_nsets_p2_small_g'+str(gamma)+'_dt'+str(dt)
 
 # Reference - It is the reference density of topos when there is no gene that we will use to calculate the
 #             fold enrichment.
@@ -122,8 +121,8 @@ k_open_min = 0.01
 k_open_max = 0.5
 k_ini_min = 0.05
 k_ini_max = 0.5
-gamma_min = 0.01
-gamma_max = 1.0
+# gamma_min = 0.01
+# gamma_max = 1.0
 k_off_min = 0.01
 k_off_max = 0.5
 
@@ -192,7 +191,7 @@ def objective_function(params, calibrating=True):
     effect_oparams = { 'k_closed':params['k_closed'], 'k_open':params['k_open'],
                        'width': RNAP_oparams['width'], 'threshold': RNAP_oparams['threshold'],
                        'k_ini': params['k_ini'],
-                       'velocity': RNAP_oparams['velocity'], 'gamma': params['gamma'],
+                       'velocity': RNAP_oparams['velocity'], 'gamma': gamma,
                        'stall_torque': RNAP_oparams['stall_torque'], 'kappa': RNAP_oparams['kappa']}
     unbinding_model_name = RNAP_unbinding_model_name
     unbinding_oparams = {'k_off': params['k_off']}
@@ -278,7 +277,7 @@ space = {
     'k_closed': hp.uniform('k_closed', k_closed_min, k_closed_max),
     'k_open': hp.uniform('k_open', k_open_min, k_open_max),
     'k_ini': hp.uniform('k_ini', k_ini_min, k_ini_max),
-    'gamma': hp.uniform('gamma', gamma_min, gamma_max),
+#    'gamma': hp.uniform('gamma', gamma_min, gamma_max),
 
     'k_off': hp.uniform('k_off', k_off_min, k_off_max)
 }
@@ -362,7 +361,7 @@ complete_df['k_open'] = best_df['k_open']
 complete_df['width'] = RNAP_oparams['width']
 complete_df['threshold'] = RNAP_oparams['threshold']
 complete_df['k_ini'] = best_df['k_ini']
-complete_df['gamma'] = best_df['gamma']
+complete_df['gamma'] = gamma
 complete_df['kappa'] = RNAP_oparams['kappa']
 complete_df['velocity'] = RNAP_oparams['velocity']
 complete_df['stall_torque'] = RNAP_oparams['stall_torque']
@@ -400,7 +399,7 @@ for n in range(tests):
         'test': n, 'loss': lo,
         'k_on': va['spacer_kon'], 'superhelical_op': spacer_oparams['superhelical_op'], 'spacer': spacer_oparams['spacer'],
         'k_closed': va['k_closed'], 'k_open': va['k_open'], 'width': RNAP_oparams['width'], 'threshold': RNAP_oparams['threshold'],
-        'k_ini': va['k_ini'], 'gamma': va['gamma'], 'kappa': RNAP_oparams['kappa'], 'velocity': RNAP_oparams['velocity'],
+        'k_ini': va['k_ini'], 'gamma': gamma, 'kappa': RNAP_oparams['kappa'], 'velocity': RNAP_oparams['velocity'],
         'stall_torque': RNAP_oparams['stall_torque'], 'k_off': va['k_off']
     })
 

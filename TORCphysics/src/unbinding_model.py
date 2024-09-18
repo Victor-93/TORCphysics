@@ -254,6 +254,109 @@ class RNAPStagesSimpleUnbinding(UnBindingModel):
 
         return probability
 
+# This one should replace the one above. It is essentially the same model/function, but it communicates with the
+# site to get the k_off.
+class RNAPStagesSimpleUnbindingv2(UnBindingModel):
+    """
+     An UnbindingModel subclass that calculates unbinding probabilities of a RNAP bound to the DNA.
+     There are two possible scenarios in this model in which unbinding can happen.
+     1. If the enzyme is in the Closed_complex state, then it can spontaniusly unbind the DNA according a Poisson
+     process.
+     2. If the enzyme is transcribing the DNA and reaches the end of the transcribing region, it will immediately
+     unbind the DNA.
+
+     Attributes
+     ----------
+     filename : str, optional
+         Path to the site csv file that parametrises the unbinding model.
+     oparams : dict, optional
+         A dictionary containing the parameters used for the unbinding model.
+    """
+
+    def __init__(self, filename=None, **oparams):
+        """ The constructor of the PoissonUnBinding subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the unbinding model; for this model, there's nothing useful in
+            a file.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the unbinding model. In this case, it is not required
+        """
+        super().__init__(filename, **oparams)  # Call the base class constructor
+
+        # It doesn't have any related parameters on its own
+
+
+    #    def unbinding_probability(self, off_rate, dt) -> float:
+    def unbinding_probability(self, enzyme, dt) -> float:
+        """ Method for calculating the probability of unbinding according a Poisson Process.
+
+        Parameters
+        ----------
+        enzyme : Enzyme
+            The enzyme that is currently transcribing the DNA and its site.
+        dt : float
+            Timestep in seconds (s).
+
+        Returns
+        ----------
+        probability : float
+            A number that indicates the probability of unbinding in the current timestep.
+        """
+
+        probability = 0.0  # It will not unbind unless fulfils the condition
+        k_off = enzyme.site.binding_model.k_off
+
+        # If in the closed complex state, it can spontaneously unbind
+        if enzyme.effect_model.state == 'Closed_complex':
+            probability = utils.Poisson_process(k_off, dt)
+
+        # If it is in the elongation state (transcribing), it'll only unbind if it reaches the terminator/end.
+        if enzyme.effect_model.state == 'Elongation':
+
+            if enzyme.direction != 1 and enzyme.direction != -1:
+                raise ValueError('Error. Enzyme with invalid direction in RNAPStagesSimpleUnbinding.')
+
+            # condition for transcription in >>>>>>>>>>>>> right direction or
+            # condition for transcription in <<<<<<<<<<<<< left  direction
+            if (enzyme.direction == 1 and enzyme.end - enzyme.position <= 0) or \
+                    (enzyme.direction == -1 and enzyme.end - enzyme.position >= 0):
+                probability = 1.0  # There's no way it won't unbind with this
+
+        return probability
+
+# TODO: Document and test
+class LacISimpleUnBinding(UnBindingModel):
+
+    def __init__(self, filename=None, **oparams):
+
+        super().__init__(filename, **oparams)  # Call the base class constructor
+        if not oparams:
+            if filename is None:
+                self.k_off = 0.01  # Rate at which enzymes unbind
+            else:
+                mydata = pd.read_csv(filename)
+                if 'k_off' in mydata.columns:
+                    self.k_off = mydata['k_off'][0]
+                else:
+                    raise ValueError('Error, k_off parameter missing in csv file for LacISimpleUnBinding.')
+        else:
+            self.k_off = oparams['k_off']
+
+        self.oparams = {'k_off': self.k_off}  # Just in case
+
+    def unbinding_probability(self, enzyme, dt) -> float:
+
+        # If the bridge is formed, then it can't unbind
+        if enzyme.effect_model.state == 'UNLOOPED' :   #NOT JUST_UNLOOPED, because we remain with one
+            probability = utils.Poisson_process(self.k_off, dt)
+        # If the bridge isn't formed, then it can unbind
+        else:
+            probability = 0.0
+        return probability
+
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -374,6 +477,10 @@ def assign_unbinding_model(model_name, oparams_file=None, **oparams):
         my_model = RNAPSimpleUnbinding(filename=oparams_file, **oparams)
     elif model_name == 'RNAPStagesSimpleUnbinding':
         my_model = RNAPStagesSimpleUnbinding(filename=oparams_file, **oparams)
+    elif model_name == 'RNAPStagesSimpleUnbindingv2':
+        my_model = RNAPStagesSimpleUnbindingv2(filename=oparams_file, **oparams)
+    elif model_name == 'LacISimpleUnBinding':
+        my_model = LacISimpleUnBinding(filename=oparams_file, **oparams)
     else:
         raise ValueError('Could not recognise unbinding model ' + model_name)
     return my_model

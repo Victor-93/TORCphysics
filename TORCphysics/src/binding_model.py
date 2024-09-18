@@ -448,6 +448,216 @@ class SpacerBinding(BindingModel):
         return rate
 
 
+# Model based on spacer length (geometric modulation)
+class SpacerStagesBinding(BindingModel):
+    """
+     A BindingModel subclass that calculates binding probabilities according a geometric modulation of the spacer length.
+     The idea is that there is an optimal alignment that reduces the free energy required for binding.
+     Once enzymes bind, they form a closed_complex, and can transition to the open complex and elongation stages.
+     While this particular function is not in charge of calculating the probabilities to transition, it is compatible
+     with effect models that can extract this information from this site's binding model.
+
+     In general, this is the workflow between stages:
+     Closed complex <-> Open complex -> elongation
+
+
+     Attributes
+     ----------
+     k_on : float
+        Basal rate (1/s) at which the RNAP binds. It is assumed to be measured at the optimal superhelical density
+        superhelical_op. The geometric free energy G at this superhelical level, is asssumed to be virtually 0,
+        and k_on is the rate of binding at that superhelical level. This k_on parameter is assumed to capture the
+        free energy component related to sequence effects at the time of binding and forming the closed complex.
+     spacer : float
+        Spacer length (dimensionless).
+     superhelical_op : float
+        Optimal superhelical density (dimensionless). At this level, it is easier to bind (less energy required).
+        At his level, the RNAP do not require energy to deform the DNA into the optimal orientation.
+     scaling_factor : float
+        Scaling factor (dimensionless). It is used to scale the geometric energy G, and helps limit the rate at hyper
+        superhelical values.
+     twist_op : float
+        Optimal twist angle (deg). It is the optimal angle that the spacer can be untwisted.
+     k_closed: float
+        Reversed rate from open complex to closed complex (1/s).
+     k_open: float
+        Foward rate at which the open complex is formed.
+     k_ini: float
+        Forward rate from open complex to comence elongation (1/s).
+     k_off: float
+        Reverse rate from closed complex to unbind the DNA (1/s).
+     threshold : float
+        The threshold of the sigmoid curve. This is a dimensionless parameter.
+     width : float
+        The width of the sigmoid curve. This is a dimensionless parameter.
+     filename : str, optional
+        Path to the site csv file that parametrises the binding model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the binding model.
+    """
+
+    def __init__(self, filename=None, interacts=False, **oparams):
+
+        super().__init__(filename, **oparams)
+        self.scaling_factor = 0.0 # For now, it will be corrected later
+        if not oparams:
+            if filename is None:
+
+                # Binding related params witht he spacer length modulation
+                self.k_on = 0.05 # 0.05~ 20secs, let's assume that it is fast
+                self.spacer = 17
+                self.superhelical_op = -0.06 #optimal superhelical density for binding
+
+                # Closed complex
+                self.k_closed = 0.02  # 0.01~100secs Goes from open complex to closed complex
+
+                # Open complex
+                self.k_open = 0.05  # Goes from closed complex to opean complex
+                self.width = .003   # Width and threshold give the shape to the melting energy
+                self.threshold = -.04
+
+                # Initiation (start of elongation)
+                self.k_ini = 0.1
+
+                # Unbinding from closed_complex
+                self.k_off = 0.03
+
+            else:
+                mydata = pd.read_csv(filename)
+                # Spacer
+                if 'k_on' in mydata.columns:
+                    self.k_on = mydata['k_on'][0]
+                else:
+                    raise ValueError('Error, k_on parameter missing in csv file for SpacerStagesBinding Model')
+                if 'spacer' in mydata.columns:
+                    self.n = mydata['spacer'][0]
+                else:
+                    raise ValueError('Error, spacer parameter missing in csv file for SpacerStagesBinding Model')
+                if 'superhelical_op' in mydata.columns:
+                    self.superhelical_op = mydata['superhelical_op'][0]
+                else:
+                    raise ValueError('Error, superhelical_op parameter missing in csv file for SpacerStagesBinding Model')
+
+                # Closed complex
+                if 'k_closed' in mydata.columns:
+                    self.k_closed = mydata['k_closed'][0]
+                else:
+                    raise ValueError('Error, k_closed parameter missing in csv file for SpacerStagesBinding')
+
+                # Open complex
+                if 'k_open' in mydata.columns:
+                    self.k_open = mydata['k_open'][0]
+                else:
+                    raise ValueError('Error, k_open parameter missing in csv file for SpacerStagesBinding')
+                if 'width' in mydata.columns:
+                    self.width = mydata['width'][0]
+                else:
+                    raise ValueError('Error, width parameter missing in csv file for SpacerStagesBinding')
+                if 'threshold' in mydata.columns:
+                    self.threshold = mydata['threshold'][0]
+                else:
+                    raise ValueError('Error, threshold parameter missing in csv file for SpacerStagesBinding')
+
+                # Initiation
+                if 'k_ini' in mydata.columns:
+                    self.k_ini = mydata['k_ini'][0]
+                else:
+                    raise ValueError('Error, k_ini parameter missing in csv file for SpacerStagesBinding')
+
+                # Unbinding
+                if 'k_off' in mydata.columns:
+                    self.k_off = mydata['k_off'][0]
+                else:
+                    raise ValueError('Error, k_off parameter missing in csv file for SpacerStagesBinding Model')
+
+        else:
+            # No point testing or checking that we have these variables, as python gives error on its own.
+            self.k_on = float(oparams['k_on'])
+            self.spacer = float(oparams['spacer'])
+            self.superhelical_op = float(oparams['superhelical_op'])
+
+            # Closed complex
+            self.k_closed = float(oparams['k_closed'])
+
+            # Open complex
+            self.k_open = float(oparams['k_open'])
+            self.width = float(oparams['width'])
+            self.threshold = float(oparams['threshold'])
+
+            # Initiation (start of elongation)
+            self.k_ini = float(oparams['k_ini'])
+
+            # Unbinding
+            self.k_off = float(oparams['k_off'])
+
+
+        self.twist_op = self.spacer * params.twist_deg * (1.0 + self.superhelical_op)
+        self.set_scaling_factor()
+
+        self.interacts = interacts
+        # Just in case
+        self.oparams = {'k_on': self.k_on, 'spacer': self.spacer, 'superhelical_op': self.superhelical_op,
+                        'k_closed': self.k_closed, 'k_open': self.k_open, 'k_ini': self.k_ini,
+                        'width': self.width, 'threshold': self.threshold, 'k_off': self.k_off}
+        # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
+
+    def set_scaling_factor(self):
+        sigma = np.arange(-.2, .2, 0.001)
+        G = utils.spacer_length_free_energy(self.spacer, sigma, self.twist_op)
+        a = np.max(G) / params.spacer_factor
+        self.scaling_factor = 1.0/a  # So when calculating the exponentials, would be like exp( - G*scaling_factor )
+                                     # This avoids having lots of zeros and scaling properly.
+
+    def binding_probability(self, environmental, superhelical, dt) -> float:
+        """ Method for calculating the probability of binding according the SpcaerBinding model.
+
+        Parameters
+        ----------
+        dt : float
+            Timestep in seconds (s).
+        environmental : Environment
+            The environmental molecule that is trying to bind the site.
+        superhelical : float
+            The local supercoiling region in the site.
+
+        Returns
+        ----------
+        probability : float
+            A number that indicates the probability of binding in the current timestep.
+        """
+
+        # NOTE that the energy components related to the sequence are assumed to be captured in k_on, and that
+        # G is 0 at the optimal superhelical level.
+
+        # Calculate geometric energy (in kBT units)
+        G = utils.spacer_length_free_energy(self.spacer, superhelical, self.twist_op)
+        rate = self.k_on * np.exp( - G * self.scaling_factor) # Scale exponent
+
+        return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+
+    def rate_modulation(self, superhelical) -> float:
+        """ Method for calculating the rate modulation as a functino of superhelical density for the
+        MaxMinPromoter model.
+
+        Parameters
+        ----------
+        dt : float
+            Timestep in seconds (s).
+        environmental : Environment
+            The environmental molecule that is trying to bind the site.
+        superhelical : float
+            The local supercoiling region in the site.
+
+        Returns
+        ----------
+        rate : float
+            Rate at which the environmentals bind given the local superhelical density
+        """
+
+        G = utils.spacer_length_free_energy(self.spacer, superhelical, self.twist_op)
+        rate = self.k_on * np.exp( - G * self.scaling_factor) # Scale exponent
+        return rate
+
 
 class MaxMinPromoterBinding_cutoff(BindingModel):
     """
@@ -1075,6 +1285,8 @@ def assign_binding_model(model_name, oparams_file=None, **oparams):
         my_model = PoissonBinding(filename=oparams_file, **oparams)
     elif model_name == 'SpacerBinding':
         my_model = SpacerBinding(filename=oparams_file, **oparams)
+    elif model_name == 'SpacerStagesBinding':
+        my_model = SpacerStagesBinding(filename=oparams_file, **oparams)
     elif model_name == 'TopoIRecognition':
         my_model = TopoIRecognition(filename=oparams_file, **oparams)
     elif model_name == 'TopoIRecognitionRNAPTracking':
