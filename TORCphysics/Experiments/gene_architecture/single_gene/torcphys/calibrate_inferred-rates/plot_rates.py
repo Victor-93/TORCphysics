@@ -9,12 +9,21 @@ import pickle
 promoter_cases = ['weak', 'medium', 'strong']
 dt=1.0#0.5
 
+k_weak=0.005
+
+model_code = 'GB-Stages-'
+
 experimental_files = []
 calibration_files = []
 for pcase in promoter_cases:
-    experimental_files.append('../../junier_data/inferred-rate_' + pcase + '.csv')
+    # experimental_files.append('../../junier_data/inferred-rate_' + pcase + '.csv')
+    experimental_files.append('../../junier_data/inferred-rate_kw'+str(k_weak)+'_' + pcase + '.csv')
     #calibration_files.append('Stages-'+pcase+'_dt1.pkl')
-    calibration_files.append('Stages-'+pcase+'_dt'+str(dt)+'.pkl')
+    #calibration_files.append('Stages-'+pcase+'_dt'+str(dt)+'.pkl')
+    #calibration_files.append('k_ini-Stages-'+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
+    # calibration_files.append('GB-Stages-'+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
+    calibration_files.append(model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
+
 
 # Plotting params
 #-----------------------------------------------------------------------------------------------------------------------
@@ -26,8 +35,8 @@ xlabel_size = 14
 title_size = 16
 
 # line styles
-model_ls = '-'
-exp_ls = '--'
+model_ls = '-o'
+exp_ls = '--o'
 titles = ['weak', 'medium', 'strong']
 
 colors = ['green', 'blue', 'red']
@@ -113,6 +122,8 @@ axs[3].set_xlabel('Distance')
 axs[3].set_ylabel('expression rate')
 axs[3].grid(True)
 axs[3].set_xscale('log')
+
+plt.savefig(model_code+'kw'+str(k_weak)+'_dt'+str(dt)+'.png')
 
 plt.show()
 

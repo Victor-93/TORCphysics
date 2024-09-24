@@ -13,7 +13,7 @@ import pickle
 
 # Simulation conditions
 # --------------------------------------------------------------
-dt = 1.0 #0.5
+dt = 0.5
 initial_time = 0
 final_time = 200 # 500
 time = np.arange(initial_time, final_time + dt, dt)
@@ -26,6 +26,7 @@ pickle_files = [
     'track-uniform/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl',
     #'track-uniform/calibration_RNAPTracking_nsets_p2_small_dt0.5.pkl',
     'track-StagesStall/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
+    #'track-StagesStall/calibration_RNAPTracking_nsets_p2_small_g0.75_dt' + str(dt) + '.pkl'
 ]
 output_prefix = 'test-RNAPStages-topoIRNAPtracking'
 title = ['Uniform model', 'Stall model']
@@ -143,7 +144,8 @@ for n, pickle_file in enumerate(pickle_files):
     RNAP_CO = output['results']['RNAP_correlation']
 
     # Define the text to display
-    textstr = f'FE={FE:.2f}, RCO={RNAP_CO:.2f}, CO={CO:.2f}, OB={OB:.2e}'
+    # textstr = f'FE={FE:.2f}, RCO={RNAP_CO:.2f}, CO={CO:.2f}, OB={OB:.2e}'
+    textstr = f'FE={FE:.2f}, RCO={RNAP_CO:.2f}, CO={CO:.2f}' #, OB={OB:.2e}'
 
     # Add the text box to the plot
     props = dict(boxstyle='round', facecolor='silver', alpha=0.5)
@@ -155,6 +157,7 @@ for n, pickle_file in enumerate(pickle_files):
     print('objective', output['objective'])
     print('RNAP_correlation', output['results']['RNAP_correlation'])
 
+plt.savefig('RNAPTRACK-temp.png')
 plt.show()
 #plt.savefig(output_prefix+'-FE.png')
 #plt.savefig(output_prefix+'-FE.pdf')
