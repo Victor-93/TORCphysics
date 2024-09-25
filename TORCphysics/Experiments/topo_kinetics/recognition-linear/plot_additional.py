@@ -18,7 +18,7 @@ from TORCphysics import params as papa
 # ----------------------------------------------------------------------------------------------------------------------
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
-dt = 0.25
+dt = 0.5
 initial_time = 0
 final_time = 600
 time = np.arange(initial_time, final_time + dt, dt)
@@ -26,10 +26,10 @@ frames = len(time)
 file_out = 'calibration'
 
 # For the simulation
-circuit_filename = 'circuit.csv'
+circuit_filename = '../circuit.csv'
 sites_filename = None  # 'sites_test.csv'
 enzymes_filename = None  # 'enzymes_test.csv'
-environment_filename = 'environment.csv'
+environment_filename = '../environment_small.csv'
 
 # Concentrations in nM
 DNA_concentration = 0.75
@@ -58,7 +58,7 @@ continuation = False
 n_simulations = 4#84  # 60 #48 #120
 
 # params_file
-params_file = 'calibration.csv'
+params_file = 'calibration_dt' + str(dt) + '.csv'
 
 # Models to calibrate to calibrate
 # -----------------------------------
@@ -68,7 +68,7 @@ topoI_type = 'environmental'
 topoI_binding_model_name = 'TopoIRecognition'
 topoI_effect_model_name = 'TopoILinear'
 topoI_unbinding_model_name = 'PoissonUnBinding'
-topoI_params = 'calibration_topoI.csv'
+topoI_params = 'calibration_dt'+str(dt) +'_topoI.csv'
 
 # Gyrase
 gyrase_name = 'gyrase'
@@ -76,7 +76,8 @@ gyrase_type = 'environmental'
 gyrase_binding_model_name = 'GyraseRecognition'
 gyrase_effect_model_name = 'GyraseLinear'
 gyrase_unbinding_model_name = 'PoissonUnBinding'
-gyrase_params = 'calibration_gyrase.csv'
+#gyrase_params = 'calibration_gyrase.csv'
+gyrase_params = 'calibration_dt'+str(dt) +'_gyrase.csv'
 
 # -----------------------------------
 # FIGURE Params
@@ -94,7 +95,7 @@ model_color = 'red'
 
 gyrase_color = 'blue'
 topoI_color = 'red'
-sigma = np.arange(-.2, .2, 0.01)
+sigma = np.arange(-.75, .75, 0.01)
 
 # Initialize circuit
 my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
@@ -112,6 +113,7 @@ fig, axs = plt.subplots(2, 1, figsize=(width, 2 * height), tight_layout=True)#, 
 # -------------------------
 gyrase_bind_rate = gyrase_concentration * bm.GyraseRecognition(filename=gyrase_params).rate_modulation(superhelical=sigma)
 topoI_bind_rate = topoI_concentration * bm.TopoIRecognition(filename=topoI_params).rate_modulation(superhelical=sigma)
+
 axs[0].plot(sigma, gyrase_bind_rate, color=gyrase_color, lw=lw, label='Gyrase')
 axs[0].plot(sigma, topoI_bind_rate, color=topoI_color, lw=lw, label='Topo I')
 

@@ -18,14 +18,11 @@ from TORCphysics import topo_calibration_tools as tct
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
 dt = 1.0
-#dt = 0.5
-#dt = 0.25
 initial_time = 0
 # Let's do it for 400s to add more weight to the curve and not the plateau
 final_time = 500  #500 # 600
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-#file_out = 'calibration'
 file_out = 'calibration_dt' + str(dt)
 
 # For the simulation
@@ -89,31 +86,41 @@ gyrase_unbinding_model_name = 'PoissonUnBinding'
 # ~ 100 seconds; this for the whole circuit. - This for the small environment (realistic).
 # The true k_on of the whole circuit depends on the size of the plasmid, the size of the enzyme, and the concentration.
 k_on_min_topoI = 0.0000042 #0.001
-k_on_max_topoI = 4*0.00042 #0.1
-k_off_min_topoI = 0.01
+#k_on_max_topoI = 4*0.00042 #0.1
+k_on_max_topoI = 0.00042 #0.1
+k_off_min_topoI = 0.1
 k_off_max_topoI = 1.0
 k_cat_min_topoI = 0.0  # Ranges to vary k_cat
 k_cat_max_topoI = 20.0
-width_min_topoI = 0.001
-width_max_topoI = 0.3  #0.05
-threshold_min_topoI = -0.3  # 0.001  #-0.05
-threshold_max_topoI = 0.3  #0.05  #-0.001
+# topoI new ranges
+#thres max=0.03, min=-0.07
+#width max=0.0125, min=0.00125
+width_min_topoI = 0.00125 #0.001
+width_max_topoI = 0.0125 #0.3  #0.05
+threshold_min_topoI = -0.07#  -0.3  # 0.001  #-0.05
+threshold_max_topoI = 0.03 #0.3  #0.05  #-0.001
 
 # Gyrase ranges
 # For gyrase, the k_on of gyrase for the whole circuit is similar to the topoI, which goes from 1 bind every second
 # to 1 event every 100 seconds
 k_on_min_gyrase = 0.0000024#0.001
-k_on_max_gyrase = 4*0.00024#0.1
-k_off_min_gyrase = 0.01
+#k_on_max_gyrase = 4*0.00024#0.1
+k_on_max_gyrase = 0.00024#0.1
+k_off_min_gyrase = 0.1
 k_off_max_gyrase = 1.0
 k_cat_min_gyrase = 0.0  # Ranges to vary k_cat
 k_cat_max_gyrase = 20.0
 sigma0_min_gyrase = -.15  #-0.3
 sigma0_max_gyrase = -0.07  #0.0
-width_min_gyrase = 0.001
-width_max_gyrase = 0.3  #.05  # 1.0
-threshold_min_gyrase = -0.3  #0.0 #0.001
-threshold_max_gyrase = 0.3  # 0.1  # 1.0
+# gyrase new ranges
+#thres max=0.04, min=-0.06
+#width max=0.0125, min=0.00125
+width_min_gyrase = 0.00125 #0.001
+width_max_gyrase = 0.0125 #0.3  #.05  # 1.0
+threshold_min_gyrase = -0.06 #-0.3  #0.0 #0.001
+threshold_max_gyrase = 0.04 #0.3  # 0.1  # 1.0
+
+
 
 
 # Optimization functions
@@ -334,6 +341,7 @@ with open(output_file_path, 'w') as f:
 
     # Your code that prints to the screen
     print("Hello, this is the info file for the calibration of Topo I and Gyrase Models.")
+    print("Launching calibration for dt="+str(dt))
     print("Topo I Binding Model = " + topoI_binding_model_name)
     print("Topo I Effect Model = " + topoI_effect_model_name)
     print("Topo I Unbinding Model = " + topoI_unbinding_model_name)

@@ -1090,9 +1090,8 @@ class TopoIRecognition(BindingModel):
         """
 
         a = environmental.concentration * self.k_on
-        #b = 1 + np.exp((superhelical - self.threshold) / self.width)
-        #b = 1 + np.exp((superhelical + self.threshold) / self.width)
-        b1 = np.float128((superhelical + self.threshold) / self.width)
+        # b1 = np.float128((superhelical + self.threshold) / self.width)
+        b1 = np.float128((superhelical - self.threshold) / self.width)
         b = 1 + np.exp(b1)
         rate = a / b
         return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
@@ -1100,8 +1099,8 @@ class TopoIRecognition(BindingModel):
     def rate_modulation(self, superhelical) -> float:
         # Note that is not multiplied by the concentration
         a = self.k_on
-        #b = 1 + np.exp((superhelical - self.threshold) / self.width)
-        b = 1 + np.exp((superhelical + self.threshold) / self.width)
+        # b = 1 + np.exp((superhelical + self.threshold) / self.width)
+        b = 1 + np.exp((superhelical - self.threshold) / self.width)
         rate = a / b
         return rate
 
@@ -1212,7 +1211,8 @@ class TopoIRecognitionRNAPTracking(BindingModel):
 
         # Calculate rate based on superhelical density
         a = environmental.concentration * self.k_on
-        b1 = np.float128((superhelical + self.threshold) / self.width)
+        # b1 = np.float128((superhelical + self.threshold) / self.width)
+        b1 = np.float128((superhelical - self.threshold) / self.width)
         b = 1 + np.exp(b1)
         rate = a / b
         # b = 1 + np.exp((superhelical - self.threshold) / self.width)
@@ -1346,12 +1346,9 @@ class GyraseRecognition(BindingModel):
         """
 
         a = environmental.concentration * self.k_on
-        b1 = np.float128(-(superhelical + self.threshold) / self.width)
+        # b1 = np.float128(-(superhelical + self.threshold) / self.width)
+        b1 = np.float128(-(superhelical - self.threshold) / self.width)
         b = 1 + np.exp(b1)
-        # b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
-        #b = 1 + np.exp(-(superhelical + self.threshold) / self.width)
-        #sigma_cons = .5
-        #b = 1 + np.exp(-(superhelical + self.threshold) / self.width - sigma_cons) * np.exp(sigma_cons)
         rate = a / b
         # Configure NumPy to suppress overflow warnings
         #np.seterr(over='ignore')
@@ -1375,8 +1372,8 @@ class GyraseRecognition(BindingModel):
     def rate_modulation(self, superhelical) -> float:
         # Note that is not multiplied by the concentration
         a = self.k_on
-        # b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
-        b = 1 + np.exp(-(superhelical + self.threshold) / self.width)
+        b = 1 + np.exp(-(superhelical - self.threshold) / self.width)
+        # b = 1 + np.exp(-(superhelical + self.threshold) / self.width)
         rate = a / b
         return rate
 

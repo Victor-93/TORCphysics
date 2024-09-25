@@ -54,8 +54,8 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 1000#128#84  # 60 #48 #120
-tests = 4000#7000#100  #400  # 10  # 100  # number of tests for parametrization
+n_simulations = 100#128#84  # 60 #48 #120
+tests = 5000#7000#100  #400  # 10  # 100  # number of tests for parametrization
 
 # Models to calibrate to calibrate
 # -----------------------------------
@@ -81,7 +81,7 @@ gyrase_unbinding_model_name = 'PoissonUnBinding'
 # The true k_on of the whole circuit depends on the size of the plasmid, the size of the enzyme, and the concentration.
 k_on_min_topoI = 0.0000042 #0.001
 k_on_max_topoI = 0.00042 #0.1
-k_off_min_topoI = 0.01
+k_off_min_topoI = 0.1
 k_off_max_topoI = 1.0
 k_cat_min_topoI = 0.0  # Ranges to vary k_cat
 k_cat_max_topoI = 20.0
@@ -91,7 +91,7 @@ k_cat_max_topoI = 20.0
 # to 1 event every 100 seconds
 k_on_min_gyrase = 0.0000024#0.001
 k_on_max_gyrase = 0.00024#0.1
-k_off_min_gyrase = 0.01
+k_off_min_gyrase = 0.1
 k_off_max_gyrase = 1.0
 k_cat_min_gyrase = 0.0  # Ranges to vary k_cat
 k_cat_max_gyrase = 20.0
@@ -311,6 +311,7 @@ with open(output_file_path, 'w') as f:
 
     # Your code that prints to the screen
     print("Hello, this is the info file for the calibration of Topo I and Gyrase Models.")
+    print("Launching calibration for dt="+str(dt))
     print("Topo I Binding Model = " + topoI_binding_model_name)
     print("Topo I Effect Model = " + topoI_effect_model_name)
     print("Topo I Unbinding Model = " + topoI_unbinding_model_name)
