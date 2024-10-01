@@ -58,6 +58,8 @@ n_simulations = 100#12#96#48#24#96#10#84  # 60 #48 #120
 #topo_params_file = 'calibration_dt'+str(dt)+'.csv'
 #recognition_params_file = 'calibration2.csv'
 recognition_params_file = 'calibration_dt'+str(dt)+'.csv'
+poisson_params_file = 'calibration_'+str(dt)+'.csv'
+
 
 # Models to calibrate to calibrate
 # -----------------------------------
@@ -295,7 +297,8 @@ rec_objective, rec_sim_superhelicals = objective_function(params=params_dict)
 
 # Poisson binding
 #params_file = 'poisson-linear/calibration.csv'
-params_file = 'poisson-linear/calibration_small_dt1.csv'
+#params_file = 'poisson-linear/calibration_small_dt1.csv'
+params_file = 'poisson-linear/'+poisson_params_file
 topoI_binding_model_name = 'PoissonBinding'
 gyrase_binding_model_name = 'PoissonBinding'
 params_dict = pd.read_csv(params_file).to_dict()

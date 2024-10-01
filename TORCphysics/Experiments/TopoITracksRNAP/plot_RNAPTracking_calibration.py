@@ -13,7 +13,7 @@ import pickle
 
 # Simulation conditions
 # --------------------------------------------------------------
-dt = 0.5
+dt = 1.0
 initial_time = 0
 final_time = 200 # 500
 time = np.arange(initial_time, final_time + dt, dt)
@@ -157,7 +157,7 @@ for n, pickle_file in enumerate(pickle_files):
     print('objective', output['objective'])
     print('RNAP_correlation', output['results']['RNAP_correlation'])
 
-plt.savefig('RNAPTRACK-temp.png')
+#plt.savefig('RNAPTRACK-temp.png')
 plt.show()
 #plt.savefig(output_prefix+'-FE.png')
 #plt.savefig(output_prefix+'-FE.pdf')

@@ -9,7 +9,11 @@ import pickle
 promoter_cases = ['weak', 'medium', 'strong']
 dt=1.0#0.5
 
-k_weak=0.005
+k_weak=0.02
+
+n_inner_workers = 9
+n_subsets = 2
+n_sims = n_inner_workers * n_subsets  # This is the number of simulations launched to calculate unbinding rates
 
 model_code = 'GB-Stages-'
 
@@ -22,7 +26,9 @@ for pcase in promoter_cases:
     #calibration_files.append('Stages-'+pcase+'_dt'+str(dt)+'.pkl')
     #calibration_files.append('k_ini-Stages-'+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
     # calibration_files.append('GB-Stages-'+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
-    calibration_files.append(model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
+
+    # calibration_files.append(model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
+    calibration_files.append('reproduce-'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
 
 
 # Plotting params
@@ -95,9 +101,13 @@ for i, rate_array in enumerate(rates):
     # Prepare calibration array and plot
     x = rate_array[0]
     y = rate_array[1]
-    ys = rate_array[2]
+    ys = rate_array[2]/np.sqrt(n_sims)
 
-    axs[i].plot(x, y, model_ls, lw=lw, color=colors[i])
+    if i == 0:
+        axs[i].plot(x, y, model_ls, lw=lw, color=colors[i], label='TORCphysics')
+    else:
+        axs[i].plot(x, y, model_ls, lw=lw, color=colors[i])
+
     axs[i].fill_between(x, y-ys, y+ys, lw=lw, color=colors[i], alpha=0.2)
     axs[3].plot(x, y, model_ls, lw=lw, color=colors[i])     # Last one
     #axs[3].fill_between(x, y-ys, y+ys, lw=lw, color=colors[i], alpha=0.1)
@@ -107,7 +117,10 @@ for i, rate_array in enumerate(rates):
     x = exp['distance']
     y = exp['Signal']
     ys = exp['Error']
-    axs[i].plot(x, y, exp_ls, lw=lw, color=colors[i])
+    if i == 0:
+        axs[i].plot(x, y, exp_ls, lw=lw, color=colors[i], label='experiment')
+    else:
+        axs[i].plot(x, y, exp_ls, lw=lw, color=colors[i])
     axs[3].plot(x, y, exp_ls, lw=lw, color=colors[i])     # Last one
 
     axs[i].set_xlabel('Distance')
@@ -122,6 +135,7 @@ axs[3].set_xlabel('Distance')
 axs[3].set_ylabel('expression rate')
 axs[3].grid(True)
 axs[3].set_xscale('log')
+axs[0].legend(loc='best')
 
 plt.savefig(model_code+'kw'+str(k_weak)+'_dt'+str(dt)+'.png')
 

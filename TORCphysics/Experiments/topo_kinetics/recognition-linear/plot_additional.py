@@ -18,7 +18,7 @@ from TORCphysics import params as papa
 # ----------------------------------------------------------------------------------------------------------------------
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
-dt = 0.5
+dt = 1.0 #0.5
 initial_time = 0
 final_time = 600
 time = np.arange(initial_time, final_time + dt, dt)

@@ -1430,12 +1430,14 @@ class LacIPoissonBridging(EffectModel):
         if self.state == 'JUST_LOOPED':
             twist_left = 0.0
             twist_right = 0.0
+            self.state = 'LOOPED'
             return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
         # If the bridge was broken in the current time-step due to the other protein effect model
         # -----------------------------------------------------------------
         if self.state == 'JUST_UNLOOPED':
             twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
+            self.state = 'UNLOOPED'
             return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
         # If bridge is not formed
@@ -1501,7 +1503,7 @@ class LacIPoissonBridging(EffectModel):
             z.name = 'lacI_bridge'
 
             # Then for the other enzyme
-            random_enzyme.effect_model.bound_width = z
+            random_enzyme.effect_model.bound_with = z
             random_enzyme.name = 'lacI_bridge'
             if z.position < random_enzyme.position:  # This helps us to avoid doing calculations twice and
                                                      # introducing additional probabilities.
@@ -1531,8 +1533,11 @@ class LacIPoissonBridging(EffectModel):
         # If the bridge breaks, then update the state
         # -----------------------------------------------------------------
         if undo_bridge:
+            if  self.bound_with is None:  # This should be impossible?
+                a=2
+                b=a+3
             # First for the linked enzyme; lets unliked it to this one
-            self.bound_with.effect_model.bound_width = None
+            self.bound_with.effect_model.bound_with = None
             self.bound_with.name = 'lacI'
             if z.position < self.bound_with.position:  # This helps us to avoid doing calculations twice and
                                                        # introducing additional probabilities.

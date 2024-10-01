@@ -1,11 +1,14 @@
 import sys
-# sys.path.append("/users/ph1vvb")
+#sys.path.append("/users/ph1vvb")
 import numpy as np
 import pandas as pd
 from hyperopt import tpe, hp, fmin, Trials
+import pandas as pd
 from TORCphysics import topo_calibration_tools as tct
 from TORCphysics import Circuit, params
 import pickle
+
+
 
 # Description
 # --------------------------------------------------------------
@@ -14,8 +17,7 @@ import pickle
 # This function uses a different parallelization strategy to speed up the calibration process.
 # It does this by doing two parallelization pools.
 
-# This script launches the calibration process for the TopoIRNAPTracking binding model, SpacerBinding binding model,
-# RNAPStagesStall effect model and the RNAPStagesSimpleUnbinding unbinding model.
+# This script launches the calibration process for the TopoIRNAPTracking model.
 # It uses the parameters and models of the environment.csv file within this folder
 # Runs multiple sets of simulations, to obtain KDEs and then average them to smooth the curve and obtain more
 # stable correlations.
@@ -28,10 +30,10 @@ import pickle
 # WARNING: It is very important that the number of n_workers is within the capabilities of your system.
 #          So choose carefully n_workers and n_sets
 #n_workers = 16 # Total number of workers (cpus) - For us testing in this machine
-n_workers = 64 # For stanage
+n_workers = 16#64 # For stanage
 #n_sets = 1 #7  # Number of outer sets
-n_sets = 7 # - For stange
-n_subsets = 4   # Number of simulations per set - One KDE for each n_subset within the n_set
+n_sets = 1#1 7 # - For stange
+n_subsets =  2# 4   # Number of simulations per set - One KDE for each n_subset within the n_set
                   # As it says upthere, there are in total n_subsets * n_sets number of KDEs per test
                   # A number of n_inner_workers parallel simulations are launch to calculate each individual KDE.
 n_inner_workers = n_workers // (n_sets+1)  # Number of workers per inner pool
@@ -39,7 +41,10 @@ n_inner_workers = n_workers // (n_sets+1)  # Number of workers per inner pool
                                            # I think this number of n_inner_workers is the number of parallel simulations
                                            # ran that are used to calculate each individual KDE.
 #tests = 4 #400  # number of tests for parametrization
-tests = 2000 # - For stanage
+tests = 2#2000 # - For stanage
+
+gamma=0.25  # It'll be fixed this time
+
 
 print('Doing parallelization process for:')
 print('n_workers', n_workers)
@@ -56,10 +61,10 @@ dt = 1.0
 #dt = 0.5
 #dt = 0.25
 initial_time = 0
-final_time = 1000
+final_time = 2000
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)
+file_out = 'calibration_RNAPTracking_nsets_p2_small_g'+str(gamma)+'_dt'+str(dt)
 
 # Reference - It is the reference density of topos when there is no gene that we will use to calculate the
 #             fold enrichment.
@@ -70,9 +75,8 @@ reference_RNAP = '../RNAP_TU.txt'
 # Circuit initial conditions
 # --------------------------------------------------------------
 circuit_filename = '../circuit.csv'
-sites_filename = 'sites.csv' # '../sites.csv'
+sites_filename = 'sites.csv'
 enzymes_filename = None  #'../enzymes.csv'
-#environment_filename = 'environment.csv'
 environment_filename = 'environment_dt'+str(dt)+'.csv'
 output_prefix = 'topoIRNAPtrack-StagesStall_dt'+str(dt)
 series = True
@@ -86,58 +90,34 @@ continuation = False
 topoI_name = 'topoI'
 topoI_type = 'environmental'
 topoI_binding_model_name = 'TopoIRecognitionRNAPTracking'
-# These are parameters for the Recognition curve
 topoI_params_csv = '../calibration_dt'+str(dt)+'_topoI.csv'
-
-# Site
-gene_name = 'reporter'
-gene_type = 'site'
-gene_binding_model_name = 'SpacerBinding'
-spacer_oparams = {'superhelical_op': -0.06, 'spacer': 17}
 
 # RNAP
 RNAP_name = 'RNAP'
 RNAP_type = 'environmental'
-RNAP_effect_model_name = 'RNAPStagesStall'
-RNAP_unbinding_model_name = 'RNAPStagesSimpleUnbinding'
-RNAP_oparams = {'width': 0.005, 'threshold': -0.042, # Sam Meyer's PROMOTER CURVE (parameters taken from Houdaigi NAR 2019)
-                'velocity': params.v0, 'kappa': params.RNAP_kappa, 'stall_torque': params.stall_torque}
+RNAP_effect_model_name = 'RNAPUniform'
+RNAP_oparams = {'gamma': gamma, 'velocity': params.v0}
 
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------
-# Topo model
 RNAP_dist_min = 20
 RNAP_dist_max = 500
 fold_change_min = .1
 fold_change_max = 50
 
-# Reporter
-spacer_kon_min = 0.005
-spacer_kon_max = .5
-
-# RNAP - rates
-k_closed_min = 0.01
-k_closed_max = 0.5
-k_open_min = 0.01
-k_open_max = 0.5
-k_ini_min = 0.05
-k_ini_max = 0.5
-gamma_min = 0.01
-gamma_max = 1.0
-k_off_min = 0.01
-k_off_max = 0.5
+# RNAP
+#gamma_min = 0.01
+#gamma_max = 1.0
 
 
 # TARGETS FOR OPTIMIZATION
 # -----------------------------------
 target_FE = 1.238 # 3rd System#1.38 #1.68  # Target fold-enrichment
 target_CO = 0.944 # 3rd System #1.0  # Target correlation between topo I and RNAP densities.
-target_RNAP_CO = 1.0 # target correlation I want between RNAP KDE from simulations and ChIP-Seq
 x_spacing = 10.0  # The spacing I want at the moment of doing interpolation.
 
 # nbins is the number of bins to use when calculating the kde
-target_dict = {'target_FE': target_FE, 'target_CO': target_CO, 'target_RNAP_CO': target_RNAP_CO,
-               'target_gene': 'reporter',
+target_dict = {'target_FE': target_FE, 'target_CO': target_CO, 'target_gene': 'reporter',
                'enzymes_names': ['RNAP', 'topoI', 'gyrase']}
 
 
@@ -175,30 +155,13 @@ def objective_function(params, calibrating=True):
     topoI_variation = {'name': name, 'object_type': object_type,
                        'binding_model_name': binding_model_name, 'binding_oparams': binding_oparams}
 
-    # Gene (site)
-    name = gene_name
-    object_type = gene_type
-    binding_model_name = gene_binding_model_name
-    binding_oparams = {'k_on': params['spacer_kon'], 'spacer': spacer_oparams['spacer'],
-                       'superhelical_op': spacer_oparams['superhelical_op'],}
-
-    gene_variation = {'name': name, 'object_type': object_type,
-                      'binding_model_name': binding_model_name, 'binding_oparams': binding_oparams}
-
     # RNAP (environmental - effect model + unbinding model)
     name = RNAP_name
     object_type = RNAP_type
     effect_model_name = RNAP_effect_model_name
-    effect_oparams = { 'k_closed':params['k_closed'], 'k_open':params['k_open'],
-                       'width': RNAP_oparams['width'], 'threshold': RNAP_oparams['threshold'],
-                       'k_ini': params['k_ini'],
-                       'velocity': RNAP_oparams['velocity'], 'gamma': params['gamma'],
-                       'stall_torque': RNAP_oparams['stall_torque'], 'kappa': RNAP_oparams['kappa']}
-    unbinding_model_name = RNAP_unbinding_model_name
-    unbinding_oparams = {'k_off': params['k_off']}
+    effect_oparams = { 'velocity': RNAP_oparams['velocity'], 'gamma': RNAP_oparams['gamma']}
     RNAP_variation = {'name': name, 'object_type': object_type,
-                      'effect_model_name': effect_model_name, 'effect_oparams': effect_oparams,
-                      'unbinding_model_name': unbinding_model_name, 'unbinding_oparams': unbinding_oparams}
+                      'effect_model_name': effect_model_name, 'effect_oparams': effect_oparams}
 
     # Create lists of conditions for each system
     # ------------------------------------------
@@ -206,20 +169,19 @@ def objective_function(params, calibrating=True):
     # Global dictionaries
     global_dict_list = [global_dict]
 
-    # List of lists of variations - It is a list of lists because we have a list for each experiment.
-    #                               So for 1 experiment and three variations, the list is on the form [[v1,v2,v3]],
-    #                               if it were 2 experiments and 3 variations each: [[v1.1,v1.2,v1.3], [v2.1,v2.2,v2.3]]
-    variations_list = [[topoI_variation, gene_variation, RNAP_variation]]
+    # List of lists of variations
+    variations_list = [[topoI_variation, RNAP_variation]]
 
     # Arrays with position densities to calculate fold change
     list_reference = [reference_dict]
 
     # Finally, run objective function.
     # ------------------------------------------
-    my_objective, output_dict = tct.single_case_RNAPTracking_calibration_nsets_2scheme_plus_RNAP(global_dict_list,
-                                                                                                 variations_list,
-                                                                                                 list_reference,
-                                                                                                 target_dict)
+    my_objective, output_dict = tct.single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variations_list,
+                                                                               list_reference,
+                                                                               target_dict)
+
+#    return my_objective
     if calibrating:
         return my_objective
     else:
@@ -270,17 +232,7 @@ trials = Trials()
 space = {
     # Topo I params
     'RNAP_dist': hp.uniform('RNAP_dist', RNAP_dist_min, RNAP_dist_max),
-    'fold_change': hp.uniform('fold_change', fold_change_min, fold_change_max),
-
-    # RNAP params
-    'spacer_kon': hp.uniform('spacer_kon', spacer_kon_min, spacer_kon_max),
-
-    'k_closed': hp.uniform('k_closed', k_closed_min, k_closed_max),
-    'k_open': hp.uniform('k_open', k_open_min, k_open_max),
-    'k_ini': hp.uniform('k_ini', k_ini_min, k_ini_max),
-    'gamma': hp.uniform('gamma', gamma_min, gamma_max),
-
-    'k_off': hp.uniform('k_off', k_off_min, k_off_max)
+    'fold_change': hp.uniform('fold_change', fold_change_min, fold_change_max)
 }
 
 # Save the current standard output
@@ -295,6 +247,7 @@ with open(output_file_path, 'w') as f:
 
     # Your code that prints to the screen
     print("Hello, this is the info file for the calibration of Topo I Tracking RNAP.")
+    print("Doing for dt=" + str(dt))
     print("Topo I Binding Model = " + topoI_binding_model_name)
     print('n_workers', n_workers)
     print('n_sets', n_sets)
@@ -320,59 +273,25 @@ best_df = pd.DataFrame.from_dict([best])
 
 # Save model!
 # --------------------------------------------------------------------------
-# Topo I
 k_on = float(topoI_params['k_on'][0])
 width = float(topoI_params['width'][0])
 threshold = float(topoI_params['threshold'][0])
 
-# RNAP-spacer
-#superhelical_op = spacer_oparams['superhelical_op']
-#spacer = spacer_oparams['spacer']
-#RNAP_width = RNAP_oparams['width']
-#RNAP_threshold = RNAP_oparams['threshold']
-#kappa = RNAP_oparams['kappa']
-#velocity = RNAP_oparams['velocity']
-#stall_torque = RNAP_oparams['stall_torque']
-
-# This one will have all the values of the RNAPTracking Model for the enzyme calibration
-# Topo I
-name = 'topoI-'
+# This one will have all the values of the RNAPTracking Model
 complete_df = pd.DataFrame(columns=['k_on', 'width', 'threshold', 'RNAP_dist', 'fold_change'])
 complete_df['RNAP_dist'] = best_df['RNAP_dist']
 complete_df['fold_change'] = best_df['fold_change']
 complete_df['k_on'] = k_on
+complete_df['k_off'] = topoI_params['k_off'][0]
+complete_df['k_cat'] = topoI_params['k_cat'][0]
 complete_df['width'] = width
 complete_df['threshold'] = threshold
-complete_df['k_off'] = float(topoI_params['k_off'][0])
-complete_df['k_cat'] = float(topoI_params['k_cat'][0])
-
-complete_df.to_csv(name+file_out + '.csv', index=False, sep=',')
-
-# RNAP
-name = 'RNAP-'
-complete_df = pd.DataFrame(columns=['k_on', 'superhelical_op', 'spacer',
-                                    'k_closed', 'k_open', 'width', 'threshold',
-                                    'k_ini', 'gamma', 'kappa', 'velocity', 'stall_torque',
-                                    'k_off'])
-complete_df['k_on'] = best_df['spacer_kon']
-complete_df['superhelical_op'] = spacer_oparams['superhelical_op']
-complete_df['spacer'] = spacer_oparams['spacer']
-complete_df['k_closed'] = best_df['k_closed']
-complete_df['k_open'] = best_df['k_open']
-complete_df['width'] = RNAP_oparams['width']
-complete_df['threshold'] = RNAP_oparams['threshold']
-complete_df['k_ini'] = best_df['k_ini']
-complete_df['gamma'] = best_df['gamma']
-complete_df['kappa'] = RNAP_oparams['kappa']
+complete_df['gamma'] = RNAP_oparams['gamma']
 complete_df['velocity'] = RNAP_oparams['velocity']
-complete_df['stall_torque'] = RNAP_oparams['stall_torque']
-complete_df['k_off'] = best_df['k_off']
-complete_df.to_csv(name+file_out + '.csv', index=False, sep=',')
+complete_df.to_csv(file_out + '.csv', index=False, sep=',')
 
 # Let's save trials info (params and loses)
 # --------------------------------------------------------------------------
-# Topo I
-name = 'topoI-'
 params_df = pd.DataFrame(columns=['test', 'loss', 'RNAP_dist', 'fold_change'])
 for n in range(tests):
     tdi = trials.trials[n]  # dictionary with results for test n
@@ -381,33 +300,14 @@ for n in range(tests):
     # Add a new row using append method
     new_row = pd.DataFrame({
         'test': n, 'loss': lo, 'RNAP_dist': va['RNAP_dist'], 'fold_change': va['fold_change'],
+        'gamma': RNAP_oparams['gamma'],
         'k_on': k_on, 'width': width, 'threshold': threshold, 'k_off': topoI_params['k_off'][0],
         'k_cat': topoI_params['k_cat'][0]
     })
     #    params_df.append(new_row, ignore_index=True)
     params_df = pd.concat([params_df, new_row], ignore_index=True)
 
-params_df.to_csv(name+file_out+'-values.csv', index=False, sep=',')
-
-# RNAP
-name = 'RNAP-'
-params_df = pd.DataFrame(columns=['test', 'loss'])
-for n in range(tests):
-    tdi = trials.trials[n]  # dictionary with results for test n
-    lo = trials.trials[n]['result']['loss']  # loss
-    va = trials.trials[n]['misc']['vals']  #values
-    # Add a new row using append method
-    new_row = pd.DataFrame({
-        'test': n, 'loss': lo,
-        'k_on': va['spacer_kon'], 'superhelical_op': spacer_oparams['superhelical_op'], 'spacer': spacer_oparams['spacer'],
-        'k_closed': va['k_closed'], 'k_open': va['k_open'], 'width': RNAP_oparams['width'], 'threshold': RNAP_oparams['threshold'],
-        'k_ini': va['k_ini'], 'gamma': va['gamma'], 'kappa': RNAP_oparams['kappa'], 'velocity': RNAP_oparams['velocity'],
-        'stall_torque': RNAP_oparams['stall_torque'], 'k_off': va['k_off']
-    })
-
-    params_df = pd.concat([params_df, new_row], ignore_index=True)
-
-params_df.to_csv(name+file_out+'-values.csv', index=False, sep=',')
+params_df.to_csv(file_out+'-values.csv', index=False, sep=',')
 
 # Let's run the function once more with the best params to produce the data so we can then just plot it.
 # --------------------------------------------------------------------------

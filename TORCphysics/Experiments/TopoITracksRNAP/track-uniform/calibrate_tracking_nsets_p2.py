@@ -5,7 +5,7 @@ import pandas as pd
 from hyperopt import tpe, hp, fmin, Trials
 import pandas as pd
 from TORCphysics import topo_calibration_tools as tct
-from TORCphysics import Circuit
+from TORCphysics import Circuit, params
 import pickle
 
 
@@ -32,8 +32,8 @@ import pickle
 #n_workers = 16 # Total number of workers (cpus) - For us testing in this machine
 n_workers = 64 # For stanage
 #n_sets = 1 #7  # Number of outer sets
-n_sets = 7 # - For stange
-n_subsets =   4   # Number of simulations per set - One KDE for each n_subset within the n_set
+n_sets =7 # - For stange
+n_subsets =  4   # Number of simulations per set - One KDE for each n_subset within the n_set
                   # As it says upthere, there are in total n_subsets * n_sets number of KDEs per test
                   # A number of n_inner_workers parallel simulations are launch to calculate each individual KDE.
 n_inner_workers = n_workers // (n_sets+1)  # Number of workers per inner pool
@@ -41,7 +41,7 @@ n_inner_workers = n_workers // (n_sets+1)  # Number of workers per inner pool
                                            # I think this number of n_inner_workers is the number of parallel simulations
                                            # ran that are used to calculate each individual KDE.
 #tests = 4 #400  # number of tests for parametrization
-tests = 2000 # - For stanage
+tests = 2#2000 # - For stanage
 
 print('Doing parallelization process for:')
 print('n_workers', n_workers)
@@ -58,7 +58,7 @@ dt = 1.0
 #dt = 0.5
 #dt = 0.25
 initial_time = 0
-final_time = 1000
+final_time = 2000
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 file_out = 'calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)
@@ -89,7 +89,11 @@ topoI_type = 'environmental'
 topoI_binding_model_name = 'TopoIRecognitionRNAPTracking'
 topoI_params_csv = '../calibration_dt'+str(dt)+'_topoI.csv'
 
-
+# RNAP
+RNAP_name = 'RNAP'
+RNAP_type = 'environmental'
+RNAP_effect_model_name = 'RNAPUniform'
+RNAP_oparams = {'gamma': 0.005, 'velocity': params.v0}
 
 # RANGES FOR RANDOM SEARCH
 # -----------------------------------
@@ -97,6 +101,11 @@ RNAP_dist_min = 20
 RNAP_dist_max = 500
 fold_change_min = .1
 fold_change_max = 50
+
+# RNAP
+gamma_min = 0.01
+gamma_max = 1.0
+
 
 # TARGETS FOR OPTIMIZATION
 # -----------------------------------
@@ -143,6 +152,14 @@ def objective_function(params, calibrating=True):
     topoI_variation = {'name': name, 'object_type': object_type,
                        'binding_model_name': binding_model_name, 'binding_oparams': binding_oparams}
 
+    # RNAP (environmental - effect model + unbinding model)
+    name = RNAP_name
+    object_type = RNAP_type
+    effect_model_name = RNAP_effect_model_name
+    effect_oparams = { 'velocity': RNAP_oparams['velocity'], 'gamma': params['gamma']}
+    RNAP_variation = {'name': name, 'object_type': object_type,
+                      'effect_model_name': effect_model_name, 'effect_oparams': effect_oparams}
+
     # Create lists of conditions for each system
     # ------------------------------------------
 
@@ -150,7 +167,7 @@ def objective_function(params, calibrating=True):
     global_dict_list = [global_dict]
 
     # List of lists of variations
-    variations_list = [[topoI_variation]]
+    variations_list = [[topoI_variation, RNAP_variation]]
 
     # Arrays with position densities to calculate fold change
     list_reference = [reference_dict]
@@ -212,7 +229,9 @@ trials = Trials()
 space = {
     # Topo I params
     'RNAP_dist': hp.uniform('RNAP_dist', RNAP_dist_min, RNAP_dist_max),
-    'fold_change': hp.uniform('fold_change', fold_change_min, fold_change_max)
+    'fold_change': hp.uniform('fold_change', fold_change_min, fold_change_max),
+    'gamma': hp.uniform('gamma', gamma_min, gamma_max)
+
 }
 
 # Save the current standard output
@@ -227,6 +246,7 @@ with open(output_file_path, 'w') as f:
 
     # Your code that prints to the screen
     print("Hello, this is the info file for the calibration of Topo I Tracking RNAP.")
+    print("Doing for dt=" + str(dt))
     print("Topo I Binding Model = " + topoI_binding_model_name)
     print('n_workers', n_workers)
     print('n_sets', n_sets)
@@ -261,8 +281,12 @@ complete_df = pd.DataFrame(columns=['k_on', 'width', 'threshold', 'RNAP_dist', '
 complete_df['RNAP_dist'] = best_df['RNAP_dist']
 complete_df['fold_change'] = best_df['fold_change']
 complete_df['k_on'] = k_on
+complete_df['k_off'] = topoI_params['k_off'][0]
+complete_df['k_cat'] = topoI_params['k_cat'][0]
 complete_df['width'] = width
 complete_df['threshold'] = threshold
+complete_df['gamma'] = best_df['gamma']
+complete_df['velocity'] = RNAP_oparams['velocity']
 complete_df.to_csv(file_out + '.csv', index=False, sep=',')
 
 # Let's save trials info (params and loses)
@@ -274,8 +298,9 @@ for n in range(tests):
     va = trials.trials[n]['misc']['vals']  #values
     # Add a new row using append method
     new_row = pd.DataFrame({
-        'test': n, 'loss': lo, 'RNAP_dist': va['RNAP_dist'], 'fold_change': va['fold_change'],
-        'k_on': k_on, 'width': width, 'threshold': threshold
+        'test': n, 'loss': lo, 'RNAP_dist': va['RNAP_dist'], 'fold_change': va['fold_change'], 'gamma': va['gamma'],
+        'k_on': k_on, 'width': width, 'threshold': threshold, 'k_off': topoI_params['k_off'][0],
+        'k_cat': topoI_params['k_cat'][0]
     })
     #    params_df.append(new_row, ignore_index=True)
     params_df = pd.concat([params_df, new_row], ignore_index=True)
