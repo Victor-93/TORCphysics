@@ -247,6 +247,121 @@ def run_objective_function(global_dict_list, variations_list, exp_superhelicals,
         my_objective = my_objective + current_objective
     return my_objective, simulation_superhelicals
 
+# exactly the same as the previous function but includes std of global sigma
+def run_objective_function_g_std(global_dict_list, variations_list, exp_superhelicals, n_simulations):
+    n_systems = len(global_dict_list)  # number of systems.
+
+    # Let's run experiments for the substrate concentrations
+    my_objective = 0.0
+    simulation_superhelicals = []
+    simulation_superhelicals_std = []
+
+
+    for n in range(n_systems):
+
+        # We need a list of items, so the pool can pass each item to the function
+        Items = []
+        for simulation_number in range(n_simulations):
+            g_dict = dict(global_dict_list[n])
+            g_dict['n_simulations'] = simulation_number
+            Item = {'global_conditions': g_dict, 'variations': variations_list[n]}
+            Items.append(Item)
+
+        # Create a multiprocessing pool
+        pool = multiprocessing.Pool()
+        pool_results = pool.map(pt.single_simulation_calibration_w_supercoiling, Items)
+
+        # Process superhelical densities to calculate objective function
+        my_supercoiling = np.zeros((g_dict['frames'], n_simulations))
+        for i, sigma in enumerate(pool_results):
+            my_supercoiling[:, i] = sigma[:-1]
+
+        mea = np.mean(my_supercoiling, axis=1)
+        std = np.std(my_supercoiling, axis=1)
+
+        current_objective = np.sum(np.square(np.mean(my_supercoiling, axis=1) - exp_superhelicals[n]))
+
+        # Save average superhelical densities
+        simulation_superhelicals.append(mea)
+        simulation_superhelicals_std.append(std)
+
+        if variations_list[n][0]['name'] == 'gyrase':
+            a=2
+            b=a+3
+
+        #print('system', n, 'simulation', simulation_number, 'my_objective', my_objective)
+        my_objective = my_objective + current_objective
+    return my_objective, simulation_superhelicals, simulation_superhelicals_std
+
+# Similar to previous funciton but only apply topoisomerase variations and returns dfs
+def test_steady_topos(global_dict_list, variations_list, exp_superhelicals, n_simulations):
+    n_systems = len(global_dict_list)  # number of systems.
+
+    # Let's run experiments for the substrate concentrations
+    my_objective = 0.0
+    output_list = []
+
+    # Create a multiprocessing pool
+    pool = multiprocessing.Pool()
+
+    for n in range(n_systems):
+
+        # We need a list of items, so the pool can pass each item to the function
+        Items = []
+        for simulation_number in range(n_simulations):
+            g_dict = dict(global_dict_list[n])
+            g_dict['n_simulations'] = simulation_number
+            Item = {'global_conditions': g_dict, 'variations': variations_list[n]}
+            Items.append(Item)
+
+        pool_results = pool.map(pt.single_simulation_w_variations_barebinding_return_dfs, Items)
+
+        # Extract info from dataframes
+        for j, out_dict in enumerate(pool_results):
+
+            sites_df = out_dict['sites_df']
+            mask = sites_df['type'] == 'circuit'
+            topoI_mask = sites_df['name'] == 'DNA_topoI'
+            gyrase_mask = sites_df['name'] == 'DNA_gyrase'
+            superhelical = sites_df[mask]['superhelical'].to_numpy()
+            topoI = sites_df[topoI_mask].drop_duplicates('frame')
+            topoI = topoI['#enzymes'].to_numpy()
+            gyrase = sites_df[gyrase_mask].drop_duplicates('frame')
+            gyrase = gyrase['#enzymes'].to_numpy()
+
+            simulation_df = pd.DataFrame({'simulation_' + str(j): superhelical})
+            topoI_df = pd.DataFrame({'simulation_' + str(j): topoI})
+            gyrase_df = pd.DataFrame({'simulation_' + str(j): gyrase})
+
+
+            if j == 0:
+                superhelical_output_df = simulation_df.copy()
+                topoI_output_df = topoI_df.copy()
+                gyrase_output_df = gyrase_df.copy()
+            else:
+                superhelical_output_df = pd.concat([superhelical_output_df, simulation_df], axis=1).reset_index(
+                    drop=True)
+                topoI_output_df = pd.concat([topoI_output_df, topoI_df], axis=1).reset_index(drop=True)
+                gyrase_output_df = pd.concat([gyrase_output_df, gyrase_df], axis=1).reset_index(drop=True)
+
+        superhelical_mean = superhelical_output_df.mean(axis=1).to_numpy()
+        superhelical_std = superhelical_output_df.std(axis=1).to_numpy()
+        supercoiling = np.array([superhelical_mean, superhelical_std])
+        topoI_mean = topoI_output_df.mean(axis=1).to_numpy()
+        topoI_std = np.nan_to_num(topoI_output_df.std(axis=1).to_numpy())
+        gyrase_mean =gyrase_output_df.mean(axis=1).to_numpy()
+        gyrase_std = np.nan_to_num(gyrase_output_df.std(axis=1).to_numpy())
+        topoI = np.array([topoI_mean, topoI_std])
+        gyrase = np.array([gyrase_mean, gyrase_std])
+
+        current_objective = np.sum(np.square(supercoiling[0][1:] - exp_superhelicals[n]))
+
+        output_dict = {'supercoiling': supercoiling, 'topoI': topoI, 'gyrase': gyrase}
+        output_list.append(output_dict)
+
+        my_objective = my_objective + current_objective
+    pool.close()
+    return my_objective, output_list
 
 # Runs the objective function for the topoisomerase I RNAP Tracking model for different system conditions.
 # The objective function is calculated as a combination of fold change and correlation between densities of
@@ -1503,8 +1618,7 @@ def gene_architecture_calibration_nsets_rates(big_global_list, big_variation_lis
         Item_forpool = [(n_subsets, n_inner_workers, Item_set[j], processing_dict_list[j]) for j in
                         range(len(distances))]
 
-        results = pool.map(
-            gene_architecture_run_pool, Item_forpool)
+        results = pool.map(gene_architecture_run_pool, Item_forpool)
 
         # Process and calculate objective
         # --------------------------------------------------------------
@@ -1538,6 +1652,12 @@ def gene_architecture_run_pool(item_pool):
     processing_dict = item_pool[3]
     additional_results = processing_dict['additional_results']
 
+    # These objects needed for calculating the production rate
+    my_circuit = processing_dict['circuit']
+    total_time = my_circuit.dt * my_circuit.frames
+    site_name = processing_dict['site_name']
+
+
     # Our output will be a dictionary
     output = {}
 
@@ -1556,23 +1676,26 @@ def gene_architecture_run_pool(item_pool):
 
         pool_list += pool_results
 
-    processing_items = []
+    # Calculate production rates
+    # ---------------------------------------------------------
+    prod_rates = []
     for pool_results in pool_list:
-        processing_items.append((pool_results, processing_dict))
+        environmental_df = pool_results['environmental_df']
+        mask = environmental_df['name'] == site_name
 
-    # Process results with another parallelization process
-    # ---------------------------------------------------------
-    # Let's calculate one of each, and do the average and get std
-    output_pools = inner_pool.map(gene_architecture_process_pool, processing_items)
+        if len(environmental_df[mask]['concentration']) == 0:
+            transcripts = 0
+        else:
+            transcripts = environmental_df[mask]['concentration'].iloc[-1]
 
-    # Get averages and stds
-    # ---------------------------------------------------------
+        prod_rates.append(float(transcripts/total_time))
 
-    # Production rate -------------------------
+    # Get averages and stds -------------------------
+    # Production rate
     # Extract prod_rate values from the output_pools list
-    prod_rates = [result[0] for result in output_pools]
+    # prod_rates = [result[0] for result in output_pools]
 
-    # Convert to a NumPy array
+    # Convert to a NumPy arraypool_results
     prod_rates_array = np.array(prod_rates)
 
     # Calculate mean and standard deviation
@@ -1583,10 +1706,25 @@ def gene_architecture_run_pool(item_pool):
 
     # Additional results -------------------------
     if additional_results:
-        ares = [result[1] for result in output_pools]  # The dict returned by gene_architecture_process_pool
+
+        processing_items = []
+        for pool_results in pool_list:
+            processing_items.append((pool_results, processing_dict))
+
+        # Process results with another parallelization process
+        # ---------------------------------------------------------
+        # Let's calculate one of each, and do the average and get std
+
+        # TODO: Add the concentration or transcripts from the environmental!
+
+        output_pools = inner_pool.map(gene_architecture_process_pool, processing_items)
+
+        # ares = [result[1] for result in output_pools]  # The dict returned by gene_architecture_process_pool
+        # ares = [result for result in output_pools]  # The dict returned by gene_architecture_process_pool
+        ares = output_pools
 
         # Procesing DFs and calculating mean,std
-        for key in ['global_superhelical', 'local_superhelical', 'binding', 'unbinding']:
+        for key in ['global_superhelical', 'local_superhelical', 'binding', 'unbinding']: # , 'transcripts']:
             # Extract the NumPy arrays from each dictionary
             arrays = [d[key] for d in ares]
 
@@ -1626,6 +1764,9 @@ def gene_architecture_run_pool(item_pool):
     output['prod_rate'] = prod_rate
     # process_pools_genearch(pool_list, processing_dict)
 
+    # if additional_results:
+    #    a=3
+    #    b=a+2
     # In the meantime, let's just return the production rate
     return output
 
@@ -1650,21 +1791,27 @@ def gene_architecture_process_pool(item_pool):
 
     # Let's calculate the production rate
     # -----------------------------------------------------------------------------------------------------------------
-    total_time = my_circuit.dt * my_circuit.frames
+    # total_time = my_circuit.dt * my_circuit.frames
 
     # Ranges used for calculating unbinding events
-    a = 0  #int(my_circuit.frames / 2)
-    b = -1
+    #a = 0  #int(my_circuit.frames / 2)
+    #b = -1
 
     # Get unbinding event
-    sites_df = pool_result['sites_df']
-    mask = sites_df['name'] == site_name
-    unbinding_event = sites_df[mask]['unbinding'].to_numpy()
+    #sites_df = pool_result['sites_df']
+    #mask = sites_df['name'] == site_name
+    #unbinding_event = sites_df[mask]['unbinding'].to_numpy()
 
     # Calculate production rate (prod_rate)
-    prod_rate = np.sum(unbinding_event[a:b]) / total_time  #/ 2
-    #production_rate_dict = process_pools_calculate_production_rate([pool_result], [site_name], my_circuit)
-    #production_rate = production_rate_dict[site_name]
+    #prod_rate = np.sum(unbinding_event[a:b]) / total_time  #/ 2
+
+    # Variables for processing
+    sites_df = pool_result['sites_df']
+    site_mask = sites_df['name'] == site_name
+
+    environmental_df = pool_result['environmental_df']
+    environmental_mask = environmental_df['name'] == site_name
+
 
     additional_dict = None
     # Let's do the processing
@@ -1674,8 +1821,12 @@ def gene_architecture_process_pool(item_pool):
         # Collect measurements
         # ------------------------------------------------------------------------------
         # Site measurements
-        local_superhelical = sites_df[mask]['superhelical'].to_numpy()
-        binding_event = sites_df[mask]['binding'].to_numpy()
+        local_superhelical = sites_df[site_mask]['superhelical'].to_numpy()
+        binding_event = sites_df[site_mask]['binding'].to_numpy()
+        unbinding_event = sites_df[site_mask]['unbinding'].to_numpy()
+
+        # environmental measurements
+        # transcripts = environmental_df[environmental_mask]['concentration'].to_numpy()
 
         # Global measurements
         mask_circuit = sites_df['type'] == 'circuit'
@@ -1685,6 +1836,7 @@ def gene_architecture_process_pool(item_pool):
         additional_dict['local_superhelical'] = local_superhelical
         additional_dict['binding'] = binding_event
         additional_dict['unbinding'] = unbinding_event
+        # additional_dict['transcripts'] = transcripts
 
         # Collect measurements
         # ------------------------------------------------------------------------------
@@ -1731,4 +1883,167 @@ def gene_architecture_process_pool(item_pool):
         # And to the additional results dict
         additional_dict['KDE'] = kde_dict
 
-    return prod_rate, additional_dict
+    # return prod_rate, additional_dict
+    return additional_dict
+
+# Similar to gene architecture but here we do not do calibration and only want to produce results for plotting.
+# We just run each of the system n_simulations times, and collect data (no KDEs).
+def gene_architecture_run_simple(big_global_list, big_variation_list, experimental_curves, parallel_info,
+                                              additional_results=False):
+    # Let's unpack the info
+    ncases = len(big_global_list)
+    n_simulations = parallel_info['n_simulations']
+    output_list = []  # This list will be made out of a list of cases, each case is made of  a dict with
+    # objective and data keys. In data, it gives a list of dicts, each one containing the distance, and the results
+    objective = 0
+    # Run simulations
+    # --------------------------------------------------------------
+    # Create a multiprocessing pool for the outer loop
+    pool = multiprocessing.Pool()
+
+    # Go through list of cases
+    # --------------------------------------------------------------
+    for icase in range(ncases):
+
+        global_list = big_global_list[icase]
+        variation_list = big_variation_list[icase]
+        exp_curve = experimental_curves[icase]
+
+        distances = exp_curve['distance']
+
+        # Prepare output arrays/lists
+        # --------------------------------------------------
+        case_output = {} # This will be a dict with all results
+        rate_list = []
+        local_sigma = []
+        global_sigma = []
+        local_dsigma = []
+        global_dsigma = []
+        active_sigma = []
+        objective = 0
+
+        # Distances
+        # --------------------------------------------------------------
+        for j in range(len(distances)):
+
+            g_dict = global_list[j]
+
+            # Sort the processing info
+            # --------------------------------------------------
+            my_circuit = load_circuit(g_dict)
+            total_time = my_circuit.dt * my_circuit.frames
+            dt = my_circuit.dt
+            frames = my_circuit.frames
+
+            # Prepare items for parallelization
+            # --------------------------------------------------------------
+            Items = []
+            for simulation_number in range(n_simulations):
+                g_dict['n_simulations'] = simulation_number
+                Item = {'global_conditions': g_dict.copy(), 'variations': variation_list.copy()}
+                Items.append(Item)
+
+
+            # Run in parallel
+            # ----------------------------
+            # Run simulations in parallel within this subset
+            pool_results = pool.map(pt.single_simulation_w_variations_return_dfs, Items)
+
+            # Calculate production rates
+            # ---------------------------------------------------------
+            prod_rates = []
+            for result in pool_results:
+                environmental_df = result['environmental_df']
+                mask = environmental_df['name'] == 'reporter'
+                if len(environmental_df[mask]['concentration']) == 0:
+                    transcripts = 0
+                else:
+                    transcripts = environmental_df[mask]['concentration'].iloc[-1]
+                prod_rates.append(float(transcripts / total_time))
+            rates_array = np.array(prod_rates)
+            mean_rates = np.mean(rates_array)
+            std_rates = np.std(rates_array)
+            rates = np.array([mean_rates, std_rates])
+            rate_list.append(rates)
+
+            # Calculate superhelical densities
+            # ---------------------------------------------------------
+            lsigma = []
+            gsigma = []
+            ldsig = [] #variations
+            gdsig = []
+            lactsig = [] # sigma when the gene is being transcribed
+            for result in pool_results:
+                sites_df = result['sites_df']
+                enzymes_df = result['enzymes_df']
+                site_mask = sites_df['name'] == 'reporter'
+                mask_circuit = sites_df['type'] == 'circuit'
+                active_mask = enzymes_df['name'] == 'RNAP_Elongation'
+
+                # Collect measurements
+                local_df = sites_df[site_mask]#['superhelical']
+                local_superhelical = local_df['superhelical'].to_numpy()
+                # local_superhelical = sites_df[site_mask]['superhelical'].to_numpy()
+                global_superhelical = sites_df[mask_circuit]['superhelical'].to_numpy()
+
+
+                # Collect for active states
+                active_frames = enzymes_df[active_mask]['frame']
+                active_superhelical = local_df[local_df['frame'].isin(active_frames)]['superhelical'].to_numpy()
+                #active_superhelical = sites_df[sites_df['frame'].isin(active_frames)][site_mask].to_numpy()
+
+                if len(active_superhelical) == 0:
+                    active_superhelical = global_superhelical[:-2]  # The last one so it doesn't interfear
+
+                active_superhelical = np.array(active_superhelical)
+                # Let's collect the changes
+#                frames = len(local_superhelical)
+                d_local = np.zeros(frames)
+                d_global = np.zeros(frames)
+                for f in range(frames):  # frames because local_superhelical actually have frames+1 measurements
+                    d_local[f] = (local_superhelical[f+1] - local_superhelical[f]) / dt
+                    d_global[f] = (global_superhelical[f+1] - global_superhelical[f]) / dt
+
+                lsigma.append(local_superhelical)
+                gsigma.append(global_superhelical)
+                ldsig.append(d_local) # Variations
+                gdsig.append(d_global)
+                lactsig.append(active_superhelical)
+
+            # Add to lists as arrays
+            local_sigma.append(np.array(lsigma))
+            global_sigma.append(np.array(gsigma))
+
+            # And the variations
+            local_dsigma.append(np.array(ldsig))
+            global_dsigma.append(np.array(gdsig))
+
+            flattened_lactsig = np.concatenate(lactsig)  # Or use np.hstack(lactsig) if all arrays are 1D
+            active_sigma.append(flattened_lactsig)
+            # active_sigma.append(np.array(lactsig))
+
+        # Process and calculate objective
+        # --------------------------------------------------------------
+        prod_rates = [result[0] for result in rate_list]
+        my_objective = np.sum((exp_curve['Signal'] - prod_rates) ** 2)  # This is the objective of the icase
+
+        # Prepare case output dict
+        # --------------------------------------------------------------
+        case_output['distance'] = np.array(distances)
+        case_output['objective'] = my_objective
+        case_output['prod_rate'] = rate_list
+        case_output['local_superhelical'] = local_sigma
+        case_output['global_superhelical'] = global_sigma
+        case_output['local_superhelical_variations'] = local_dsigma
+        case_output['global_superhelical_variations'] = global_dsigma
+        case_output['active_superhelical'] = active_sigma
+
+        output_list.append(case_output)  #And add it
+        objective += my_objective
+
+
+    # Close pool
+    # --------------------------------------------------------------
+    pool.close()
+
+    return objective, output_list

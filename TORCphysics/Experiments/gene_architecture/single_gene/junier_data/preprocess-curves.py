@@ -32,7 +32,8 @@ strong_F = 4.550
 factors = [weak_F, medium_F, strong_F]
 
 # Weak promoter expression rate
-k_weak = 0.02#0.02 # 0.02 ~ 2 transcripts per 100s, or 1 transcript every 50seconds
+#k_weak = 0.0334#0.02#0.02 # 0.02 ~ 2 transcripts per 100s, or 1 transcript every 50seconds
+k_weak = 0.03#0.0275 #0.0225# 0.03 #0.025
 
 # Output parms
 out_prefix = 'inferred-rate_kw'+str(k_weak)+'_'

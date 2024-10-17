@@ -1,0 +1,4 @@
+type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+RNAP,RNAP,gene,1.0,30,20,none,none,RNAPStagesStall,none,RNAPStagesSimpleUnbinding,none
+topo,topoI,DNA,17.0,20,10,TopoIRecognitionRNAPTracking,../../../topoI-calibration_RNAPTracking_nsets_p2_small_dt1.0.csv,TopoILinear,../../../topoI-calibration_RNAPTracking_nsets_p2_small_dt1.0.csv,PoissonUnBinding,../../../topoI-calibration_RNAPTracking_nsets_p2_small_dt1.0.csv
+topo,gyrase,DNA,44.6,30,20,GyraseRecognition,../../../calibration_dt1.0_gyrase.csv,GyraseLinear,../../../calibration_dt1.0_gyrase.csv,PoissonUnBinding,../../../calibration_dt1.0_gyrase.csv

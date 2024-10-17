@@ -1,11 +1,10 @@
 import numpy as np
-import pandas as pd
 from TORCphysics import topo_calibration_tools as tct
 from TORCphysics import Circuit
 import matplotlib.pyplot as plt
 import pickle
+import matplotlib.patches as mpatches
 
-# TODO: Once you have your "true" calibration results, modify the script to load them.
 # Description
 # --------------------------------------------------------------
 # Following the calibration process by executing calibrate_tracking_nsets_p2.py for both the stalling and uniform
@@ -24,14 +23,10 @@ frames = len(time)
 
 pickle_files = [
     'track-uniform/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl',
-    #'track-uniform/calibration_RNAPTracking_nsets_p2_small_dt0.5.pkl',
-    #'track-StagesStall/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
-    #'track-StagesStall/reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
     'track-StagesStall/reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'-02.pkl'
-    #'track-StagesStall/calibration_RNAPTracking_nsets_p2_small_g0.75_dt' + str(dt) + '.pkl'
 ]
 output_prefix = 'RNAPStages-topoIRNAPtracking'
-title = ['Uniform model', 'Stall model']
+title = ['Uniform Model', 'Stages-Stall Model']
 
 # Circuit initial conditions
 # --------------------------------------------------------------
@@ -45,7 +40,7 @@ continuation = False
 # Figure initial conditions
 # ---------------------------------------------------------
 width = 8
-height = 4
+height = 3.5
 lw = 3
 font_size = 12
 xlabel_size = 14
@@ -54,10 +49,11 @@ title_size = 16
 alpha=0.3
 
 names = ['RNAP', 'topoI', 'gyrase']
-colors_dict = {'RNAP': 'purple', 'topoI': 'red', 'gyrase': 'cyan'}
+colors_dict = {'RNAP': 'purple', 'topoI': 'red', 'gyrase': 'blue'}
 kwargs = {'linewidth': 2, 'ls': '-'}
 ylabel = 'Fold Enrichment'
 ylabel2 = 'RNAP Density'
+
 
 # TARGETS FOR OPTIMIZATION - We need this even though we will not run the parallelization
 # -----------------------------------
@@ -89,11 +85,24 @@ x_gene = tct.get_interpolated_x(target_gene.start - RNAP_env.size, target_gene.e
 ncases = len(pickle_files)
 fig, axs = plt.subplots(ncases, figsize=(width, ncases*height), tight_layout=True)
 
+x1 = 3500
+x0 = 2500#-30
+h = [.725,.725]
+dx = x1 - x0
+gene_colour = 'gray'
+gene_lw=2
+
+ylims = [[.67,1.5], [.67,1.8]]
+mylabels = ['RNAP', 'Topoisomerase I', 'Gyrase']
+
 for n, pickle_file in enumerate(pickle_files):
 
-
-    # Plot line at 1.0
-    #axs[n].plot([-200,my_circuit.size+200], [1,1], '--', 'black', lw=1.0)
+    # Draw gene
+    # ---------------------------------------------------------
+    arrow = mpatches.FancyArrowPatch((x0, h[n]), (x1, h[n]), arrowstyle='simple',
+                                     facecolor=gene_colour, zorder=5, edgecolor='black', lw=gene_lw,
+                                     mutation_scale=40, shrinkA=0, shrinkB=0)
+    axs[n].add_patch(arrow)
 
     # Load the dictionary from the file
     # ---------------------------------------------------------
@@ -111,7 +120,10 @@ for n, pickle_file in enumerate(pickle_files):
             ax = ax2
             x = x_gene
             y = output['results']['kde_gene'][name]['mean']
+            ymax = np.max(y)
             ys = output['results']['kde_gene'][name]['std']
+            y=y/ymax
+            ys=ys/ymax
             # ax2 = ax.twinx()
             # ax2.plot(x_gene, output['results']['kde_gene'][name]['mean'], colors_dict[name], lw=lw, label=name)
         else:
@@ -119,23 +131,33 @@ for n, pickle_file in enumerate(pickle_files):
             y = output['results']['FE_curve'][name]['mean']
             ys = output['results']['FE_curve'][name]['std']
             # ax.plot(x_system, output['results']['FE_curve'][name]['mean'], color=colors_dict[name], lw=lw, label=name)
-        ax.plot(x, y, color=colors_dict[name], lw=lw, label=name)
+        ax.plot(x, y, color=colors_dict[name], lw=lw, label=mylabels[p])
         ax.fill_between(x, y-ys, y+ys, color=colors_dict[name], alpha=alpha)
-        print(pickle_file, name, np.mean(y))
+        print(name, np.mean(y), p)
 
     # Labels
     # ------------------------
-    ax.set_ylabel(ylabel, fontsize=font_size)
-    ax2.set_ylabel(ylabel2, fontsize=font_size, color=colors_dict['RNAP'])
-    ax.set_xlabel(r'Position (bp)', fontsize=font_size)
+    ax.set_ylabel(ylabel, fontsize=xlabel_size)
+    ax2.set_ylabel(ylabel2, fontsize=xlabel_size, color=colors_dict['RNAP'])
+    ax.set_xlabel(r'Position (bp)', fontsize=xlabel_size)
     ax.set_xlim(0, my_circuit.size)
     ax.grid(True)
-    #ax.set_ylim(.5,1.5)
+    yl = ylims[n]
+    ax.set_ylim(yl[0],yl[1])
     ax.set_xlim(0, my_circuit.size)
-    ax.set_title(title[n], fontsize=font_size)
+    ax.set_title(title[n], fontsize=title_size)
+    ax2.tick_params(axis='y', labelcolor=colors_dict['RNAP'])
+
     # fig.suptitle(title[n], fontsize=title_size)
     if n == 0:
-        ax.legend(loc='best', fontsize=font_size)
+        # Combine the legends from both axes
+        lines, labels = ax.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+
+        # Create one unified legend
+        ax.legend(lines + lines2, labels + labels2, loc='upper left', fontsize=font_size)
+        #ax.legend(loc='best', fontsize=font_size)
+        #ax2.legend(loc='best', fontsize=font_size)
 
 
     # Add FE and correlation labels
@@ -151,7 +173,7 @@ for n, pickle_file in enumerate(pickle_files):
 
     # Add the text box to the plot
     props = dict(boxstyle='round', facecolor='silver', alpha=0.5)
-    ax.text(0.05, 0.1, textstr, transform=ax.transAxes, fontsize=14,
+    ax.text(0.6, .93, textstr, transform=ax.transAxes, fontsize=font_size*.95,
             verticalalignment='top', bbox=props)
     print('For ', title[n])
     print('FE',FE)
@@ -159,7 +181,8 @@ for n, pickle_file in enumerate(pickle_files):
     print('objective', output['objective'])
     print('RNAP_correlation', output['results']['RNAP_correlation'])
 
-#plt.savefig('RNAPTRACK-temp.png')
+    ax.plot([x0,x0], [-10,10], lw=2, color='gray', ls='--' )
+    ax.plot([x1, x1], [-10, 10], lw=2, color='gray', ls='--')
 plt.savefig(output_prefix+'-FE.png')
 plt.savefig(output_prefix+'-FE.pdf')
 plt.show()

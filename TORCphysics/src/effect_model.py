@@ -537,7 +537,7 @@ class RNAPStagesStallv2(EffectModel):
         # -------------------------------------------------
         if self.state == 'Elongation':
 
-            # z.name = 'RNAP_' + self.state
+            z.name = 'RNAP_' + self.state
 
             # Elongation
             position, twist_left, twist_right = utils.RNAP_stall_mec_model(z, z_list, dt)
