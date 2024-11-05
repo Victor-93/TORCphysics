@@ -738,7 +738,7 @@ class GaussianBinding(BindingModel):
                 else:
                     raise ValueError('Error, k_on parameter missing in csv file for GaussianBinding Model')
                 if 'spread' in mydata.columns:
-                    self.n = mydata['spread'][0]
+                    self.spread = mydata['spread'][0]
                 else:
                     raise ValueError('Error, spread parameter missing in csv file for GaussianBinding Model')
                 if 'superhelical_op' in mydata.columns:
@@ -749,36 +749,36 @@ class GaussianBinding(BindingModel):
                 # I am comenting them out as  we won't always need them. Basically because depends on the effect
                 # model
                 # Closed complex
-                # if 'k_closed' in mydata.columns:
-                #    self.k_closed = mydata['k_closed'][0]
-                # else:
-                #     raise ValueError('Error, k_closed parameter missing in csv file for GaussianBinding')
+                if 'k_closed' in mydata.columns:
+                    self.k_closed = mydata['k_closed'][0]
+                else:
+                    raise ValueError('Error, k_closed parameter missing in csv file for GaussianBinding')
 
                 # Open complex
-                # if 'k_open' in mydata.columns:
-                #     self.k_open = mydata['k_open'][0]
-                # else:
-                 #    raise ValueError('Error, k_open parameter missing in csv file for GaussianBinding')
-                # if 'width' in mydata.columns:
-                #     self.width = mydata['width'][0]
-                # else:
-                #     raise ValueError('Error, width parameter missing in csv file for GaussianBinding')
-                # if 'threshold' in mydata.columns:
-                #     self.threshold = mydata['threshold'][0]
-                # else:
-                #     raise ValueError('Error, threshold parameter missing in csv file for GaussianBinding')
+                if 'k_open' in mydata.columns:
+                    self.k_open = mydata['k_open'][0]
+                else:
+                   raise ValueError('Error, k_open parameter missing in csv file for GaussianBinding')
+                if 'width' in mydata.columns:
+                    self.width = mydata['width'][0]
+                else:
+                    raise ValueError('Error, width parameter missing in csv file for GaussianBinding')
+                if 'threshold' in mydata.columns:
+                    self.threshold = mydata['threshold'][0]
+                else:
+                    raise ValueError('Error, threshold parameter missing in csv file for GaussianBinding')
 
                 # Initiation
-                # if 'k_ini' in mydata.columns:
-                #     self.k_ini = mydata['k_ini'][0]
-                # else:
-                #     raise ValueError('Error, k_ini parameter missing in csv file for GaussianBinding')
+                if 'k_ini' in mydata.columns:
+                    self.k_ini = mydata['k_ini'][0]
+                else:
+                    raise ValueError('Error, k_ini parameter missing in csv file for GaussianBinding')
 
                 # Unbinding
-                # if 'k_off' in mydata.columns:
-                #     self.k_off = mydata['k_off'][0]
-                # else:
-                #     raise ValueError('Error, k_off parameter missing in csv file for GaussianBinding Model')
+                if 'k_off' in mydata.columns:
+                    self.k_off = mydata['k_off'][0]
+                else:
+                    raise ValueError('Error, k_off parameter missing in csv file for GaussianBinding Model')
 
         else:
             # No point testing or checking that we have these variables, as python gives error on its own.
@@ -821,6 +821,7 @@ class GaussianBinding(BindingModel):
         self.interacts = interacts
 
         # Just in case
+        # print(mydata)
         self.oparams = {'k_on': self.k_on, 'spread': self.spread, 'superhelical_op': self.superhelical_op,
                         'k_closed': self.k_closed, 'k_open': self.k_open, 'k_ini': self.k_ini,
                         'width': self.width, 'threshold': self.threshold, 'k_off': self.k_off}

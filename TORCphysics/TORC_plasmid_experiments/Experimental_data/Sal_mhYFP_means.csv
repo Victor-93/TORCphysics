@@ -1,0 +1,36 @@
+bacterium,promoter,strain,mhYFP_by_A600,mhYFP_by_A600_std
+Salmonella enterica Typhimurium SL1344,None,WT,,
+Salmonella enterica Typhimurium SL1344,None,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",,
+Salmonella enterica Typhimurium SL1344,None,ΔtopA::cat,,
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,21461.16595798088,813.483489722619
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",22190.99183910571,1486.8740400205747
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,31071.663042237025,6771.14100687419
+Salmonella enterica Typhimurium SL1344,PleuWT.1minRBS mhYFP,WT,97476.84797550422,23529.775239428327
+Salmonella enterica Typhimurium SL1344,PleuWT.1minRBS mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",65790.23073722397,15977.013869789069
+Salmonella enterica Typhimurium SL1344,PleuWT.1minRBS mhYFP,ΔtopA::cat,108978.02201941166,29766.519200178278
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,20428.085399244006,1242.8429206020166
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",35204.630327351675,2824.282232550086
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,28597.304748332626,5887.669131514762
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mRaspberry,WT,983.894891734233,69.81131980492314
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mRaspberry,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",814.6919559007148,117.81331300272629
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mRaspberry,ΔtopA::cat,825.6226191551319,126.64051918763839
+Salmonella enterica Typhimurium SL1344,PleuWT.1minRBS mRaspberry,WT,928.6655103344962,80.93521901689002
+Salmonella enterica Typhimurium SL1344,PleuWT.1minRBS mRaspberry,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",710.7108048679162,102.84446293935991
+Salmonella enterica Typhimurium SL1344,PleuWT.1minRBS mRaspberry,ΔtopA::cat,760.5660492367507,122.58698931531606
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mRaspberry,WT,,
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mRaspberry,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",,
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mRaspberry,ΔtopA::cat,,

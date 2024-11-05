@@ -1,0 +1,7 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+lacOP,lac2,45,0.0,0.01,none,none
+gene,bla,1095,191,0.01,none,none
+gene,PleuWT,2088,1260,0.01,none,none
+lacOP,lac1,2166,0.0,0.01,none,none
+gene,antitet,2246,1746,0.01,none,none
+gene,tetA,2241,3479,0.01,none,none

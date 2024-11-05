@@ -1380,7 +1380,7 @@ class LacIPoissonBridging(EffectModel):
                 else:
                     raise ValueError('Error, k_bridge_off parameter missing in csv file for LacIPoissonBridging')
                 if 'leakage' in mydata.columns:
-                    self.leakege = mydata['leakage'][0]
+                    self.leakage = mydata['leakage'][0]
                 else:
                     raise ValueError('Error, leakage parameter missing in csv file for LacIPoissonBridging')
 

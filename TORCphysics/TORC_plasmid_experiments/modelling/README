@@ -1,0 +1,7 @@
+12/09/2024
+
+Here, I will run TORCPhysics trying to find parametrisation that can reproduce and explain experimental results.
+
+In this folder, I will put all the parametrization, e.g. topoI, gyrase, RNAP parametrizations.
+
+In optimization/ I'll have the actual code that runs the calibration, the circuit files and environmental files.

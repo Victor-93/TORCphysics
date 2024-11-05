@@ -158,6 +158,7 @@ class Site:
         """
 
         # Binding Model
+        # print(self.name)
         self.binding_model, self.binding_model_name, self.binding_oparams_file, self.binding_model_oparams = (
             bm.get_binding_model(self.name, self.binding_model, self.binding_model_name,
                                  self.binding_oparams_file, self.binding_model_oparams))

@@ -1,0 +1,517 @@
+well	protocol	A600	A700	mhYFP	mRaspberry	date	bacterium	strain	plasmid	promoter	code	biorep	antibiotic
+A1	PRT14_6	0.899	0.792	1545	1299	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	1	Ampicillin
+A2	PRT14_6	0.888	0.788	1528	1307	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	2	Ampicillin
+A3	PRT14_6	0.895	0.789	1538	1310	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	3	Ampicillin
+A4	PRT14_6	0.876	0.773	1493	1314	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	4	Ampicillin
+A5	PRT14_6	0.904	0.799	10834	1313	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	1	Ampicillin
+A6	PRT14_6	0.897	0.791	10551	1286	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	2	Ampicillin
+A7	PRT14_6	0.902	0.8	13784	1321	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	3	Ampicillin
+A8	PRT14_6	0.872	0.769	11671	1317	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	4	Ampicillin
+A9	PRT14_6	0.812	0.726	44472	1319	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	1	Ampicillin
+A10	PRT14_6	0.923	0.824	47240	1312	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	2	Ampicillin
+A11	PRT14_6	0.899	0.799	51083	1322	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	3	Ampicillin
+A12	PRT14_6	0.927	0.824	43994	1309	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	4	Ampicillin
+B1	PRT14_6	0.891	0.78	1567	6121	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	1	Ampicillin
+B2	PRT14_6	0.895	0.783	1553	6305	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	2	Ampicillin
+B3	PRT14_6	0.884	0.772	1574	6316	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	3	Ampicillin
+B4	PRT14_6	0.88	0.768	1501	6196	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	4	Ampicillin
+B5	PRT14_6	0.723	0.603	1685	20735	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	1	Ampicillin
+B6	PRT14_6	0.856	0.708	1622	38349	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	2	Ampicillin
+B7	PRT14_6	0.745	0.636	1625	13676	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	3	Ampicillin
+B8	PRT14_6	0.777	0.644	1484	36654	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	4	Ampicillin
+B9	PRT14_6	0.695	0.611	12457	1284	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	1	Ampicillin
+B10	PRT14_6	0.66	0.587	10298	1298	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	2	Ampicillin
+B11	PRT14_6	0.701	0.62	10866	1302	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	3	Ampicillin
+B12	PRT14_6	0.816	0.716	15002	1295	2024_08_09	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	4	Ampicillin
+C1	PRT14_6	0.792	0.675	1636	1316	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	1	Ampicillin
+C2	PRT14_6	0.79	0.686	1929	1292	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	2	Ampicillin
+C3	PRT14_6	0.79	0.691	1958	1304	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	3	Ampicillin
+C4	PRT14_6	0.768	0.67	2028	1310	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	4	Ampicillin
+C5	PRT14_6	0.721	0.604	8606	1305	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	1	Ampicillin
+C6	PRT14_6	0.752	0.647	7178	1300	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	2	Ampicillin
+C7	PRT14_6	0.78	0.671	7330	1304	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	3	Ampicillin
+C8	PRT14_6	0.764	0.657	7854	1295	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	4	Ampicillin
+C9	PRT14_6	0.821	0.705	46045	1299	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	1	Ampicillin
+C10	PRT14_6	0.753	0.655	43605	1307	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	2	Ampicillin
+C11	PRT14_6	0.724	0.63	43125	1299	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	3	Ampicillin
+C12	PRT14_6	0.724	0.631	43826	1295	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	4	Ampicillin
+D1	PRT14_6	0.796	0.679	1636	4948	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	1	Ampicillin
+D2	PRT14_6	0.849	0.76	2073	4300	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	2	Ampicillin
+D3	PRT14_6	0.805	0.701	2043	4340	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	3	Ampicillin
+D4	PRT14_6	0.7	0.606	1924	4003	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	4	Ampicillin
+D5	PRT14_6	0.883	0.759	1878	23146	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	1	Ampicillin
+D6	PRT14_6	0.771	0.666	2173	19512	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	2	Ampicillin
+D7	PRT14_6	0.764	0.658	2197	19687	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	3	Ampicillin
+D8	PRT14_6	0.804	0.692	1886	27713	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	4	Ampicillin
+D9	PRT14_6	0.747	0.634	11242	1292	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	1	Ampicillin
+D10	PRT14_6	0.749	0.644	9324	1275	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	2	Ampicillin
+D11	PRT14_6	0.707	0.614	9326	1288	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	3	Ampicillin
+D12	PRT14_6	0.759	0.653	9613	1288	2024_08_09	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	4	Ampicillin
+E1	PRT14_6	0.893	0.776	2108	1286	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	1	Ampicillin
+E2	PRT14_6	0.83	0.713	1885	1271	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	2	Ampicillin
+E3	PRT14_6	0.862	0.746	1924	1291	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	3	Ampicillin
+E4	PRT14_6	0.822	0.705	1781	1286	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	4	Ampicillin
+E5	PRT14_6	0.901	0.785	15674	1275	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	1	Ampicillin
+E6	PRT14_6	0.84	0.724	16729	1261	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	2	Ampicillin
+E7	PRT14_6	0.864	0.75	16284	1283	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	3	Ampicillin
+E8	PRT14_6	0.809	0.695	16093	1275	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	4	Ampicillin
+E9	PRT14_6	0.876	0.764	68770	1285	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	1	Ampicillin
+E10	PRT14_6	0.865	0.753	69655	1281	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	2	Ampicillin
+E11	PRT14_6	0.869	0.757	66744	1283	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	3	Ampicillin
+E12	PRT14_6	0.833	0.721	71856	1286	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	4	Ampicillin
+F1	PRT14_6	0.708	0.614	2022	5360	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	1	Ampicillin
+F2	PRT14_6	0.738	0.642	2017	5457	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	2	Ampicillin
+F3	PRT14_6	0.758	0.661	2090	5157	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	3	Ampicillin
+F4	PRT14_6	0.694	0.607	1837	5536	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	4	Ampicillin
+F5	PRT14_6	0.805	0.676	1811	33972	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	1	Ampicillin
+F6	PRT14_6	0.827	0.696	1868	34445	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	2	Ampicillin
+F7	PRT14_6	0.788	0.663	1842	33844	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	3	Ampicillin
+F8	PRT14_6	0.768	0.642	1652	34170	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	4	Ampicillin
+F9	PRT14_6	0.798	0.684	11772	1281	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	1	Ampicillin
+F10	PRT14_6	0.844	0.731	11550	1277	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	2	Ampicillin
+F11	PRT14_6	0.8	0.687	11608	1267	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	3	Ampicillin
+F12	PRT14_6	0.832	0.718	12208	1283	2024_08_09	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	4	Ampicillin
+H1	PRT14_6	0.087	0.08	1000	1206	2024_08_09	na	na	na	na	blank	na	Ampicillin
+H2	PRT14_6	0.089	0.082	1001	1211	2024_08_09	na	na	na	na	blank	na	Ampicillin
+H3	PRT14_6	0.088	0.081	1013	1211	2024_08_09	na	na	na	na	blank	na	Ampicillin
+H4	PRT14_6	0.088	0.08	995	1210	2024_08_09	na	na	na	na	blank	na	Ampicillin
+H5	PRT14_6	0.088	0.08	1010	1217	2024_08_09	na	na	na	na	blank	na	Ampicillin
+H6	PRT14_6	0.087	0.08	992	1207	2024_08_09	na	na	na	na	blank	na	Ampicillin
+H7	PRT14_6	0.086	0.079	993	1214	2024_08_09	na	na	na	na	blank	na	Ampicillin
+H8	PRT14_6	0.086	0.08	976	1211	2024_08_09	na	na	na	na	blank	na	Ampicillin
+H9	PRT14_6	0.087	0.079	1000	1215	2024_08_09	na	na	na	na	blank	na	Ampicillin
+H10	PRT14_6	0.087	0.08	1001	1214	2024_08_09	na	na	na	na	blank	na	Ampicillin
+H11	PRT14_6	0.087	0.08	1012	1211	2024_08_09	na	na	na	na	blank	na	Ampicillin
+H12	PRT14_6	0.088	0.082	1016	1209	2024_08_09	na	na	na	na	blank	na	Ampicillin
+A1	PRT14_6	0.752	0.606	1548	1315	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	1	Ampicillin
+A2	PRT14_6	0.73	0.594	1468	1310	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	2	Ampicillin
+A3	PRT14_6	0.726	0.589	1484	1319	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	3	Ampicillin
+A4	PRT14_6	0.709	0.573	1372	1305	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	4	Ampicillin
+A5	PRT14_6	0.713	0.581	14134	1316	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	1	Ampicillin
+A6	PRT14_6	0.713	0.579	13305	1299	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	2	Ampicillin
+A7	PRT14_6	0.7	0.576	14074	1309	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	3	Ampicillin
+A8	PRT14_6	0.714	0.586	13786	1320	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	4	Ampicillin
+A9	PRT14_6	0.73	0.603	22870	1321	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	1	Ampicillin
+A10	PRT14_6	0.709	0.584	62913	1314	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	2	Ampicillin
+A11	PRT14_6	0.754	0.618	54186	1311	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	3	Ampicillin
+A12	PRT14_6	0.702	0.57	67350	1319	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	4	Ampicillin
+B1	PRT14_6	0.717	0.583	1523	6156	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	1	Ampicillin
+B2	PRT14_6	0.698	0.574	1486	6090	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	2	Ampicillin
+B3	PRT14_6	0.719	0.595	1533	5743	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	3	Ampicillin
+B4	PRT14_6	0.715	0.588	1432	6282	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	4	Ampicillin
+B5	PRT14_6	0.714	0.581	1512	19830	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	1	Ampicillin
+B6	PRT14_6	0.737	0.599	1524	23374	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	2	Ampicillin
+B7	PRT14_6	0.728	0.599	1584	11844	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	3	Ampicillin
+B8	PRT14_6	0.692	0.557	1433	21882	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	4	Ampicillin
+B9	PRT14_6	0.76	0.635	15025	1309	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	1	Ampicillin
+B10	PRT14_6	0.767	0.638	15250	1311	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	2	Ampicillin
+B11	PRT14_6	0.738	0.614	15281	1314	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	3	Ampicillin
+B12	PRT14_6	0.756	0.626	15369	1309	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	4	Ampicillin
+C1	PRT14_6	0.718	0.591	1509	1355	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	1	Ampicillin
+C2	PRT14_6	0.751	0.624	1533	1355	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	2	Ampicillin
+C3	PRT14_6	0.72	0.594	1522	1317	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	3	Ampicillin
+C4	PRT14_6	0.742	0.614	1505	1322	2024_08_13	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	4	Ampicillin
+C5	PRT14_6	0.784	0.662	1401	1300	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	1	Ampicillin
+C6	PRT14_6	0.795	0.671	1467	1315	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	2	Ampicillin
+C7	PRT14_6	0.723	0.603	1590	1310	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	3	Ampicillin
+C8	PRT14_6	0.688	0.577	1489	1297	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	4	Ampicillin
+C9	PRT14_6	0.807	0.689	34488	1306	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	1	Ampicillin
+C10	PRT14_6	0.807	0.683	27504	1297	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	2	Ampicillin
+C11	PRT14_6	0.733	0.622	14008	1298	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	3	Ampicillin
+C12	PRT14_6	0.74	0.619	14682	1296	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	4	Ampicillin
+D1	PRT14_6	0.759	0.635	85826	1303	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	1	Ampicillin
+D2	PRT14_6	0.765	0.651	83883	1284	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	2	Ampicillin
+D3	PRT14_6	0.654	0.549	36992	1283	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	3	Ampicillin
+D4	PRT14_6	0.608	0.51	29720	1272	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	4	Ampicillin
+D5	PRT14_6	0.816	0.691	1415	8754	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	1	Ampicillin
+D6	PRT14_6	0.813	0.691	1460	8630	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	2	Ampicillin
+D7	PRT14_6	0.655	0.549	1487	3323	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	3	Ampicillin
+D8	PRT14_6	0.712	0.601	1479	4064	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	4	Ampicillin
+D9	PRT14_6	0.84	0.705	1418	24467	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	1	Ampicillin
+D10	PRT14_6	0.81	0.678	1412	18990	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	2	Ampicillin
+D11	PRT14_6	0.72	0.607	1465	12112	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	3	Ampicillin
+D12	PRT14_6	0.622	0.512	1394	4967	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	4	Ampicillin
+E1	PRT14_6	0.826	0.697	25844	1305	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	1	Ampicillin
+E2	PRT14_6	0.818	0.698	24076	1287	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	2	Ampicillin
+E3	PRT14_6	0.745	0.632	12967	1291	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	3	Ampicillin
+E4	PRT14_6	0.724	0.617	10543	1289	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	4	Ampicillin
+E5	PRT14_6	0.802	0.689	1447	1613	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	1	Ampicillin
+E6	PRT14_6	0.723	0.618	1354	1362	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	2	Ampicillin
+E7	PRT14_6	0.571	0.481	1303	1309	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	3	Ampicillin
+E8	PRT14_6	0.618	0.52	1351	1377	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	4	Ampicillin
+E9	PRT14_6	0.797	0.673	1493	1288	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	1	Ampicillin
+E10	PRT14_6	0.788	0.67	17637	1293	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	2	Ampicillin
+E11	PRT14_6	0.785	0.662	1482	1295	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	3	Ampicillin
+E12	PRT14_6	0.783	0.655	14833	1301	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	4	Ampicillin
+F1	PRT14_6	0.82	0.692	17668	1303	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	1	Ampicillin
+F2	PRT14_6	0.813	0.692	17479	1295	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	2	Ampicillin
+F3	PRT14_6	0.781	0.661	18803	1315	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	3	Ampicillin
+F4	PRT14_6	0.804	0.684	16645	1283	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	4	Ampicillin
+F5	PRT14_6	0.834	0.711	55193	1292	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	1	Ampicillin
+F6	PRT14_6	0.818	0.699	54452	1282	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	2	Ampicillin
+F7	PRT14_6	0.808	0.689	54451	1279	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	3	Ampicillin
+F8	PRT14_6	0.802	0.682	53537	1293	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	4	Ampicillin
+F9	PRT14_6	0.798	0.676	1522	7142	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	1	Ampicillin
+F10	PRT14_6	0.79	0.66	1532	7155	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	2	Ampicillin
+F11	PRT14_6	0.787	0.661	1521	7412	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	3	Ampicillin
+F12	PRT14_6	0.807	0.675	1516	7323	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	4	Ampicillin
+G1	PRT14_6	0.77	0.637	1420	20728	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	1	Ampicillin
+G2	PRT14_6	0.796	0.668	1463	14588	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	2	Ampicillin
+G3	PRT14_6	0.852	0.79	1541	23197	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	3	Ampicillin
+G4	PRT14_6	0.79	0.663	1400	18972	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	4	Ampicillin
+G5	PRT14_6	0.81	0.693	28654	1295	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	1	Ampicillin
+G6	PRT14_6	0.803	0.686	27981	1293	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	2	Ampicillin
+G7	PRT14_6	0.769	0.653	28097	1289	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	3	Ampicillin
+G8	PRT14_6	0.793	0.675	27488	1297	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	4	Ampicillin
+G9	PRT14_6	0.798	0.68	1479	2691	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	1	Ampicillin
+G10	PRT14_6	0.788	0.672	1472	2542	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	2	Ampicillin
+G11	PRT14_6	0.779	0.662	1463	2532	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	3	Ampicillin
+G12	PRT14_6	0.797	0.675	1484	2639	2024_08_13	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1 mRaspberry	pTORC66	4	Ampicillin
+H1	PRT14_6	0.086	0.08	878	1223	2024_08_13	na	na	na	na	blank	na	Ampicillin
+H2	PRT14_6	0.087	0.08	895	1233	2024_08_13	na	na	na	na	blank	na	Ampicillin
+H3	PRT14_6	0.087	0.081	886	1234	2024_08_13	na	na	na	na	blank	na	Ampicillin
+H4	PRT14_6	0.088	0.08	937	1240	2024_08_13	na	na	na	na	blank	na	Ampicillin
+H5	PRT14_6	0.086	0.079	859	1230	2024_08_13	na	na	na	na	blank	na	Ampicillin
+H6	PRT14_6	0.087	0.079	925	1233	2024_08_13	na	na	na	na	blank	na	Ampicillin
+H7	PRT14_6	0.086	0.078	907	1236	2024_08_13	na	na	na	na	blank	na	Ampicillin
+H8	PRT14_6	0.086	0.08	863	1220	2024_08_13	na	na	na	na	blank	na	Ampicillin
+H9	PRT14_6	0.086	0.078	889	1224	2024_08_13	na	na	na	na	blank	na	Ampicillin
+H10	PRT14_6	0.086	0.079	848	1225	2024_08_13	na	na	na	na	blank	na	Ampicillin
+H11	PRT14_6	0.086	0.079	930	1238	2024_08_13	na	na	na	na	blank	na	Ampicillin
+H12	PRT14_6	0.086	0.079	921	1249	2024_08_13	na	na	na	na	blank	na	Ampicillin
+A1	PRT14_6	0.872	0.739	1437	1325	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	5	Ampicillin
+A2	PRT14_6	0.866	0.742	1358	1324	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	6	Ampicillin
+A3	PRT14_6	0.854	0.729	13159	1334	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	5	Ampicillin
+A4	PRT14_6	0.822	0.695	13986	1340	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	6	Ampicillin
+A5	PRT14_6	0.86	0.74	53232	1336	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	5	Ampicillin
+A6	PRT14_6	0.882	0.756	49495	1312	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	6	Ampicillin
+A7	PRT14_6	0.791	0.664	1422	6835	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	5	Ampicillin
+A8	PRT14_6	0.825	0.694	1340	6970	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	6	Ampicillin
+A9	PRT14_6	0.835	0.682	1459	37348	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	5	Ampicillin
+A10	PRT14_6	0.833	0.678	1317	38661	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	6	Ampicillin
+A11	PRT14_6	0.768	0.64	15891	1342	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	5	Ampicillin
+A12	PRT14_6	0.87	0.71	15840	1343	2024_08_20	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	6	Ampicillin
+B1	PRT14_6	0.764	0.64	1720	1325	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	5	Ampicillin
+B2	PRT14_6	0.759	0.642	1580	1330	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	6	Ampicillin
+B3	PRT14_6	0.693	0.579	8248	1327	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	5	Ampicillin
+B4	PRT14_6	0.696	0.581	8137	1336	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	6	Ampicillin
+B5	PRT14_6	0.774	0.658	49771	1331	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	5	Ampicillin
+B6	PRT14_6	0.809	0.689	51136	1334	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	6	Ampicillin
+B7	PRT14_6	0.752	0.635	1771	5669	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	5	Ampicillin
+B8	PRT14_6	0.745	0.629	1595	5349	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	6	Ampicillin
+B9	PRT14_6	0.883	0.753	1930	26034	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	5	Ampicillin
+B10	PRT14_6	0.844	0.721	1863	20725	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	6	Ampicillin
+B11	PRT14_6	0.748	0.626	12988	1339	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	5	Ampicillin
+B12	PRT14_6	0.787	0.666	12406	1332	2024_08_20	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	6	Ampicillin
+C1	PRT14_6	0.801	0.68	1965	1321	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	5	Ampicillin
+C2	PRT14_6	0.885	0.765	2122	1321	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	6	Ampicillin
+C3	PRT14_6	0.866	0.751	15741	1306	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	5	Ampicillin
+C4	PRT14_6	0.873	0.757	15585	1309	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	6	Ampicillin
+C5	PRT14_6	0.847	0.734	70528	1298	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	5	Ampicillin
+C6	PRT14_6	0.881	0.767	71147	1288	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	6	Ampicillin
+C7	PRT14_6	0.734	0.638	2118	5232	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	5	Ampicillin
+C8	PRT14_6	0.711	0.609	2113	5460	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	6	Ampicillin
+C9	PRT14_6	0.823	0.688	1913	34781	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	5	Ampicillin
+C10	PRT14_6	0.801	0.669	1879	33813	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	6	Ampicillin
+C11	PRT14_6	0.826	0.709	11503	1315	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	5	Ampicillin
+C12	PRT14_6	0.78	0.664	12483	1321	2024_08_20	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	6	Ampicillin
+D1	PRT14_6	0.664	0.527	1382	1306	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	5	Ampicillin
+D2	PRT14_6	0.664	0.533	1364	1318	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	6	Ampicillin
+D3	PRT14_6	0.659	0.526	13744	1297	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	5	Ampicillin
+D4	PRT14_6	0.692	0.561	13799	1299	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	6	Ampicillin
+D5	PRT14_6	0.706	0.577	77785	1343	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	5	Ampicillin
+D6	PRT14_6	0.731	0.599	59765	1304	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	6	Ampicillin
+D7	PRT14_6	0.665	0.535	1417	6286	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	5	Ampicillin
+D8	PRT14_6	0.672	0.541	1406	5932	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	6	Ampicillin
+D9	PRT14_6	0.681	0.543	1364	22587	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	5	Ampicillin
+D10	PRT14_6	0.686	0.548	1386	22304	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	6	Ampicillin
+D11	PRT14_6	0.714	0.579	13482	1303	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	5	Ampicillin
+D12	PRT14_6	0.725	0.591	13818	1323	2024_08_20	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	6	Ampicillin
+E1	PRT14_6	0.774	0.647	1256	1306	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	5	Ampicillin
+E2	PRT14_6	0.771	0.651	1409	1294	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	6	Ampicillin
+E3	PRT14_6	0.772	0.638	21726	1298	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	5	Ampicillin
+E4	PRT14_6	0.729	0.602	21322	1303	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	6	Ampicillin
+E5	PRT14_6	0.819	0.705	85883	1285	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	5	Ampicillin
+E6	PRT14_6	0.74	0.631	91349	1301	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	6	Ampicillin
+E7	PRT14_6	0.79	0.672	1315	11434	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	5	Ampicillin
+E8	PRT14_6	0.763	0.64	1402	12022	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	6	Ampicillin
+E9	PRT14_6	0.795	0.668	1278	24667	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	5	Ampicillin
+E10	PRT14_6	0.771	0.64	1359	27727	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	6	Ampicillin
+E11	PRT14_6	0.812	0.701	24457	1299	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	5	Ampicillin
+E12	PRT14_6	0.844	0.722	23927	1317	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	6	Ampicillin
+F1	PRT14_6	0.766	0.647	1273	1303	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	5	Ampicillin
+F2	PRT14_6	0.779	0.66	1267	1298	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	6	Ampicillin
+F3	PRT14_6	0.784	0.665	16164	1307	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	5	Ampicillin
+F4	PRT14_6	0.776	0.659	16127	1307	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	6	Ampicillin
+F5	PRT14_6	0.794	0.678	50934	1308	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	5	Ampicillin
+F6	PRT14_6	0.807	0.688	50968	1288	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	6	Ampicillin
+F7	PRT14_6	0.766	0.647	1282	8726	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	5	Ampicillin
+F8	PRT14_6	0.771	0.648	1235	7757	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	6	Ampicillin
+F9	PRT14_6	0.777	0.652	1228	18772	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	5	Ampicillin
+F10	PRT14_6	0.78	0.653	1205	19001	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	6	Ampicillin
+F11	PRT14_6	0.822	0.704	24185	1313	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	5	Ampicillin
+F12	PRT14_6	0.791	0.671	24738	1297	2024_08_20	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	6	Ampicillin
+H1	PRT14_6	0.087	0.079	827	1245	2024_08_20	na	na	na	na	blank	na	Ampicillin
+H2	PRT14_6	0.086	0.08	838	1245	2024_08_20	na	na	na	na	blank	na	Ampicillin
+H3	PRT14_6	0.087	0.081	836	1254	2024_08_20	na	na	na	na	blank	na	Ampicillin
+H4	PRT14_6	0.086	0.079	832	1242	2024_08_20	na	na	na	na	blank	na	Ampicillin
+H5	PRT14_6	0.088	0.081	842	1249	2024_08_20	na	na	na	na	blank	na	Ampicillin
+H6	PRT14_6	0.087	0.08	837	1254	2024_08_20	na	na	na	na	blank	na	Ampicillin
+H7	PRT14_6	0.086	0.08	836	1248	2024_08_20	na	na	na	na	blank	na	Ampicillin
+H8	PRT14_6	0.087	0.08	818	1244	2024_08_20	na	na	na	na	blank	na	Ampicillin
+H9	PRT14_6	0.085	0.079	827	1245	2024_08_20	na	na	na	na	blank	na	Ampicillin
+H10	PRT14_6	0.087	0.078	827	1239	2024_08_20	na	na	na	na	blank	na	Ampicillin
+H11	PRT14_6	0.085	0.08	827	1249	2024_08_20	na	na	na	na	blank	na	Ampicillin
+H12	PRT14_6	0.085	0.079	844	1244	2024_08_20	na	na	na	na	blank	na	Ampicillin
+A1	PRT14_6	0.867	0.731	1434	1339	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	7	Ampicillin
+A2	PRT14_6	0.903	0.77	1392	1323	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	8	Ampicillin
+A3	PRT14_6	0.838	0.717	12952	1332	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	7	Ampicillin
+A4	PRT14_6	0.786	0.654	14778	1331	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	8	Ampicillin
+A5	PRT14_6	0.881	0.751	52762	1337	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	7	Ampicillin
+A6	PRT14_6	0.826	0.705	55473	1341	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	8	Ampicillin
+A7	PRT14_6	0.814	0.687	1425	6420	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	7	Ampicillin
+A8	PRT14_6	0.805	0.666	1287	6929	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	8	Ampicillin
+A9	PRT14_6	0.813	0.651	1455	37612	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	7	Ampicillin
+A10	PRT14_6	0.807	0.653	1284	37927	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	8	Ampicillin
+A11	PRT14_6	0.805	0.662	14827	1348	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	7	Ampicillin
+A12	PRT14_6	0.799	0.665	15576	1344	2024_08_21	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	8	Ampicillin
+B1	PRT14_6	0.779	0.663	1769	1317	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	7	Ampicillin
+B2	PRT14_6	0.761	0.652	1608	1327	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	8	Ampicillin
+B3	PRT14_6	0.684	0.581	7886	1322	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	7	Ampicillin
+B4	PRT14_6	0.699	0.588	7863	1324	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	8	Ampicillin
+B5	PRT14_6	0.782	0.665	47242	1322	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	7	Ampicillin
+B6	PRT14_6	0.786	0.669	48841	1320	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	8	Ampicillin
+B7	PRT14_6	0.753	0.637	1732	5063	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	7	Ampicillin
+B8	PRT14_6	0.735	0.619	1542	5120	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	8	Ampicillin
+B9	PRT14_6	0.877	0.748	1849	27855	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	7	Ampicillin
+B10	PRT14_6	0.802	0.679	1784	24200	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	8	Ampicillin
+B11	PRT14_6	0.74	0.622	12658	1344	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	7	Ampicillin
+B12	PRT14_6	0.773	0.655	12868	1333	2024_08_21	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	8	Ampicillin
+C1	PRT14_6	0.89	0.772	2145	1317	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	7	Ampicillin
+C2	PRT14_6	0.869	0.755	2012	1318	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	8	Ampicillin
+C3	PRT14_6	0.846	0.733	15690	1311	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	7	Ampicillin
+C4	PRT14_6	0.86	0.749	15326	1306	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	8	Ampicillin
+C5	PRT14_6	0.844	0.735	71197	1307	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	7	Ampicillin
+C6	PRT14_6	0.86	0.749	69731	1316	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	8	Ampicillin
+C7	PRT14_6	0.763	0.66	2189	5277	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	7	Ampicillin
+C8	PRT14_6	0.723	0.624	2103	5096	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	8	Ampicillin
+C9	PRT14_6	0.832	0.699	1932	33441	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	7	Ampicillin
+C10	PRT14_6	0.81	0.677	1907	33436	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	8	Ampicillin
+C11	PRT14_6	0.825	0.711	11553	1325	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	7	Ampicillin
+C12	PRT14_6	0.786	0.673	11811	1321	2024_08_21	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	8	Ampicillin
+D1	PRT14_6	0.675	0.544	1429	1320	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	7	Ampicillin
+D2	PRT14_6	0.658	0.533	1375	1322	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	8	Ampicillin
+D3	PRT14_6	0.678	0.55	13434	1315	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	7	Ampicillin
+D4	PRT14_6	0.669	0.547	13383	1327	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	8	Ampicillin
+D5	PRT14_6	0.72	0.592	70560	1314	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	7	Ampicillin
+D6	PRT14_6	0.712	0.588	70427	1309	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	8	Ampicillin
+D7	PRT14_6	0.676	0.548	1452	6540	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	7	Ampicillin
+D8	PRT14_6	0.66	0.535	1433	6121	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	8	Ampicillin
+D9	PRT14_6	0.699	0.556	1420	21330	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	7	Ampicillin
+D10	PRT14_6	0.691	0.552	1424	21565	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	8	Ampicillin
+D11	PRT14_6	0.711	0.578	13120	1316	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	7	Ampicillin
+D12	PRT14_6	0.743	0.606	13670	1330	2024_08_21	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	8	Ampicillin
+E1	PRT14_6	0.763	0.639	1430	1304	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	7	Ampicillin
+E2	PRT14_6	0.741	0.627	1483	1326	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	8	Ampicillin
+E3	PRT14_6	0.775	0.641	22076	1316	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	7	Ampicillin
+E4	PRT14_6	0.754	0.626	22013	1336	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	8	Ampicillin
+E5	PRT14_6	0.81	0.699	83780	1301	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	7	Ampicillin
+E6	PRT14_6	0.691	0.586	79653	1292	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	8	Ampicillin
+E7	PRT14_6	0.775	0.659	1394	10641	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	7	Ampicillin
+E8	PRT14_6	0.765	0.647	1483	9959	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	8	Ampicillin
+E9	PRT14_6	0.791	0.668	1396	20002	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	7	Ampicillin
+E10	PRT14_6	0.772	0.645	1410	25839	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	8	Ampicillin
+E11	PRT14_6	0.809	0.699	19729	1300	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	7	Ampicillin
+E12	PRT14_6	0.809	0.697	22095	1317	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	8	Ampicillin
+F1	PRT14_6	0.767	0.645	1470	1317	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	7	Ampicillin
+F2	PRT14_6	0.767	0.651	1469	1314	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	8	Ampicillin
+F3	PRT14_6	0.783	0.664	15594	1307	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	7	Ampicillin
+F4	PRT14_6	0.766	0.653	15915	1302	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	8	Ampicillin
+F5	PRT14_6	0.733	0.622	11842	1285	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	7	Ampicillin
+F6	PRT14_6	0.8	0.683	42563	1304	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	8	Ampicillin
+F7	PRT14_6	0.766	0.651	1474	6402	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	7	Ampicillin
+F8	PRT14_6	0.777	0.661	1423	6804	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	8	Ampicillin
+F9	PRT14_6	0.78	0.659	1377	17140	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	7	Ampicillin
+F10	PRT14_6	0.766	0.643	1355	18175	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	8	Ampicillin
+F11	PRT14_6	0.785	0.672	23613	1308	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	7	Ampicillin
+F12	PRT14_6	0.794	0.678	23875	1324	2024_08_21	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	8	Ampicillin
+H1	PRT14_6	0.088	0.08	815	1248	2024_08_21	na	na	na	na	blank	na	Ampicillin
+H2	PRT14_6	0.087	0.08	820	1245	2024_08_21	na	na	na	na	blank	na	Ampicillin
+H3	PRT14_6	0.088	0.08	811	1249	2024_08_21	na	na	na	na	blank	na	Ampicillin
+H4	PRT14_6	0.086	0.079	787	1244	2024_08_21	na	na	na	na	blank	na	Ampicillin
+H5	PRT14_6	0.087	0.08	815	1251	2024_08_21	na	na	na	na	blank	na	Ampicillin
+H6	PRT14_6	0.088	0.08	820	1252	2024_08_21	na	na	na	na	blank	na	Ampicillin
+H7	PRT14_6	0.086	0.08	802	1248	2024_08_21	na	na	na	na	blank	na	Ampicillin
+H8	PRT14_6	0.087	0.08	812	1255	2024_08_21	na	na	na	na	blank	na	Ampicillin
+H9	PRT14_6	0.086	0.08	805	1247	2024_08_21	na	na	na	na	blank	na	Ampicillin
+H10	PRT14_6	0.087	0.079	831	1255	2024_08_21	na	na	na	na	blank	na	Ampicillin
+H11	PRT14_6	0.086	0.081	825	1259	2024_08_21	na	na	na	na	blank	na	Ampicillin
+H12	PRT14_6	0.085	0.078	813	1259	2024_08_21	na	na	na	na	blank	na	Ampicillin
+A1	PRT14_6	0.88	0.74	13614	1357	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	9	Ampicillin
+A2	PRT14_6	0.799	0.673	1406	1365	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	10	Ampicillin
+A3	PRT14_6	0.842	0.719	12961	1353	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	9	Ampicillin
+A4	PRT14_6	0.843	0.718	13117	1349	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	10	Ampicillin
+A5	PRT14_6	0.864	0.74	49640	1353	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	9	Ampicillin
+A6	PRT14_6	0.81	0.689	63671	1394	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	10	Ampicillin
+A7	PRT14_6	0.796	0.671	1445	6428	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	9	Ampicillin
+A8	PRT14_6	0.798	0.674	1345	6559	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	10	Ampicillin
+A9	PRT14_6	0.808	0.656	1444	35696	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	9	Ampicillin
+A10	PRT14_6	0.795	0.648	1377	36523	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	10	Ampicillin
+A11	PRT14_6	0.767	0.635	15512	1365	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	9	Ampicillin
+A12	PRT14_6	0.72	0.598	16033	1385	2024_08_22	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	10	Ampicillin
+B1	PRT14_6	0.782	0.666	1777	1343	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	9	Ampicillin
+B2	PRT14_6	0.714	0.603	1605	1356	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	10	Ampicillin
+B3	PRT14_6	0.681	0.571	8055	1357	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	9	Ampicillin
+B4	PRT14_6	0.69	0.579	7773	1340	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	10	Ampicillin
+B5	PRT14_6	0.753	0.636	47263	1362	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	9	Ampicillin
+B6	PRT14_6	0.782	0.671	47963	1336	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	10	Ampicillin
+B7	PRT14_6	0.746	0.629	1765	4989	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	9	Ampicillin
+B8	PRT14_6	0.763	0.645	1617	4971	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	10	Ampicillin
+B9	PRT14_6	0.864	0.728	1766	28655	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	9	Ampicillin
+B10	PRT14_6	0.793	0.671	1744	27816	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	10	Ampicillin
+B11	PRT14_6	0.771	0.654	11467	1340	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	9	Ampicillin
+B12	PRT14_6	0.771	0.658	12553	1327	2024_08_22	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	10	Ampicillin
+C1	PRT14_6	0.876	0.756	2107	1329	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	9	Ampicillin
+C2	PRT14_6	0.85	0.737	2071	1324	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	10	Ampicillin
+C3	PRT14_6	0.848	0.735	15377	1311	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	9	Ampicillin
+C4	PRT14_6	0.86	0.746	15458	1320	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	10	Ampicillin
+C5	PRT14_6	0.852	0.738	69074	1314	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	9	Ampicillin
+C6	PRT14_6	0.867	0.754	71201	1322	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	10	Ampicillin
+C7	PRT14_6	0.697	0.59	2072	5076	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	9	Ampicillin
+C8	PRT14_6	0.699	0.599	2072	5128	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	10	Ampicillin
+C9	PRT14_6	0.851	0.718	1930	31767	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	9	Ampicillin
+C10	PRT14_6	0.787	0.664	1892	32481	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	10	Ampicillin
+C11	PRT14_6	0.831	0.717	10949	1325	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	9	Ampicillin
+C12	PRT14_6	0.772	0.661	12056	1332	2024_08_22	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	10	Ampicillin
+D1	PRT14_6	0.668	0.541	1419	1333	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	9	Ampicillin
+D2	PRT14_6	0.613	0.497	1361	1343	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	10	Ampicillin
+D3	PRT14_6	0.677	0.55	13278	1321	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	9	Ampicillin
+D4	PRT14_6	0.646	0.523	13070	1319	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	10	Ampicillin
+D5	PRT14_6	0.701	0.573	66128	1311	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	9	Ampicillin
+D6	PRT14_6	0.735	0.606	71249	1327	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	10	Ampicillin
+D7	PRT14_6	0.665	0.54	1459	6075	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	9	Ampicillin
+D8	PRT14_6	0.647	0.522	1427	5992	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	10	Ampicillin
+D9	PRT14_6	0.678	0.543	1416	21380	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	9	Ampicillin
+D10	PRT14_6	0.674	0.54	1409	21035	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	10	Ampicillin
+D11	PRT14_6	0.732	0.598	14482	1322	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	9	Ampicillin
+D12	PRT14_6	0.707	0.578	13301	1336	2024_08_22	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	10	Ampicillin
+E1	PRT14_6	0.759	0.634	1350	1322	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	9	Ampicillin
+E2	PRT14_6	0.739	0.624	1486	1333	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	10	Ampicillin
+E3	PRT14_6	0.754	0.625	21054	1327	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	9	Ampicillin
+E4	PRT14_6	0.746	0.618	22139	1336	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	10	Ampicillin
+E5	PRT14_6	0.804	0.691	46924	1300	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	9	Ampicillin
+E6	PRT14_6	0.739	0.629	83701	1308	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	10	Ampicillin
+E7	PRT14_6	0.78	0.664	1373	9917	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	9	Ampicillin
+E8	PRT14_6	0.773	0.657	1479	9378	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	10	Ampicillin
+E9	PRT14_6	0.781	0.658	1308	23672	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	9	Ampicillin
+E10	PRT14_6	0.758	0.632	1416	23946	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	10	Ampicillin
+E11	PRT14_6	0.795	0.684	22421	1311	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	9	Ampicillin
+E12	PRT14_6	0.787	0.674	22790	1322	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	10	Ampicillin
+F1	PRT14_6	0.757	0.636	1411	1325	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	9	Ampicillin
+F2	PRT14_6	0.763	0.644	1442	1320	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	10	Ampicillin
+F3	PRT14_6	0.792	0.672	16859	1313	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	9	Ampicillin
+F4	PRT14_6	0.762	0.649	14359	1310	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	10	Ampicillin
+F5	PRT14_6	0.797	0.682	48472	1313	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	9	Ampicillin
+F6	PRT14_6	0.781	0.667	50444	1312	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	10	Ampicillin
+F7	PRT14_6	0.763	0.645	1421	6792	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	9	Ampicillin
+F8	PRT14_6	0.768	0.649	1415	6644	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	10	Ampicillin
+F9	PRT14_6	0.769	0.645	1357	16551	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	9	Ampicillin
+F10	PRT14_6	0.761	0.639	1344	16963	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	10	Ampicillin
+F11	PRT14_6	0.785	0.672	24008	1317	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	9	Ampicillin
+F12	PRT14_6	0.79	0.675	26562	1326	2024_08_22	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	10	Ampicillin
+H1	PRT14_6	0.113	0.105	946	1268	2024_08_22	na	na	na	na	blank	na	Ampicillin
+H2	PRT14_6	0.1	0.088	965	1269	2024_08_22	na	na	na	na	blank	na	Ampicillin
+H3	PRT14_6	0.095	0.086	961	1268	2024_08_22	na	na	na	na	blank	na	Ampicillin
+H4	PRT14_6	0.115	0.096	941	1264	2024_08_22	na	na	na	na	blank	na	Ampicillin
+H5	PRT14_6	0.127	0.106	962	1266	2024_08_22	na	na	na	na	blank	na	Ampicillin
+H6	PRT14_6	0.116	0.101	937	1260	2024_08_22	na	na	na	na	blank	na	Ampicillin
+H7	PRT14_6	0.11	0.097	941	1260	2024_08_22	na	na	na	na	blank	na	Ampicillin
+H8	PRT14_6	0.119	0.101	909	1254	2024_08_22	na	na	na	na	blank	na	Ampicillin
+H9	PRT14_6	0.106	0.092	906	1259	2024_08_22	na	na	na	na	blank	na	Ampicillin
+H10	PRT14_6	0.105	0.096	965	1272	2024_08_22	na	na	na	na	blank	na	Ampicillin
+H11	PRT14_6	0.094	0.086	961	1274	2024_08_22	na	na	na	na	blank	na	Ampicillin
+H12	PRT14_6	0.091	0.083	967	1284	2024_08_22	na	na	na	na	blank	na	Ampicillin
+A1	PRT14_6	0.87	0.745	1419	1336	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	11	Ampicillin
+A2	PRT14_6	0.844	0.725	1336	1331	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322	None	pTORC1	12	Ampicillin
+A3	PRT14_6	0.903	0.742	13685	1328	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	11	Ampicillin
+A4	PRT14_6	0.806	0.681	14025	1336	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	12	Ampicillin
+A5	PRT14_6	0.857	0.734	49809	1330	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	11	Ampicillin
+A6	PRT14_6	0.882	0.75	50321	1334	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	12	Ampicillin
+A7	PRT14_6	0.812	0.687	1368	7136	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	11	Ampicillin
+A8	PRT14_6	0.799	0.665	1275	7372	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	12	Ampicillin
+A9	PRT14_6	0.787	0.643	1414	35693	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	11	Ampicillin
+A10	PRT14_6	0.801	0.656	1331	38244	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	12	Ampicillin
+A11	PRT14_6	0.753	0.626	15553	1346	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	11	Ampicillin
+A12	PRT14_6	0.733	0.623	14587	1341	2024_08_23	Escherichia coli K12 MG1655	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	12	Ampicillin
+B1	PRT14_6	0.741	0.623	1711	1322	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	11	Ampicillin
+B2	PRT14_6	0.795	0.663	1596	1314	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322	None	pTORC1	12	Ampicillin
+B3	PRT14_6	0.704	0.591	7503	1312	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	11	Ampicillin
+B4	PRT14_6	0.698	0.595	7445	1308	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	12	Ampicillin
+B5	PRT14_6	0.758	0.647	45242	1322	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	11	Ampicillin
+B6	PRT14_6	0.733	0.618	46802	1315	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	12	Ampicillin
+B7	PRT14_6	0.756	0.642	1704	5330	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	11	Ampicillin
+B8	PRT14_6	0.783	0.67	1571	5059	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	12	Ampicillin
+B9	PRT14_6	0.872	0.749	1990	22718	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	11	Ampicillin
+B10	PRT14_6	0.816	0.696	1750	23258	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	12	Ampicillin
+B11	PRT14_6	0.785	0.67	11844	1334	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	11	Ampicillin
+B12	PRT14_6	0.741	0.624	12062	1333	2024_08_23	Escherichia coli K12 MG1655	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	12	Ampicillin
+C1	PRT14_6	0.852	0.733	2110	1324	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	11	Ampicillin
+C2	PRT14_6	0.847	0.73	2023	1321	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322	None	pTORC1	12	Ampicillin
+C3	PRT14_6	0.825	0.696	14704	1319	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	11	Ampicillin
+C4	PRT14_6	0.866	0.752	15041	1309	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	12	Ampicillin
+C5	PRT14_6	0.897	0.771	73736	1315	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	11	Ampicillin
+C6	PRT14_6	0.863	0.751	67746	1299	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	12	Ampicillin
+C7	PRT14_6	0.808	0.7	2257	5162	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	11	Ampicillin
+C8	PRT14_6	0.777	0.672	2209	5219	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	12	Ampicillin
+C9	PRT14_6	0.964	0.822	2003	37684	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	11	Ampicillin
+C10	PRT14_6	0.83	0.692	1886	36051	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	12	Ampicillin
+C11	PRT14_6	0.816	0.701	11235	1311	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	11	Ampicillin
+C12	PRT14_6	0.765	0.652	12480	1312	2024_08_23	Escherichia coli K12 MG1655	ΔlacIZYA::FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	12	Ampicillin
+D1	PRT14_6	0.81	0.668	1422	1308	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	11	Ampicillin
+D2	PRT14_6	0.658	0.53	1355	1316	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322	None	pTORC1	12	Ampicillin
+D3	PRT14_6	0.637	0.51	13202	1312	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	11	Ampicillin
+D4	PRT14_6	0.668	0.543	13058	1306	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	12	Ampicillin
+D5	PRT14_6	0.888	0.753	69293	1319	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	11	Ampicillin
+D6	PRT14_6	0.715	0.586	66079	1311	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	12	Ampicillin
+D7	PRT14_6	0.648	0.52	1403	5973	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	11	Ampicillin
+D8	PRT14_6	0.656	0.528	1382	6055	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	12	Ampicillin
+D9	PRT14_6	0.837	0.698	1449	21873	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	11	Ampicillin
+D10	PRT14_6	0.667	0.53	1367	20989	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	12	Ampicillin
+D11	PRT14_6	0.787	0.649	13047	1338	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	11	Ampicillin
+D12	PRT14_6	0.693	0.559	12862	1324	2024_08_23	Salmonella enterica Typhimurium SL1344	WT	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	12	Ampicillin
+E1	PRT14_6	0.757	0.634	1298	1308	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	11	Ampicillin
+E2	PRT14_6	0.748	0.629	1412	1307	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322	None	pTORC1	12	Ampicillin
+E3	PRT14_6	0.774	0.643	21098	1308	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	11	Ampicillin
+E4	PRT14_6	0.784	0.647	21147	1331	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	12	Ampicillin
+E5	PRT14_6	0.806	0.691	80366	1304	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	11	Ampicillin
+E6	PRT14_6	0.707	0.6	83336	1296	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	12	Ampicillin
+E7	PRT14_6	0.817	0.697	1353	11816	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	11	Ampicillin
+E8	PRT14_6	0.768	0.647	1451	10520	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	12	Ampicillin
+E9	PRT14_6	0.782	0.658	1279	24050	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	11	Ampicillin
+E10	PRT14_6	0.767	0.643	1418	23567	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	12	Ampicillin
+E11	PRT14_6	0.797	0.682	22484	1318	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	11	Ampicillin
+E12	PRT14_6	0.796	0.679	23334	1322	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	12	Ampicillin
+F1	PRT14_6	0.755	0.635	1337	1324	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	11	Ampicillin
+F2	PRT14_6	0.781	0.661	1397	1324	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322	None	pTORC1	12	Ampicillin
+F3	PRT14_6	0.772	0.655	15631	1328	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	11	Ampicillin
+F4	PRT14_6	0.842	0.733	15871	1335	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1min mhYFP	pTORC49	12	Ampicillin
+F5	PRT14_6	0.794	0.68	47114	1320	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	11	Ampicillin
+F6	PRT14_6	0.788	0.67	51370	1323	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mhYFP	pTORC50	12	Ampicillin
+F7	PRT14_6	0.779	0.66	1375	7509	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	11	Ampicillin
+F8	PRT14_6	0.806	0.689	1468	6306	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1min mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1min mRaspberry	pTORC63	12	Ampicillin
+F9	PRT14_6	0.772	0.649	1308	17863	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	11	Ampicillin
+F10	PRT14_6	0.779	0.652	1335	17583	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1minRBS mRaspberry-SalOpt lacO1.1 lacO1.2	PleuWT.1minRBS mRaspberry	pTORC64	12	Ampicillin
+F11	PRT14_6	0.79	0.674	24739	1319	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	11	Ampicillin
+F12	PRT14_6	0.784	0.664	23363	1326	2024_08_23	Salmonella enterica Typhimurium SL1344	ΔSL1483::lacIMG1655-FRT ΔtopA::cat	pBR322 PleuWT.1 mhYFP-SalOpt lacO1.1 lacO1.2	PleuWT.1 mhYFP	pTORC65	12	Ampicillin
+H1	PRT14_6	0.087	0.079	779	1261	2024_08_23	na	na	na	na	blank	na	Ampicillin
+H2	PRT14_6	0.086	0.08	812	1278	2024_08_23	na	na	na	na	blank	na	Ampicillin
+H3	PRT14_6	0.088	0.08	826	1278	2024_08_23	na	na	na	na	blank	na	Ampicillin
+H4	PRT14_6	0.087	0.08	833	1284	2024_08_23	na	na	na	na	blank	na	Ampicillin
+H5	PRT14_6	0.087	0.079	827	1279	2024_08_23	na	na	na	na	blank	na	Ampicillin
+H6	PRT14_6	0.086	0.079	829	1280	2024_08_23	na	na	na	na	blank	na	Ampicillin
+H7	PRT14_6	0.086	0.079	831	1284	2024_08_23	na	na	na	na	blank	na	Ampicillin
+H8	PRT14_6	0.087	0.08	838	1286	2024_08_23	na	na	na	na	blank	na	Ampicillin
+H9	PRT14_6	0.086	0.079	852	1290	2024_08_23	na	na	na	na	blank	na	Ampicillin
+H10	PRT14_6	0.086	0.078	807	1274	2024_08_23	na	na	na	na	blank	na	Ampicillin
+H11	PRT14_6	0.086	0.081	820	1272	2024_08_23	na	na	na	na	blank	na	Ampicillin
+H12	PRT14_6	0.084	0.078	814	1270	2024_08_23	na	na	na	na	blank	na	Ampicillin

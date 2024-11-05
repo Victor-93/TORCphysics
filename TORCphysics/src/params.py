@@ -67,7 +67,7 @@ spacer_factor = 15.0 # Effective energy used to scale down the geometric modulat
 # ---------------------------------------------------------------------------------------------------------------------
 # RNA Polymerase (RNAP)
 v0 = 30.0  # 60.0  # Velocity (bp/sec) of RNAPs
-gamma = 0.835 #0.5 # How much supercoiling is injected per bp
+gamma = 0.05 #0.835 #0.5 # How much supercoiling is injected per bp
 stall_torque = 12.0#12.0  # 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper.
 # 12pN*nm according 2022SevierBioJ
 sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall - According Gleng?
