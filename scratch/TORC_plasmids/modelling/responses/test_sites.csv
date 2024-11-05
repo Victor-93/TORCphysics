@@ -1,5 +1,0 @@
-type,name,start,end,k_on,binding_model,binding_oparams
-gene,antitet,100,200,1,MaxMinPromoterBinding,antitet.csv
-gene,bla,300,400,1,MaxMinPromoterBinding,bla.csv
-gene,PleuWT,500,600,1,MaxMinPromoterBinding,PleuWT.csv
-gene,tetA,700,800,1,MaxMinPromoterBinding,tetA.csv
