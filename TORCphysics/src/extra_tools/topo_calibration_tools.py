@@ -8,7 +8,6 @@ from TORCphysics import Circuit
 from TORCphysics import analysis as ann
 import pandas as pd
 
-
 # Stuff added to make parallel / parallel processes
 # -----------------------------------------------------------------------------------
 class NoDaemonProcess(multiprocessing.Process):
@@ -2041,6 +2040,228 @@ def gene_architecture_run_simple(big_global_list, big_variation_list, experiment
         output_list.append(case_output)  #And add it
         objective += my_objective
 
+
+    # Close pool
+    # --------------------------------------------------------------
+    pool.close()
+
+    return objective, output_list
+
+# Similar to gene architecture but here we do not do calibration and only want to produce results for plotting.
+# We just run each of the system n_simulations times, and collect data (no KDEs).
+def gene_architecture_run_simple_wKDEs(big_global_list, big_variation_list, experimental_curves, parallel_info,
+                                              additional_results=False):
+    # Let's unpack the info
+    ncases = len(big_global_list)
+    n_simulations = parallel_info['n_simulations']
+    output_list = []  # This list will be made out of a list of cases, each case is made of  a dict with
+    # objective and data keys. In data, it gives a list of dicts, each one containing the distance, and the results
+    objective = 0
+    # Run simulations
+    # --------------------------------------------------------------
+    # Create a multiprocessing pool for the outer loop
+    pool = multiprocessing.Pool()
+
+    # Go through list of cases
+    # --------------------------------------------------------------
+    for icase in range(ncases):
+
+        global_list = big_global_list[icase]
+        variation_list = big_variation_list[icase]
+        exp_curve = experimental_curves[icase]
+
+        distances = exp_curve['distance']
+
+        # Prepare output arrays/lists
+        # --------------------------------------------------
+        case_output = {} # This will be a dict with all results
+        rate_list = []
+        local_sigma = []
+        global_sigma = []
+        local_dsigma = []
+        global_dsigma = []
+        active_sigma = []
+        kde_list = []
+        objective = 0
+
+        # Distances
+        # --------------------------------------------------------------
+        for j in range(len(distances)):
+
+            g_dict = global_list[j]
+
+            # Sort the processing info
+            # --------------------------------------------------
+            my_circuit = load_circuit(g_dict)
+            total_time = my_circuit.dt * my_circuit.frames
+            dt = my_circuit.dt
+            frames = my_circuit.frames
+
+            target_gene = [site for site in my_circuit.site_list if site.name == 'reporter'][0]
+            RNAP_env = [environment for environment in my_circuit.environmental_list if environment.name == 'RNAP'][0]
+
+            # Define x-axes
+            x_system = get_interpolated_x(1, my_circuit.size, x_spacing=20)
+            x_gene = get_interpolated_x(target_gene.start - RNAP_env.size, target_gene.end, x_spacing=20)
+
+            # Prepare items for parallelization
+            # --------------------------------------------------------------
+            Items = []
+            for simulation_number in range(n_simulations):
+                g_dict['n_simulations'] = simulation_number
+                Item = {'global_conditions': g_dict.copy(), 'variations': variation_list.copy()}
+                Items.append(Item)
+
+
+            # Run in parallel
+            # ----------------------------
+            # Run simulations in parallel within this subset
+            pool_results = pool.map(pt.single_simulation_w_variations_return_dfs, Items)
+
+            # Calculate production rates
+            # ---------------------------------------------------------
+            prod_rates = []
+            for result in pool_results:
+                environmental_df = result['environmental_df']
+                mask = environmental_df['name'] == 'reporter'
+                if len(environmental_df[mask]['concentration']) == 0:
+                    transcripts = 0
+                else:
+                    transcripts = environmental_df[mask]['concentration'].iloc[-1]
+                prod_rates.append(float(transcripts / total_time))
+            rates_array = np.array(prod_rates)
+            mean_rates = np.mean(rates_array)
+            std_rates = np.std(rates_array)
+            rates = np.array([mean_rates, std_rates])
+            rate_list.append(rates)
+
+            # Calculate KDEs
+            # ---------------------------------------------------------
+            kde_dict = {}
+            for i, name in enumerate(['topoI', 'gyrase', 'RNAP']):
+
+                all_positions = np.empty([1])
+                #all_positions = []
+
+                # Extract info from dataframes
+                for j, out_dict in enumerate(pool_results):
+                    enzymes_df = out_dict['enzymes_df']
+
+                    # Filter superhelical density
+                    mask = enzymes_df['name'] == name
+
+                    # Position
+                    # ------------------------------------------------------------------------------
+                    position = enzymes_df[mask]['position']#.to_numpy()
+
+                    all_positions = np.concatenate([position, all_positions])
+                    #all_positions.append(position)
+
+                #all_positions = np.array(all_positions)
+
+                # number of bins for histogram - which we will not plot
+                my_environmental = \
+                    [environmental for environmental in my_circuit.environmental_list if environmental.name == name][
+                        0]
+                if name == 'RNAP':
+                    size = abs(
+                        my_environmental.site_list[0].start - my_environmental.size - my_environmental.site_list[0].end)
+                    #nbins = int(size / my_environmental.size)  # because genes are smaller
+                    nbins = 90 #60#90  # Maybe check the one up
+                    x = x_gene
+                else:
+                    nbins = int(
+                        1.5 * my_circuit.size / my_environmental.size)  # number of bins. - note that this only applies for topos
+
+                    x = x_system
+
+                # Calculate KDE
+                kde_x, kde_y = calculate_KDE(data=all_positions, nbins=nbins, scaled=True)
+
+                kde_y = get_interpolated_kde(kde_x, kde_y, x)
+                #if name != 'RNAP':
+                #    kde_y = get_interpolated_kde(kde_x, kde_y, x)
+                #kde_x = x
+                # Add it to the kde_dict
+                kde_dict[name] = {'kde_y': kde_y, 'kde_x': x}
+            kde_list.append(kde_dict)
+
+
+            # Calculate superhelical densities
+            # ---------------------------------------------------------
+            lsigma = []
+            gsigma = []
+            ldsig = [] #variations
+            gdsig = []
+            lactsig = [] # sigma when the gene is being transcribedall_positions
+            for result in pool_results:
+                sites_df = result['sites_df']
+                enzymes_df = result['enzymes_df']
+                site_mask = sites_df['name'] == 'reporter'
+                mask_circuit = sites_df['type'] == 'circuit'
+                active_mask = enzymes_df['name'] == 'RNAP_Elongation'
+
+                # Collect measurements
+                local_df = sites_df[site_mask]#['superhelical']
+                local_superhelical = local_df['superhelical'].to_numpy()
+                # local_superhelical = sites_df[site_mask]['superhelical'].to_numpy()
+                global_superhelical = sites_df[mask_circuit]['superhelical'].to_numpy()
+
+
+                # Collect for active states
+                active_frames = enzymes_df[active_mask]['frame']
+                active_superhelical = local_df[local_df['frame'].isin(active_frames)]['superhelical'].to_numpy()
+                #active_superhelical = sites_df[sites_df['frame'].isin(active_frames)][site_mask].to_numpy()
+
+                if len(active_superhelical) == 0:
+                    active_superhelical = global_superhelical[:-2]  # The last one so it doesn't interfear
+
+                active_superhelical = np.array(active_superhelical)
+                # Let's collect the changes
+#                frames = len(local_superhelical)
+                d_local = np.zeros(frames)
+                d_global = np.zeros(frames)
+                for f in range(frames):  # frames because local_superhelical actually have frames+1 measurements
+                    d_local[f] = (local_superhelical[f+1] - local_superhelical[f]) / dt
+                    d_global[f] = (global_superhelical[f+1] - global_superhelical[f]) / dt
+
+                lsigma.append(local_superhelical)
+                gsigma.append(global_superhelical)
+                ldsig.append(d_local) # Variations
+                gdsig.append(d_global)
+                lactsig.append(active_superhelical)
+
+            # Add to lists as arrays
+            local_sigma.append(np.array(lsigma))
+            global_sigma.append(np.array(gsigma))
+
+            # And the variations
+            local_dsigma.append(np.array(ldsig))
+            global_dsigma.append(np.array(gdsig))
+
+            flattened_lactsig = np.concatenate(lactsig)  # Or use np.hstack(lactsig) if all arrays are 1D
+            active_sigma.append(flattened_lactsig)
+            # active_sigma.append(np.array(lactsig))
+
+        # Process and calculate objective
+        # --------------------------------------------------------------
+        prod_rates = [result[0] for result in rate_list]
+        my_objective = np.sum((exp_curve['Signal'] - prod_rates) ** 2)  # This is the objective of the icase
+
+        # Prepare case output dict
+        # --------------------------------------------------------------
+        case_output['distance'] = np.array(distances)
+        case_output['objective'] = my_objective
+        case_output['prod_rate'] = rate_list
+        case_output['local_superhelical'] = local_sigma
+        case_output['global_superhelical'] = global_sigma
+        case_output['local_superhelical_variations'] = local_dsigma
+        case_output['global_superhelical_variations'] = global_dsigma
+        case_output['active_superhelical'] = active_sigma
+        case_output['KDE'] = kde_list
+
+        output_list.append(case_output)  #And add it
+        objective += my_objective
 
     # Close pool
     # --------------------------------------------------------------

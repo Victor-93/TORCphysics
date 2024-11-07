@@ -57,13 +57,16 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 100
+n_simulations = 10 #100
 
+#recognition_path = 'recognition-linear/'
+recognition_path = ''
 # params_file
 #topo_params_file = 'calibration_dt'+str(dt)+'.csv'
 #recognition_params_file = 'calibration2.csv'
-recognition_params_file = 'calibration_dt'+str(dt)+'.csv'
-poisson_params_file = 'calibration_'+str(dt)+'.csv'
+#recognition_params_file = 'calibration_dt'+str(dt)+'.csv'
+recognition_params_file = 'avg_dt'+str(dt)+'.csv'
+#poisson_params_file = 'calibration_'+str(dt)+'.csv'
 
 
 # Models to calibrate to calibrate
@@ -299,7 +302,8 @@ both_sigma_rx = sigma
 # Recognition binding
 #params_file = 'recognition-linear/calibration.csv'
 #params_file = 'recognition-linear/calibration_small_dt1.csv'
-params_file = 'recognition-linear/'+recognition_params_file
+#params_file = 'recognition-linear/'+recognition_params_file
+params_file = recognition_path+recognition_params_file
 params_dict = pd.read_csv(params_file).to_dict()
 rec_objective, rec_sim_superhelicals, rec_sim_superhelicals_std = objective_function(params=params_dict)
 
@@ -401,6 +405,6 @@ ax.text(-0.07, 1.0, outside_label[n], transform=ax.transAxes,
 #ax.legend(loc='best', fontsize=font_size)
 ax.grid(True)
 
-plt.savefig(file_out + '.png')
-plt.savefig(file_out + '.pdf')
+#plt.savefig(file_out + '.png')
+#plt.savefig(file_out + '.pdf')
 plt.show()

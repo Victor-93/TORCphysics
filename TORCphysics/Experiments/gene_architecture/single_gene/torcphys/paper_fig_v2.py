@@ -21,6 +21,7 @@ params_files = []
 for pcase in promoter_cases:
     experimental_files.append('../junier_data/inferred-rate_kw'+str(k_weak)+'_' + pcase + '.csv')
     calibration_files.append('calibrate_inferred-rates/local_runs/reproduce-'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
+    #calibration_files.append('calibrate_inferred-rates/local_runs/reproduce-'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'-wKDEs.pkl')
     params_files.append('calibrate_inferred-rates/'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.csv')
 
 

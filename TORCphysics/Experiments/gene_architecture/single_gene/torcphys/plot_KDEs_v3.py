@@ -3,10 +3,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 
+# Description
+#-----------------------------------------------------------------------------------------------------------------------
+# We now want to plot the topoI, RNAP and gyrase KDEs for 2 or 3 key distances
+
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
 #promoter_cases = ['weak', 'medium', 'strong']
-promoter_cases = ['medium', 'medium', 'strong']
+promoter_cases = ['strong', 'medium', 'strong']
+enzyme_names = ['topoI', 'gyrase']#,'RNAP']#, 'gyrase']
+enzyme_names = ['RNAP']
+#dist_index = [0,9,11]
+#dist_index = [0,10]
+#dist_index = [10]
+dist_index = [5]
+
 dt=1.0#0.5
 
 k_weak=0.02
@@ -28,7 +39,8 @@ for pcase in promoter_cases:
     # calibration_files.append('GB-Stages-'+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
 
     # calibration_files.append(model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
-    calibration_files.append('calibrate_inferred-rates/reproduce-'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
+    # calibration_files.append('calibrate_inferred-rates/reproduce-'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
+    calibration_files.append('calibrate_inferred-rates/local_runs/reproduce-'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'-wKDEs.pkl')
 
 # Plotting params
 #-----------------------------------------------------------------------------------------------------------------------
@@ -43,6 +55,11 @@ title_size = 16
 model_ls = '-o'
 exp_ls = '--o'
 titles = ['weak', 'medium', 'strong']
+
+lines = ['-', '-', '-']
+alphas = [1, 1, 1.0]
+#enzyme_colors = {'RNAP': 'black', 'topoI': 'red', 'gyrase':'blue'}
+enzyme_colors = {'RNAP': ['black', 'green'], 'topoI': ['red', 'orange'], 'gyrase':['blue', 'purple']}
 
 colors = ['green', 'blue', 'red']
 
@@ -118,6 +135,30 @@ def get_RNAP_KDE_lines(results_list):
         RNAP_collection.append(np.array([x, y, ys]))
     return distance, RNAP_collection
 
+# Get's the KDEs of RNAP, and topoisomerases for three key distances, and
+# sets the start of the transcription unit (promoter) at x=0.
+def get_enzymes_KDEs(results_list, names_list, index_list):
+    output_list = []
+    n = len(results_list)
+
+    for i in index_list:
+        out_dict = {}
+        out_dict['index'] = i
+        out_dict['distance'] = results_list['distance'][i]
+
+        # We just need to obtain the value to align the enzymes
+        x_disp =  np.min(results_list['KDE'][i]['RNAP']['kde_x'])
+
+        # Now we collect measurements
+        for name in names_list:
+            y = results_list['KDE'][i][name]['kde_y']
+            kde_x = results_list['KDE'][i][name]['kde_x']
+            x= kde_x - x_disp
+            out_dict[name] = np.array([x, y])
+        output_list.append(out_dict)
+    return output_list
+
+
 # Load
 #-----------------------------------------------------------------------------------------------------------------------
 pickle_data = []
@@ -126,100 +167,51 @@ for pickle_file in calibration_files:
         data = pickle.load(file)
         pickle_data.append(data)
 
-# Calculate rates
-rates = []
+# Get KDEs
+enzymes_KDEs = []
 for i, data in enumerate(pickle_data):
     x=i
-    rates.append(get_prod_rates(data[0]['data']))
+    enzymes_KDEs.append(get_enzymes_KDEs(data[0], enzyme_names, dist_index))
 
-# TODO: Let's first plot the 3D densities for RNAPs. Then we might do it for topoI and gyrase
-#  We alos need to compare the parameters
-# Collect KDEs and arange them as heatmap
-RNAP_KDEs = []
-for i, data in enumerate(pickle_data):
-    x=i
-    RNAP_KDEs.append(get_RNAP_KDE_matrix(data[0]['data']))
-
-# Collect KDEs and arange them as heatmap
-RNAP_KDE_lines = []
-for i, data in enumerate(pickle_data):
-    x=i
-    RNAP_KDE_lines.append(get_RNAP_KDE_lines(data[0]['data']))
 
 # Plot - 3D lines
 #-----------------------------------------------------------------------------------------------------------------------
-fig, axs = plt.subplots(3, figsize=(width, 3*height), tight_layout=True, sharex=True)#, subplot_kw={'projection': '3d'})
+fig, axs = plt.subplots(3, figsize=(width, 3*height), tight_layout=True, sharex=False)#, subplot_kw={'projection': '3d'})
 
-for i in range(len(RNAP_KDE_lines)):
+for i in range(len(enzymes_KDEs)):
 
     ax = axs[i]
     axs[i].set_title(titles[i])
 
-    distance = RNAP_KDE_lines[i][0]
-    RNAP_collection = RNAP_KDE_lines[i][1]
+    # Get info
+    case_kde = enzymes_KDEs[i]
+    for j, kde_dict in  enumerate(case_kde):
+        distance = kde_dict['distance']
+        for name in enzyme_names:
+            x = kde_dict[name][0]
+            y = kde_dict[name][1]
+#            if name == 'topoI' or name == 'gyrase':
+#                if j == 0:
+#                    x = x[15:-15]
+#                    y = y[15:-15]
+#                else:
+#                    x = x[:-15]
+#                    y = y[:-15]
 
-    # Plot each 3D plot in separate subplots
-    for j, dist in enumerate(distance):
-        x = RNAP_collection[j][0]
-        y = RNAP_collection[j][1]
-        ys = RNAP_collection[j][2]
-        # ax.plot(x, y, zs=dist)
-        ax.plot(x, y)
+            #ax.plot(x, y, color=enzyme_colors[name], ls=lines[j], lw=lw,alpha=alphas[j])
+            ax.plot(x, y, color=enzyme_colors[name][j], lw=lw)
 
-    #ax.set_ylabel(r'Upstream distance')
-    #ax.set_xlabel('Transcription unit')
+    ax.set_ylabel(r'Density')
+    ax.set_xlabel('Position (bp)')
     ax.grid(True)
+    #ax.set_ylim(0,100)
 
 #fig.colorbar(im, )# ticks=[1, 2, 3])
 
 
 plt.show()
 #sys.exit()
-# Plot matrix
-#-----------------------------------------------------------------------------------------------------------------------
-# Let's plot as we do the process
-fig, axs = plt.subplots(3, figsize=(width, 3*height), tight_layout=True, sharex=True)
 
-gene_length = 900
-x_pos =np.array([0,25,50,75,100])
-x_labels = gene_length*x_pos/100
-
-# Let's find the maximum
-mymax=0
-for i in range(len(RNAP_KDEs)):
-    RNAP_matrix = RNAP_KDEs[i][1]
-
-    max = np.max(RNAP_matrix)
-    if max > mymax:
-        mymax = max
-
-for i in range(len(RNAP_KDEs)):
-
-    ax = axs[i]
-    axs[i].set_title(titles[i])
-
-    distance = RNAP_KDEs[i][0]
-    RNAP_matrix = RNAP_KDEs[i][1]/mymax
-
-    im  = ax.imshow( RNAP_matrix, cmap= 'viridis', interpolation= 'nearest', aspect=5, vmin=0, vmax=1)
-
-    y_pos = np.arange(len(distance))
-    y_labels = distance
-
-    ax.set_yticks( y_pos )
-    ax.set_yticklabels( y_labels )
-
-    ax.set_xticks( x_pos )
-    ax.set_xticklabels( x_labels )
-
-    ax.set_ylabel(r'Upstream distance')
-    ax.set_xlabel('Transcription unit')
-    ax.grid(True)
-
-#fig.colorbar(im, )# ticks=[1, 2, 3])
-
-
-plt.show()
 
 
 

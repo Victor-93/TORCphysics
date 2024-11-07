@@ -44,6 +44,7 @@ def calibrate_w_rate(info_list, target_dict, n_simulations, additional_results=F
         # Run simulations in parallel within this subset
         pool_results = pool.map(pt.single_simulation_w_variations_return_dfs, Items)
 
+        # TODO: Let's add prod_rates, cross_correlations, local/global supercoiling levels  and  KDEs?
         # Process transcripts - Serial
         # ----------------------------
         # Collect results (is it better to do it in serial or parallel? What causes more overhead?)
@@ -96,6 +97,24 @@ def calibrate_w_rate(info_list, target_dict, n_simulations, additional_results=F
 
             output_list[i]['reference'] = np.array([system['reference'], system['reference_std']])
 
+            # Get Supercoiling and related df quantities
+            # TODO: AQUIMEQUEDE: You have somehow to save local sigma, global sigma per system
+            # Maybe the positions as well
+            # --------------------------------------------------------------------
+            for result in pool_results:
+                sites_df = result['sites_df']
+                enzymes_df = result['enzymes_df']
+                site_mask = sites_df['name'] == target_dict['reporter']
+                mask_circuit = sites_df['type'] == 'circuit'
+
+                # Collect measurements
+                local_df = sites_df[site_mask]#['superhelical']
+                local_superhelical = local_df['superhelical'].to_numpy()
+                # local_superhelical = sites_df[site_mask]['superhelical'].to_numpy()
+                global_superhelical = sites_df[mask_circuit]['superhelical'].to_numpy()
+
+
+
     # Objective function part
     # --------------------------------------------------------------
     # We need to calculate the relative rate and add to the objective function
@@ -120,6 +139,8 @@ def calibrate_w_rate(info_list, target_dict, n_simulations, additional_results=F
                 output_list[i]['relative_rate'] = relative_rate
 
     return objective, output_list
+
+
 
     #if additional_results:
     #    return objective, output_list

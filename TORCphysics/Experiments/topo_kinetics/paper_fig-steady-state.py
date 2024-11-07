@@ -52,12 +52,16 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 100#12#96#48#24#96#10#84  # 60 #48 #120
+#n_simulations = 100#12#96#48#24#96#10#84  # 60 #48 #120
+n_simulations = 10#12#96#48#24#96#10#84  # 60 #48 #120
 
 # params_file
+#recognition_path = 'recognition-linear/'
+recognition_path = ''
 #topo_params_file = 'calibration_dt'+str(dt)+'.csv'
 #recognition_params_file = 'calibration2.csv'
-recognition_params_file = 'calibration_dt'+str(dt)+'.csv'
+#recognition_params_file = 'calibration_dt'+str(dt)+'.csv'
+recognition_params_file = 'avg_dt'+str(dt)+'.csv'
 poisson_params_file = 'calibration_'+str(dt)+'.csv'
 
 
@@ -294,7 +298,9 @@ both_sigma_rx = sigma
 # Recognition binding
 #params_file = 'recognition-linear/calibration.csv'
 #params_file = 'recognition-linear/calibration_small_dt1.csv'
-params_file = 'recognition-linear/'+recognition_params_file
+#params_file = 'recognition-linear/'+recognition_params_file
+params_file = recognition_path+recognition_params_file
+
 params_dict = pd.read_csv(params_file).to_dict()
 rec_objective, rec_output = objective_function(params=params_dict)
 
@@ -351,6 +357,6 @@ for n in range(4):
 axs[0,0].legend(loc='best', fontsize=font_size)
 axs[0,1].legend(loc='best', fontsize=font_size)
 
-plt.savefig(file_out + '.png')
-plt.savefig(file_out + '.pdf')
+#plt.savefig(file_out + '.png')
+#plt.savefig(file_out + '.pdf')
 plt.show()

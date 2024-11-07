@@ -3,10 +3,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 
+# Description
+#-----------------------------------------------------------------------------------------------------------------------
+# We now want to plot the topoI, RNAP and gyrase KDEs for 2 or 3 key distances
+
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
-#promoter_cases = ['weak', 'medium', 'strong']
-promoter_cases = ['medium', 'medium', 'strong']
+#promoter_cases = ['weak', 'weak', 'strong']
+promoter_cases = ['weak', 'medium', 'strong']
+enzyme_names = ['topoI','RNAP']#, 'gyrase']
+#dist_index = [0,9,11]
+#dist_index = [0,10]
+#dist_index = [10]
+dist_index = [8,0]
+time = 80000
+
 dt=1.0#0.5
 
 k_weak=0.02
@@ -44,6 +55,10 @@ model_ls = '-o'
 exp_ls = '--o'
 titles = ['weak', 'medium', 'strong']
 
+lines = ['-', '-', '-']
+alphas = [1, 1, 1.0]
+#enzyme_colors = {'RNAP': 'black', 'topoI': 'red', 'gyrase':'blue'}
+enzyme_colors = {'RNAP': ['black', 'green'], 'topoI': ['red', 'orange'], 'gyrase':['blue', 'purple']}
 colors = ['green', 'blue', 'red']
 
 # Processing functions
@@ -118,6 +133,31 @@ def get_RNAP_KDE_lines(results_list):
         RNAP_collection.append(np.array([x, y, ys]))
     return distance, RNAP_collection
 
+# Get's the KDEs of RNAP, and topoisomerases for three key distances, and
+# sets the start of the transcription unit (promoter) at x=0.
+def get_enzymes_KDEs(results_list, names_list, index_list):
+    output_list = []
+    n = len(results_list)
+
+    for i in index_list:
+        out_dict = {}
+        out_dict['index'] = i
+        out_dict['distance'] = results_list[i]['distance']
+
+        # We just need to obtain the value to align the enzymes
+        x_disp =  np.min(results_list[i]['result']['KDE']['RNAP']['kde_x'])
+
+        # Now we collect measurements
+        for name in names_list:
+            y = results_list[i]['result']['KDE'][name]['kde_y'][0]
+            ys = results_list[i]['result']['KDE'][name]['kde_y'][1]
+            kde_x = results_list[i]['result']['KDE'][name]['kde_x']
+            x= kde_x - x_disp
+            out_dict[name] = np.array([x, y, ys])
+        output_list.append(out_dict)
+    return output_list
+
+
 # Load
 #-----------------------------------------------------------------------------------------------------------------------
 pickle_data = []
@@ -132,8 +172,12 @@ for i, data in enumerate(pickle_data):
     x=i
     rates.append(get_prod_rates(data[0]['data']))
 
-# TODO: Let's first plot the 3D densities for RNAPs. Then we might do it for topoI and gyrase
-#  We alos need to compare the parameters
+# Get KDEs
+enzymes_KDEs = []
+for i, data in enumerate(pickle_data):
+    x=i
+    enzymes_KDEs.append(get_enzymes_KDEs(data[0]['data'], enzyme_names, dist_index))
+
 # Collect KDEs and arange them as heatmap
 RNAP_KDEs = []
 for i, data in enumerate(pickle_data):
@@ -148,78 +192,49 @@ for i, data in enumerate(pickle_data):
 
 # Plot - 3D lines
 #-----------------------------------------------------------------------------------------------------------------------
-fig, axs = plt.subplots(3, figsize=(width, 3*height), tight_layout=True, sharex=True)#, subplot_kw={'projection': '3d'})
+fig, axs = plt.subplots(3, figsize=(width, 3*height), tight_layout=True, sharex=False)#, subplot_kw={'projection': '3d'})
 
-for i in range(len(RNAP_KDE_lines)):
+for i in range(len(enzymes_KDEs)):
 
     ax = axs[i]
     axs[i].set_title(titles[i])
 
-    distance = RNAP_KDE_lines[i][0]
-    RNAP_collection = RNAP_KDE_lines[i][1]
+    # Get info
+    case_kde = enzymes_KDEs[i]
+    for j, kde_dict in  enumerate(case_kde):
+        distance = kde_dict['distance']
+        for name in enzyme_names:
+            x = kde_dict[name][0]
+            y = kde_dict[name][1]#/time
+            ys = kde_dict[name][2]#/time/1#/np.sqrt(time)
+            if name == 'topoI' or name == 'gyrase':
+                if j == 0:
+                    x = x[15:-15]
+                    y = y[15:-15]
+                    ys = ys[15:-15]
+                else:
+                    x = x[:-15]
+                    y = y[:-15]
+                    ys = ys[:-15]
 
-    # Plot each 3D plot in separate subplots
-    for j, dist in enumerate(distance):
-        x = RNAP_collection[j][0]
-        y = RNAP_collection[j][1]
-        ys = RNAP_collection[j][2]
-        # ax.plot(x, y, zs=dist)
-        ax.plot(x, y)
+            label = name + ' ud:' +str(distance)
+            #ax.plot(x, y, color=enzyme_colors[name], ls=lines[j], lw=lw,alpha=alphas[j])
+            ax.plot(x, y, color=enzyme_colors[name][j], lw=lw, label=label)
+            #ax.fill_between(x,y,y+ys,color=enzyme_colors[name][j], alpha=0.25)
 
-    #ax.set_ylabel(r'Upstream distance')
-    #ax.set_xlabel('Transcription unit')
+    ax.set_ylabel(r'Density')
+    ax.set_xlabel('Position (bp)')
     ax.grid(True)
+#    ax.set_yscale('log')
+    ax.legend(loc='best')
+    #ax.set_ylim(0,100)
 
 #fig.colorbar(im, )# ticks=[1, 2, 3])
 
 
 plt.show()
 #sys.exit()
-# Plot matrix
-#-----------------------------------------------------------------------------------------------------------------------
-# Let's plot as we do the process
-fig, axs = plt.subplots(3, figsize=(width, 3*height), tight_layout=True, sharex=True)
 
-gene_length = 900
-x_pos =np.array([0,25,50,75,100])
-x_labels = gene_length*x_pos/100
-
-# Let's find the maximum
-mymax=0
-for i in range(len(RNAP_KDEs)):
-    RNAP_matrix = RNAP_KDEs[i][1]
-
-    max = np.max(RNAP_matrix)
-    if max > mymax:
-        mymax = max
-
-for i in range(len(RNAP_KDEs)):
-
-    ax = axs[i]
-    axs[i].set_title(titles[i])
-
-    distance = RNAP_KDEs[i][0]
-    RNAP_matrix = RNAP_KDEs[i][1]/mymax
-
-    im  = ax.imshow( RNAP_matrix, cmap= 'viridis', interpolation= 'nearest', aspect=5, vmin=0, vmax=1)
-
-    y_pos = np.arange(len(distance))
-    y_labels = distance
-
-    ax.set_yticks( y_pos )
-    ax.set_yticklabels( y_labels )
-
-    ax.set_xticks( x_pos )
-    ax.set_xticklabels( x_labels )
-
-    ax.set_ylabel(r'Upstream distance')
-    ax.set_xlabel('Transcription unit')
-    ax.grid(True)
-
-#fig.colorbar(im, )# ticks=[1, 2, 3])
-
-
-plt.show()
 
 
 
