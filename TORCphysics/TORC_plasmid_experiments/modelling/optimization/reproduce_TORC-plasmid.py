@@ -19,7 +19,7 @@ import pickle
 # INPUT: Model & simulation conditions
 # ----------------------------------------------------------------------------------------------------------------------
 dt = 1.0
-final_time = 100
+final_time = 10000
 
 Ecoli_topoI_C = 17.0
 Ecoli_gyrase_C = 44.6
