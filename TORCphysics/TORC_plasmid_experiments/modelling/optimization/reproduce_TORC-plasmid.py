@@ -7,12 +7,19 @@ import pickle
 
 # Description
 # ----------------------------------------------------------------------------------------------------------------------
-# Following the optimization proces, we want to reproduce the experiment
+# Following the optimization proces, we want to reproduce the experiment and get some data.
+# This script produces a pickle file with data called file_out .pkl (check the file_out variable  in the input).
+# This pickle file is a list of dictionaries with the results, and each entry represents a different system e.g., Ecoli WT.
+# For each experiment, it provides system information such as name, description, bacterium, promoter and strain.
+# It also includes the 'reference' which is the relative expression rate from experiments,
+# the 'relative_rate' which is the relative expression rate calculated from simulations, the objective component
+# (difference between relative expressions with experimental data), the number of transcripts of reporter gene,
+# 'global_superhelical' density, 'local_superhelical' density per site, and the 'production_rate' per site as well.
 
-# Model & simulation conditions
+# INPUT: Model & simulation conditions
 # ----------------------------------------------------------------------------------------------------------------------
 dt = 1.0
-final_time = 100 #2000
+final_time = 100
 
 Ecoli_topoI_C = 17.0
 Ecoli_gyrase_C = 44.6
@@ -21,10 +28,15 @@ Ecoli_lacI_C = 1.0  # We do not know, at the moment we will assume that lacI beh
                     # In Salmonella vary relative to this one, by increasing to 2.0 (twice) or 0.5 (half). Keep that in mind in case
                     # we need it
 
-n_simulations = 50
+n_simulations = 12#50
 sigma0 = -0.049 # Initial superhelical density
 
+lacI_blocking = True
+
 file_out='rep-TORC_plasmid'
+
+if lacI_blocking == True:
+    file_out = 'block-'+file_out
 
 ref_file = '../../Experimental_data/reference.csv'
 
@@ -148,8 +160,13 @@ print('This is the calibration params: ', calibration_dict)
 # ----------------------------------------------------------------------------------------------------------------------
 min_circuit_file = '../circuit_min-linear.csv'
 complete_circuit_file = '../circuit_complete-linear.csv'
-min_sites_file = 'sites_min-linear.csv'
-complete_sites_file = 'sites_complete-linear.csv'
+if lacI_blocking:  # If we consider blocking, then we use the displaced lac1 site file which moves the lacO1 a bit
+                   # so it can block the promoter
+    min_sites_file = 'disp-sites_min-linear.csv'
+    complete_sites_file = 'disp-sites_complete-linear.csv'
+else:
+    min_sites_file = 'sites_min-linear.csv'
+    complete_sites_file = 'sites_complete-linear.csv'
 enzymes_filename = None
 environment_filename = 'environment.csv'
 output_prefix = 'TORC_plasmid'

@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 
-
 # Description
 #-----------------------------------------------------------------------------------------------------------------------
 # I want to plot bar plots of the parameters inferred
@@ -16,9 +15,10 @@ pkl_file  = dir_source + v_code+ '.pkl'
 params_file = dir_source + v_code + '.csv'
 loss_file = dir_source + v_code + '-values.csv'
 
-out_file = 'TORC_plasmid-test'
+out_file = 'params_'+v_code
 
-err_threshold = 0.3 # The minimum error we want
+percentage_threshold = .10
+#err_threshold = 0.5 # The minimum error we want
 
 # Plotting params
 #-----------------------------------------------------------------------------------------------------------------------
@@ -40,7 +40,12 @@ colors = ['green', 'blue', 'red']
 # Read inputs
 #-----------------------------------------------------------------------------------------------------------------------
 df = pd.read_csv(loss_file)
-#df = df.sort_values(by='loss', ascending=False)#, inplace=True)
+df = df.sort_values(by='loss', ascending=False)#, inplace=True)
+
+n = len(df['loss'])
+nconsidered = int(n*percentage_threshold)
+err_threshold = df['loss'].iloc[-nconsidered]
+
 # Filter according error
 filtered_df = df[df['loss'] <= err_threshold]
 
@@ -109,7 +114,7 @@ axs.set_title('TORC Plasmid')
 axs.set_xticks(x)
 axs.set_xticklabels(promoter_keys, rotation=45, ha='right')
 axs.legend(loc='best')
-axs.grid(True)
+axs.grid(True,alpha=0.25)
 
-#plt.savefig(out_file+'png')
+plt.savefig(out_file+'.png')
 plt.show()

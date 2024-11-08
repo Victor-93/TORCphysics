@@ -2,6 +2,7 @@ import numpy as np
 import multiprocessing
 import multiprocessing.pool
 from TORCphysics import parallelization_tools as pt
+from TORCphysics import topo_calibration_tools as tct
 from scipy.stats import gaussian_kde
 from scipy.interpolate import interp1d
 from TORCphysics import Circuit
@@ -31,6 +32,21 @@ def calibrate_w_rate(info_list, target_dict, n_simulations, additional_results=F
         system = info_list[i]
         additional_dict = {}
 
+        # Sort the processing info
+        # --------------------------------------------------
+        # Overall
+        my_circuit = pt.load_circuit(system['global_conditions'])
+        total_time = my_circuit.dt * my_circuit.frames
+        dt = my_circuit.dt
+        frames = my_circuit.frames
+
+        # Sites - get sites that are not bare DNA or EXT
+        target_sites = [site.name for site in my_circuit.site_list if 'DNA' not in site.site_type and 'EXT' not in site.site_type]
+        target_genes = [site.name for site in my_circuit.site_list if site.site_type == 'gene' ]
+
+        # Define x-axes
+        # x_system = tct.get_interpolated_x(1, my_circuit.size, x_spacing=20)
+
         # We need a list of items, so the pool can pass each item to the function
         Items = []
         for simulation_number in range(n_simulations):
@@ -44,7 +60,7 @@ def calibrate_w_rate(info_list, target_dict, n_simulations, additional_results=F
         # Run simulations in parallel within this subset
         pool_results = pool.map(pt.single_simulation_w_variations_return_dfs, Items)
 
-        # TODO: Let's add prod_rates, cross_correlations, local/global supercoiling levels  and  KDEs?
+        # TODO: We still need to calculate cross_correlations  and  KDEs?
         # Process transcripts - Serial
         # ----------------------------
         # Collect results (is it better to do it in serial or parallel? What causes more overhead?)
@@ -77,10 +93,9 @@ def calibrate_w_rate(info_list, target_dict, n_simulations, additional_results=F
 
         system['transcripts'] = transcripts
 
-        # Here process additional stuff if
-        # TODO: Create the processing function and launch calibration! - This would be parameters related to the dfs
-        #  Maybe think about this when you actually need it, because you need to pass additional information like x_gene
-        #  etc... Maybe build those arrays some part in the beggining of this function if additional_results=True
+        # --------------------------------------------------------------------
+        # Here process additional stuff
+        # --------------------------------------------------------------------
         if additional_results:   # Note I add it here to start giving shape to the code, in case in the future
                                  # I want to add the KDEs or the processing bit, so it can
 
@@ -97,23 +112,52 @@ def calibrate_w_rate(info_list, target_dict, n_simulations, additional_results=F
 
             output_list[i]['reference'] = np.array([system['reference'], system['reference_std']])
 
-            # Get Supercoiling and related df quantities
-            # TODO: AQUIMEQUEDE: You have somehow to save local sigma, global sigma per system
-            # Maybe the positions as well
+            # Global sigma
             # --------------------------------------------------------------------
+            global_superhelical = []
             for result in pool_results:
-                sites_df = result['sites_df']
-                enzymes_df = result['enzymes_df']
-                site_mask = sites_df['name'] == target_dict['reporter']
-                mask_circuit = sites_df['type'] == 'circuit'
+                 sites_df = result['sites_df']
+                 mask_circuit = sites_df['type'] == 'circuit'
+                 # Collect measurements
+                 global_superhelical.append(sites_df[mask_circuit]['superhelical'].to_numpy())
+            output_list[i]['global_superhelical'] = np.array(global_superhelical)
 
-                # Collect measurements
-                local_df = sites_df[site_mask]#['superhelical']
-                local_superhelical = local_df['superhelical'].to_numpy()
-                # local_superhelical = sites_df[site_mask]['superhelical'].to_numpy()
-                global_superhelical = sites_df[mask_circuit]['superhelical'].to_numpy()
+            # Get site related measurements: local supercoiling, correlations & positions
+            # --------------------------------------------------------------------
+            local_superhelical = {}
+            for site_name in target_sites:
+                local_superhelical[site_name] = []
+                for result in pool_results:
+                    sites_df = result['sites_df']
+                    site_mask = sites_df['name'] == site_name
 
+                    # Collect measurements
+                    local_superhelical[site_name].append(sites_df[site_mask]['superhelical'].to_numpy())
+                local_superhelical[site_name] = np.array(local_superhelical[site_name])
+            output_list[i]['local_superhelical'] = local_superhelical
 
+            # Get transcripts
+            # --------------------------------------------------------------------
+            # Collect results (is it better to do it in serial or parallel? What causes more overhead?)
+            expression_rate = {}
+            for gene_name in target_genes:
+                expression_rate[gene_name] = []
+                transcript_list = []
+                for result in pool_results:
+                    environmental_df = result['environmental_df']
+                    mask = environmental_df['name'] == gene_name
+
+                    if len(environmental_df[mask]['concentration']) == 0:
+                        transcript = 0
+                    else:
+                        transcript = environmental_df[mask]['concentration'].iloc[-1]
+                    transcript_list.append(transcript)
+                expression_array = np.array(transcript_list)/total_time
+                mean_expression = np.mean(expression_array)
+                std_expression = np.std(expression_array)
+
+                expression_rate[gene_name] = np.array([mean_expression, std_expression])
+            output_list[i]['production_rate'] = expression_rate
 
     # Objective function part
     # --------------------------------------------------------------
@@ -140,17 +184,3 @@ def calibrate_w_rate(info_list, target_dict, n_simulations, additional_results=F
 
     return objective, output_list
 
-
-
-    #if additional_results:
-    #    return objective, output_list
-    #else:
-    #    return objective
-
-#def process_additional_results(item):
-#    # Global measurements
-
-#    mask_circuit = sites_df['type'] == 'circuit'
-#    global_superhelical = sites_df[mask_circuit]['superhelical'].to_numpy()
-
-#    additional_dict['global_superhelical'] = global_superhelical

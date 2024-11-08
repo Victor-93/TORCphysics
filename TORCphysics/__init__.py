@@ -13,4 +13,5 @@ from .src import analysis
 from .src import visualization
 from .src.circuit import Circuit
 from .src.extra_tools import parallelization_tools, add_enzyme
-from .src.extra_tools import topo_calibration_tools, parameter_search
+from .src.extra_tools import topo_calibration_tools
+from .src.extra_tools import parameter_search

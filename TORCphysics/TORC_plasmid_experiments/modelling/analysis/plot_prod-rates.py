@@ -6,34 +6,29 @@ import pickle
 
 # Description
 #-----------------------------------------------------------------------------------------------------------------------
-# We want to plot the results from the TORC plasmid following the optmization process
+# We want to plot the expression rates from the TORC plasmid following the optmization process
 
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
 dir_source = '../optimization/'
-v_code = 'block-op_TORC_plasmid'
+#v_code = 'block-op_TORC_plasmid'
+v_code = 'block-rep-TORC_plasmid'
 #v_code = 'op_TORC_plasmid'
 pkl_file  = dir_source + v_code+ '.pkl'
-params_file = dir_source + v_code + '.csv'
-loss_file = dir_source + v_code + '-values.csv'
 
-#pkl_file  = dir_source + 'rep-TORC_plasmid.pkl'
-#params_file = dir_source + 'calibration_TORC_plasmid.csv'
-#loss_file = dir_source + 'calibration_TORC_plasmid-values.csv'
-
-out_file = 'relatives_'+v_code
+out_file = 'prod-rate_'+v_code
 
 # Plotting params
 #-----------------------------------------------------------------------------------------------------------------------
-width = 8
+width = 12#8
 height = 5
 lw = 3
 font_size = 12
 xlabel_size = 14
 title_size = 16
 
-
-colors = ['green', 'blue', 'red']
+colors=['yellow', 'blue', 'red', 'green', 'purple']
+gene_names = ['PleuWT', 'tetA', 'antitet', 'bla']#, 'lacI']
 
 # Load
 #-----------------------------------------------------------------------------------------------------------------------
@@ -49,33 +44,23 @@ fig, axs = plt.subplots(1, figsize=(width, 1*height), tight_layout=True, sharex=
 keys = [my_dict['name'] for my_dict in pkl_data]
 
 # Number of cases and keys
-n_cases = 2#len(pkl_data) # because we have 2 measurements per case - experimental and simulation
+n_cases = len(gene_names) # because we have 2 measurements per case - experimental and simulation
 n_keys = len(keys)
 
 # Set up the positions for each bar group (x-axis)
 x = np.arange(n_keys)  # Position of each group on the x-axis
-width = .8 / n_cases  # Dynamically calculate the width of each bar
+bwidth = .8 / n_cases  # Dynamically calculate the width of each bar
 
-labels = ['exp', 'sim']
-colors=['red', 'blue']
+labels = gene_names
 # Plot each case in the list
-for i, measurement in enumerate(['reference', 'relative_rate']):
+for i, name in enumerate(gene_names):
 
-    values = [my_dict[measurement][0] for my_dict in pkl_data] # mean
-    std = [my_dict[measurement][1] for my_dict in pkl_data] # std
+    mean = [my_dict['production_rate'][name][0] for my_dict in pkl_data] # mean
+    std = [my_dict['production_rate'][name][1] for my_dict in pkl_data] # std
 
-    axs.bar(x + i * width - width * (n_cases - 1) / 2, values, width, yerr=std, label=labels[i], color=colors[i])
+    print(name)
+    axs.bar(x + i * bwidth - bwidth * (n_cases - 1) / 2, mean, bwidth, yerr=std, label=labels[i], color=colors[i], alpha=0.7)
 
-# Let's draw the error
-objective = sum([my_dict['objective'] for my_dict in pkl_data])
-# Add label outside the plot
-# Add errors
-formatted_sum_err = "{:.3f}".format(objective)  # Formatting to three significant figures
-er_label = r'$\epsilon={}$'.format(formatted_sum_err)
-props = dict(boxstyle='round', facecolor='silver', alpha=0.4)
-axs.text(0.3, 0.95, er_label, transform=axs.transAxes, fontsize=font_size,
-        verticalalignment='top', bbox=props)
-print(objective)
 
 # Add labels, title, and custom ticks
 axs.set_xlabel('System')

@@ -7,6 +7,19 @@ import random
 import sys
 
 
+# This function just loads the circuit from the global dict and returns the circuit (without running it).
+# I put as a function so in case you just need to process the circuit to extract some global data, you don't
+# actually need to write the whole thing. So it is just to save some space and clean up a bit the functions.
+def load_circuit(global_dict):
+    my_circuit = Circuit(circuit_filename=global_dict['circuit_filename'], sites_filename=global_dict['sites_filename'],
+                         enzymes_filename=global_dict['enzymes_filename'],
+                         environment_filename=global_dict['environment_filename'],
+                         output_prefix=global_dict['output_prefix'], frames=global_dict['frames'],
+                         series=global_dict['series'], continuation=global_dict['continuation'],
+                         dt=global_dict['dt'])
+
+    return my_circuit
+
 # TODO: Maybe later it can accept specific conditions
 # Run simple simulation. The idea is that an external file executes this one. The external file should handle the
 # parallelization process. This file is just in charge of sorting out the simulation number
