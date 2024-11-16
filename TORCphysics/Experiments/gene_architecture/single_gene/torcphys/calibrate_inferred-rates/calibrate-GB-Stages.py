@@ -27,11 +27,13 @@ promoter_cases = ['strong']
 
 dt=1.0
 initial_time = 0
-final_time = 2000#2000#5000  #30000 ~8.3hrs
+final_time = 15000#2000#5000  #30000 ~8.3hrs
+#final_time = 2000#2000#5000  #30000 ~8.3hrs
 
 k_weak = 0.02 # This is the one inferred from the experiment
 
-model_code='GB-Stages-'
+#model_code='GB-Stages-'
+model_code='GB-Stages-avg-'
 
 print("Doing model " + model_code + '; case ' +str(promoter_cases[0])+'; k_weak=' + str(k_weak) +'; dt=' +str(dt))
 
@@ -102,8 +104,10 @@ output_prefix = 'single_gene'  #Although we won't use it
 series = True
 continuation = False
 enzymes_filename = None
-environment_filename = 'environment_dt'+str(dt)+'.csv'
-RNAP_filename = '../../RNAP-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.csv'
+#environment_filename = 'environment_dt'+str(dt)+'.csv'
+#RNAP_filename = '../../RNAP-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.csv'
+environment_filename = 'environment_avg_dt'+str(dt)+'.csv'
+RNAP_filename = '../../avg_RNAP_dt'+str(dt)+'.csv'
 
 # Load the promoter response
 # -----------------------------------

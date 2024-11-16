@@ -11,6 +11,7 @@ import seaborn as sns
 # Inputs
 # ---------------------------------------------------------
 out = 'noTracking'
+dt=1.0
 # Figure initial conditions
 # ---------------------------------------------------------
 width = 8
@@ -25,8 +26,10 @@ names = ['topoI', 'gyrase']
 colors_dict = {'topoI': 'red', 'gyrase': 'cyan'}
 #colors_dict = {'RNAP': 'black', 'topoI': 'red', 'gyrase': 'cyan'}
 kwargs = {'linewidth': 2, 'ls': '-'}
-nbins = [166,62]
+#nbins = [166,62]
+nbins = [301,201]
 
+#tarray = [np.arange(0,6001,20), np.arange(0,6001,30)]
 # Let's plot
 # ---------------------------------------------------------
 fig, axs = plt.subplots(2, figsize=(width, 2*height), tight_layout=True)
@@ -37,7 +40,8 @@ for p, name in enumerate(names):
     print(name)
 
     # Load
-    x = np.loadtxt('position_'+name+'.txt')
+    #x = np.loadtxt('position_'+name+'.txt')
+    x = np.loadtxt('position_'+name+'_dt'+str(dt)+'.txt')
 
     # Plot
     #hist = sns.histplot(x, ax=ax, color=colors_dict[name], label=name)

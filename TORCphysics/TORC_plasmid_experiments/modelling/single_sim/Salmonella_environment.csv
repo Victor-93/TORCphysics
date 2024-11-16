@@ -2,4 +2,4 @@ type,name,site_type,concentration,size,effective_size,binding_model,binding_opar
 RNAP,RNAP,gene,1.0,30,20,none,none,RNAPStagesStallv2,none,RNAPStagesSimpleUnbindingv2,none
 topo,topoI,DNA,8.53674154554195,20,10,TopoIRecognition,../responses/calibration_dt1.0_topoI.csv,TopoILinear,../responses/calibration_dt1.0_topoI.csv,PoissonUnBinding,../responses/calibration_dt1.0_topoI.csv
 topo,gyrase,DNA,23.774137788626987,30,20,GyraseRecognition,../responses/calibration_dt1.0_gyrase.csv,GyraseLinear,../responses/calibration_dt1.0_gyrase.csv,PoissonUnBinding,../responses/calibration_dt1.0_gyrase.csv
-lacI,lacI,lacOP,1.0,16,10,none,none,LacIPoissonBridging,../optimization/oparam_lacI.csv,LacISimpleUnBinding,../optimization/oparam_lacI.csv
+lacI,lacI,lacOP,0.0,16,10,none,none,LacIPoissonBridging,../optimization/oparam_lacI.csv,LacISimpleUnBinding,../optimization/oparam_lacI.csv

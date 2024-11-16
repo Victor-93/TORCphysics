@@ -10,11 +10,12 @@ n_simulations = 8#8#64#120 #60#48 #24#8 #96 # 120
 
 # Simulation conditions
 # --------------------------------------------------------------
-#dt = 1.0
+dt = 1.0
 #dt = 0.5
-dt = 0.25
+#dt = 0.25
 initial_time = 0
-final_time = 2000#500
+final_time = 3600 #1hr
+#final_time = 2000#500
 time = np.arange(initial_time, final_time + dt, dt)
 
 # Circuit initial conditions
@@ -22,7 +23,8 @@ time = np.arange(initial_time, final_time + dt, dt)
 circuit_filename = '../circuit.csv'
 sites_filename = None
 enzymes_filename = None
-environment_filename = 'environment_dt'+str(dt)+'.csv'
+#environment_filename = 'environment_dt'+str(dt)+'.csv'
+environment_filename = 'environment_avg_dt'+str(dt)+'.csv'
 output_prefix = 'noRNAP'
 frames = len(time)
 series = True

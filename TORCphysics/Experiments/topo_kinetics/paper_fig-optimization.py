@@ -23,7 +23,7 @@ initial_time = 0
 final_time = 500
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'topo_optimization-dt'+str(dt)
+file_out = 'ov-topo_optimization-dt'+str(dt)
 #file_out = 'calibration_small_dt1'
 
 # For the simulation
@@ -57,7 +57,7 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 10 #100
+n_simulations = 100
 
 #recognition_path = 'recognition-linear/'
 recognition_path = ''
@@ -77,7 +77,8 @@ topoI_type = 'environmental'
 topoI_binding_model_name = 'TopoIRecognition'
 topoI_effect_model_name = 'TopoILinear'
 topoI_unbinding_model_name = 'PoissonUnBinding'
-topoI_params = 'recognition-linear/calibration_dt'+str(dt) +'_topoI.csv'
+#topoI_params = 'recognition-linear/calibration_dt'+str(dt) +'_topoI.csv'
+topoI_params = 'topoI_rec_avg_dt'+str(dt)+'.csv'
 
 # Gyrase
 gyrase_name = 'gyrase'
@@ -85,7 +86,8 @@ gyrase_type = 'environmental'
 gyrase_binding_model_name = 'GyraseRecognition'
 gyrase_effect_model_name = 'GyraseLinear'
 gyrase_unbinding_model_name = 'PoissonUnBinding'
-gyrase_params = 'recognition-linear/calibration_dt'+str(dt) +'_gyrase.csv'
+#gyrase_params = 'recognition-linear/calibration_dt'+str(dt) +'_gyrase.csv'
+gyrase_params = 'gyrase_rec_avg_dt'+str(dt)+'.csv'
 
 # -----------------------------------
 # FIGURE Params
@@ -405,6 +407,6 @@ ax.text(-0.07, 1.0, outside_label[n], transform=ax.transAxes,
 #ax.legend(loc='best', fontsize=font_size)
 ax.grid(True)
 
-#plt.savefig(file_out + '.png')
-#plt.savefig(file_out + '.pdf')
+plt.savefig(file_out + '.png')
+plt.savefig(file_out + '.pdf')
 plt.show()

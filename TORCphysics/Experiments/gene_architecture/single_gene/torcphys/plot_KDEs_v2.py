@@ -205,8 +205,8 @@ for i in range(len(enzymes_KDEs)):
         distance = kde_dict['distance']
         for name in enzyme_names:
             x = kde_dict[name][0]
-            y = kde_dict[name][1]#/time
-            ys = kde_dict[name][2]#/time/1#/np.sqrt(time)
+            y = kde_dict[name][1]/time
+            ys = kde_dict[name][2]/time#/1#/np.sqrt(time)
             if name == 'topoI' or name == 'gyrase':
                 if j == 0:
                     x = x[15:-15]

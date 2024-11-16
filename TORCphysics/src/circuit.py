@@ -818,15 +818,20 @@ class Circuit:
     # TODO: there might be a better way to realise enzymes/substances to the environment.
     #  1.- Currently, only the concentration is summed. 2.- But will this still be the case if we add degradation?
     #  3.- And, will there be a more automatic way of defining these output to the environment?
+    #  4.- CHECK HOW THIS AFFECTS TRANSCRIPTION TERMINATION FOR THE NEW MODELS
     def add_to_environment(self, drop_list_enzymes):
 
         for enzyme in drop_list_enzymes:
 
             # TODO: Check this, it might notbe completly correct
-            if enzyme.name == 'RNAP':
-                size = abs(enzyme.site.start - enzyme.site.end + 1)
-                output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
-                                                 size=size, effective_size=0, site_type=None)
+            if 'RNAP' in enzyme.name:
+                size = abs(enzyme.site.start - enzyme.site.end + 1) # Gene size
+                tsize = abs(enzyme.position - enzyme.site.start)  # Transcript size
+                if tsize > size*.8:                # Only consider transcripts longer than 80% of gene
+                    output_environment = Environment(e_type='mRNA', name=enzyme.site.name, site_list=[], concentration=1,
+                                                     size=size, effective_size=0, site_type=None)
+                else:
+                    continue
             else:
                 continue
 

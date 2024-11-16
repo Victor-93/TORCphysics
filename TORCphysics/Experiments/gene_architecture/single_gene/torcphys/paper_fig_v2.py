@@ -24,6 +24,7 @@ for pcase in promoter_cases:
     #calibration_files.append('calibrate_inferred-rates/local_runs/reproduce-'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'-wKDEs.pkl')
     params_files.append('calibrate_inferred-rates/'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.csv')
 
+calibration_files[0] = 'calibrate_inferred-rates/local_runs/reproduce-'+model_code+'weak-kw'+str(k_weak)+'_dt'+str(dt)+'-02.pkl'
 
 
 # Plotting params

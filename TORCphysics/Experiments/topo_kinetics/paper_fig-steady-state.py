@@ -18,7 +18,7 @@ initial_time = 0
 final_time = 500
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'steady-'+str(dt)
+file_out = 'ov-steady-'+str(dt)
 #file_out = 'calibration_small_dt1'
 
 # For the simulation
@@ -52,8 +52,8 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-#n_simulations = 100#12#96#48#24#96#10#84  # 60 #48 #120
-n_simulations = 10#12#96#48#24#96#10#84  # 60 #48 #120
+n_simulations = 100#12#96#48#24#96#10#84  # 60 #48 #120
+#n_simulations = 10
 
 # params_file
 #recognition_path = 'recognition-linear/'
@@ -357,6 +357,6 @@ for n in range(4):
 axs[0,0].legend(loc='best', fontsize=font_size)
 axs[0,1].legend(loc='best', fontsize=font_size)
 
-#plt.savefig(file_out + '.png')
-#plt.savefig(file_out + '.pdf')
+plt.savefig(file_out + '.png')
+plt.savefig(file_out + '.pdf')
 plt.show()

@@ -39,7 +39,7 @@ n_inner_workers = n_workers // (n_sets+1)  # Number of workers per inner pool
                                            # I think this number of n_inner_workers is the number of parallel simulations
                                            # ran that are used to calculate each individual KDE.
 #tests = 4 #400  # number of tests for parametrization
-tests = 2000 # - For stanage
+tests = 3000 # - For stanage
 
 print('Doing parallelization process for:')
 print('n_workers', n_workers)
@@ -73,7 +73,8 @@ circuit_filename = '../circuit.csv'
 sites_filename = 'sites.csv' # '../sites.csv'
 enzymes_filename = None  #'../enzymes.csv'
 #environment_filename = 'environment.csv'
-environment_filename = 'environment_dt'+str(dt)+'.csv'
+#environment_filename = 'environment_dt'+str(dt)+'.csv'
+environment_filename = 'environment_avg_dt'+str(dt)+'.csv'
 output_prefix = 'topoIRNAPtrack-StagesStall_dt'+str(dt)
 series = True
 continuation = False
@@ -87,7 +88,8 @@ topoI_name = 'topoI'
 topoI_type = 'environmental'
 topoI_binding_model_name = 'TopoIRecognitionRNAPTracking'
 # These are parameters for the Recognition curve
-topoI_params_csv = '../calibration_dt'+str(dt)+'_topoI.csv'
+#topoI_params_csv = '../calibration_dt'+str(dt)+'_topoI.csv'
+topoI_params_csv = '../topoI_rec_avg_dt'+str(dt)+'.csv'
 
 # Site
 gene_name = 'reporter'

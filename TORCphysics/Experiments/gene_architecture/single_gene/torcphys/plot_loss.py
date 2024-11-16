@@ -5,9 +5,13 @@ import numpy as np
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
 loss_files = []
-loss_files.append('calibrate_inferred-rates/Stages-weak_dt1.0-values.csv')
-loss_files.append('calibrate_inferred-rates/Stages-medium_dt1.0-values.csv')
-loss_files.append('calibrate_inferred-rates/Stages-strong_dt1.0-values.csv')
+loss_files.append('calibrate_inferred-rates/GB-Stages-weak-kw0.02_dt1.0-values.csv')
+loss_files.append('calibrate_inferred-rates/GB-Stages-medium-kw0.02_dt1.0-values.csv')
+loss_files.append('calibrate_inferred-rates/GB-Stages-strong-kw0.02_dt1.0-values.csv')
+
+#loss_files.append('calibrate_inferred-rates/Stages-weak_dt1.0-values.csv')
+#loss_files.append('calibrate_inferred-rates/Stages-medium_dt1.0-values.csv')
+#loss_files.append('calibrate_inferred-rates/Stages-strong_dt1.0-values.csv')
 
 titles = ['Weak dt=1.0', 'Medium dt=1.0', 'Strong dt=1.0']
 

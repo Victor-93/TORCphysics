@@ -23,7 +23,8 @@ frames = len(time)
 
 pickle_files = [
     'track-uniform/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl',
-    'track-StagesStall/reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'-02.pkl'
+    'track-StagesStall/avg-reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
+    #'track-StagesStall/reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'-02.pkl'
 ]
 output_prefix = 'RNAPStages-topoIRNAPtracking'
 title = ['Uniform Model', 'Stages-Stall Model']
@@ -92,7 +93,8 @@ dx = x1 - x0
 gene_colour = 'gray'
 gene_lw=2
 
-ylims = [[.67,1.5], [.67,1.8]]
+#ylims = [[.67,1.5], [.67,1.8]]
+ylims = [[.67,1.5], [.67,2.]]
 mylabels = ['RNAP', 'Topoisomerase I', 'Gyrase']
 
 for n, pickle_file in enumerate(pickle_files):
@@ -183,6 +185,6 @@ for n, pickle_file in enumerate(pickle_files):
 
     ax.plot([x0,x0], [-10,10], lw=2, color='gray', ls='--' )
     ax.plot([x1, x1], [-10, 10], lw=2, color='gray', ls='--')
-plt.savefig(output_prefix+'-FE.png')
-plt.savefig(output_prefix+'-FE.pdf')
+#plt.savefig(output_prefix+'-FE.png')
+#plt.savefig(output_prefix+'-FE.pdf')
 plt.show()

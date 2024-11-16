@@ -44,7 +44,8 @@ for pcase in promoter_cases:
 param_file = '../' + model_code + promoter_cases[0] + '-kw' + str(k_weak) + '_dt' + str(dt)+'.csv' # This one has the parametrisation from calibration
 
 info_file = 'reproduce-'+model_code + promoter_cases[0] + '-kw' + str(k_weak) + '_dt' + str(dt)
-file_out = info_file
+#file_out = info_file
+file_out = info_file + '-02'
 
 
 # Parallelization conditions

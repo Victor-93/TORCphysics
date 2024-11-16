@@ -86,8 +86,8 @@ for name in topos_names:
     topo_dict['k_on'] = df_avg['k_on_'+name]
     topo_dict['k_off'] = df_avg['k_off_' + name]
     topo_dict['k_cat'] = df_avg['k_cat_'+name]
-    topo_dict['k_width'] = df_avg['width_'+name]
-    topo_dict['k_threshold'] = df_avg['threshold_'+name]
+    topo_dict['width'] = df_avg['width_'+name]
+    topo_dict['threshold'] = df_avg['threshold_'+name]
     if name == 'gyrase':
         topo_dict['sigma0'] = df_avg['sigma0_'+name]
 
