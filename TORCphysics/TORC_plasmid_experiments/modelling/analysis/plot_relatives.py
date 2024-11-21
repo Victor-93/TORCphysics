@@ -11,8 +11,9 @@ import pickle
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
 dir_source = '../optimization/'
-v_code = 'block-op_TORC_plasmid'
+#v_code = 'block-op_TORC_plasmid'
 #v_code = 'op_TORC_plasmid'
+v_code = 'block-op-simple_TORC_plasmid'
 pkl_file  = dir_source + v_code+ '.pkl'
 params_file = dir_source + v_code + '.csv'
 loss_file = dir_source + v_code + '-values.csv'

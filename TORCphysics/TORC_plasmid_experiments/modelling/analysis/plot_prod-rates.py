@@ -11,8 +11,8 @@ import pickle
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
 dir_source = '../optimization/'
-#v_code = 'block-op_TORC_plasmid'
-v_code = 'block-rep-TORC_plasmid'
+v_code = 'block-op_TORC_plasmid'
+#v_code = 'block-rep-TORC_plasmid'
 #v_code = 'op_TORC_plasmid'
 pkl_file  = dir_source + v_code+ '.pkl'
 

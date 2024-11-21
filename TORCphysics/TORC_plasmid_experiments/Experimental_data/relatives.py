@@ -14,7 +14,9 @@ import matplotlib.pyplot as plt
 # Input data
 #-----------------------------------------------------------------------------------------------------------------------
 Ecoli_input = 'EColi_mhYFP_means.csv'
+Ecoli_input_group = 'EColi_grouped.csv'
 Sal_input = 'Sal_mhYFP_means.csv'
+Sal_input_group = 'Sal_grouped.csv'
 
 reference_dict = {'file':Sal_input, 'promoter': 'PleuWT.1min mhYFP', 'strain': 'WT'}
 
@@ -38,7 +40,7 @@ titles = ['weak', 'medium', 'strong']
 
 colors = ['green', 'blue', 'red']
 
-# Process
+# Process - Using averages
 #-----------------------------------------------------------------------------------------------------------------------
 # Load Data
 Ecoli_data = pd.read_csv(Ecoli_input)
@@ -46,7 +48,8 @@ Sal_data = pd.read_csv(Sal_input)
 
 # Get reference value and data
 df = pd.read_csv(reference_dict['file']) # Load the reference file
-reference_value = df.loc[(df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'WT'), 'mhYFP_by_A600'].values[0]
+#reference_value = df.loc[(df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'WT'), 'mhYFP_by_A600'].values[0]
+reference_value = df.loc[(df['promoter'] == reference_dict['promoter']) & (df['strain'] == reference_dict['strain']), 'mhYFP_by_A600'].values[0]
 
 # Let' transform the data using the reference
 Ecoli_data['mhYFP_by_A600'] = Ecoli_data['mhYFP_by_A600']/reference_value
@@ -55,8 +58,8 @@ Sal_data['mhYFP_by_A600'] = Sal_data['mhYFP_by_A600']/reference_value
 Sal_data['mhYFP_by_A600_std'] = Sal_data['mhYFP_by_A600_std']/reference_value
 
 # Filter the DataFrame using the 'promoter' column and `isin()`
-Ecoli_data = Ecoli_data.loc[df['promoter'].isin(promoter_target)]
-Sal_data = Sal_data.loc[df['promoter'].isin(promoter_target)]
+Ecoli_data = Ecoli_data.loc[Ecoli_data['promoter'].isin(promoter_target)]
+Sal_data = Sal_data.loc[Sal_data['promoter'].isin(promoter_target)]
 
 # And join them to form a new reference df
 ref_df = pd.concat([Ecoli_data, Sal_data], ignore_index=True)
@@ -64,7 +67,26 @@ ref_df = ref_df.rename(columns={'mhYFP_by_A600': 'relative'}) # Rename the colum
 ref_df = ref_df.rename(columns={'mhYFP_by_A600_std': 'std'}) # Rename the column with measurement
 ref_df.to_csv(out_file+'.csv', index=False)
 
-# And plot
+# Process - Using distributions instead - (It is exactly the same process)
+#-----------------------------------------------------------------------------------------------------------------------
+# Load Data
+Ecoli_data = pd.read_csv(Ecoli_input_group)
+Sal_data = pd.read_csv(Sal_input_group)
+
+# Let' transform the data using the reference
+Ecoli_data['mhYFP_by_A600'] = Ecoli_data['mhYFP_by_A600']/reference_value
+Sal_data['mhYFP_by_A600'] = Sal_data['mhYFP_by_A600']/reference_value
+
+# Filter the DataFrame using the 'promoter' column and `isin()`
+Ecoli_data = Ecoli_data.loc[Ecoli_data['promoter'].isin(promoter_target)]
+Sal_data = Sal_data.loc[Sal_data['promoter'].isin(promoter_target)]
+
+# And join them to form a new reference df
+dist_ref_df = pd.concat([Ecoli_data, Sal_data], ignore_index=True)
+dist_ref_df = dist_ref_df.rename(columns={'mhYFP_by_A600': 'relative'}) # Rename the column with measurement
+dist_ref_df.to_csv(out_file+'_distribution.csv', index=False)
+
+# And plot - for average
 #-----------------------------------------------------------------------------------------------------------------------
 # Create a FacetGrid to organize the rows by 'bacterium' and group bars by 'promoter'
 df = ref_df
@@ -105,6 +127,35 @@ g.savefig(out_file+".png", dpi=300, bbox_inches='tight')  # Save as PNG with hig
 
 # Show the plot
 plt.show()
+
+# And plot - for distribution
+#-----------------------------------------------------------------------------------------------------------------------
+# Create a FacetGrid to organize the rows by 'bacterium' and group bars by 'promoter'
+df = dist_ref_df
+g = sns.catplot(
+    data=df, kind='bar',
+    x='strain', y='relative', hue='promoter',
+    col='bacterium', col_wrap=2,  # One column per bacterium
+    height=height, aspect=1
+    #    palette='coolwarm'  # Using the 'coolwarm' colormap
+)
+
+
+# Customize the plot
+g.set_axis_labels('Strain', 'Relative Value')
+g.set_titles('Bacterium: {col_name}')
+g.despine(left=True)
+
+# Add grid lines to all subplots
+for ax in g.axes.flat:
+    ax.grid(True)  # Enable grid lines for each subplot
+
+g.savefig(out_file+"_dist.png", dpi=300, bbox_inches='tight')  # Save as PNG with high DPI
+
+# Show the plot
+plt.show()
+
+
 
 
 

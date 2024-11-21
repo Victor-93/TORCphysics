@@ -368,7 +368,7 @@ class RNAPStagesStall(EffectModel):
                 self.state = 'Open_complex'  # TRANSITIONS TO OPEN COMPLEX!
 
             # Finally, calculate change in twist givenn the fact that it doesn't form a barrier
-            twist_left, twist_right = instant_twist_transfer(z, z_list)
+            twist_left, twist_right = utils.instant_twist_transfer(z, z_list)
 
             return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
@@ -396,7 +396,7 @@ class RNAPStagesStall(EffectModel):
             # Else, do nothing... it stays as an open complex
 
             # And calculate change in twist given the fact that it doesn't form a barrier
-            twist_left, twist_right = instant_twist_transfer(z, z_list)
+            twist_left, twist_right = utils.instant_twist_transfer(z, z_list)
 
             return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
@@ -501,7 +501,7 @@ class RNAPStagesStallv2(EffectModel):
                 self.state = 'Open_complex'  # TRANSITIONS TO OPEN COMPLEX!
 
             # Finally, calculate change in twist givenn the fact that it doesn't form a barrier
-            twist_left, twist_right = instant_twist_transfer(z, z_list)
+            twist_left, twist_right = utils.instant_twist_transfer(z, z_list)
 
             return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
@@ -529,7 +529,7 @@ class RNAPStagesStallv2(EffectModel):
             # Else, do nothing... it stays as an open complex
 
             # And calculate change in twist given the fact that it doesn't form a barrier
-            twist_left, twist_right = instant_twist_transfer(z, z_list)
+            twist_left, twist_right = utils.instant_twist_transfer(z, z_list)
 
             return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
@@ -1881,23 +1881,28 @@ def velocity_2022SevierBioJ(z, torque):
 # Having an enzyme E sourrounded by a molecules L and R, on the left and right respectively (L____E____R),
 # calculate the change in twist on the left and right sides of E given the fact that enzyme E completely
 # leaks the twist on both sides (it doesn't form a topological barrier).
-def instant_twist_transfer(z,z_list):
-    # Get enzyme before z (z_b, on the left) and enzyme after z (z_a, on the right)
-    z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)
-    z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)
-    # Total twist trapped in the region
-    total_twist = z_b.twist + z.twist
-    # Calculate lengths
-    total_length = utils.calculate_length(z_b, z_a) # Twist from barrier on the left to barrier on the right
-    length_left = utils.calculate_length(z_b, z)
-    length_right = utils.calculate_length(z, z_a)
-    # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
-    total_superhelical = total_twist / (params.w0 * total_length)
-    # Partitionate the twist
-    twist_left = total_superhelical * params.w0 * length_left  # these are the twist that each side should have
-    twist_right = total_superhelical * params.w0 * length_right
-    # And calculate the actual change in twist
-    dtwist_left = twist_left - z_b.twist
-    dtwist_right = twist_right - z.twist
-    return dtwist_left, dtwist_right
+#def instant_twist_transfer(z,z_list):
+#    # Get enzyme before z (z_b, on the left) and enzyme after z (z_a, on the right)
+#    z_b = utils.get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)
+#    z_a = utils.get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)
+#    # Total twist trapped in the region
+#    total_twist = z_b.twist + z.twist
+#    # Calculate lengths
+#    #total_length = utils.calculate_length(z_b, z_a) # Twist from barrier on the left to barrier on the right
+#    length_left = utils.calculate_length(z_b, z)
+#    length_right = utils.calculate_length(z, z_a)
+#    # This is the total superhelical density of a region; enzyme X does not block supercoils  O______X_____O
+#    # total_superhelical = total_twist / (params.w0 * total_length)
+#    # Partitionate the twist
+#    #twist_left = total_superhelical * params.w0 * length_left  # these are the twist that each side should have
+#    # twist_right = total_superhelical * params.w0 * length_right##
+#
+#    # Fixed: Partitionate the twist
+#    twist_left = total_twist * length_left / (length_left + length_right)
+#    twist_right = total_twist * length_right / (length_left + length_right)
+#
+#    # And calculate the actual change in twist
+#    dtwist_left = twist_left - z_b.twist
+#    dtwist_right = twist_right - z.twist
+#    return dtwist_left, dtwist_right
 

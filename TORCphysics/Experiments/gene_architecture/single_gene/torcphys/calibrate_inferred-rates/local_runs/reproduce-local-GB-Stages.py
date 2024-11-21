@@ -18,9 +18,9 @@ import sys
 # **********************************************************************************************************************
 
 #promoter_cases = ['weak', 'medium', 'strong']
-promoter_cases = ['weak']
+#promoter_cases = ['weak']
 #promoter_cases = ['medium']
-#promoter_cases = ['strong']
+promoter_cases = ['strong']
 
 dt=1.0
 initial_time = 0
@@ -29,7 +29,7 @@ n_simulations =  16 #50 #12 # Per system
 
 k_weak = 0.02#3#25 #25 # This is the one inferred from the experiment
 
-model_code='GB-Stages-'
+model_code='GB-Stages-avg-'
 
 # Junier experimental data - we only need distances for now.for i, promoter_case in enumerate(promoter_cases):
 experimental_files = []
@@ -44,8 +44,8 @@ for pcase in promoter_cases:
 param_file = '../' + model_code + promoter_cases[0] + '-kw' + str(k_weak) + '_dt' + str(dt)+'.csv' # This one has the parametrisation from calibration
 
 info_file = 'reproduce-'+model_code + promoter_cases[0] + '-kw' + str(k_weak) + '_dt' + str(dt)
-#file_out = info_file
-file_out = info_file + '-02'
+file_out = info_file
+#file_out = info_file + '-02'
 
 
 # Parallelization conditions

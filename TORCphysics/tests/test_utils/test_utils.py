@@ -4,6 +4,77 @@ import numpy as np
 
 
 # TODO: Test remaining functions of utils.
+class TestUtilsFunctions(TestCase):
+
+    def test_instant_twist_transfer(self):
+
+
+        # Here, we have a system in which an enzyme E is sorrouned by left L and right barrriers as: L__E____R
+        # Enzyme E does not form a barrier and instantly lets the twist pass through.
+
+        # Let's define objects we need
+        # ------------------------------------------------
+        # This a test site to link enzymes
+        s0 = Site(site_type='EXT', name='EXT', start=1, end=5000, k_on=0.0)
+
+        E_right = Enzyme(e_type='RNAP', name='RIGHT', site=s0, size=100, effective_size=50, position=2000,
+                         twist=0.0, superhelical=0.0)
+
+        # (Null). Both sides have the same superhelical density initially, so the change in twist is 0 on
+        #         both sides
+        # Total twist = 0 here
+        E_left = Enzyme(e_type='RNAP', name='RIGHT', site=s0, size=100, effective_size=50, position=1000,
+                         twist=0.0, superhelical=0.0)
+        enzyme = Enzyme(e_type='RNAP', name='test1', site=s0, size=100, effective_size=50, position=1500,
+                         twist=0.0, superhelical=0.0)
+        enzyme_list = [E_left, enzyme, E_right]
+        dtwist_left, dtwist_right = utils.instant_twist_transfer(enzyme,enzyme_list)
+        self.assertEqual(dtwist_left, 0.0, 'Error in instant twist transfer')
+        self.assertEqual(dtwist_right, 0.0, 'Error in instant twist transfer')
+
+        # Same superhelical but not 0!
+        E_left = Enzyme(e_type='RNAP', name='RIGHT', site=s0, size=100, effective_size=50, position=1000,
+                         twist=-100.0, superhelical=0.0)
+        enzyme = Enzyme(e_type='RNAP', name='test1', site=s0, size=100, effective_size=50, position=1500,
+                         twist=-100.0, superhelical=0.0)
+        enzyme_list = [E_left, enzyme, E_right]
+        dtwist_left, dtwist_right = utils.instant_twist_transfer(enzyme,enzyme_list)
+        self.assertEqual(dtwist_left, 0.0, 'Error in instant twist transfer')
+        self.assertEqual(dtwist_right, 0.0, 'Error in instant twist transfer')
+
+        # Negative superhelical density
+        E_left = Enzyme(e_type='RNAP', name='RIGHT', site=s0, size=100, effective_size=50, position=1000,
+                         twist=-100.0, superhelical=0.0)
+        enzyme = Enzyme(e_type='RNAP', name='test1', site=s0, size=100, effective_size=50, position=1500,
+                         twist=-1500.0, superhelical=0.0)
+        enzyme_list = [E_left, enzyme, E_right]
+        total_twist = E_left.twist + enzyme.twist
+        dtwist_left, dtwist_right = utils.instant_twist_transfer(enzyme,enzyme_list)
+        diff = abs(dtwist_left + E_left.twist + dtwist_right + enzyme.twist - total_twist)
+        self.assertEqual(diff, 0.0, 'Error in instant twist transfer')
+
+        # Negative and positive
+        E_left = Enzyme(e_type='RNAP', name='RIGHT', site=s0, size=100, effective_size=50, position=1000,
+                         twist=-200.0, superhelical=0.0)
+        enzyme = Enzyme(e_type='RNAP', name='test1', site=s0, size=100, effective_size=50, position=1500,
+                         twist=1000.0, superhelical=0.0)
+        enzyme_list = [E_left, enzyme, E_right]
+        total_twist = E_left.twist + enzyme.twist
+        dtwist_left, dtwist_right = utils.instant_twist_transfer(enzyme,enzyme_list)
+        diff = abs(dtwist_left + E_left.twist + dtwist_right + enzyme.twist - total_twist)
+        self.assertEqual(diff, 0.0, 'Error in instant twist transfer')
+
+        # Positive superhelical density
+        E_left = Enzyme(e_type='RNAP', name='RIGHT', site=s0, size=100, effective_size=50, position=1000,
+                         twist=2000.0, superhelical=0.0)
+        enzyme = Enzyme(e_type='RNAP', name='test1', site=s0, size=100, effective_size=50, position=1500,
+                         twist=1000.0, superhelical=0.0)
+        enzyme_list = [E_left, enzyme, E_right]
+        total_twist = E_left.twist + enzyme.twist
+        dtwist_left, dtwist_right = utils.instant_twist_transfer(enzyme,enzyme_list)
+        diff = abs(dtwist_left + E_left.twist + dtwist_right + enzyme.twist - total_twist)
+        self.assertEqual(diff, 0.0, 'Error in instant twist transfer')
+
 class TestSiteAvailability(TestCase):
 
     def test_site_availability(self):

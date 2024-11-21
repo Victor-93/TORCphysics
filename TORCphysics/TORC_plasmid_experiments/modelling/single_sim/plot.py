@@ -2,12 +2,15 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-sys_name = 'Ecoli'
-#sys_name = 'Sal'
+#sys_name = 'Ecoli'
+sys_name = 'Sal_noRNAPs'
+sys_name = 'no_topos'
 #inputfile = 'torc_min_minimum_Ecoli_sites_df.csv'
 #inputfile = 'torc_min_minimum_Sal_sites_df.csv'
-inputfile = 'torc_min_minimum_'+sys_name+'_sites_df.csv'
-enzymefile = 'torc_min_minimum_'+sys_name+'_enzymes_df.csv'
+#inputfile = 'torc_min_minimum_'+sys_name+'_sites_df.csv'
+#enzymefile = 'torc_min_minimum_'+sys_name+'_enzymes_df.csv'
+inputfile = 'torc_min_'+sys_name+'_sites_df.csv'
+enzymefile = 'torc_min_'+sys_name+'_enzymes_df.csv'
 
 df = pd.read_csv(inputfile)
 edf = pd.read_csv(enzymefile)
@@ -105,7 +108,7 @@ for i, name in enumerate(tnames):
 # Let's plot the global
 mask = df['type'] == 'circuit'
 sigma = df[mask]['superhelical'].to_numpy()
-ax.plot(sigma, lw=0.75,color='black', label='global')
+ax.plot(sigma, lw=1.75,color='black', label='global')
 
 ax.set_ylim([-0.12,0.0])
 ax.set_xlabel('Time')

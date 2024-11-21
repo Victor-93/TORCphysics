@@ -27,6 +27,32 @@ topo_t = params.topo_b_t
 gyra_w = params.gyra_b_w
 gyra_t = params.gyra_b_t
 
+# Having an enzyme E sourrounded by a molecules L and R, on the left and right respectively (L____E____R),
+# calculate the change in twist on the left and right sides of E given the fact that enzyme E completely
+# leaks the twist on both sides (it doesn't form a topological barrier).
+def instant_twist_transfer(z,z_list):
+
+    # Get enzyme before z (z_b, on the left) and enzyme after z (z_a, on the right)
+    z_b = get_enzyme_before_position(position=z.position - 10, enzyme_list=z_list)
+    z_a = get_enzyme_after_position(position=z.position + 10, enzyme_list=z_list)
+
+    # Total twist trapped in the region
+    total_twist = z_b.twist + z.twist
+    # Calculate lengths
+    length_left = calculate_length(z_b, z)
+    length_right = calculate_length(z, z_a)
+
+    # Partitionate the twist
+    twist_left = total_twist * length_left / (length_left + length_right)
+    twist_right = total_twist * length_right / (length_left + length_right)
+
+    # And calculate the actual change in twist
+    dtwist_left = twist_left - z_b.twist
+    dtwist_right = twist_right - z.twist
+
+    return dtwist_left, dtwist_right
+
+
 # Having RNAP molecule z and a list of enzymes z_list on the DNA, it calculates the updated position and the
 # twist induced on both sides of z (left and right) according a mechanical model where the RNAP can stall
 # according the balance of torques.
@@ -119,6 +145,16 @@ def superhelical_free_energy(superhelical, length):
 def get_enzyme_before_position(position, enzyme_list):
     #    enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= position][-1]
     enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= position][-1]
+
+    # I did this to test, and sometimes for circular structures this can produce errors. But maybe is not due to
+    # this function, it might be more of the circular nature. Anyway, we also need to test this function independently
+    # Of write some warnings.
+    #n = len([enzyme for enzyme in enzyme_list if enzyme.position <= position])
+    #if n >0:
+    #    enzyme_before = [enzyme for enzyme in enzyme_list if enzyme.position <= position][-1]
+    #else:
+    #    enzyme_before = None
+    #    a=2
     return enzyme_before
 
 

@@ -64,6 +64,13 @@ t_tests_mRas = perform_t_tests(data_mg1655, 'mRas_by_A600')
 t_tests_mhYFP['p_adj'] = multipletests(t_tests_mhYFP['p_value'], method='fdr_bh')[1]
 t_tests_mRas['p_adj'] = multipletests(t_tests_mRas['p_value'], method='fdr_bh')[1]
 
+# Group and save so we can get the distributions!
+# ----------------------------------------------------------------------------------------------------------------------
+Ecoli_group = data_mg1655.groupby(['bacterium', 'promoter', 'strain']).apply(lambda x: x).reset_index(drop=True)
+column_list = ['bacterium', 'promoter', 'strain', 'mhYFP_by_A600']
+Ecoli_group = Ecoli_group[column_list]  # Select only the desired columns
+Ecoli_group.to_csv('EColi_grouped.csv', index=False)
+
 # Previous -------------------------------------------------------------------------------------------------------------
 # Group by bacterium, promoter, and strain to get the mean
 #mean_values_Ecoli = data_mg1655.groupby(['bacterium', 'promoter', 'strain'])['mhYFP_by_A600'].mean().reset_index()
@@ -101,6 +108,12 @@ data_sl1344['promoter'] = pd.Categorical(data_sl1344['promoter'], categories=pro
 # Reordering 'strain' factor levels
 strain_order = ["WT", "ΔSL1483::\nlacIMG1655-FRT\nΔtopA::cat", "ΔtopA::cat"]
 data_sl1344['strain'] = pd.Categorical(data_sl1344['strain'], categories=strain_order, ordered=True)
+
+# Group and save so we can get the distributions!
+# ----------------------------------------------------------------------------------------------------------------------
+Sal_group = data_sl1344.groupby(['bacterium', 'promoter', 'strain']).apply(lambda x: x).reset_index(drop=True)
+Sal_group = Sal_group[column_list]  # Select only the desired columns
+Sal_group.to_csv('Sal_grouped.csv', index=False)
 
 # Previous -------------------------------------------------------------------------------------------------------------
 # Group by bacterium, promoter, and strain to get the mean

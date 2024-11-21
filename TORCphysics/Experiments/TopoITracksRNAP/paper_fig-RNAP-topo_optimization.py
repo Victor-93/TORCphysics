@@ -23,8 +23,13 @@ frames = len(time)
 
 pickle_files = [
     'track-uniform/calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl',
-    'track-StagesStall/avg-reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
+    #'track-StagesStall/avg-reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
+    #'track-StagesStall/avgx2-reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
     #'track-StagesStall/reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'-02.pkl'
+
+    # Second avg test - with Stages-Stall fixed
+    #'track-StagesStall/avg02/calibration_avg-RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
+    'track-StagesStall/avg02/avgx2-reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
 ]
 output_prefix = 'RNAPStages-topoIRNAPtracking'
 title = ['Uniform Model', 'Stages-Stall Model']

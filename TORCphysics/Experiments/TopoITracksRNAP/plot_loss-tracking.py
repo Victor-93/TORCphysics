@@ -13,10 +13,13 @@ percentage_threshold = .1
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
 dt = 1.0 #0.25
 file_out = 'loss-'+str(dt)
-param_out = 'avg_' # prefix for outputting averaged parameters to be used as model parametrization
+#param_out = 'avg_' # prefix for outputting averaged parameters to be used as model parametrization
+param_out = 'avgx2_' # prefix for outputting averaged parameters to be used as model parametrization
 
-path = 'track-StagesStall/'
-loss_file = '-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'-values.csv'
+#path = 'track-StagesStall/'
+path = 'track-StagesStall/avg02/'
+#loss_file = '-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'-values.csv'
+loss_file = '-calibration_avg-RNAPTracking_nsets_p2_small_dt'+str(dt)+'-values.csv'
 
 enzyme_names = ['topoI', 'RNAP']
 
@@ -105,7 +108,7 @@ for i, name in enumerate(enzyme_names):
 df_avg = pd.concat([avg_list[0], avg_list[1]], axis=1)
 df_std = pd.concat([std_list[0], std_list[1]], axis=1)
 new_df = pd.concat([df_avg, df_std], axis=0)
-new_df.to_csv('table_dt'+str(dt)+'.csv', index=False, sep=',')
+new_df.to_csv(param_out+'table_dt'+str(dt)+'.csv', index=False, sep=',')
 #new_df.to_csv('table_dt'+str(dt)+'.csv', index=False, sep=',')
 
 plt.show()

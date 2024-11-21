@@ -11,7 +11,7 @@ import numpy as np
 # ----------------------------------------------------------------------------------------------------------------------
 dt = 1.0
 initial_time = 0
-final_time = 10000
+final_time = 5000
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 
@@ -26,7 +26,8 @@ continuation = False
 circuit_filename = '../circuit_min-linear.csv'
 sites_filename = 'disp-sites_min-linear.csv'
 #output_prefix = 'minimum_Ecoli'
-output_prefix = 'minimum_Sal'
+#output_prefix = 'minimum_Sal'
+output_prefix = 'no_topos'
 
 # Complete system conditions - Choose for the complete promoter
 #circuit_filename = '../circuit_complete-linear.csv'
@@ -35,7 +36,8 @@ output_prefix = 'minimum_Sal'
 
 # Environmentals
 #environment_filename = 'Ecoli_environment.csv' # For Ecoli
-environment_filename = 'Salmonella_environment.csv' # For Salmonella
+#environment_filename = 'Salmonella_environment.csv' # For Salmonella
+environment_filename = 'no_topos_environment.csv'
 
 # Simulation
 # ----------------------------------------------------------------------------------------------------------------------
