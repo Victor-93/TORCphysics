@@ -43,8 +43,14 @@ def instant_twist_transfer(z,z_list):
     length_right = calculate_length(z, z_a)
 
     # Partitionate the twist
-    twist_left = total_twist * length_left / (length_left + length_right)
-    twist_right = total_twist * length_right / (length_left + length_right)
+    #  *** Small update. It is very unlikely but sometimes it can divide by zero. Let's ignore the cases when
+    #  this happens and don't do anything
+    b = length_left + length_right
+    if b == 0:
+        return 0, 0
+
+    twist_left = total_twist * length_left / b #(length_left + length_right)
+    twist_right = total_twist * length_right / b# (length_left + length_right)
 
     # And calculate the actual change in twist
     dtwist_left = twist_left - z_b.twist
