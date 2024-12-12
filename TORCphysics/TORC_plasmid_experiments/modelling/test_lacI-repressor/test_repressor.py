@@ -2,13 +2,16 @@ import sys
 import pandas as pd
 import numpy as np
 from TORCphysics import utils, Enzyme, Site, Environment
+from unittest import TestCase
+from TORCphysics import Circuit
+import matplotlib.pyplot as plt
 
 min_circuit_file = '../circuit_min-linear.csv'
 complete_circuit_file = '../circuit_complete-linear.csv'
-min_sites_file = 'sites_min-linear.csv'
-complete_sites_file = 'sites_complete-linear.csv'
+min_sites_file = '../sites_min-linear.csv'
+complete_sites_file =  None #'..//sites_complete-linear.csv'
 enzymes_filename = None
-environment_filename = 'environment.csv'
+environment_filename = None #'environment.csv'
 output_prefix = 'TORC_plasmid'
 series = True
 continuation = False
@@ -109,3 +112,57 @@ if available:
     print('Full PleuWT available')
 else:
     print('Full PleuWT not available')
+
+
+# Now let's test the leaking
+# ----------------------------------------------------------------------------------------------------------------------
+# Define circuit
+my_circuit = Circuit(complete_circuit_file, complete_sites_file, enzymes_filename, environment_filename,
+                     output_prefix, frames, series, continuation, dt)
+# Define bound lac
+bound_lac = Enzyme(e_type='lac', name='full_lac1', site=full_lac1, position=2182-displacement, size=16, effective_size=10,
+                 twist=0, superhelical=-0.06, effect_model_name='LacIPoissonBridging',
+                   effect_model_oparams={'k_bridge_on': 0.05, 'k_bridge_off': 0.05, 'leakage':.1})
+
+# Let's add the site and the bound lac
+my_circuit.site_list.append(full_blac1)
+my_circuit.enzyme_list.append(bound_lac)
+my_circuit.sort_lists()
+
+# Modify local superhelicity and update
+my_circuit.enzyme_list[0].superhelical = -0.25
+my_circuit.enzyme_list[1].superhelical = 0.01
+my_circuit.update_twist()
+my_circuit.update_supercoiling()
+my_circuit.update_global_twist()
+my_circuit.update_global_superhelical()
+
+enzymes_df, sites_df, environmentals_df = my_circuit.run_return_dfs()
+
+# Let's get global supercoiling
+mask_circuit = sites_df['type'] == 'circuit'
+global_superhelical = sites_df[mask_circuit]['superhelical'].to_numpy()
+
+# Let's get supercoiling before and after lac
+mask_left = enzymes_df['name'] == 'EXT_L'
+mask_right = enzymes_df['name'] == bound_lac.name
+left_superhelical = enzymes_df[mask_left]['superhelical'].to_numpy()
+right_superhelical = enzymes_df[mask_right]['superhelical'].to_numpy()
+
+fig, axs = plt.subplots(1, figsize=(6,3), tight_layout=True)
+
+axs.plot(global_superhelical[1:], lw=3, color='black')
+axs.plot(left_superhelical[1:], lw=2, color='blue')
+axs.plot(right_superhelical[1:], lw=1,color='red')
+
+axs.grid(True)
+axs.set_xlabel('time')
+axs.set_ylabel('superhelical')
+axs.set_ylim([-.25,.01])
+plt.show()
+
+sigma_dif = abs(global_superhelical[1] - global_superhelical[-1])
+if sigma_dif < 0.000000001:
+    print('Superhelical did not change, so model works as expected')
+else:
+    print('Superhelical changed, so model is not working')

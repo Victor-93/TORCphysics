@@ -1426,7 +1426,10 @@ class LacIPoissonBridging(EffectModel):
             # -----------------------------------------------------------------
             # If it the bridge will undo, then update the state and twist leaks.
             if undo_bridge:
-                twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
+                if self.leakage >= 1.0:
+                    twist_left, twist_right = utils.instant_twist_transfer(z, z_list)
+                else:
+                    twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
                 return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
             # If the bridge remains, then nothing happens and not twist leaks.
@@ -1446,7 +1449,11 @@ class LacIPoissonBridging(EffectModel):
         # If the bridge was broken in the current time-step due to the other protein effect model
         # -----------------------------------------------------------------
         if self.state == 'JUST_UNLOOPED':
-            twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
+            #twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
+            if self.leakage >= 1.0:
+                twist_left, twist_right = utils.instant_twist_transfer(z, z_list)
+            else:
+                twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
             self.state = 'UNLOOPED'
             return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
@@ -1468,7 +1475,12 @@ class LacIPoissonBridging(EffectModel):
 
             # If the bridge does not form, then the state is not updated and twist leaks.
             else:
-                twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
+                # twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
+                if self.leakage >= 1.0:
+                    twist_left, twist_right = utils.instant_twist_transfer(z, z_list)
+                else:
+                    twist_left, twist_right = self.leak_twist(z=z, z_list=z_list, dt=dt)
+
                 return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
         if self.state not in ['LOOPED', 'JUST_LOOPED', 'UNLOOPED', 'JUST_UNLOOPED']:
