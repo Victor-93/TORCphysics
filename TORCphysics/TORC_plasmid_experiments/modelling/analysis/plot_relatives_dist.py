@@ -11,10 +11,10 @@ import pickle
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
 dir_source = '../optimization/'
-#v_code = 'block-op_TORC_plasmid'
-#v_code = 'op_TORC_plasmid'
-v_code = 'block-op-simple_TORC_plasmid'
 #v_code = 'block-dist_op_TORC_plasmid'
+#v_code = 'batch-dist_op_TORC_plasmid-01'
+#v_code = 'block-batch-dist_op_TORC_plasmid-01'
+v_code = 'block-batch-dist_op_TORC_plasmid-04'
 pkl_file  = dir_source + v_code+ '.pkl'
 params_file = dir_source + v_code + '.csv'
 loss_file = dir_source + v_code + '-values.csv'
@@ -63,8 +63,9 @@ colors=['red', 'blue']
 # Plot each case in the list
 for i, measurement in enumerate(['reference', 'relative_rate']):
 
-    values = [my_dict[measurement][0] for my_dict in pkl_data] # mean
-    std = [my_dict[measurement][1] for my_dict in pkl_data] # std
+    values = [my_dict[measurement] for my_dict in pkl_data] # mean
+    std = np.std(values, axis=1)
+    values = np.mean(values, axis=1)
 
     axs.bar(x + i * width - width * (n_cases - 1) / 2, values, width, yerr=std, label=labels[i], color=colors[i])
 
@@ -75,8 +76,8 @@ objective = sum([my_dict['objective'] for my_dict in pkl_data])
 formatted_sum_err = "{:.3f}".format(objective)  # Formatting to three significant figures
 er_label = r'$\epsilon={}$'.format(formatted_sum_err)
 props = dict(boxstyle='round', facecolor='silver', alpha=0.4)
-axs.text(0.3, 0.95, er_label, transform=axs.transAxes, fontsize=font_size,
-        verticalalignment='top', bbox=props)
+#axs.text(0.3, 0.95, er_label, transform=axs.transAxes, fontsize=font_size,
+#        verticalalignment='top', bbox=props)
 print(objective)
 
 # Add labels, title, and custom ticks

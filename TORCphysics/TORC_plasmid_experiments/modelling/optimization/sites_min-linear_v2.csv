@@ -1,0 +1,7 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+lacOP,lac2,45,0.0,0.01,PoissonBinding,../responses/lacI.csv
+gene,bla,1095,191,0.01,none,none
+gene,PleuWT,2022,1260,0.01,none,none
+lacOP,lac1,2057,0.0,0.01,PoissonBinding,../responses/lacI.csv
+gene,antitet,2121,1621,0.01,none,none
+membrane_gene,tetA,2116,3354,0.01,none,none

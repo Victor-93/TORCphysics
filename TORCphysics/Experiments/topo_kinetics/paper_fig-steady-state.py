@@ -52,7 +52,7 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 100#12#96#48#24#96#10#84  # 60 #48 #120
+n_simulations = 200#12#96#48#24#96#10#84  # 60 #48 #120
 #n_simulations = 10
 
 # params_file

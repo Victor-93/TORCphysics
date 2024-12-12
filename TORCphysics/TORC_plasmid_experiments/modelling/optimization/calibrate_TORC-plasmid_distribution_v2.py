@@ -10,6 +10,10 @@ from hyperopt import tpe, hp, fmin, Trials
 # Description
 # ----------------------------------------------------------------------------------------------------------------------
 # Same optimization but comparing distributions instead of fitting averages.
+# This version _v2 does the same optimization process but it does not vary lacI activity and tetA has a different
+# gamma as it induces more supercoils than regular plasmids.
+
+# TODO: We still need to check if the lacI leakage works and does not introduce addiitonal supercoils
 
 # Model & simulation conditions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -23,18 +27,18 @@ Ecoli_lacI_C = 1.0  # We do not know, at the moment we will assume that lacI beh
                     # In Salmonella vary relative to this one, by increasing to 2.0 (twice) or 0.5 (half). Keep that in mind in case
                     # we need it
 
-n_simulations = 24 #180 - ask for 61 cores (Each would run 3 simulations per system approximately).
+n_simulations = 12#24 #180 - ask for 61 cores (Each would run 3 simulations per system approximately).
 n_batches = 12 # The number of simulations n_simulations will be grouped into n_batches. For each batch, an average
                # will be calculated. In this way, we will be comparing averages with averages.
 
-tests = 2#10 #2000 #1
+tests = 4#10 #2000 #1
 sigma0 = -0.049 # Initial superhelical density
 
 #lacI_blocking = True  # True if we consider that lacI can block the binding in the minimal PleuWT, False if not.
 lacI_blocking = False
 
 #file_out = 'dist_op_TORC_plasmid'
-file_out = 'test-dist_op_TORC_plasmid'
+file_out = 'test-dist_op_TORC_plasmid_v2'
 
 if lacI_blocking == True:
     file_out = 'block-'+file_out
@@ -106,24 +110,6 @@ variation = {'name': oname, 'object_type': otype,
              'binding_model_name': binding_model, 'binding_oparams': binding_oparams}
 variation_dict['bla'] = variation
 
-# Lacs
-oname = 'lac1'
-otype = 'site'
-binding_model = 'PoissonBinding'
-binding_oparams = {'k_on': 0.05}
-variation = {'name': oname, 'object_type': otype,
-             'binding_model_name': binding_model, 'binding_oparams': binding_oparams}
-#load_list.append(variation)
-variation_dict['lac1'] = variation
-
-oname = 'lac2'
-variation = {'name': oname, 'object_type': otype,
-             'binding_model_name': binding_model, 'binding_oparams': binding_oparams}
-
-variation_dict['lac2'] = variation
-
-#load_list.append(variation)
-
 # Environmentals
 # -------------------------------------
 # topoI
@@ -136,33 +122,6 @@ variation_dict['topoI'] = variation
 variation = {'name': 'gyrase', 'object_type': 'environmental', 'concentration': 40.0}
 #load_list.append({'name': 'gyrase', 'object_type': 'environmental', 'concentration': 40.0})
 variation_dict['gyrase'] = variation
-
-# RNAP
-oname = 'RNAP'
-otype = 'environmental'
-effect_model = 'RNAPStagesStallv2'
-effect_oparams =  {'velocity': params.v0, 'kappa': params.RNAP_kappa, 'stall_torque': params.stall_torque,
-                   'gamma':0.05}
-unbinding_model = 'RNAPStagesSimpleUnbindingv2'
-variation = {'name': oname, 'object_type': otype,
-             'effect_model_name': effect_model, 'effect_oparams': effect_oparams,
-             'unbinding_model_name': unbinding_model, 'unbinding_oparams': {}}
-variation_dict['RNAP'] = variation
-#load_list.append(variation)
-
-# Lac - we'll keep the concentration at 1 because we do not know the on/off yet
-oname = 'lacI'
-otype = 'environmental'
-effect_model = 'LacIPoissonBridging'
-effect_oparams =  {'k_bridge_on': 0.05, 'k_bridge_off': 0.05, 'leakage': 0.2}
-unbinding_model = 'LacISimpleUnBinding'
-unbinding_oparams = {'k_off':0.1}
-variation = {'name': oname, 'object_type': otype,
- #            'binding_model_name': binding_model, 'binding_oparams': binding_oparams,
-             'effect_model_name': effect_model, 'effect_oparams': effect_oparams,
-             'unbinding_model_name': unbinding_model, 'unbinding_oparams': unbinding_oparams}
-variation_dict['lacI'] = variation
-#load_list.append(variation)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Variations
@@ -191,20 +150,6 @@ k_ini_min = 0.01
 k_ini_max = 0.5
 k_off_min = 0.01
 k_off_max = 0.5
-
-# LacI
-# --------------------------------
-lacI_k_on_min = k_on_min
-lacI_k_on_max = k_on_max
-lacI_koff_min = k_off_min
-lacI_koff_max = k_off_max
-k_bridge_on_min = k_on_min
-k_bridge_on_max = k_on_max
-k_bridge_off_min = 0.001
-k_bridge_off_max = 0.1
-# Leakage for the moment we do not consider it
-leakege_min = 0.01
-leakege_max = 0.5
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PARAMETER SPACE FOR OPTIMIZATION
@@ -249,14 +194,8 @@ space = {
     'bla_k_closed': hp.uniform('bla_k_closed', k_closed_min, k_closed_max),
     'bla_k_open': hp.uniform('bla_k_open', k_open_min, k_open_max),
     'bla_k_ini': hp.uniform('bla_k_ini', k_ini_min, k_ini_max),
-    'bla_k_off': hp.uniform('bla_k_off', k_off_min, k_off_max),
+    'bla_k_off': hp.uniform('bla_k_off', k_off_min, k_off_max)
 
-    # lacI
-    'lacI_k_on': hp.uniform('lacI_k_on', lacI_k_on_min, lacI_k_on_max),
-    'lacI_k_off': hp.uniform('lacI_k_off', lacI_koff_min, lacI_koff_max),
-    'bridge_on': hp.uniform('bridge_on', k_bridge_on_min, k_bridge_on_max),
-    'bridge_off': hp.uniform('bridge_off', k_bridge_off_min, k_bridge_off_max),
-    'leakage': hp.uniform('leakage', leakege_min, leakege_max)
 }
 
 # Circuit initial conditions
@@ -266,13 +205,13 @@ complete_circuit_file = '../circuit_complete-linear.csv'
 
 if lacI_blocking:  # If we consider blocking, then we use the displaced lac1 site file which moves the lacO1 a bit
                    # so it can block the promoter
-    min_sites_file = 'disp-sites_min-linear.csv'
-    complete_sites_file = 'disp-sites_complete-linear.csv'
+    min_sites_file = 'disp-sites_min-linear_v2.csv'
+    complete_sites_file = 'disp-sites_complete-linear_v2.csv'
 else:
-    min_sites_file = 'sites_min-linear.csv'
-    complete_sites_file = 'sites_complete-linear.csv'
+    min_sites_file = 'sites_min-linear_v2.csv'
+    complete_sites_file = 'sites_complete-linear_v2.csv'
 enzymes_filename = None
-environment_filename = 'environment.csv'
+environment_filename = 'environment_v2.csv'
 output_prefix = 'TORC_plasmid'
 series = True
 continuation = False
@@ -341,12 +280,6 @@ def objective_function(params, calibrating=True):
     bla_variation['binding_oparams']['superhelical_op'] = params['bla_superhelical_op']
     bla_variation['binding_oparams']['spread'] = params['bla_spread']
 
-    # lac1/lac2 - site
-    lac1_variation = variation_dict['lac1']
-    lac1_variation['binding_oparams']['k_on'] = params['lacI_k_on']
-    lac2_variation = variation_dict['lac2']
-    lac2_variation['binding_oparams']['k_on'] = params['lacI_k_on']
-
     # topoI - Environment
     topoI_variation = variation_dict['topoI']
     topoI_variation['concentration'] = params['topoI_concentration']
@@ -356,13 +289,6 @@ def objective_function(params, calibrating=True):
     gyrase_variation = variation_dict['gyrase']
     gyrase_variation['concentration'] = params['gyrase_concentration']
 
-    # lacI - Environment
-    lacI_variation = variation_dict['lacI']
-    lacI_variation['effect_oparams']['k_bridge_on'] = params['bridge_on']
-    lacI_variation['effect_oparams']['k_bridge_off'] = params['bridge_off']
-    lacI_variation['effect_oparams']['leakage'] = params['leakage']
-    lacI_variation['unbinding_oparams']['k_off'] = params['lacI_k_off']
-
     # Variations independant of calibration (params) - These variations will help us simulate different system
     # conditions
 
@@ -371,10 +297,6 @@ def objective_function(params, calibrating=True):
 
     # lacI - environment
     dlacI_variation = {'name': 'lacI', 'object_type': 'environmental', 'concentration': 0.0}
-
-    # RNAP - Environment
-    RNAP_variation = variation_dict['RNAP']
-
 
     # ------------------------------------------------------------------------------------------------------------------
     # Build systems - Sort out input information to run each of the systems with their corresponding variations
@@ -410,8 +332,7 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      lacI_variation, RNAP_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation ]
 
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') & (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'WT'), 'relative'].to_numpy()
     ref_std_value = None
@@ -430,8 +351,7 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      lacI_variation, RNAP_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation]
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') & (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'WT'), 'relative'].to_numpy()
     info_dict = {'name': 'EColi_full_WT', 'description': ' E. Coli, Complete promoter, WT background',
                  'bacterium': 'EColi', 'promoter': 'full', 'strain': 'WT',
@@ -446,8 +366,7 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      lacI_variation, RNAP_variation, dtopA_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, dtopA_variation]
 
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') &
                        (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'ΔtopA::cat'), 'relative'].to_numpy()
@@ -464,8 +383,7 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      lacI_variation, RNAP_variation, dtopA_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, dtopA_variation]
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') &
                        (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'ΔtopA::cat'), 'relative'].to_numpy()
     info_dict = {'name': 'EColi_full_dtopA', 'description': ' E. Coli, Complete promoter, ΔtopA background',
@@ -481,8 +399,7 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      RNAP_variation, dtopA_variation, dlacI_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, dtopA_variation, dlacI_variation]
 
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') &
                        (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'ΔlacIZYA::FRT\nΔtopA::cat'), 'relative'].to_numpy()
@@ -499,8 +416,7 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      RNAP_variation, dtopA_variation, dlacI_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,  dtopA_variation, dlacI_variation]
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') &
                        (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'ΔlacIZYA::FRT\nΔtopA::cat'), 'relative'].to_numpy()
     info_dict = {'name': 'EColi_full_dtopA-dlacI','description': ' E. Coli, Complete promoter, ΔtopA-ΔlacI background',
@@ -522,8 +438,8 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      RNAP_variation, topoI_variation, gyrase_variation, dlacI_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
+                    topoI_variation, gyrase_variation, dlacI_variation]
 
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'WT'), 'relative'].to_numpy()
@@ -540,8 +456,8 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      RNAP_variation, topoI_variation, gyrase_variation, dlacI_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
+                    topoI_variation, gyrase_variation, dlacI_variation]
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'WT'), 'relative'].to_numpy()
     info_dict = {'name': 'Sal_full_WT', 'description': 'Salmonella, Complete promoter, WT background',
@@ -557,8 +473,8 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      RNAP_variation, gyrase_variation, dlacI_variation, dtopA_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
+                    gyrase_variation, dlacI_variation, dtopA_variation]
 
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'ΔtopA::cat'), 'relative'].to_numpy()
@@ -576,8 +492,8 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      RNAP_variation, gyrase_variation, dlacI_variation, dtopA_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
+                    gyrase_variation, dlacI_variation, dtopA_variation]
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'ΔtopA::cat'), 'relative'].to_numpy()
     info_dict = {'name':'Sal_full_dtopA', 'description': 'Salmonella, Complete promoter, ΔtopA background',
@@ -594,8 +510,8 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      RNAP_variation, gyrase_variation, lacI_variation, dtopA_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
+                    gyrase_variation,  dtopA_variation]
 
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'ΔSL1483::\nlacIMG1655-FRT\nΔtopA::cat'), 'relative'].to_numpy()
@@ -612,8 +528,8 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, lac1_variation, lac2_variation,
-                      RNAP_variation, gyrase_variation, lacI_variation, dtopA_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
+                    gyrase_variation, dtopA_variation]
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'ΔSL1483::\nlacIMG1655-FRT\nΔtopA::cat'), 'relative'].to_numpy()
     info_dict = {'name':'Sal_full_dtopA-lacI', 'description': 'Salmonella, Complete promoter, ΔtopA-lacI background',

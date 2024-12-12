@@ -5,6 +5,11 @@ import pickle
 from TORCphysics import utils
 from TORCphysics import binding_model as bm
 
+# Description
+#-----------------------------------------------------------------------------------------------------------------------
+# This one considers averages and standard deviations for the bar plots.
+# It also uses the susceptibility from using averages, a
+
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
 promoter_cases = ['weak', 'medium', 'strong']
@@ -14,11 +19,12 @@ k_weak=0.003
 # k_weak=0.0334
 
 #model_code = 'GB-Stages-avg-'
+#model_code='gene-avg_sus_GB-Stages-avgx2-02-'
 model_code='sus_GB-Stages-avgx2-02-'
 outfile = model_code+'fig'
 
-#susceptibility_based = False
-susceptibility_based = True
+susceptibility_based = False
+#susceptibility_based = True
 
 experimental_files = []
 susceptibility_files = []
@@ -32,14 +38,14 @@ for pcase in promoter_cases:
     #params_files.append('calibrate_inferred-rates/avgx2_simple_02/'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.csv')
 
     # Susceptibility
-    calibration_files.append('susceptibility/'+model_code+pcase+'_dt'+str(dt)+'.pkl')
+    #calibration_files.append('susceptibility/'+model_code+pcase+'_dt'+str(dt)+'.pkl')
     #calibration_files.append('susceptibility/reproduce-'+model_code+pcase+'_dt'+str(dt)+'.pkl')
-    #calibration_files.append('susceptibility/reproduce-'+model_code+pcase+'_dt'+str(dt)+'RNAPtracking_off.pkl')
+    #calibration_files.append('susceptibility/reproduce-gene-avg_'+model_code+pcase+'_dt'+str(dt)+'.pkl')
+    calibration_files.append('susceptibility/reproduce-'+model_code+pcase+'_dt'+str(dt)+'_RNAPTracking_off.pkl')
     #RNAPtracking_off
-    params_files.append('susceptibility/'+model_code+pcase+'_dt'+str(dt)+'.csv')
-    #params_files.append('susceptibility/gene-avg_'+model_code+pcase+'_dt'+str(dt)+'.csv')
+    #params_files.append('susceptibility/'+model_code+pcase+'_dt'+str(dt)+'.csv')
+    params_files.append('table_'+model_code+pcase+'_dt'+str(dt)+'.csv')
 
-#calibration_files[1]='susceptibility/reproduce-'+model_code+promoter_cases[1]+'_dt'+str(dt)+'.pkl'
 
 # Erase this -----------------
 #experimental_files[0] = '../junier_data/inferred-rate_kw0.002_' + promoter_cases[0] + '.csv'
@@ -197,8 +203,7 @@ for i, rate_array in enumerate(plot_array):
             fontsize=font_size*1.5, fontweight='bold', va='center', ha='center')
 
     ax.set_xlabel('Upstream Distance (bp)', fontsize=font_size)
-    #ax.set_ylabel(r'Expression Rate $(s^{-1})$', fontsize=font_size)
-    ax.set_ylabel(r'Susceptibility', fontsize=font_size)
+    ax.set_ylabel(r'Expression Rate $(s^{-1})$', fontsize=font_size)
     ax.grid(True)
     ax.set_xlim([80, 6000])
     ax.set_xscale('log')

@@ -57,7 +57,7 @@ series = True
 continuation = False
 
 # For parallelization and calibration
-n_simulations = 100
+n_simulations = 200#100
 
 #recognition_path = 'recognition-linear/'
 recognition_path = ''

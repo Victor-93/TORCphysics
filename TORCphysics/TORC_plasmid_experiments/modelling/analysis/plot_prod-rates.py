@@ -14,6 +14,10 @@ dir_source = '../optimization/'
 v_code = 'block-op_TORC_plasmid'
 #v_code = 'block-rep-TORC_plasmid'
 #v_code = 'op_TORC_plasmid'
+v_code = 'block-dist_op_TORC_plasmid'
+v_code = 'batch-dist_op_TORC_plasmid-01'
+
+
 pkl_file  = dir_source + v_code+ '.pkl'
 
 out_file = 'prod-rate_'+v_code
@@ -64,13 +68,12 @@ for i, name in enumerate(gene_names):
 
 # Add labels, title, and custom ticks
 axs.set_xlabel('System')
-axs.set_ylabel('Relative expression')
+axs.set_ylabel(r'Production rate ($s^{-1}$)')
 axs.set_title('TORC Plasmid')
 axs.set_xticks(x)
 axs.set_xticklabels(keys, rotation=45, ha='right')
 axs.legend(loc='best')
 axs.grid(True)
-
 #plt.savefig(out_file+'.png')
 plt.show()
 

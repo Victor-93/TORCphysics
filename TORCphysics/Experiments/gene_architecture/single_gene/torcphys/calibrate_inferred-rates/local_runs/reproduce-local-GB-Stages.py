@@ -203,7 +203,7 @@ def objective_function(params, calibrating=True):
                            'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
                            'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                            'frames': frames, 'dt': dt,
-                           'n_simulations': n_inner_workers,
+                           'n_simulations': n_simulations,
                            'DNA_concentration': 0.0}
             global_list.append(global_dict)
 
@@ -239,7 +239,7 @@ def objective_function(params, calibrating=True):
         big_variation_list.append([reporter_variation, RNAP_variation])
 
     # Info needed for the parallelization
-    parallel_info = {'n_simulations': n_workers}
+    parallel_info = {'n_simulations': n_simulations}
 
     # Finally, run objective function.
     # ------------------------------------------

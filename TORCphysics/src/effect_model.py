@@ -449,6 +449,14 @@ class RNAPStagesStallv2(EffectModel):
                     self.gamma = mydata['gamma'][0]
                 else:
                     raise ValueError('Error, gamma parameter missing in csv file for RNAPStagesStallv2')  #: ', filename)
+                if 'kappa' in mydata.columns:
+                    self.kappa = mydata['kappa'][0]
+                else:
+                    self.kappa = params.RNAP_kappa
+                if 'stall_torque' in mydata.columns:
+                    self.stall_torque = mydata['stall_torque'][0]
+                else:
+                    self.stall_torque = params.stall_torque
         else:
 
             # Elongation
@@ -484,6 +492,8 @@ class RNAPStagesStallv2(EffectModel):
         # Superhelical density for openning the DNA. It is the superhelical density acting on the region
         if self.state == 'Closed_complex':
 
+            z.name = 'RNAP_' + self.state
+
             # Get superhelical density in the region
             superhelical_region, twist_region = utils.get_superhelical_in_region(z, z_list)
             # Calculate the opening function U (it is not actually the energy because it is scaled with an effective
@@ -510,7 +520,7 @@ class RNAPStagesStallv2(EffectModel):
         # Posibilities, it either transitions to closed complex, stays as an open complex or transitions to elongation.
         if self.state == 'Open_complex':
 
-            # z.name = 'RNAP_' + self.state
+            z.name = 'RNAP_' + self.state
 
             # Calculate probabilities as Poisson processes
             p_closed = utils.Poisson_process(k_closed, dt) # probability of forming closed complex

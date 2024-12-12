@@ -4,53 +4,48 @@ import pandas as pd
 from TORCphysics import topo_calibration_tools as tct
 from TORCphysics import params
 import pickle
-from hyperopt import tpe, hp, fmin, Trials
 import os
 import sys
 
 # **********************************************************************************************************************
 # Description
 # **********************************************************************************************************************
-# This one calibrates the GaussianBinding model + Stages.
-# This time we want to calibrate using the inferred rates rather than the susceptibility (it is too volatile), and
-# using the Spacer binding model + the RNAPStages effect model. We will optimize to obtain the rates that optimize
-# the inferred rates curve (previously calculated by a pre-process). In this sense, we can do independent calibrations
-# between promoters.
+# After the calibration of GaussianBinding model + Stages, this program
+# uses the outputted parametrisation to the re-run the cases, producing pkl files for analysis.
 
 # **********************************************************************************************************************
 # Inputs/Initial conditions - At least the ones you need to change before each run
 # **********************************************************************************************************************
 
+#promoter_cases = ['weak', 'medium', 'strong']
 promoter_cases = ['weak']
 #promoter_cases = ['medium']
 #promoter_cases = ['strong']
 
 dt=1.0
 initial_time = 0
-final_time = 100
-#final_time = 15000#2000#5000  #30000 ~8.3hrs
-#final_time = 2000#2000#5000  #30000 ~8.3hrs
+final_time = 5400#10000#5000  #30000 ~8.3hrs
+n_simulations =  16#16 #50 #12 # Per system
 
-k_weak = 0.02 # This is the one inferred from the experiment
+k_weak = 0.02#3#25 #25 # This is the one inferred from the experiment
 
-#model_code='GB-Stages-'
-model_code='GB-Stages-avgx2-'
-
-print("Doing model " + model_code + '; case ' +str(promoter_cases[0])+'; k_weak=' + str(k_weak) +'; dt=' +str(dt))
+model_code='sus_GB-Stages-avgx2-02-'
 
 # Junier experimental data - we only need distances for now.for i, promoter_case in enumerate(promoter_cases):
 experimental_files = []
 promoter_responses_files = []
+susceptibility_files = []
 for pcase in promoter_cases:
     experimental_files.append('../../junier_data/inferred-rate_kw' + str(k_weak) + '_'+ pcase + '.csv')
+    susceptibility_files.append('../../junier_data/'+ pcase + '.csv')
 
     # Promoter responses
     promoter_responses_files.append('../../promoter_responses/' + pcase + '.csv')
 
-#info_file = 'Stages-' + promoter_cases[0] + '_dt1'
-info_file = model_code + promoter_cases[0] + '-kw' + str(k_weak) + '_dt' + str(dt)
-file_out = info_file
+param_file = model_code + promoter_cases[0] + '_dt' + str(dt)+'.csv' # This one has the parametrisation from calibration
 
+info_file = 'reproduce-'+model_code + promoter_cases[0] + '_dt' + str(dt) + '-wKDEs'
+file_out = info_file
 
 # Parallelization conditions
 # --------------------------------------------------------------
@@ -64,7 +59,7 @@ n_sets = 4#6#4  #4  # Number of outer sets
 n_inner_workers = n_workers // (n_sets + 1)  # Number of workers per inner pool
 n_subsets = 2#2 #1  #2  # Number of simulations per inner pool
 # +1 because one worker is spent in creating the outer pool
-tests = 2#5#10 #100  # number of tests for parametrization
+tests = 5#10 #100  # number of tests for parametrization
 
 # Basically, you make 'tests' number of tests. Then, according to the number of distances (12), you create a number
 # 'n_sets' of groups (or sets) to distribute the work. If you make 6 sets, then each set runs 2 different systems (distances)
@@ -75,6 +70,7 @@ tests = 2#5#10 #100  # number of tests for parametrization
 # Each n_inner_worker performs: n_subsets simulations
 # Total number of simulations per test is: n_sets * n_subsets * n_inner_workers
 
+print("Doing model " + model_code + '; case ' +str(promoter_cases[0])+'; k_weak=' + str(k_weak) +'; dt=' +str(dt))
 print('Doing parallelization process for:')
 print('n_workers', n_workers)
 print('n_sets', n_sets)
@@ -83,6 +79,7 @@ print('n_inner_workers', n_inner_workers)
 print('hyperopt tests', tests)
 print('Total number of simulations per test:', n_sets * n_subsets * n_inner_workers)
 print('Total number of actual workers:', n_sets * (1 + n_inner_workers))
+
 
 # Simulation conditions
 # --------------------------------------------------------------
@@ -105,8 +102,7 @@ output_prefix = 'single_gene'  #Although we won't use it
 series = True
 continuation = False
 enzymes_filename = None
-#environment_filename = 'environment_dt'+str(dt)+'.csv'
-#RNAP_filename = '../../RNAP-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.csv'
+#environment_filename = 'environment_avgx2_dt'+str(dt)+'_RNAPtracking_off.csv'
 environment_filename = 'environment_avgx2_dt'+str(dt)+'.csv'
 RNAP_filename = '../../avgx2_RNAP_dt'+str(dt)+'.csv'
 
@@ -137,25 +133,19 @@ RNAP_unbinding_model_name = 'RNAPStagesSimpleUnbindingv2'
 RNAP_oparams = {'velocity': params.v0, 'kappa': params.RNAP_kappa, 'stall_torque': params.stall_torque,
                 'gamma':RNAPresponse['gamma'].iloc[0]}
 
-# RANGES FOR RANDOM SEARCH
+# Let's read the csv file
 # -----------------------------------
-# Reporter
-kon_min = 0.01
-kon_max = .5
-superhelical_op_min=-0.1
-superhelical_op_max=0.0
-spread_min=0.005
-spread_max=0.05
+calibration_params = pd.read_csv(param_file)
 
-# RNAP - rates
-k_closed_min = 0.01
-k_closed_max = 0.5
-k_open_min = 0.01
-k_open_max = 0.5
-k_ini_min = 0.01  #- Maybe this k_ini we really don't need it
-k_ini_max = 0.5
-k_off_min = 0.01
-k_off_max = 0.5
+# Convert the DataFrame to a dictionary (list of dictionaries)
+calibration_dict = calibration_params.to_dict(orient='records')[0]  # Get the first (and only) dictionary
+
+# Rename the key 'k_on' to 'kon'
+if 'k_on' in calibration_dict:
+    calibration_dict['kon'] = calibration_dict.pop('k_on')
+
+# Now calibration_dict will have the key 'kon' instead of 'k_on'
+print('This is the calibration params: ', calibration_dict)
 
 
 # **********************************************************************************************************************
@@ -213,7 +203,7 @@ def objective_function(params, calibrating=True):
                            'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
                            'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                            'frames': frames, 'dt': dt,
-                           'n_simulations': n_inner_workers,
+                           'n_simulations': n_simulations,
                            'DNA_concentration': 0.0}
             global_list.append(global_dict)
 
@@ -249,8 +239,7 @@ def objective_function(params, calibrating=True):
         big_variation_list.append([reporter_variation, RNAP_variation])
 
     # Info needed for the parallelization
-    parallel_info = {'n_workers': n_workers, 'n_sets': n_sets,
-                     'n_subsets': n_subsets, 'n_inner_workers': n_inner_workers}
+    parallel_info = {'n_simulations': n_simulations}
 
     # Finally, run objective function.
     # ------------------------------------------
@@ -258,7 +247,7 @@ def objective_function(params, calibrating=True):
         additional_results = False
     else:
         additional_results = True
-    my_objective, output_dict = tct.gene_architecture_calibration_nsets_rates(big_global_list, big_variation_list,
+    my_objective, output_dict = tct.gene_architecture_run_simple_wKDEs(big_global_list, big_variation_list,
                                                                               experimental_curves, parallel_info,
                                                                               additional_results=additional_results)
 
@@ -317,106 +306,11 @@ for i, promoter_case in enumerate(promoter_cases):
     presponse = pd.read_csv(promoter_responses_files[i])  #.to_dict()
     promoter_responses.append(presponse)
 
+
 # **********************************************************************************************************************
-# Optimization
-# -----------------------------------------------------
-trials = Trials()
-space = {
-    # SITE
-    'kon': hp.uniform('kon', kon_min, kon_max),
-    'spread': hp.uniform('spread', spread_min, spread_max),
-    'superhelical_op': hp.uniform('superhelical_op', superhelical_op_min, superhelical_op_max),
-
-    # RNAP
-    'k_closed': hp.uniform('k_closed', k_closed_min, k_closed_max),
-    'k_open': hp.uniform('k_open', k_open_min, k_open_max),
-    'k_ini': hp.uniform('k_ini', k_ini_min, k_ini_max),
-    'k_off': hp.uniform('k_off', k_off_min, k_off_max)
-}
-
-# Save the current standard output
-original_stdout = sys.stdout
-
-# Define the file where you want to save the output
-output_file_path = info_file + '.info'
-
-# Open the file in write mode
-with open(output_file_path, 'w') as f:
-    # Redirect the standard output to the file
-    sys.stdout = f  ##
-
-    # Your code that prints to the screen
-    print("Hello, this is the info file for the calibration of gene architecture.")
-    print('n_workers', n_workers)
-    print('n_sets', n_sets)
-    print('n_subsets', n_subsets)
-    print('n_inner_workers', n_inner_workers)
-    print('hyperopt tests', tests)
-    print('Total number of simulations per test:', n_sets * n_subsets * n_inner_workers)
-    print('Total number of actual workers:', n_sets * (1 + n_inner_workers))
-
-    best = fmin(
-        fn=objective_function,  # Objective Function to optimize
-        space=space,  # Hyperparameter's Search Space
-        algo=tpe.suggest,  # Optimization algorithm (representative TPE)
-        max_evals=tests,  # Number of optimization attempts
-        trials=trials
-    )
-
-    print(" ")
-    print("Optimal parameters found from random search: ")
-    print(best)
-
-best_df = pd.DataFrame.from_dict([best])
-
-# Save model!
-# --------------------------------------------------------------------------
-
-# This one will have all the values of gene architecture (SITE + RNAP) - luckly they don't have same params names!
-complete_df = pd.DataFrame(columns=['k_on', 'superhelical_op', 'spread',
-                                    'k_closed', 'k_open', 'width', 'threshold',
-                                    'k_ini', 'gamma', 'kappa', 'velocity', 'stall_torque',
-                                    'k_off'])
-complete_df['k_on'] = best_df['kon']
-complete_df['superhelical_op'] = best_df['superhelical_op']
-complete_df['spread'] = best_df['spread']
-complete_df['k_closed'] = best_df['k_closed']
-complete_df['k_open'] = best_df['k_open']
-complete_df['width'] = reporter_oparams['width']
-complete_df['threshold'] = reporter_oparams['threshold']
-complete_df['k_ini'] = best_df['k_ini']
-complete_df['gamma'] = RNAP_oparams['gamma']
-complete_df['kappa'] = RNAP_oparams['kappa']
-complete_df['velocity'] = RNAP_oparams['velocity']
-complete_df['stall_torque'] = RNAP_oparams['stall_torque']
-complete_df['k_off'] = best_df['k_off']
-complete_df.to_csv(file_out + '.csv', index=False, sep=',')
-
-# Let's save trials info (params and loses)
-# --------------------------------------------------------------------------
-params_df = pd.DataFrame(columns=['test', 'loss'])
-for n in range(tests):
-    tdi = trials.trials[n]  # dictionary with results for test n
-    lo = trials.trials[n]['result']['loss']  # loss
-    va = trials.trials[n]['misc']['vals']  #values
-    # Add a new row using append method
-    new_row = pd.DataFrame({
-        'test': n, 'loss': lo,
-        'k_on': va['kon'], 'superhelical_op': va['superhelical_op'],
-        'spread': va['spread'], 'k_closed': va['k_closed'], 'k_open': va['k_open'],
-        'width': reporter_oparams['width'], 'threshold': reporter_oparams['threshold'],
-        'k_ini': va['k_ini'], 'gamma': RNAP_oparams['gamma'], 'kappa': RNAP_oparams['kappa'],
-        'velocity': RNAP_oparams['velocity'],
-        'stall_torque': RNAP_oparams['stall_torque'], 'k_off': va['k_off']
-    })
-
-    params_df = pd.concat([params_df, new_row], ignore_index=True)
-
-params_df.to_csv(file_out + '-values.csv', index=False, sep=',')
-
 # Let's run the function once more with the best params to produce the data so we can then just plot it.
 # --------------------------------------------------------------------------
-objective, output = objective_function(params=best, calibrating=False)
+objective, output = objective_function(params=calibration_dict, calibrating=False)
 
 # Save the dictionary to a file
 with open(file_out + '.pkl', 'wb') as file:

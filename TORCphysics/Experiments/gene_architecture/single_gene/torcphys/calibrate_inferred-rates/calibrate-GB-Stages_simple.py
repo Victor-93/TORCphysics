@@ -1,25 +1,34 @@
 import numpy as np
 import pandas as pd
+import sys
 # sys.path.append("/users/ph1vvb")
 from TORCphysics import topo_calibration_tools as tct
 from TORCphysics import params
 import pickle
 from hyperopt import tpe, hp, fmin, Trials
 import os
-import sys
 
 # **********************************************************************************************************************
 # Description
 # **********************************************************************************************************************
-# This one calibrates the GaussianBinding model + Stages.
-# This time we want to calibrate using the inferred rates rather than the susceptibility (it is too volatile), and
-# using the Spacer binding model + the RNAPStages effect model. We will optimize to obtain the rates that optimize
-# the inferred rates curve (previously calculated by a pre-process). In this sense, we can do independent calibrations
-# between promoters.
+# After the calibration of GaussianBinding model + Stages, this program
+# uses the outputted parametrisation to the re-run the cases, producing pkl files for analysis.
+
 
 # **********************************************************************************************************************
 # Inputs/Initial conditions - At least the ones you need to change before each run
 # **********************************************************************************************************************
+model_code='GB-Stages-avgx2-'
+
+#promoter_cases = ['NPROMOTER']
+#dt=NDT
+#initial_time = 0
+#final_time = 5400 #~1.5hrs
+#k_weak = NKWEAK # This is the one inferred from the experiment
+#tests = 1500  # number of tests for parametrization
+
+#susceptibility_based = False
+susceptibility_based = True
 
 promoter_cases = ['weak']
 #promoter_cases = ['medium']
@@ -27,44 +36,31 @@ promoter_cases = ['weak']
 
 dt=1.0
 initial_time = 0
-final_time = 100
-#final_time = 15000#2000#5000  #30000 ~8.3hrs
-#final_time = 2000#2000#5000  #30000 ~8.3hrs
-
-k_weak = 0.02 # This is the one inferred from the experiment
-
-#model_code='GB-Stages-'
-model_code='GB-Stages-avgx2-'
-
-print("Doing model " + model_code + '; case ' +str(promoter_cases[0])+'; k_weak=' + str(k_weak) +'; dt=' +str(dt))
+final_time = 500 #5400# ~1.3hrs
+n_simulations =  4 # #50 #12
+k_weak = 0.02#3#25 #25 # This is the one inferred from the experiment
 
 # Junier experimental data - we only need distances for now.for i, promoter_case in enumerate(promoter_cases):
 experimental_files = []
 promoter_responses_files = []
+susceptibility_files = []
+
 for pcase in promoter_cases:
     experimental_files.append('../../junier_data/inferred-rate_kw' + str(k_weak) + '_'+ pcase + '.csv')
+    susceptibility_files.append('../../junier_data/'+ pcase + '.csv')
 
     # Promoter responses
     promoter_responses_files.append('../../promoter_responses/' + pcase + '.csv')
 
-#info_file = 'Stages-' + promoter_cases[0] + '_dt1'
-info_file = model_code + promoter_cases[0] + '-kw' + str(k_weak) + '_dt' + str(dt)
+if susceptibility_based:
+    info_file = 'sus_'+model_code + promoter_cases[0] + '_dt' + str(dt)
+else:
+    info_file = model_code + promoter_cases[0] + '-kw' + str(k_weak) + '_dt' + str(dt)
 file_out = info_file
-
 
 # Parallelization conditions
 # --------------------------------------------------------------
-# So, we have 12 distances, we can do  6 sets, each set processes 2 distances? Note that some distances take more
-# time to simulate, but it's ok.
-# So, n_sets = 6, n_subsets = 1 or 2, because if we have 64 workers and n_innerworkers = 9, then we'll have 9-18 simulations
-# per distance, which would be enough, right?
-
-n_workers = 12#64#12  #64  # Total number of workers (cpus)
-n_sets = 4#6#4  #4  # Number of outer sets
-n_inner_workers = n_workers // (n_sets + 1)  # Number of workers per inner pool
-n_subsets = 2#2 #1  #2  # Number of simulations per inner pool
-# +1 because one worker is spent in creating the outer pool
-tests = 2#5#10 #100  # number of tests for parametrization
+tests = 5#10 #100  # number of tests for parametrization
 
 # Basically, you make 'tests' number of tests. Then, according to the number of distances (12), you create a number
 # 'n_sets' of groups (or sets) to distribute the work. If you make 6 sets, then each set runs 2 different systems (distances)
@@ -75,14 +71,12 @@ tests = 2#5#10 #100  # number of tests for parametrization
 # Each n_inner_worker performs: n_subsets simulations
 # Total number of simulations per test is: n_sets * n_subsets * n_inner_workers
 
+print("Doing model " + model_code + '; case ' +str(promoter_cases[0])+'; k_weak=' + str(k_weak) +'; dt=' +str(dt))
 print('Doing parallelization process for:')
-print('n_workers', n_workers)
-print('n_sets', n_sets)
-print('n_subsets', n_subsets)
-print('n_inner_workers', n_inner_workers)
+print('n_simulations', n_simulations)
 print('hyperopt tests', tests)
-print('Total number of simulations per test:', n_sets * n_subsets * n_inner_workers)
-print('Total number of actual workers:', n_sets * (1 + n_inner_workers))
+print('Total number of simulations per test:', 12*n_simulations)
+
 
 # Simulation conditions
 # --------------------------------------------------------------
@@ -105,8 +99,6 @@ output_prefix = 'single_gene'  #Although we won't use it
 series = True
 continuation = False
 enzymes_filename = None
-#environment_filename = 'environment_dt'+str(dt)+'.csv'
-#RNAP_filename = '../../RNAP-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.csv'
 environment_filename = 'environment_avgx2_dt'+str(dt)+'.csv'
 RNAP_filename = '../../avgx2_RNAP_dt'+str(dt)+'.csv'
 
@@ -156,7 +148,6 @@ k_ini_min = 0.01  #- Maybe this k_ini we really don't need it
 k_ini_max = 0.5
 k_off_min = 0.01
 k_off_max = 0.5
-
 
 # **********************************************************************************************************************
 # Functions
@@ -213,7 +204,7 @@ def objective_function(params, calibrating=True):
                            'enzymes_filename': enzymes_filename, 'environment_filename': environment_filename,
                            'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                            'frames': frames, 'dt': dt,
-                           'n_simulations': n_inner_workers,
+                           'n_simulations': n_simulations,
                            'DNA_concentration': 0.0}
             global_list.append(global_dict)
 
@@ -249,8 +240,7 @@ def objective_function(params, calibrating=True):
         big_variation_list.append([reporter_variation, RNAP_variation])
 
     # Info needed for the parallelization
-    parallel_info = {'n_workers': n_workers, 'n_sets': n_sets,
-                     'n_subsets': n_subsets, 'n_inner_workers': n_inner_workers}
+    parallel_info = {'n_simulations': n_simulations}
 
     # Finally, run objective function.
     # ------------------------------------------
@@ -258,9 +248,16 @@ def objective_function(params, calibrating=True):
         additional_results = False
     else:
         additional_results = True
-    my_objective, output_dict = tct.gene_architecture_calibration_nsets_rates(big_global_list, big_variation_list,
-                                                                              experimental_curves, parallel_info,
-                                                                              additional_results=additional_results)
+    # Choose the curve to use for optimization
+    if susceptibility_based:
+        exp_curve = susceptibility_curves
+    else:
+        exp_curve = experimental_curves
+
+    my_objective, output_dict = tct.gene_architecture_run_simple(big_global_list, big_variation_list,
+                                                                 exp_curve, parallel_info,
+                                                                 additional_results=additional_results,
+                                                                 susceptibility_based=susceptibility_based)
 
     # Return objective
     if calibrating:
@@ -274,15 +271,18 @@ def objective_function(params, calibrating=True):
 # **********************************************************************************************************************
 
 experimental_curves = []
+susceptibility_curves = []
 distances = []
 files_list = []
 promoter_responses = []
 for i, promoter_case in enumerate(promoter_cases):
 
     exp_df = pd.read_csv(experimental_files[i])
+    sus_df = pd.read_csv(susceptibility_files[i])
 
     # Load exp
     experimental_curves.append(exp_df)
+    susceptibility_curves.append(sus_df)
 
     # Extract distances
     dists = list(exp_df['distance'])
@@ -347,13 +347,12 @@ with open(output_file_path, 'w') as f:
 
     # Your code that prints to the screen
     print("Hello, this is the info file for the calibration of gene architecture.")
-    print('n_workers', n_workers)
-    print('n_sets', n_sets)
-    print('n_subsets', n_subsets)
-    print('n_inner_workers', n_inner_workers)
+    print("Doing model " + model_code + '; case ' + str(promoter_cases[0]) + '; k_weak=' + str(k_weak) + '; dt=' + str(
+        dt))
+    print('Doing parallelization process for:')
+    print('n_simulations', n_simulations)
     print('hyperopt tests', tests)
-    print('Total number of simulations per test:', n_sets * n_subsets * n_inner_workers)
-    print('Total number of actual workers:', n_sets * (1 + n_inner_workers))
+    print('Total number of simulations per test:', 12 * n_simulations)
 
     best = fmin(
         fn=objective_function,  # Objective Function to optimize

@@ -14,12 +14,15 @@ k_weak=0.025
 # k_weak=0.0334
 
 model_code = 'GB-Stages-'
+model_code='sus_GB-Stages-avgx2-02-'
+
 
 experimental_files = []
 calibration_files = []
 for pcase in promoter_cases:
     experimental_files.append('../junier_data/inferred-rate_kw'+str(k_weak)+'_' + pcase + '.csv')
     calibration_files.append('calibrate_inferred-rates/reproduce-'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
+    calibration_files.append('susceptibility/'+model_code+pcase+'_dt'+str(dt)+'.pkl')
 
 
 # Plotting params
