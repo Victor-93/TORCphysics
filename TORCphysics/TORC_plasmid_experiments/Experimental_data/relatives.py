@@ -18,12 +18,14 @@ Ecoli_input_group = 'EColi_grouped.csv'
 Sal_input = 'Sal_mhYFP_means.csv'
 Sal_input_group = 'Sal_grouped.csv'
 
-reference_dict = {'file':Sal_input, 'promoter': 'PleuWT.1min mhYFP', 'strain': 'WT'}
+#reference_dict = {'file':Sal_input, 'promoter': 'PleuWT.1min mhYFP', 'strain': 'WT'}
+reference_dict = {'file':Sal_input, 'promoter': 'PleuWT.1 mhYFP', 'strain': 'WT'} # For the full length promoter as reference
 
 # This is a list of the promoters I want to filter - The ones I'll end up using
 promoter_target =  ['PleuWT.1min mhYFP', 'PleuWT.1 mhYFP']
 
-out_file = 'reference'
+#out_file = 'reference'
+out_file = 'reference_full' # For the full length promoter as reference
 # Plotting params
 #-----------------------------------------------------------------------------------------------------------------------
 width = 5

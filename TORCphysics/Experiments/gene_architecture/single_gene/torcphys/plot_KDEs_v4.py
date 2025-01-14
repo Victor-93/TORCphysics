@@ -16,7 +16,7 @@ enzyme_names = ['topoI','RNAP']#, 'gyrase']
 #dist_index = [0,10]
 #dist_index = [10]
 dist_index = [8,0]
-time = 80000
+time = 2000
 
 dt=1.0#0.5
 
@@ -26,8 +26,7 @@ n_inner_workers = 9
 n_subsets = 2
 n_sims = n_inner_workers * n_subsets  # This is the number of simulations launched to calculate unbinding rates
 
-model_code = 'GB-Stages-'
-#model_code='sus_GB-Stages-avgx2-02-'
+model_code='sus_GB-Stages-avgx2-02-'
 
 experimental_files = []
 calibration_files = []
@@ -35,8 +34,7 @@ for pcase in promoter_cases:
     # experimental_files.append('../../junier_data/inferred-rate_' + pcase + '.csv')
     experimental_files.append('../junier_data/inferred-rate_kw'+str(k_weak)+'_' + pcase + '.csv')
 
-    calibration_files.append('calibrate_inferred-rates/reproduce-'+model_code+pcase+'-kw'+str(k_weak)+'_dt'+str(dt)+'.pkl')
-    #calibration_files.append('susceptibility/reproduce-'+model_code+pcase+'_dt'+str(dt)+'-wKDEs.pkl')
+    calibration_files.append('susceptibility/reproduce-'+model_code+pcase+'_dt'+str(dt)+'-wKDEs.pkl')
 
 # Plotting params
 #-----------------------------------------------------------------------------------------------------------------------
@@ -134,23 +132,21 @@ def get_RNAP_KDE_lines(results_list):
 # sets the start of the transcription unit (promoter) at x=0.
 def get_enzymes_KDEs(results_list, names_list, index_list):
     output_list = []
-    n = len(results_list)
 
     for i in index_list:
         out_dict = {}
         out_dict['index'] = i
-        out_dict['distance'] = results_list[i]['distance']
+        out_dict['distance'] = results_list['distance'][i]
 
         # We just need to obtain the value to align the enzymes
-        x_disp =  np.min(results_list[i]['result']['KDE']['RNAP']['kde_x'])
+        x_disp =  np.min(results_list['KDE'][i]['RNAP']['kde_x'])
 
         # Now we collect measurements
         for name in names_list:
-            y = results_list[i]['result']['KDE'][name]['kde_y'][0]
-            ys = results_list[i]['result']['KDE'][name]['kde_y'][1]
-            kde_x = results_list[i]['result']['KDE'][name]['kde_x']
+            y = results_list['KDE'][i][name]['kde_y']
+            kde_x = results_list['KDE'][i][name]['kde_x']
             x= kde_x - x_disp
-            out_dict[name] = np.array([x, y, ys])
+            out_dict[name] = np.array([x, y])
         output_list.append(out_dict)
     return output_list
 
@@ -163,29 +159,11 @@ for pickle_file in calibration_files:
         data = pickle.load(file)
         pickle_data.append(data)
 
-# Calculate rates
-rates = []
-for i, data in enumerate(pickle_data):
-    x=i
-    rates.append(get_prod_rates(data[0]['data']))
-
 # Get KDEs
 enzymes_KDEs = []
 for i, data in enumerate(pickle_data):
     x=i
-    enzymes_KDEs.append(get_enzymes_KDEs(data[0]['data'], enzyme_names, dist_index))
-
-# Collect KDEs and arange them as heatmap
-RNAP_KDEs = []
-for i, data in enumerate(pickle_data):
-    x=i
-    RNAP_KDEs.append(get_RNAP_KDE_matrix(data[0]['data']))
-
-# Collect KDEs and arange them as heatmap
-RNAP_KDE_lines = []
-for i, data in enumerate(pickle_data):
-    x=i
-    RNAP_KDE_lines.append(get_RNAP_KDE_lines(data[0]['data']))
+    enzymes_KDEs.append(get_enzymes_KDEs(data[0], enzyme_names, dist_index))
 
 # Plot - 3D lines
 #-----------------------------------------------------------------------------------------------------------------------
@@ -203,16 +181,16 @@ for i in range(len(enzymes_KDEs)):
         for name in enzyme_names:
             x = kde_dict[name][0]
             y = kde_dict[name][1]/time
-            ys = kde_dict[name][2]/time#/1#/np.sqrt(time)
+#            ys = kde_dict[name][2]/time#/1#/np.sqrt(time)
             if name == 'topoI' or name == 'gyrase':
                 if j == 0:
                     x = x[15:-15]
                     y = y[15:-15]
-                    ys = ys[15:-15]
+ #                   ys = ys[15:-15]
                 else:
                     x = x[:-15]
                     y = y[:-15]
-                    ys = ys[:-15]
+  #                  ys = ys[:-15]
 
             label = name + ' ud:' +str(distance)
             #ax.plot(x, y, color=enzyme_colors[name], ls=lines[j], lw=lw,alpha=alphas[j])

@@ -14,8 +14,10 @@ dir_source = '../optimization/'
 v_code = 'block-op_TORC_plasmid'
 #v_code = 'block-rep-TORC_plasmid'
 #v_code = 'op_TORC_plasmid'
-v_code = 'block-dist_op_TORC_plasmid'
-v_code = 'batch-dist_op_TORC_plasmid-01'
+#v_code = 'block-dist_op_TORC_plasmid'
+#v_code = 'batch-dist_op_TORC_plasmid-01'
+#v_code = 'full-dist_op_TORC_plasmid_st3-02'
+#v_code = 'full-trackingON-dist_op_TORC_plasmid_st3-02'
 
 
 pkl_file  = dir_source + v_code+ '.pkl'

@@ -1,5 +1,5 @@
 import numpy as np
-from TORCphysics import utils, Enzyme
+from TORCphysics import utils, Enzyme, params
 import sys
 
 
@@ -99,6 +99,15 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
                                                                environmental=environment)
                 if not site_available:
                     continue
+
+                # Thresholds
+                # -------------------------------------------------------------
+                if 'gene' in site.name:  # For genes, if the number of bound molecules or RNAPs is greater than
+                                         # the threshold, then they won't be able to bind. This is to stop
+                                         # over-crowding.
+                    nenzymes = len([enzyme for enzyme in enzyme_list if enzyme.site.name == site.name])
+                    if nenzymes >= abs(site.start-site.end)/params.gene_RNAP_threshold:
+                        continue
 
                 # Add enzyme
                 # --------------------------------------------------------

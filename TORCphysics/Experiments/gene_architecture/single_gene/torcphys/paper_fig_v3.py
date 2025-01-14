@@ -23,8 +23,8 @@ k_weak=0.003
 model_code='sus_GB-Stages-avgx2-02-'
 outfile = model_code+'fig'
 
-susceptibility_based = False
-#susceptibility_based = True
+#susceptibility_based = False
+susceptibility_based = True
 
 experimental_files = []
 susceptibility_files = []
@@ -41,7 +41,8 @@ for pcase in promoter_cases:
     #calibration_files.append('susceptibility/'+model_code+pcase+'_dt'+str(dt)+'.pkl')
     #calibration_files.append('susceptibility/reproduce-'+model_code+pcase+'_dt'+str(dt)+'.pkl')
     #calibration_files.append('susceptibility/reproduce-gene-avg_'+model_code+pcase+'_dt'+str(dt)+'.pkl')
-    calibration_files.append('susceptibility/reproduce-'+model_code+pcase+'_dt'+str(dt)+'_RNAPTracking_off.pkl')
+    #calibration_files.append('susceptibility/reproduce-'+model_code+pcase+'_dt'+str(dt)+'_RNAPTracking_off.pkl')
+    calibration_files.append('susceptibility/'+model_code+pcase+'_dt'+str(dt)+'.pkl')
     #RNAPtracking_off
     #params_files.append('susceptibility/'+model_code+pcase+'_dt'+str(dt)+'.csv')
     params_files.append('table_'+model_code+pcase+'_dt'+str(dt)+'.csv')

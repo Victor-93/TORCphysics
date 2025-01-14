@@ -36,7 +36,8 @@ for pcase in promoter_cases:
     #calibration_files.append('susceptibility/reproduce-'+model_code+pcase+'_dt'+str(dt)+'.pkl')
     #calibration_files.append('susceptibility/reproduce-'+model_code+pcase+'_dt'+str(dt)+'RNAPtracking_off.pkl')
     #RNAPtracking_off
-    params_files.append('susceptibility/'+model_code+pcase+'_dt'+str(dt)+'.csv')
+    #params_files.append('susceptibility/'+model_code+pcase+'_dt'+str(dt)+'.csv')
+    params_files.append('table_'+model_code+pcase+'_dt'+str(dt)+'.csv')
     #params_files.append('susceptibility/gene-avg_'+model_code+pcase+'_dt'+str(dt)+'.csv')
 
 #calibration_files[1]='susceptibility/reproduce-'+model_code+promoter_cases[1]+'_dt'+str(dt)+'.pkl'
@@ -295,7 +296,7 @@ axs[2,1].text(-0.1, 1.1, outside_label[5], transform=axs[2,1].transAxes,
 
 
 #plt.savefig(model_code+'kw'+str(k_weak)+'_dt'+str(dt)+'_v2.png')
-#plt.savefig(outfile+'.pdf')
+plt.savefig(outfile+'.pdf')
 
 plt.show()
 

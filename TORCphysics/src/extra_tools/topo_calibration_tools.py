@@ -2134,6 +2134,332 @@ def gene_architecture_run_simple(big_global_list, big_variation_list, experiment
 
 # Similar to gene architecture but here we do not do calibration and only want to produce results for plotting.
 # We just run each of the system n_simulations times, and collect data (no KDEs).
+# Also, this version includes an objective_dict, which is a dictionary with minimalistic information necessary
+# for analysing every trial.
+def gene_architecture_run_simple_odict(big_global_list, big_variation_list, experimental_curves, parallel_info,
+                                              additional_results=False, susceptibility_based=False):
+    # Let's unpack the info
+    ncases = len(big_global_list)
+    n_simulations = parallel_info['n_simulations']
+    output_list = []  # This list will be made out of a list of cases, each case is made of  a dict with
+    # objective and data keys. In data, it gives a list of dicts, each one containing the distance, and the results
+    objective = 0
+    objective_dict = {'loss': 100, 'status':'fail',
+                      'susceptibility': None, 'prod_rate': None, 'distance': None,
+                      'global_superhelical': None, 'local_superhelical': None,
+                      'nenzymes': None}
+    # Run simulations
+    # --------------------------------------------------------------
+    # Create a multiprocessing pool for the outer loop
+    pool = multiprocessing.Pool()
+
+    # Go through list of cases
+    # --------------------------------------------------------------
+    for icase in range(ncases):
+
+        global_list = big_global_list[icase]
+        variation_list = big_variation_list[icase]
+        exp_curve = experimental_curves[icase]
+
+        distances = exp_curve['distance']
+
+        # Prepare output arrays/lists
+        # --------------------------------------------------
+        case_output = {} # This will be a dict with all results
+        rate_list = []
+        local_sigma = []
+        global_sigma = []
+        local_dsigma = []
+        global_dsigma = []
+        active_sigma = []
+        objective = 0
+
+        # These three lists will count the average number of enzymes per frame
+        ntopoI = []
+        ngyrase = []
+        nRNAP = []
+
+        # And same number of enzymes but not the averages because we want distributions
+        ntopoI_dist = []
+        ngyrase_dist = []
+        nRNAP_dist = []
+
+        # Variables related with the objective_dict
+        ob_local_sigma = []
+        ob_global_sigma = []
+        ob_RNAP = []   # Number of enzymes
+        ob_gyrase = []
+        ob_topoI = []
+
+
+        # Distances
+        # --------------------------------------------------------------
+        for j in range(len(distances)):
+
+            g_dict = global_list[j]
+
+            # Sort the processing info
+            # --------------------------------------------------
+            my_circuit = load_circuit(g_dict)
+            total_time = my_circuit.dt * my_circuit.frames
+            dt = my_circuit.dt
+            frames = my_circuit.frames
+
+            # Prepare items for parallelization
+            # --------------------------------------------------------------
+            Items = []
+            for simulation_number in range(n_simulations):
+                g_dict['n_simulations'] = simulation_number
+                Item = {'global_conditions': g_dict.copy(), 'variations': variation_list.copy()}
+                Items.append(Item)
+
+
+            # Run in parallel
+            # ----------------------------
+            # Run simulations in parallel within this subset
+            pool_results = pool.map(pt.single_simulation_w_variations_return_dfs, Items)
+
+            # Calculate production rates
+            # ---------------------------------------------------------
+            prod_rates = []
+            for result in pool_results:
+                environmental_df = result['environmental_df']
+                mask = environmental_df['name'] == 'reporter'
+                if len(environmental_df[mask]['concentration']) == 0:
+                    transcripts = 0
+                else:
+                    transcripts = environmental_df[mask]['concentration'].iloc[-1]
+                prod_rates.append(float(transcripts / total_time))
+            rates_array = np.array(prod_rates)
+            mean_rates = np.mean(rates_array)
+            std_rates = np.std(rates_array)
+            rates = np.array([mean_rates, std_rates])
+            rate_list.append(rates)
+
+            # Calculate superhelical levels and number of enzymes
+            # ---------------------------------------------------------
+            lsigma = []
+            gsigma = []
+            lRNAP = []
+            lgyrase = []
+            ltopoI = []
+            for r, result in enumerate(pool_results):
+                sites_df = result['sites_df']
+                site_mask = sites_df['name'] == 'reporter'
+                mask_circuit = sites_df['type'] == 'circuit'
+
+                # Collect superhelical densities -----------------------
+                local_df = sites_df[site_mask]
+                local_superhelical = local_df['superhelical'].to_numpy()
+                global_superhelical = sites_df[mask_circuit]['superhelical'].to_numpy()
+
+                lsigma.append(local_superhelical[int(frames/2):])  # We assume the data is equilibrated from half of the simulation
+                gsigma.append(global_superhelical[int(frames/2):])
+
+                # Collect number of bound enzymes -------------------------
+                RNAP_mask = sites_df['name'] == 'reporter'
+                topoI_mask = sites_df['name'] == 'DNA_topoI'
+                gyrase_mask = sites_df['name'] == 'DNA_gyrase'
+                RNAP = sites_df[RNAP_mask].drop_duplicates('frame')
+                RNAP = RNAP['#enzymes'].to_numpy()
+                topoI = sites_df[topoI_mask].drop_duplicates('frame')
+                topoI = topoI['#enzymes'].to_numpy()
+                gyrase = sites_df[gyrase_mask].drop_duplicates('frame')
+                gyrase = gyrase['#enzymes'].to_numpy()
+
+                lRNAP.append(RNAP[int(frames/2):])
+                lgyrase.append(gyrase[int(frames/2):])
+                ltopoI.append(topoI[int(frames/2):])
+
+
+            # Calculate averages and standard deviations
+            # Superhelical ---------------------------------------------------
+            avg = np.mean(np.array(lsigma))
+            std = np.std(np.array(lsigma))
+            ob_local_sigma.append(np.array([avg, std]))
+            avg = np.mean(np.array(gsigma))
+            std = np.std(np.array(gsigma))
+            ob_global_sigma.append(np.array([avg, std]))
+
+            # Number of enzymes -----------------------------------------------
+            avg = np.mean(np.array(lRNAP))
+            std = np.std(np.array(lRNAP))
+            ob_RNAP.append(np.array([avg, std]))
+            avg = np.mean(np.array(lgyrase))
+            std = np.std(np.array(lgyrase))
+            ob_gyrase.append(np.array([avg, std]))
+            avg = np.mean(np.array(ltopoI))
+            std = np.std(np.array(ltopoI))
+            ob_topoI.append(np.array([avg, std]))
+
+
+            if additional_results:
+                # Calculate superhelical densities
+                # ---------------------------------------------------------
+                # lnenzymes = []
+                lsigma = []
+                gsigma = []
+                ldsig = [] #variations
+                gdsig = []
+                lactsig = [] # sigma when the gene is being transcribed
+
+                for r, result in enumerate(pool_results):
+                    sites_df = result['sites_df']
+                    enzymes_df = result['enzymes_df']
+                    #environmental_df = result['environmental_df']
+                    site_mask = sites_df['name'] == 'reporter'
+                    mask_circuit = sites_df['type'] == 'circuit'
+                    active_mask = enzymes_df['name'] == 'RNAP_Elongation'
+
+                    # Collect measurements
+                    local_df = sites_df[site_mask]#['superhelical']
+                    local_superhelical = local_df['superhelical'].to_numpy()
+                    # local_superhelical = sites_df[site_mask]['superhelical'].to_numpy()
+                    global_superhelical = sites_df[mask_circuit]['superhelical'].to_numpy()
+
+                    # Collect for active states
+                    active_frames = enzymes_df[active_mask]['frame']
+                    active_superhelical = local_df[local_df['frame'].isin(active_frames)]['superhelical'].to_numpy()
+                    #active_superhelical = sites_df[sites_df['frame'].isin(active_frames)][site_mask].to_numpy()
+
+                    if len(active_superhelical) == 0:
+                        active_superhelical = global_superhelical[:-2]  # The last one so it doesn't interfear
+
+                    active_superhelical = np.array(active_superhelical)
+                    # Let's collect the changes
+    #                frames = len(local_superhelical)
+                    d_local = np.zeros(frames)
+                    d_global = np.zeros(frames)
+                    for f in range(frames):  # frames because local_superhelical actually have frames+1 measurements
+                        d_local[f] = (local_superhelical[f+1] - local_superhelical[f]) / dt
+                        d_global[f] = (global_superhelical[f+1] - global_superhelical[f]) / dt
+
+                    lsigma.append(local_superhelical)
+                    gsigma.append(global_superhelical)
+                    ldsig.append(d_local) # Variations
+                    gdsig.append(d_global)
+                    lactsig.append(active_superhelical)
+
+                    # Calculating number of interacting enzymes
+                    # --------------------------------------------------------
+                    RNAP_mask = sites_df['name'] == 'reporter'
+                    topoI_mask = sites_df['name'] == 'DNA_topoI'
+                    gyrase_mask = sites_df['name'] == 'DNA_gyrase'
+                    RNAP = sites_df[RNAP_mask].drop_duplicates('frame')
+                    RNAP = RNAP['#enzymes'].to_numpy()
+                    topoI = sites_df[topoI_mask].drop_duplicates('frame')
+                    topoI = topoI['#enzymes'].to_numpy()
+                    gyrase = sites_df[gyrase_mask].drop_duplicates('frame')
+                    gyrase = gyrase['#enzymes'].to_numpy()
+
+                    RNAP_df = pd.DataFrame({'simulation_' + str(r): RNAP})
+                    topoI_df = pd.DataFrame({'simulation_' + str(r): topoI})
+                    gyrase_df = pd.DataFrame({'simulation_' + str(r): gyrase})
+
+                    if r == 0:
+                        RNAP_output_df = RNAP_df.copy()
+                        topoI_output_df = topoI_df.copy()
+                        gyrase_output_df = gyrase_df.copy()
+                    else:
+                        RNAP_output_df = pd.concat([RNAP_output_df, RNAP_df], axis=1).reset_index(drop=True)
+                        topoI_output_df = pd.concat([topoI_output_df, topoI_df], axis=1).reset_index(drop=True)
+                        gyrase_output_df = pd.concat([gyrase_output_df, gyrase_df], axis=1).reset_index(drop=True)
+
+                # Add to lists as arrays
+                local_sigma.append(np.array(lsigma))
+                global_sigma.append(np.array(gsigma))
+
+                # And the variations
+                local_dsigma.append(np.array(ldsig))
+                global_dsigma.append(np.array(gdsig))
+
+                flattened_lactsig = np.concatenate(lactsig)  # Or use np.hstack(lactsig) if all arrays are 1D
+                active_sigma.append(flattened_lactsig)
+                # active_sigma.append(np.array(lactsig))
+
+                # Append the distributions
+                ngyrase_dist.append(gyrase_output_df)
+                ntopoI_dist.append(topoI_output_df)
+                nRNAP_dist.append(RNAP_output_df)
+
+                # And number of topos and RNAPs
+                RNAP_mean = RNAP_output_df.mean(axis=1).to_numpy()
+                RNAP_std = np.nan_to_num(RNAP_output_df.std(axis=1).to_numpy())
+                topoI_mean = topoI_output_df.mean(axis=1).to_numpy()
+                topoI_std = np.nan_to_num(topoI_output_df.std(axis=1).to_numpy())
+                gyrase_mean = gyrase_output_df.mean(axis=1).to_numpy()
+                gyrase_std = np.nan_to_num(gyrase_output_df.std(axis=1).to_numpy())
+                RNAP = np.array([RNAP_mean, RNAP_std])
+                topoI = np.array([topoI_mean, topoI_std])
+                gyrase = np.array([gyrase_mean, gyrase_std])
+                nRNAP.append(RNAP)
+                ntopoI.append(topoI)
+                ngyrase.append(gyrase)
+
+        # Calculate susceptibiltyy
+        # --------------------------------------------------------------
+        norm = rate_list[4][0]  # This is the reference
+        susceptibility_list = rate_list / norm
+
+        # Process and calculate objective
+        # --------------------------------------------------------------
+        if susceptibility_based:
+            simulation_output = [result[0] for result in susceptibility_list]
+        else:
+            # prod_rates = [result[0] for result in rate_list]
+            simulation_output = [result[0] for result in rate_list]
+
+        # my_objective = np.sum((exp_curve['Signal'] - prod_rates) ** 2)  # This is the objective of the icase
+        my_objective = np.sum((exp_curve['Signal'] - simulation_output) ** 2)  # This is the objective of the icase
+        objective += my_objective
+
+        # Fill objective_dist
+        # --------------------------------------------------------------
+        has_nan = np.isnan(susceptibility_list).any()
+        if has_nan:  # Determine if set is valid
+            objective_dict['status'] = 'fail'
+            objective +=100 # To ensure this one is not picked as the best
+        else:
+            objective_dict['status'] = 'ok'  # Everything OK!
+
+        objective_dict['susceptibility'] = susceptibility_list
+        objective_dict['prod_rate'] = np.array(rate_list)
+        objective_dict['local_superhelical'] = np.array(ob_local_sigma)
+        objective_dict['global_superhelical'] = np.array(ob_global_sigma)
+        objective_dict['loss'] = my_objective
+        objective_dict['nenzymes'] = {'RNAP': np.array(ob_RNAP), 'topoI': np.array(ob_topoI),
+                                      'gyrase': np.array(ob_gyrase)}
+        objective_dict['distance'] = np.array(distances)
+
+        if additional_results:
+            # Prepare case output dict
+            # --------------------------------------------------------------
+            case_output['objective_dict'] = objective_dict
+            case_output['distance'] = np.array(distances)
+            case_output['objective'] = my_objective
+            case_output['prod_rate'] = rate_list
+            case_output['susceptibility'] = susceptibility_list
+            case_output['local_superhelical'] = local_sigma
+            case_output['global_superhelical'] = global_sigma
+            case_output['local_superhelical_variations'] = local_dsigma
+            case_output['global_superhelical_variations'] = global_dsigma
+            case_output['active_superhelical'] = active_sigma
+
+            # n enzymes dict
+            case_output['nenzymes'] = {'RNAP': nRNAP, 'topoI': ntopoI, 'gyrase': ngyrase}
+
+            case_output['nenzymes_dist'] = {'RNAP': nRNAP_dist, 'topoI': ntopoI_dist, 'gyrase': ngyrase_dist}
+
+            output_list.append(case_output)  #And add it
+
+    # Close pool
+    # --------------------------------------------------------------
+    pool.close()
+
+    return objective_dict, output_list
+
+# Similar to gene architecture but here we do not do calibration and only want to produce results for plotting.
+# We just run each of the system n_simulations times, and collect data (no KDEs).
 def gene_architecture_run_simple_wKDEs(big_global_list, big_variation_list, experimental_curves, parallel_info,
                                               additional_results=False):
     # Let's unpack the info

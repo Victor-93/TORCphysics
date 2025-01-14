@@ -5,6 +5,7 @@ import numpy as np
 # Description
 #-----------------------------------------------------------------------------------------------------------------------
 # Let's plot the losses
+# TODO: Keep working on it
 
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
@@ -52,44 +53,35 @@ filtered_df = df[df['loss'] <= err_threshold]
 loss = df['loss'].to_numpy()
 floss = filtered_df['loss'].to_numpy()
 ax.set_title(title)
-ax.plot(df['test'], df['loss'], 'o', ms=ms, color='blue', label='all')
-ax.plot(filtered_df['test'], filtered_df['loss'], 'o', ms=ms, color='red', label='best')
-#ax.plot(df['loss'], 'o', ms=ms, color='blue')
-#ax.plot(loss, 'o', ms=ms, color='blue')
-#ax.plot(floss, 'o', ms=ms, color='green')
 
+# Create a histogram
+minv = min(loss)
+maxv = np.mean(loss) + 1*np.std(loss)
+maxv = .5#max(loss)*.2
+bins = np.linspace(minv, maxv, 100)  # Define bins
+hist, bin_edges = np.histogram(loss, bins=bins)
+
+# Plot the full histogram
+ax.hist(loss, bins=bins, color='gray', alpha=0.6, label='Loss')
+
+# Highlight bins corresponding to floss
+for value in floss:
+    # Find the bin index for the current value
+    bin_index = np.digitize(value, bin_edges) - 1
+    # Plot the specific bin
+    plt.bar(
+        bin_edges[bin_index],  # Bin start
+        hist[bin_index],  # Bin height
+        width=bin_edges[1] - bin_edges[0],  # Bin width
+        color='red',  # Highlight color
+        alpha=0.8,
+#        edgecolor='black',
+        label='Highlighted' if bin_index == np.digitize(floss[0], bin_edges) - 1 else ""
+    )
 ax.grid(True)
-ax.set_xlabel('test')
-ax.set_ylabel('loss')
-ax.set_yscale('log')
+#ax.set_xlabel('test')
+#ax.set_ylabel('loss')
+ax.set_xscale('log')
 
-# Let's calculate averages and save the info:
-#-----------------------------------------------------------------------------------------------------------------------
-
-# Calculate averages and standard deviations
-df_avg = filtered_df.mean(axis=0).to_frame().T.rename(index={0:'avg'})
-df_std = filtered_df.std(axis=0).to_frame().T.rename(index={0:'std'})
-
-# Join them for the table
-new_df = pd.concat([df_avg, df_std], axis=0)
-new_df.to_csv('table_dt'+str(dt)+'.csv', index=False, sep=',')
-
-# And let's separate them into topoI and gyrase so we can load them.
-
-# topoI
-topos_names = ['topoI', 'gyrase']
-for name in topos_names:
-    topo_dict = {}
-    topo_dict['k_on'] = df_avg['k_on_'+name]
-    topo_dict['k_off'] = df_avg['k_off_' + name]
-    topo_dict['k_cat'] = df_avg['k_cat_'+name]
-    topo_dict['width'] = df_avg['width_'+name]
-    topo_dict['threshold'] = df_avg['threshold_'+name]
-    if name == 'gyrase':
-        topo_dict['sigma0'] = df_avg['sigma0_'+name]
-
-    topo_df = pd.DataFrame.from_dict(topo_dict)
-    topo_df.to_csv(name+'_rec_avg_dt'+str(dt)+'.csv', index=False, sep=',')
-df_avg.to_csv('avg_dt'+str(dt)+'.csv', index=False, sep=',')
 
 plt.show()

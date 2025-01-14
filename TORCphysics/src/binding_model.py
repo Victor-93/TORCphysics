@@ -174,8 +174,20 @@ class PoissonBinding(BindingModel):
         return rate
 
 
-# TODO: Document this function
 class MeyerPromoterOpening(BindingModel):
+    """
+     A BindingModel subclass that calculates binding probabilities according a to the Sam Meyer's binding model.
+     It basically modulates the binding according a predefined sigmoid function.
+
+     Attributes
+     ----------
+     k_on: float
+        Binding rate (1/s) at which the enzymes bind.
+     filename : str, optional
+        Path to the site csv file that parametrises the binding model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the binding model.
+    """
 
     def __init__(self, filename=None, interacts=False, **oparams):
 
@@ -207,6 +219,78 @@ class MeyerPromoterOpening(BindingModel):
     def rate_modulation(self, superhelical) -> float:
         rate = utils.promoter_curve_Meyer(basal_rate=self.k_on, superhelical=superhelical)
         return rate
+
+
+class SISTBasedBinding(BindingModel):
+    """
+     A BindingModel subclass that calculates binding probabilities according based on the SIST profiles.
+     This model is based on Sam Meyer's binding model, where the binding is modulated by a sigmoid function that
+     is parametrised with the SIST profile. In case of default params, this model is equivalent to Sam Meyer's.
+
+     Attributes
+     ----------
+     k_on: float
+        Binding rate (1/s) at which the enzymes bind.
+     threshold : float
+        The threshold of the sigmoid curve. This is a dimensionless parameter.
+     width : float
+        The width of the sigmoid curve. This is a dimensionless parameter.
+     filename : str, optional
+        Path to the site csv file that parametrises the binding model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the binding model.
+    """
+
+    def __init__(self, filename=None, interacts=False, **oparams):
+
+        super().__init__(filename, **oparams)  # Call the base class constructor
+        if not oparams:
+            if filename is None:
+                self.k_on = params.k_on  # If no filename was given, then it uses default k_on.
+                self.width = params.SM_epsilon_t   # Width and threshold give the shape to the melting energy
+                self.threshold = params.SM_sigma_t
+
+                # Note that the value used also depends on the input site.csv file.
+            else:
+                mydata = pd.read_csv(filename)
+                if 'k_on' in mydata.columns:
+                    #  self.k_on = float(rows['k_on'])
+                    self.k_on = mydata['k_on'][0]
+                else:
+                    raise ValueError('Error, k_on parameter missing in csv file for SISTBasedBinding')
+                if 'width' in mydata.columns:
+                    self.width = mydata['width'][0]
+                else:
+                    raise ValueError('Error, width parameter missing in csv file for SISTBasedBinding')
+                if 'threshold' in mydata.columns:
+                    self.threshold = mydata['threshold'][0]
+                else:
+                    raise ValueError('Error, threshold parameter missing in csv file for SISTBasedBinding')
+
+        else:
+            self.k_on = oparams['k_on']
+            self.width = float(oparams['width'])
+            self.threshold = float(oparams['threshold'])
+
+
+        self.interacts = interacts
+        self.oparams = {'width': self.width, 'threshold': self.threshold, 'k_on': self.k_on}
+
+    #    def binding_probability(self, on_rate, dt) -> float:
+    # NOTE: Shouldn't on_rate be the same that k_on? It should be a property of the Site on it's own, right?
+    def binding_probability(self, environmental, superhelical, dt) -> float:
+
+        # Calculate the opening function U (it is not actually the energy because it is scaled with an effective
+        # energy)
+        U = utils.opening_function(superhelical, self.threshold, self.width)
+        rate = self.k_on * np.exp(-U)
+        probability = utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+        return probability
+
+    def rate_modulation(self, superhelical) -> float:
+        rate = utils.promoter_curve_Meyer(basal_rate=self.k_on, superhelical=superhelical)
+        return rate
+
 
 
 # TODO: Do you need the inverse version of the function? And if so, would you need another class or is it better
@@ -1518,6 +1602,8 @@ def assign_binding_model(model_name, oparams_file=None, **oparams):
         my_model = GyraseRecognition(filename=oparams_file, **oparams)
     elif model_name == 'MeyerPromoterOpening':
         my_model = MeyerPromoterOpening(filename=oparams_file, **oparams)
+    elif model_name == 'SISTBasedBinding':
+        my_model = SISTBasedBinding(filename=oparams_file, **oparams)
     elif model_name == 'MaxMinPromoterBinding':
         my_model = MaxMinPromoterBinding(filename=oparams_file, **oparams)
     elif model_name == 'MaxMinPromoterBinding_cutoff':

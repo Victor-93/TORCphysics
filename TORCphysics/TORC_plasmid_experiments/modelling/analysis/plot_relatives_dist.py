@@ -15,6 +15,8 @@ dir_source = '../optimization/'
 #v_code = 'batch-dist_op_TORC_plasmid-01'
 #v_code = 'block-batch-dist_op_TORC_plasmid-01'
 v_code = 'block-batch-dist_op_TORC_plasmid-04'
+v_code = 'block-dist_op_TORC_plasmid_v2-01'
+
 pkl_file  = dir_source + v_code+ '.pkl'
 params_file = dir_source + v_code + '.csv'
 loss_file = dir_source + v_code + '-values.csv'

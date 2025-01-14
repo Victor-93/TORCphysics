@@ -1,6 +1,5 @@
 import sys
 #sys.path.append("/users/ph1vvb")
-from TORCphysics import params
 from TORCphysics import parameter_search as ps
 import pandas as pd
 import numpy as np
@@ -9,14 +8,31 @@ from hyperopt import tpe, hp, fmin, Trials
 
 # Description
 # ----------------------------------------------------------------------------------------------------------------------
-# Same optimization but comparing distributions instead of fitting averages.
-# This version _v2 does the same optimization process but it does not vary lacI activity and tetA has a different
-# gamma as it induces more supercoils than regular plasmids.
+# Optimization process based on the third strategy .2! It is the same as st3, but here we vary topoisomerase
+# concentrations for both Salmonella and Ecoli.
+# According to previous analysis, it might be harder to achieve a good agreement for minimum promoter and cases with
+# dtopA background.
+# Here we expand the calibration so it can now only consider the full length promoter (not minimum) and in the dtopA
+# background, rather than completely eliminating topoisomerase I, we introduce a hyper parameter a_dtopA that
+# reduces the activity of topo I in dtopA backgroun (in E. coli and Salmonella) as: concentration* = concentration*a_dtopA
+
+# We need to modify the code and finish the explanation of what it does - All of this is done!
+#  1.- Consider full - Done
+#  2.- Add a_dtopA - Done
+#  3.- apply RNAPTracking - Done
+#  4.- Make light version of function, where we only return the trials object (pkl), and not the huger output.
+#      This is not necessary, but fix the utils of instant_twist_transfer when division by zero (very unlikely!)
+#  5.- Vary topo concentrations for Ecoli and Salmonella
 
 # Model & simulation conditions
 # ----------------------------------------------------------------------------------------------------------------------
 dt = 1.0
-final_time = 200 #2000
+final_time = 2000
+
+# Indicates if we want to include both minimum and full promoters or
+# only the full promoter (could be expanded to only the minimum)
+# Options are: 'both' and 'full'
+promoter_selection = 'full'
 
 Ecoli_topoI_C = 17.0
 Ecoli_gyrase_C = 44.6
@@ -35,15 +51,27 @@ sigma0 = -0.049 # Initial superhelical density
 #lacI_blocking = True  # True if we consider that lacI can block the binding in the minimal PleuWT, False if not.
 lacI_blocking = False
 
-#file_out = 'dist_op_TORC_plasmid'
-file_out = 'test-dist_op_TORC_plasmid_v2'
+# This indicates if topoisomerases follows RNAPs
+RNAP_Tracking = True
+#RNAP_Tracking = False
 
+file_out = 'dist_op_TORC_plasmid_st3.2_test'
+
+if RNAP_Tracking:
+    file_out = 'trackingON-' + file_out
+# Modify input/outputs based on promoter selection
+if promoter_selection == 'full':
+    file_out = 'full-'+file_out
+    reference_system = 'Sal_full_WT'
+    ref_file = '../../Experimental_data/reference_full_distribution.csv'
+else:
+    reference_system = 'Sal_min_WT'
+    ref_file = '../../Experimental_data/reference_distribution.csv'
+
+# Change output filenames if we consider that lacI can block the promoter
 if lacI_blocking == True:
     file_out = 'block-'+file_out
 
-ref_file = '../../Experimental_data/reference_distribution.csv'
-
-reference_system = 'Sal_min_WT'
 reporter = 'PleuWT'
 
 # For Salmonella we do not know! So we will vary it
@@ -127,36 +155,45 @@ variation_dict['gyrase'] = variation
 
 # Topoisomerase concentration
 # --------------------------------
-topoI_C_min = Ecoli_topoI_C/2  # This variation will be applied to Salmonella
-topoI_C_max = Ecoli_topoI_C*2
-gyrase_C_min = Ecoli_gyrase_C/2
-gyrase_C_max = Ecoli_gyrase_C*2
+topoI_C_min = 10 # Ecoli_topoI_C/3  # This variation will be applied to Salmonella
+topoI_C_max = 40#Ecoli_topoI_C*3
+gyrase_C_min = 10#Ecoli_gyrase_C/3
+gyrase_C_max = 80# Ecoli_gyrase_C*3
+
+a_dtopA_min = 0.0  # This variation affects the dtopA background, and reduces the activity of topoI
+a_dtopA_max = 0.75
 
 # For genes
 # --------------------------------
 k_on_min = 0.01
-k_on_max = .5
+k_on_max = .4
 superhelical_op_min=-0.1
 superhelical_op_max=0.0
 spread_min=0.005
 spread_max=0.05
 k_closed_min = 0.01
-k_closed_max = 0.5
+k_closed_max = 0.4
 k_open_min = 0.01
-k_open_max = 0.5
+k_open_max = 0.4
 k_ini_min = 0.01
-k_ini_max = 0.5
+k_ini_max = 0.4
 k_off_min = 0.01
-k_off_max = 0.5
+k_off_max = 0.4
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PARAMETER SPACE FOR OPTIMIZATION
 # ----------------------------------------------------------------------------------------------------------------------
 trials = Trials()
 space = {
-    # topoisomerases
-    'topoI_concentration': hp.uniform('topoI_concentration', topoI_C_min, topoI_C_max),
-    'gyrase_concentration': hp.uniform('gyrase_concentration', gyrase_C_min, gyrase_C_max),
+    # topoisomerases - Salmonella
+    'topoI_concentration_Sal': hp.uniform('topoI_concentration_Sal', topoI_C_min, topoI_C_max),
+    'gyrase_concentration_Sal': hp.uniform('gyrase_concentration_Sal', gyrase_C_min, gyrase_C_max),
+
+    # topoisomerases - Ecoli
+    'topoI_concentration_Ecoli': hp.uniform('topoI_concentration_Ecoli', topoI_C_min, topoI_C_max),
+    'gyrase_concentration_Ecoli': hp.uniform('gyrase_concentration_Ecoli', gyrase_C_min, gyrase_C_max),
+
+    'a_dtopA': hp.uniform('a_dtopA', a_dtopA_min, a_dtopA_max),
 
     # PleuWT
     'PleuWT_k_on': hp.uniform('PleuWT_k_on', k_on_min, k_on_max),
@@ -209,7 +246,10 @@ else:
     min_sites_file = 'sites_min-linear_v2.csv'
     complete_sites_file = 'sites_complete-linear_v2.csv'
 enzymes_filename = None
-environment_filename = 'environment_v2.csv'
+if RNAP_Tracking: # Use the environment in which topo I follow RNAPs...
+    environment_filename = 'environment_v2_tracking.csv'
+else:
+    environment_filename = 'environment_v2.csv'
 output_prefix = 'TORC_plasmid'
 series = True
 continuation = False
@@ -223,7 +263,6 @@ frames = len(time)
 # ----------------------------------------------------------------------------------------------------------------------
 # Let's build our reference or info file
 reference_pd = pd.read_csv(ref_file)
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -278,20 +317,33 @@ def objective_function(params, calibrating=True):
     bla_variation['binding_oparams']['superhelical_op'] = params['bla_superhelical_op']
     bla_variation['binding_oparams']['spread'] = params['bla_spread']
 
+    # Topoisomerase variations - Salmonella
     # topoI - Environment
-    topoI_variation = variation_dict['topoI']
-    topoI_variation['concentration'] = params['topoI_concentration']
-
+    topoI_variation_Sal = variation_dict['topoI']
+    topoI_variation_Sal['concentration'] = params['topoI_concentration_Sal']
 
     # gyrase - Environment
-    gyrase_variation = variation_dict['gyrase']
-    gyrase_variation['concentration'] = params['gyrase_concentration']
+    gyrase_variation_Sal = variation_dict['gyrase']
+    gyrase_variation_Sal['concentration'] = params['gyrase_concentration_Sal']
+
+    # Topoisomerase variations - Ecoli
+    # topoI - Environment
+    topoI_variation_Ecoli = variation_dict['topoI']
+    topoI_variation_Ecoli['concentration'] = params['topoI_concentration_Ecoli']
+
+    # gyrase - Environment
+    gyrase_variation_Ecoli = variation_dict['gyrase']
+    gyrase_variation_Ecoli['concentration'] = params['gyrase_concentration_Ecoli']
+
 
     # Variations independant of calibration (params) - These variations will help us simulate different system
     # conditions
 
     # ΔtopA - environment
-    dtopA_variation = {'name': 'topoI', 'object_type': 'environmental', 'concentration': 0.0}
+    Ecoli_dtopA_variation = {'name': 'topoI', 'object_type': 'environmental',
+                             'concentration': params['topoI_concentration_Ecoli']*params['a_dtopA']}
+    Sal_dtopA_variation = {'name': 'topoI', 'object_type': 'environmental',
+                           'concentration': params['topoI_concentration_Sal']*params['a_dtopA']}
 
     # lacI - environment
     dlacI_variation = {'name': 'lacI', 'object_type': 'environmental', 'concentration': 0.0}
@@ -330,7 +382,8 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation ]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
+                    topoI_variation_Ecoli, gyrase_variation_Ecoli ]
 
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') & (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'WT'), 'relative'].to_numpy()
     ref_std_value = None
@@ -340,7 +393,8 @@ def objective_function(params, calibrating=True):
                  'bacterium': 'EColi', 'promoter': 'min', 'strain': 'WT',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
+    if promoter_selection != 'full':
+        info_list.append(info_dict)
 
     # 1.2.- E. Coli, Complete, WT:
     # ------------------------------------------------------------------------------------------------------------------
@@ -349,13 +403,15 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
+                    topoI_variation_Ecoli, gyrase_variation_Ecoli]
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') & (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'WT'), 'relative'].to_numpy()
     info_dict = {'name': 'EColi_full_WT', 'description': ' E. Coli, Complete promoter, WT background',
                  'bacterium': 'EColi', 'promoter': 'full', 'strain': 'WT',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
+    if promoter_selection == 'full' or promoter_selection == 'both':
+        info_list.append(info_dict)
 
     # 2.1.- E. Coli, Minimum, ΔtopA (gyrase and lacI):
     # ------------------------------------------------------------------------------------------------------------------
@@ -364,7 +420,8 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, dtopA_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
+                    Ecoli_dtopA_variation, gyrase_variation_Ecoli]
 
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') &
                        (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'ΔtopA::cat'), 'relative'].to_numpy()
@@ -372,7 +429,8 @@ def objective_function(params, calibrating=True):
                  'bacterium': 'EColi', 'promoter': 'min', 'strain': 'ΔtopA',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
+    if promoter_selection != 'full':
+        info_list.append(info_dict)
 
     # 2.2.- E. Coli, Complete, ΔtopA:
     # ------------------------------------------------------------------------------------------------------------------
@@ -381,14 +439,16 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, dtopA_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, Ecoli_dtopA_variation,
+                    gyrase_variation_Ecoli]
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') &
                        (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'ΔtopA::cat'), 'relative'].to_numpy()
     info_dict = {'name': 'EColi_full_dtopA', 'description': ' E. Coli, Complete promoter, ΔtopA background',
                  'bacterium': 'EColi', 'promoter': 'full', 'strain': 'ΔtopA',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
+    if promoter_selection == 'full' or promoter_selection == 'both':
+        info_list.append(info_dict)
 
     # 3.1.- E. Coli, Minimum, ΔtopA-ΔlacI (gyrase):
     # ------------------------------------------------------------------------------------------------------------------
@@ -397,7 +457,8 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation, dtopA_variation, dlacI_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
+                    Ecoli_dtopA_variation, dlacI_variation, gyrase_variation_Ecoli]
 
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') &
                        (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'ΔlacIZYA::FRT\nΔtopA::cat'), 'relative'].to_numpy()
@@ -405,7 +466,8 @@ def objective_function(params, calibrating=True):
                  'bacterium': 'EColi', 'promoter': 'min', 'strain': 'ΔtopA-ΔlacI',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
+    if promoter_selection != 'full':
+        info_list.append(info_dict)
 
     # 3.2.- E. Coli, Complete, ΔtopA-ΔlacI:
     # ------------------------------------------------------------------------------------------------------------------
@@ -414,14 +476,16 @@ def objective_function(params, calibrating=True):
                        'output_prefix': output_prefix, 'series': series, 'continuation': continuation,
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
-    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,  dtopA_variation, dlacI_variation]
+    my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
+                    Ecoli_dtopA_variation, dlacI_variation, gyrase_variation_Ecoli]
     ref_value = df.loc[(df['bacterium'] == 'Escherichia coli K12 MG1655') &
                        (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'ΔlacIZYA::FRT\nΔtopA::cat'), 'relative'].to_numpy()
     info_dict = {'name': 'EColi_full_dtopA-dlacI','description': ' E. Coli, Complete promoter, ΔtopA-ΔlacI background',
                  'bacterium': 'EColi', 'promoter': 'full', 'strain': 'ΔtopA-ΔlacI',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
+    if promoter_selection == 'full' or promoter_selection == 'both':
+        info_list.append(info_dict)
 
     # =================================================
     # =================================================
@@ -437,7 +501,7 @@ def objective_function(params, calibrating=True):
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
     my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
-                    topoI_variation, gyrase_variation, dlacI_variation]
+                    topoI_variation_Sal, gyrase_variation_Sal, dlacI_variation]
 
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'WT'), 'relative'].to_numpy()
@@ -445,7 +509,8 @@ def objective_function(params, calibrating=True):
                  'bacterium': 'Salmonella', 'promoter': 'min', 'strain': 'WT',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
+    if promoter_selection != 'full':
+        info_list.append(info_dict)
 
     # 4.2.- Salmonella, Complete, WT:
     # ------------------------------------------------------------------------------------------------------------------
@@ -455,14 +520,15 @@ def objective_function(params, calibrating=True):
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
     my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
-                    topoI_variation, gyrase_variation, dlacI_variation]
+                    topoI_variation_Sal, gyrase_variation_Sal, dlacI_variation]
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'WT'), 'relative'].to_numpy()
     info_dict = {'name': 'Sal_full_WT', 'description': 'Salmonella, Complete promoter, WT background',
                  'bacterium': 'Salmonella', 'promoter': 'full', 'strain': 'WT',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
+    if promoter_selection == 'full' or promoter_selection == 'both':
+        info_list.append(info_dict)
 
     # 5.1.- Salmonella, Minimum, ΔtopA (gyrase):
     # ------------------------------------------------------------------------------------------------------------------
@@ -472,7 +538,7 @@ def objective_function(params, calibrating=True):
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
     my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
-                    gyrase_variation, dlacI_variation, dtopA_variation]
+                    gyrase_variation_Sal, dlacI_variation, Sal_dtopA_variation]
 
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'ΔtopA::cat'), 'relative'].to_numpy()
@@ -481,7 +547,8 @@ def objective_function(params, calibrating=True):
                  'bacterium': 'Salmonella', 'promoter': 'min', 'strain': 'ΔtopA',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
+    if promoter_selection != 'full':
+        info_list.append(info_dict)
 
     # 5.2.- Salmonella, Complete, ΔtopA:
     # ------------------------------------------------------------------------------------------------------------------
@@ -491,14 +558,15 @@ def objective_function(params, calibrating=True):
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
     my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
-                    gyrase_variation, dlacI_variation, dtopA_variation]
+                    gyrase_variation_Sal, dlacI_variation, Sal_dtopA_variation]
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'ΔtopA::cat'), 'relative'].to_numpy()
     info_dict = {'name':'Sal_full_dtopA', 'description': 'Salmonella, Complete promoter, ΔtopA background',
                  'bacterium': 'Salmonella', 'promoter': 'full', 'strain': 'ΔtopA',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
+    if promoter_selection == 'full' or promoter_selection == 'both':
+        info_list.append(info_dict)
 
     # 6.- Sal ΔtopA-lacI (gyrase and lacI)
     # 6.1.- Salmonella, Minimum, ΔtopA-lacI (gyrase and lacI):
@@ -509,7 +577,7 @@ def objective_function(params, calibrating=True):
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
     my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
-                    gyrase_variation,  dtopA_variation]
+                    gyrase_variation_Sal,  Sal_dtopA_variation]
 
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1min mhYFP') & (df['strain'] == 'ΔSL1483::\nlacIMG1655-FRT\nΔtopA::cat'), 'relative'].to_numpy()
@@ -517,7 +585,8 @@ def objective_function(params, calibrating=True):
                  'bacterium': 'Salmonella', 'promoter': 'min', 'strain': 'ΔtopA-lacI',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
+    if promoter_selection != 'full':
+        info_list.append(info_dict)
 
     # 6.2.- Salmonella, Complete, WT:
     # ------------------------------------------------------------------------------------------------------------------
@@ -527,15 +596,15 @@ def objective_function(params, calibrating=True):
                        'frames': frames, 'dt': dt, 'n_simulations': n_simulations, 'initial_sigma': sigma0,
                        'DNA_concentration': 0.0}
     my_variation = [PleuWT_variation, tetA_variation, antitet_variation, bla_variation,
-                    gyrase_variation, dtopA_variation]
+                    gyrase_variation_Sal, Sal_dtopA_variation]
     ref_value = df.loc[(df['bacterium'] == 'Salmonella enterica Typhimurium SL1344') &
                        (df['promoter'] == 'PleuWT.1 mhYFP') & (df['strain'] == 'ΔSL1483::\nlacIMG1655-FRT\nΔtopA::cat'), 'relative'].to_numpy()
     info_dict = {'name':'Sal_full_dtopA-lacI', 'description': 'Salmonella, Complete promoter, ΔtopA-lacI background',
                  'bacterium': 'Salmonella', 'promoter': 'full', 'strain': 'ΔtopA-lacI',
                  'reference': ref_value, 'reference_std': ref_std_value, 'global_conditions': my_global_dict,
                  'variations': my_variation, 'transcripts': None, 'relative_rate': None}
-    info_list.append(info_dict)
-
+    if promoter_selection == 'full' or promoter_selection == 'both':
+        info_list.append(info_dict)
     # Note that it can be expanded to have multiple reporters (maybe if you treat it as a list)
     target_dict = {'reference_system': reference_system, 'reporter': reporter}
 

@@ -15,6 +15,7 @@ import numpy as np
 # ---------------------------------------------------------------------------------------------------------------------
 # PARAMETERS
 # ---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 
 # Physical constants
 # -----------------------------------------------------------
@@ -23,7 +24,7 @@ Temperature = 300  # K - temperature
 kBT_pN_nm = 4.1  # pN nm at T=300K
 kB_kcalmolK = 1.987204259 * .001  # 10**(-3) #Boltzman constant in kcal/(mol*K) units...
 # kB_kcalmolK = .593 #10**(-3) #Boltzman constant in kcal/(mol*K) units...
-dt = 1.0  # timestep (seconds)
+dt = 1.0  # Default timestep (seconds)
 bp_nm = .34  # nm - base-pair rise
 T_bp = 10.5  # Number of bp per helical turn
 w0 = 2.0 * np.pi / T_bp  # Relaxed twist density per bp (rad/bp)
@@ -79,6 +80,14 @@ topo_b_k_off = 0.5
 
 # GYRASE
 gyra_b_k_off = 0.5
+
+# Thresholds
+# ---------------------------------------------------------------------------------------------------------------------
+gene_RNAP_threshold = (60/12) * v0 # This quantity is used to define a threshold in the number of bound RNAPs to a gene.
+                                   # It takes the form: (60secs/ ntranscripts) * v0, which gives a distance that
+                                   # indicates the maximum number of RNAPs per gene section that can be bound.
+                                   # Example: 60/12 * 30 = 150 bp, that means that the threshold for number of bound
+                                   # RNAPs is gene_length/150; which for a gene_length=900 is 6.
 
 # ---------------------------------------------------------------------------------------------------------------------
 # BINDING MODEL PARAMETERS

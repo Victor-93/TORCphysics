@@ -12,14 +12,16 @@ percentage_threshold = .1
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
 dt = 1.0 #0.25
-file_out = 'loss-'+str(dt)
+file_out = 'loss-small-dist_'+str(dt)
 #param_out = 'avg_' # prefix for outputting averaged parameters to be used as model parametrization
-param_out = 'avgx2_' # prefix for outputting averaged parameters to be used as model parametrization
+param_out = 'avgx2_small-dist_' # prefix for outputting averaged parameters to be used as model parametrization
 
 #path = 'track-StagesStall/'
-path = 'track-StagesStall/avg02/'
+#path = 'track-StagesStall/avg02/'
+path = 'track-StagesStall/small_distance/'
 #loss_file = '-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'-values.csv'
-loss_file = '-calibration_avg-RNAPTracking_nsets_p2_small_dt'+str(dt)+'-values.csv'
+#loss_file = '-calibration_avg-RNAPTracking_nsets_p2_small_dt'+str(dt)+'-values.csv'
+loss_file = '-02-calibration_avg-RNAPTracking_nsets_p2_small_dt'+str(dt)+'-values.csv'
 
 enzyme_names = ['topoI', 'RNAP']
 
