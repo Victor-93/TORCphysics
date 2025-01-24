@@ -968,6 +968,41 @@ def single_case_RNAPTracking_calibration_nsets_2scheme_plus_RNAP(global_dict_lis
     my_objective = my_objective + RNAP_objective
     return my_objective, output_dict
 
+# It is like the function single_case_RNAPTracking_calibration_nsets_2scheme but adds to the objective function the
+# correlation between the RNAP KDE and the RNAP reference signal (from ChIP-Seq)
+def single_case_RNAPTracking_calibration_nsets_2scheme_plus_RNAP_odict(global_dict_list, variations_list,
+                                                                 reference_dict, target_dict):
+    my_objective, output_dict = single_case_RNAPTracking_calibration_nsets_2scheme(global_dict_list, variations_list,
+                                                                               reference_dict, target_dict)
+    RNAP_correlation = output_dict['results']['RNAP_correlation']
+    target_RNAP_CO = target_dict['target_RNAP_CO']
+    RNAP_objective = (target_RNAP_CO - RNAP_correlation) ** 2
+    my_objective = my_objective + RNAP_objective
+
+    # Define objective dict and fill it - it is the one that will be saved for trials
+    # -----------------------------------------------------------------------------------------
+    objective_dict = {}
+    objective_dict['status'] = 'ok'
+
+    # Overall data and used for calculating loss/objective
+    objective_dict['loss'] = my_objective
+    objective_dict['FE'] = output_dict['FE'][0]  # Fold enrichment of topoI
+    objective_dict['RNAP_correlation'] = output_dict['results']['RNAP_correlation']  # Correlation between RNAP and experimental RNAP
+    objective_dict['overall_correlation'] = output_dict['overall_correlation']  # Overall correlation between RNAP and topoI
+    # objective_dict['objective'] = my_objective  #
+
+    # Measures for plotting and analysis
+    objective_dict['kde_gene'] = output_dict['results']['kde_gene']
+    objective_dict['kde_system'] = output_dict['results']['kde_system']
+    objective_dict['FE_curve'] = output_dict['results']['FE_curve']
+    objective_dict['hist_dict'] = output_dict['results']['hists_dict']
+
+    # Additional
+    objective_dict['FE_vals'] = output_dict['results']['FE_val']
+    objective_dict['correlation_vals'] = output_dict['results']['correlation']  # Between sets (not overalls)
+
+    return objective_dict, output_dict
+
 def process_set(item_pool):
     #    n_set, n_subsets, Items_subset, n_inner_workers, processing_info_dict
     n_set = item_pool[0]

@@ -37,7 +37,8 @@ def calibrate_w_rate(info_list, target_dict, n_simulations, additional_results=F
 
         # Sites - get sites that are not bare DNA or EXT
         target_sites = [site.name for site in my_circuit.site_list if 'DNA' not in site.site_type and 'EXT' not in site.site_type]
-        target_genes = [site.name for site in my_circuit.site_list if site.site_type == 'gene' ]
+        # target_genes = [site.name for site in my_circuit.site_list if site.site_type == 'gene' ]
+        target_genes = [site.name for site in my_circuit.site_list if 'gene' in site.site_type ]
 
         # Define x-axes
         # x_system = tct.get_interpolated_x(1, my_circuit.size, x_spacing=20)
@@ -607,7 +608,8 @@ def KS_calibrate_dist_batches_lossdict(info_list, target_dict, n_simulations, n_
 
         # Sites - get sites that are not bare DNA or EXT
         target_sites = [site.name for site in my_circuit.site_list if 'DNA' not in site.site_type and 'EXT' not in site.site_type]
-        target_genes = [site.name for site in my_circuit.site_list if site.site_type == 'gene' ]
+        # target_genes = [site.name for site in my_circuit.site_list if site.site_type == 'gene' ]
+        target_genes = [site.name for site in my_circuit.site_list if 'gene' in site.site_type ]
 
         # Define x-axes
         # x_system = tct.get_interpolated_x(1, my_circuit.size, x_spacing=20)
