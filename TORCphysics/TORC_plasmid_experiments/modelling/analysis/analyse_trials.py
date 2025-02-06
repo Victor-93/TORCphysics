@@ -10,10 +10,10 @@ import seaborn as sns
 
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
-dir_source = '../optimization/'
+dir_source = '../optimization/third_strategy.2/'
 # Nuevos
-v_code = 'block-full-dist_op_TORC_plasmid_st3.2-01'
-#v_code = 'block-full-trackingON-dist_op_TORC_plasmid_st3.2-01'
+v_code = 'block-full-dist_op_TORC_plasmid_st3.2-02'
+v_code = 'block-full-trackingON-dist_op_TORC_plasmid_st3.2-02'
 
 # Viejos
 #v_code = 'block-dist_op_TORC_plasmid_v2-01'
@@ -89,7 +89,7 @@ index = next(i for i, item in enumerate(results) if item == dat)
 # Plot
 #-----------------------------------------------------------------------------------------------------------------------
 # Let's plot as we load
-fig, axs = plt.subplots(4, figsize=(width, 4*height), tight_layout=True)
+fig, axs = plt.subplots(5, figsize=(width, 5*height), tight_layout=True)
 
 # Loss
 # ----------------------------------------------------------------------------------------------------------------------
@@ -196,41 +196,41 @@ ax.set_xticklabels(keys, rotation=45, ha='right')
 ax.legend(loc='best')
 ax.grid(True)
 ax.set_ylim(0,2)
+
 # Production rates - Comparing with experiments
 # ----------------------------------------------------------------------------------------------------------------------
-# FOR SOME REASON, THERES NO TETA
-#ax = axs[4]
-#keys = [my_dict['name'] for my_dict in pkl_data]
-#colors=['yellow', 'blue', 'red', 'green', 'purple']
-#gene_names = ['PleuWT', 'tetA', 'antitet', 'bla']#, 'lacI']
+ax = axs[4]
+keys = [my_dict['name'] for my_dict in pkl_data]
+colors=['yellow', 'blue', 'red', 'green', 'purple']
+gene_names = ['PleuWT', 'tetA', 'antitet', 'bla']#, 'lacI']
 
 # Number of cases and keys
-#n_cases = len(gene_names) # because we have 2 measurements per case - experimental and simulation
-#n_keys = len(keys)
+n_cases = len(gene_names) # because we have 2 measurements per case - experimental and simulation
+n_keys = len(keys)
 
 # Set up the positions for each bar group (x-axis)
-#x = np.arange(n_keys)  # Position of each group on the x-axis
-#bwidth = .8 / n_cases  # Dynamically calculate the width of each bar
+x = np.arange(n_keys)  # Position of each group on the x-axis
+bwidth = .8 / n_cases  # Dynamically calculate the width of each bar
 
-#labels = gene_names
+labels = gene_names
 # Plot each case in the list
-#for i, name in enumerate(gene_names):
+for i, name in enumerate(gene_names):
 
-#    mean = [my_dict['production_rate'][name][0] for my_dict in pkl_data] # mean
-#    std = [my_dict['production_rate'][name][1] for my_dict in pkl_data] # std
+    mean = [my_dict['production_rate'][name][0] for my_dict in pkl_data] # mean
+    std = [my_dict['production_rate'][name][1] for my_dict in pkl_data] # std
 
-#    print(name)
-#    ax.bar(x + i * bwidth - bwidth * (n_cases - 1) / 2, mean, bwidth, yerr=std, label=labels[i], color=colors[i], alpha=0.7)
+    print(name)
+    ax.bar(x + i * bwidth - bwidth * (n_cases - 1) / 2, mean, bwidth, yerr=std, label=labels[i], color=colors[i], alpha=0.7)
 
 
 # Add labels, title, and custom ticks
-#ax.set_xlabel('System')
-#ax.set_ylabel(r'Production rate ($s^{-1}$)')
-#ax.set_title('TORC Plasmid')
-#ax.set_xticks(x)
-#ax.set_xticklabels(keys, rotation=45, ha='right')
-#ax.legend(loc='best')
-#ax.grid(True)
+ax.set_xlabel('System')
+ax.set_ylabel(r'Production rate ($s^{-1}$)')
+ax.set_title('TORC Plasmid')
+ax.set_xticks(x)
+ax.set_xticklabels(keys, rotation=45, ha='right')
+ax.legend(loc='best')
+ax.grid(True)
 
 #plt.savefig(out_file+'.png')
 #plt.savefig(out_file+'.pdf')

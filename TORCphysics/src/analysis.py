@@ -27,6 +27,19 @@ def build_signal_by_type(sites_df, my_type):
         names.append(name)
     return signals, names
 
+# Build signals by site/enzyme name. Returns the signal
+def build_signal_by_name(my_df, my_name):
+    frames = my_df['frame'].max()+1
+    mask = my_df['name'] == my_name
+    my_df = my_df[mask]
+    df_names = my_df.drop_duplicates(subset='frame')#['name']
+    x = np.zeros(frames, dtype=int)
+    signal_frames = my_df['frame'].to_numpy()
+    for f in signal_frames:
+        x[int(f)] = 1
+    signal = x
+    return signal
+
 
 # Build all signals in input sites_df. Returns list of signals and list of names
 def build_signals(sites_df):
@@ -40,6 +53,25 @@ def build_signals(sites_df):
         names.append(name)
     return signals, names
 
+# Using enzymes_df, builds the elongation (transcription) signals given a model using the stages.
+# Using this method requires to provide a list of gene names
+# It returns a list with each signal, where each entry correspond to the same order in which they were given in
+# gene_names.
+def build_elongation_signal_stages(enzymes_df, gene_names):
+
+    signals = []
+    frames = enzymes_df['frame'].max()+1
+    for name in gene_names:
+        x = np.zeros(frames, dtype=int)
+        mask1 = enzymes_df['site'] == name  # Let's filter the rows with our gene mae
+        df1 = enzymes_df[mask1]
+        mask2 = df1['name'] == 'RNAP_Elongation'
+        df2 = df1[mask2]
+        elongation_frames = df2['frame'].to_numpy()
+        for f in elongation_frames:
+            x[int(f)] = 1
+        signals.append(x)
+    return signals
 
 # This one computes the cross-correlation hyper-matrix.
 # Input: You give it a list of signals (each entry is one signal) that you want to calculate the cross-correlation, and

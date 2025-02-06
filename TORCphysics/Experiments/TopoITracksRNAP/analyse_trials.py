@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 import pickle
 import matplotlib.patches as mpatches
 import pandas as pd
+import seaborn as sns
+import sys
 
 # Description
 # --------------------------------------------------------------
 # Following the calibration process by executing calibrate_tracking_nsets_p2.py for both the stalling and uniform
 # models, here I plot their results
-
-# TODO: You have to find a way to figure out the averaged values of rates.
 
 # Simulation conditions
 # --------------------------------------------------------------
@@ -20,6 +20,7 @@ initial_time = 0
 final_time = 200 # 500
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
+percentage_threshold = .005
 
 # Inputs
 # --------------------------------------------------------------
@@ -29,8 +30,13 @@ pickle_files = [
     #'track-StagesStall/avg02/calibration_avg-RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
 #    'track-StagesStall/avg02/avgx2-reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
     #'track-StagesStall/small_distance/02-calibration_avg-RNAPTracking_nsets_p2_small_dt' + str(dt) + '.pkl'
-    'track-StagesStall/test-borrar-trials'+'.pkl'
+#    'track-StagesStall/test-borrar-trials'+'.pkl'
+    [f'track-StagesStall/trials_bigdist/0{i}-calibration_avg-RNAPTracking_nsets_p2_small_dt1.0-trials.pkl' for i in range(1, 5)],
+    [f'track-StagesStall/trials_smalldist/0{i}-calibration_avg-RNAPTracking_nsets_p2_small_dt1.0_smalldist-trials.pkl' for i in range(1, 5)]
 ]
+
+system_labels = ['bid_dist', 'small_dist']
+
 param_file = 'avgx2_small-dist_table_dt1.0.csv'
 
 output_prefix = 'RNAPStages-topoIRNAPtracking_v2_wrates'
@@ -91,44 +97,148 @@ x_gene = tct.get_interpolated_x(target_gene.start - RNAP_env.size, target_gene.e
 # Let's plot
 # ---------------------------------------------------------
 ncases = len(pickle_files)
-fig, axs = plt.subplots(ncases+1, figsize=(width, 2*height), tight_layout=True)
+fig, axs = plt.subplots(6,ncases, figsize=(ncases*width, 6*height), tight_layout=True)
 outside_label = ['a)', 'b)', 'c)', 'd)', 'e)', 'f)']
+
+
 
 x1 = 3500
 x0 = 2500#-30
-h = [2.3]
+h = [2.3, 1.7]
 dx = x1 - x0
 gene_colour = 'gray'
 gene_lw=3
 
-#ylims = [[.67,1.5], [.67,1.8]]
-ylims = [[.75,1.8]]
+ylims = [[.7,2.5], [.67,1.8]]
+#ylims = [[.75,1.8]]
 #ylims = [[.0,1]]
 mylabels = ['RNAP', 'Topoisomerase I', 'Gyrase']
 
-for n, pickle_file in enumerate(pickle_files):
+for k, pfiles in enumerate(pickle_files):
+
+
+    # Load data and process losses according threshold
+    # ---------------------------------------------------------
+    trials_data = []
+    for pfile in pfiles:
+        with open(pfile, 'rb') as file:
+            trials_data.extend( pickle.load(file))
+
+    results_data = []
+    for pfile in pfiles:
+        with open(pfile, 'rb') as file:
+            results_data.extend( pickle.load(file).results)
+
+    # Loss distributions and filtered percentage
+    # ---------------------------------------------------------
+    # Let's sort the losses
+    results = results_data
+
+    loss_df = pd.DataFrame({'loss': [t['loss'] for t in results]})
+
+    loss_df = loss_df.sort_values(by='loss', ascending=False)  # , inplace=True)
+
+    n = len(loss_df['loss'])
+    nconsidered = int(n * percentage_threshold)
+    err_threshold = loss_df['loss'].iloc[-nconsidered]
+    print('Number of tests', n)
+    print('Considered', nconsidered)
+    print('For ', percentage_threshold * 100, '%')
+    # Filter according error
+    filtered_df = loss_df[loss_df['loss'] <= err_threshold]
+
+    # Set with minimum loss
+    dat = min(results, key=lambda x: x['loss'])
+
+    # Let's filter the range of values that give the best result
+    filtered_trials = [trial for trial in trials_data if trial['result']['loss'] <= err_threshold] # This contains all info
+    # Now, the dict with the actual parametrisation from the random search
+    filtered_oparams_dict = [
+        {key: val[0] for key, val in trial['misc']['vals'].items()}
+        for trial in filtered_trials
+    ]
+
+    # filtered_oparams_dict = [trial['misc']['vals'] for trial in filtered_trials]
+    filtered_oparams_df = pd.DataFrame(filtered_oparams_dict)  # And make it a dataframe
+
+    # And the best trial
+    best_trial = min(filtered_trials, key=lambda x: x['result']['loss'])
+
+    # Loss distributions and filtered percentage
+    # ---------------------------------------------------------
+    ax = axs[0,k]
+    ax.set_title('Loss distribution ' + system_labels[k])
+
+    sns.violinplot(data=loss_df, ax=ax, inner="quart")  # , cut=0, color=colors[i])
+ #   ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+    ax.set_ylabel('Loss')
+    ax.grid(True)
+
+    ax.set_ylim([0,4])
+    #ax.set_yscale('log')
+
+    # Filtered loss distribution
+    # ----------------------------------------------------------------------------------------------------------------------
+    ax = axs[1,k]
+    ax.set_title('Filtered loss for ' + system_labels[k])
+
+    sns.violinplot(data=filtered_df, ax=ax, inner="quart")  # , cut=0, color=colors[i])
+#    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+    ax.set_ylabel('Loss')
+    ax.grid(True)
+
+    # Histogram
+    # ----------------------------------------------------------------------------------------------------------------------
+    ax = axs[2,k]
+    loss = loss_df['loss'].to_numpy()
+    floss = filtered_df['loss'].to_numpy()
+
+    # Create a histogram
+    minv = min(loss)
+    maxv = np.mean(loss) + 1 * np.std(loss)
+    maxv = 0.075#.5  # max(loss)*.2
+    bins = np.linspace(minv, maxv, 100)  # Define bins
+    hist, bin_edges = np.histogram(loss, bins=bins)
+
+    # Plot the full histogram
+    ax.hist(loss, bins=bins, color='gray', alpha=0.6, label='Loss')
+
+    # Highlight bins corresponding to floss
+    for value in floss:
+        # Find the bin index for the current value
+        bin_index = np.digitize(value, bin_edges) - 1
+        # Plot the specific bin
+        ax.bar(
+            bin_edges[bin_index],  # Bin start
+            hist[bin_index],  # Bin height
+            width=bin_edges[1] - bin_edges[0],  # Bin width
+            color='red',  # Highlight color
+            alpha=0.8,
+            #        edgecolor='black',
+            label='Highlighted' if bin_index == np.digitize(floss[0], bin_edges) - 1 else ""
+        )
+    # ax.set_xlabel('test')
+    # ax.set_ylabel('loss')
+    #ax.set_xscale('log')
+    ax.grid(True)
+
+    # ----------------------------------------------------------------------------------------------------------------------
+    # Best result
+    # ----------------------------------------------------------------------------------------------------------------------
+    ax = axs[3,k]
 
     # Draw gene
     # ---------------------------------------------------------
-    arrow = mpatches.FancyArrowPatch((x0, h[n]), (x1, h[n]), arrowstyle='simple',
+    arrow = mpatches.FancyArrowPatch((x0, h[k]), (x1, h[k]), arrowstyle='simple',
                                      facecolor=gene_colour, zorder=5, edgecolor='black', lw=gene_lw,
                                      mutation_scale=40, shrinkA=0, shrinkB=0)
-    axs[0].add_patch(arrow)
+    ax.add_patch(arrow)
 
-    # Load the dictionary from the file
-    # ---------------------------------------------------------
-    with open(pickle_file, 'rb') as file:
-        #output = pickle.load(file)
-        data = pickle.load(file).results
-
-    # Filter data to include only entries with 'status' == 'ok'
-    data = [item for item in data if item['status'] == 'ok']
-
-    output = min(data, key=lambda x: x['loss']) # Select the one with the minimum loss
+    output = dat #min(data, key=lambda x: x['loss']) # Select the one with the minimum loss
 
     for p, name in enumerate(names):
 
-        ax = axs[0]
+        ax = axs[3, k]
 
         # Different process for RNAP or topos
         if name == 'RNAP':
@@ -158,15 +268,15 @@ for n, pickle_file in enumerate(pickle_files):
     ax.set_xlabel(r'Position (bp)', fontsize=xlabel_size)
     ax.set_xlim(0, my_circuit.size)
     ax.grid(True)
-    yl = ylims[n]
+    yl = ylims[k]
     ax.set_ylim(yl[0],yl[1])
     ax.set_xlim(0, my_circuit.size)
-    ax.set_title(title[n], fontsize=title_size)
+    #ax.set_title(title[n], fontsize=title_size)
     ax2.tick_params(axis='y', labelcolor=colors_dict['RNAP'])
     ax2.set_ylim(0,1)
 
     # fig.suptitle(title[n], fontsize=title_size)
-    if n == 0:
+    if k == 0:
         # Combine the legends from both axes
         lines, labels = ax.get_legend_handles_labels()
         lines2, labels2 = ax2.get_legend_handles_labels()
@@ -195,7 +305,7 @@ for n, pickle_file in enumerate(pickle_files):
     props = dict(boxstyle='round', facecolor='silver', alpha=0.5)
     ax.text(0.63, .93, textstr, transform=ax.transAxes, fontsize=font_size*.95,
             verticalalignment='top', bbox=props)
-    print('For ', title[n])
+#    print('For ', title[n])
     print('FE',FE)
     print('CO',CO)
     print('objective', output['loss'])
@@ -208,49 +318,111 @@ for n, pickle_file in enumerate(pickle_files):
     ax.text(-0.1, 1.1, outside_label[0], transform=ax.transAxes,
             fontsize=font_size*1.5, fontweight='bold', va='center', ha='center')
 
+    # ----------------------------------------------------------------------------------------------------------------------
+    # Values - best set
+    # ----------------------------------------------------------------------------------------------------------------------
+    ax = axs[4,k]
+    ax.set_title('Best set vals')
 
-# Rates
-ax = axs[1]
-case_dict = pd.read_csv(param_file)
-nokeys = ['RNAP_dist', 'fold_change', 'gamma']
+    case_dict = filtered_oparams_df #pd.read_csv(param_file)
+    case_dict['RNAP_dist'] = case_dict['RNAP_dist'].apply(lambda x: x/1000)
+    case_dict['fold_change'] = case_dict['fold_change'].apply(lambda x: x / 100)
+    mean_vals = case_dict.mean(axis=0)
+    std_vals = case_dict.std(axis=0)
 
-# Remove the keys from all dictionaries in the list
-#for case_dict in responses:
-for key in nokeys:
-    if key in case_dict:
-        del case_dict[key]
+    # Overalls
+    ov_df = pd.concat([mean_vals, std_vals], axis=1)
 
-keys = list(case_dict.keys())
+    print('mean vals:', ov_df)
+#    case_dict['RNAP_dist'] =case_dict['RNAP']/100.0
+ #   nokeys = ['RNAP_dist', 'fold_change', 'gamma']
 
-# Number of cases and keys
-n_cases = 1
-n_keys = len(keys)
+    # Remove the keys from all dictionaries in the list
+#    for key in nokeys:
+#        if key in case_dict:
+#            del case_dict[key]
 
-# Set up the positions for each bar group (x-axis)
-x = np.arange(n_keys)  # Position of each group on the x-axis
-width = 0.8 / n_cases  # Dynamically calculate the width of each bar
+    keys = list(case_dict.keys())
 
-keys = ['k_on', 'k_off', 'k_open', 'k_closed', 'k_ini']
+    # Number of cases and keys
+    n_cases = 1
+    n_keys = len(keys)
 
-# Plot each case in the list
-values = np.array([case_dict[key] for key in keys])  # Get values for the current case
-ax.bar(x +  width / 2, values[:,0], width, yerr=values[:,1], color='purple')
+    # Set up the positions for each bar group (x-axis)
+    x = np.arange(n_keys)  # Position of each group on the x-axis
+    width = 0.8 / n_cases  # Dynamically calculate the width of each bar
 
-# Add labels, title, and custom ticks
-ax.set_xlabel('Rate Type', fontsize=xlabel_size)
-ax.set_ylabel(r'Rate ($s^{-1}$)', fontsize=xlabel_size)
-ax.set_title('Transition Rates', fontsize=title_size)
-ax.set_xticks(x)
-ax.set_xticklabels(keys)
-ax.grid(True)
+#    keys = ['spacer_kon', 'k_off', 'k_open', 'k_closed', 'k_ini']
 
-# Add label outside the plot
-ax.text(-0.1, 1.1, outside_label[1], transform=ax.transAxes,
-        fontsize=font_size * 1.5, fontweight='bold', va='center', ha='center')
+    # Plot each case in the list
+    values_m = np.array([mean_vals[key] for key in keys])  # Get values for the current case
+    values_s = np.array([std_vals[key] for key in keys])  # Get values for the current case
+    ax.bar(x +  width / 2, values_m, width, yerr=values_s, color='purple')
 
-#axs[2,1].text(-0.1, 1.1, outside_label[5], transform=axs[2,1].transAxes,
-#        fontsize=font_size*1.5, fontweight='bold', va='center', ha='center')
+    # Add labels, title, and custom ticks
+    ax.set_xlabel('Rate Type', fontsize=xlabel_size)
+    ax.set_ylabel(r'Rate ($s^{-1}$)', fontsize=xlabel_size)
+    ax.set_title('Transition Rates - Best set', fontsize=title_size)
+    ax.set_xticks(x)
+    ax.set_xticklabels(keys)
+    ax.grid(True)
 
+    # Add label outside the plot
+    ax.text(-0.1, 1.1, outside_label[1], transform=ax.transAxes,
+            fontsize=font_size * 1.5, fontweight='bold', va='center', ha='center')
+
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="center")
+
+    #axs[2,1].text(-0.1, 1.1, outside_label[5], transform=axs[2,1].transAxes,
+    #        fontsize=font_size*1.5, fontweight='bold', va='center', ha='center')
+
+    # ----------------------------------------------------------------------------------------------------------------------
+    # Values - best trial
+    # ----------------------------------------------------------------------------------------------------------------------
+    ax = axs[5,k]
+    ax.set_title('Best set vals')
+
+    #case_dict = [
+    #    {key: val[0] for key, val in [best_trial].items()}
+    #
+    #for trial in [best_trial]
+   # ]
+    case_dict = best_trial['misc']['vals']
+
+    for val in case_dict:
+        case_dict[val] = case_dict[val][0]
+        if 'RNAP_dist' in val:
+            case_dict[val] = case_dict[val]/1000
+        if 'fold_change' in val:
+            case_dict[val] = case_dict[val]/100
+
+    keys = list(case_dict.keys())
+
+    # Number of cases and keys
+    n_cases = 1
+    n_keys = len(keys)
+
+    # Set up the positions for each bar group (x-axis)
+    x = np.arange(n_keys)  # Position of each group on the x-axis
+    width = 0.8 / n_cases  # Dynamically calculate the width of each bar
+
+    # Plot each case in the list
+    values = np.array([case_dict[key] for key in keys])  # Get values for the current case
+    ax.bar(x +  width / 2, values, width, color='red')
+
+    # Add labels, title, and custom ticks
+    ax.set_xlabel('Rate Type', fontsize=xlabel_size)
+    ax.set_ylabel(r'Rate ($s^{-1}$)', fontsize=xlabel_size)
+    ax.set_title('Transition Rates - Best case', fontsize=title_size)
+    ax.set_xticks(x)
+    ax.set_xticklabels(keys)
+    ax.grid(True)
+
+    # Add label outside the plot
+    ax.text(-0.1, 1.1, outside_label[1], transform=ax.transAxes,
+            fontsize=font_size * 1.5, fontweight='bold', va='center', ha='center')
+
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="center")
 
 #plt.savefig(output_prefix+'-FE.png')
 #plt.savefig(output_prefix+'-FE.pdf')

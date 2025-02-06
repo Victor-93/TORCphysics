@@ -5,10 +5,12 @@ import numpy as np
 # Description
 #-----------------------------------------------------------------------------------------------------------------------
 # Let's plot the losses
-# TODO: Keep working on it
 
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
+model_code='sus_GB-Stages-avgx2-02-'
+promoter_cases = ['weak', 'medium', 'strong']
+pcase = promoter_cases[2]
 percentage_threshold = 0.005#.10
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
@@ -17,14 +19,11 @@ initial_time = 0
 final_time = 500
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'TORCMeeting-Topos-loss-'+str(dt)
-#file_out = 'loss-'+str(dt)
-#file_out = 'calibration_small_dt1'
+file_out = 'TORCMeeting-genearch-loss-'+str(dt)
 
-loss_file = 'recognition-linear/calibration_dt'+str(dt)+'_values.csv'
+loss_file='susceptibility/' + model_code + pcase + '_dt' + str(dt) + '-values.csv'
 
-#title = 'Topoisomerase optimization for dt='+str(dt) + ' and '+str(int(percentage_threshold*100))+'% of best cases'
-title = 'Topoisomerase calibration'
+title = 'Gene architecture calibration V2 ' + pcase + ' promoter'
 
 # Plotting params
 #-----------------------------------------------------------------------------------------------------------------------
@@ -45,6 +44,8 @@ ax = axs
 
 df = pd.read_csv(loss_file)
 df = df.sort_values(by='loss', ascending=False)#, inplace=True)
+df.replace([np.inf, -np.inf], np.nan, inplace=True)
+df = df.dropna()
 n = len(df['loss'])
 nconsidered = int(n*percentage_threshold)
 err_threshold = df['loss'].iloc[-nconsidered]
@@ -59,7 +60,7 @@ ax.set_title(title)
 # Create a histogram
 minv = min(loss)
 maxv = np.mean(loss) + 1*np.std(loss)
-maxv = .5#max(loss)*.2
+maxv = 1.#max(loss)*.5
 bins = np.linspace(minv, maxv, 100)  # Define bins
 hist, bin_edges = np.histogram(loss, bins=bins)
 

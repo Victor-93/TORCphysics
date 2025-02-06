@@ -11,8 +11,11 @@ import seaborn as sns
 
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
-dir_source = '../optimization/'
+#dir_source = '../optimization/'
+dir_source = '../optimization/third_strategy.2/'
 v_code = 'block-full-dist_op_TORC_plasmid_st3.2-01'
+#v_code = 'block-full-trackingON-dist_op_TORC_plasmid_st3.2-02'
+
 #v_code = 'block-full-trackingON-dist_op_TORC_plasmid_st3.2-01'
 #v_code = 'block-op_TORC_plasmid'
 #v_code = 'block-rep-TORC_plasmid'
@@ -52,14 +55,15 @@ with open(pkl_file, 'rb') as file:
 # Plot
 #-----------------------------------------------------------------------------------------------------------------------
 # Let's plot as we do the process
-fig, axs = plt.subplots(1, figsize=(width, 1*height), tight_layout=True, sharex=True)
+fig, axs = plt.subplots(2, figsize=(width, 2*height), tight_layout=True, sharex=True)
 
-ax = axs
+ax = axs[0]
 ax.set_title('Version '+ v_code)
 
 my_dict = {}
 for system in pkl_data:
     name = system['name']
+    print(name)
 #    g = []
 #    frames = len(system['global_superhelical'][0,:]) # How ma
 
@@ -76,6 +80,31 @@ ax.set_ylabel('Global superhelical density')
 ax.grid(True)
 ax.set_ylim(-.11, -.0)
 
+
+# Local superhelical at PleuWT
+# ----------------------------------------------------------------------------------------------------------------------
+ax = axs[1]
+my_dict = {}
+for system in pkl_data:
+    name = system['name']
+#    g = []
+#    frames = len(system['global_superhelical'][0,:]) # How ma
+
+#    for n in range(n_simulations):
+#        g.append(system['global_superhelical'][n,int(frames/2):]) # Only the last half
+#    my_dict[name] = np.array(g).flatten()
+    my_dict[name] = system['local_superhelical']['PleuWT'].flatten()
+
+local_superhelical_df = pd.DataFrame.from_dict(my_dict)
+
+sns.violinplot(data=local_superhelical_df, ax=ax, inner="quart")#, cut=0, color=colors[i])
+ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+ax.set_ylabel('Local superhelical density at PleuWT')
+ax.grid(True)
+ax.set_ylim(-.2, .1)
+
+#plt.savefig(out_file+'.png')
+#plt.savefig(out_file+'.pdf')
 plt.show()
 
 
