@@ -3,8 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 #sys_name = 'Ecoli'
-sys_name = 'Sal_noRNAPs'
-sys_name = 'no_topos'
+#sys_name = 'Sal_noRNAPs'
+#sys_name = 'no_topos'
+sys_name='minimum_Sal'
 #inputfile = 'torc_min_minimum_Ecoli_sites_df.csv'
 #inputfile = 'torc_min_minimum_Sal_sites_df.csv'
 #inputfile = 'torc_min_minimum_'+sys_name+'_sites_df.csv'

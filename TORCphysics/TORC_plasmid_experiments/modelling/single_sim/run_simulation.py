@@ -26,8 +26,8 @@ continuation = False
 circuit_filename = '../circuit_min-linear.csv'
 sites_filename = 'disp-sites_min-linear.csv'
 #output_prefix = 'minimum_Ecoli'
-#output_prefix = 'minimum_Sal'
-output_prefix = 'no_topos'
+output_prefix = 'minimum_Sal'
+#output_prefix = 'no_topos'
 
 # Complete system conditions - Choose for the complete promoter
 #circuit_filename = '../circuit_complete-linear.csv'
@@ -36,8 +36,8 @@ output_prefix = 'no_topos'
 
 # Environmentals
 #environment_filename = 'Ecoli_environment.csv' # For Ecoli
-#environment_filename = 'Salmonella_environment.csv' # For Salmonella
-environment_filename = 'no_topos_environment.csv'
+environment_filename = 'Salmonella_environment.csv' # For Salmonella
+#environment_filename = 'no_topos_environment.csv'
 
 # Simulation
 # ----------------------------------------------------------------------------------------------------------------------

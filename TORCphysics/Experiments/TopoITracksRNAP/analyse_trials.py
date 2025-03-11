@@ -31,11 +31,12 @@ pickle_files = [
 #    'track-StagesStall/avg02/avgx2-reproduce-calibration_RNAPTracking_nsets_p2_small_dt'+str(dt)+'.pkl'
     #'track-StagesStall/small_distance/02-calibration_avg-RNAPTracking_nsets_p2_small_dt' + str(dt) + '.pkl'
 #    'track-StagesStall/test-borrar-trials'+'.pkl'
+    [f'track-StagesStall/trials_bigdist_v2/0{i}-02-calibration_avg-RNAPTracking_nsets_p2_small_dt1.0-trials.pkl' for i in range(1, 3)],
     [f'track-StagesStall/trials_bigdist/0{i}-calibration_avg-RNAPTracking_nsets_p2_small_dt1.0-trials.pkl' for i in range(1, 5)],
     [f'track-StagesStall/trials_smalldist/0{i}-calibration_avg-RNAPTracking_nsets_p2_small_dt1.0_smalldist-trials.pkl' for i in range(1, 5)]
 ]
 
-system_labels = ['bid_dist', 'small_dist']
+system_labels = ['bid_dist_v2', 'bid_dist', 'small_dist']
 
 param_file = 'avgx2_small-dist_table_dt1.0.csv'
 
@@ -104,12 +105,12 @@ outside_label = ['a)', 'b)', 'c)', 'd)', 'e)', 'f)']
 
 x1 = 3500
 x0 = 2500#-30
-h = [2.3, 1.7]
+h = [2.3, 2.3, 1.7]
 dx = x1 - x0
 gene_colour = 'gray'
 gene_lw=3
 
-ylims = [[.7,2.5], [.67,1.8]]
+ylims = [[.7,2.5], [.7,2.5], [.67,1.8]]
 #ylims = [[.75,1.8]]
 #ylims = [[.0,1]]
 mylabels = ['RNAP', 'Topoisomerase I', 'Gyrase']

@@ -85,7 +85,7 @@ for i, ename in enumerate(enzyme_names):
 
 axs[0].legend(loc='best', fontsize=font_size)
 
-plt.savefig(out+'.png')
-plt.savefig(out+'.pdf')
-
+#plt.savefig(out+'.png')
+#plt.savefig(out+'.pdf')
+plt.show()
 

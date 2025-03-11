@@ -501,10 +501,9 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
 
 # This function uses matplotlib ArtistAnimation instead of FuncAnimation. It also uses predifined png files to
 # represent enzymes
-
-def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out_format,
-                                   site_type=None, site_colours=None):
-    output_file = output + out_format
+def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, environmental_df, output, out_format='mp4',
+                                   fps=30, site_type=None, site_colours=None):
+    output_file = output + '.' + out_format
     h = 1.5
     dh = 0.5
     gx = np.array([0, my_circuit.size])
@@ -623,9 +622,17 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out
             gene_names.append(site.name)
     max_mRNA = -1
     for name in gene_names:
-        mask = sites_df['name'] == name
-        gene_df = sites_df[mask]
-        n_mRNA = gene_df['unbinding'].sum()
+        # mask = sites_df['name'] == name
+        # gene_df = sites_df[mask]
+        # n_mRNA = gene_df['unbinding'].sum()
+
+        # Using environmental_df instead of sites
+        mask = environmental_df['name'] == name
+        gene_df = environmental_df[mask]
+        if len(gene_df) == 0:
+            continue
+        n_mRNA = gene_df['concentration'].iloc[-1]
+
         if n_mRNA > max_mRNA:
             max_mRNA = n_mRNA
 
@@ -694,9 +701,21 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out
                 continue
 
             # Calculate number of mRNA
-            mask = (sites_df['name'] == site.name) & (sites_df['frame'] <= k)
-            gene_df = sites_df[mask]
-            n_mRNA = gene_df['unbinding'].sum()
+
+            # Using sites_df
+            #mask = (sites_df['name'] == site.name) & (sites_df['frame'] <= k)
+            #gene_df = sites_df[mask]
+            #n_mRNA = gene_df['unbinding'].sum()
+
+            # Using environmental_df
+            mask = (environmental_df['name'] == site.name) & (environmental_df['frame']  == k )
+            gene_df = environmental_df[mask]
+
+            if len(gene_df) == 0:
+                n_mRNA = 0
+            else:
+                n_mRNA = gene_df['concentration'].iloc[-1]
+
 
             if n_mRNA < 1: continue # Skip if there are no mRNA yet
 
@@ -734,7 +753,7 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, output, out
 
     # Let's try to make it faster
     # Using 'ultrafast' preset for faster encoding
-    writervideo = animation.FFMpegWriter(fps=30, codec='libx264', extra_args=['-preset', 'ultrafast'])
+    writervideo = animation.FFMpegWriter(fps=fps, codec='libx264', extra_args=['-preset', 'ultrafast'])
     ani.save(output_file, writer=writervideo)
 
 
