@@ -502,7 +502,7 @@ def create_animation_linear(my_circuit, sites_df, enzymes_df, output, out_format
 # This function uses matplotlib ArtistAnimation instead of FuncAnimation. It also uses predifined png files to
 # represent enzymes
 def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, environmental_df, output, out_format='mp4',
-                                   fps=30, site_type=None, site_colours=None):
+                                   fps=30, site_type=None, site_colours=None, draw_containers=True):
     output_file = output + '.' + out_format
     h = 1.5
     dh = 0.5
@@ -562,18 +562,19 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, environment
     # -----------------------------------
     # Draw containers of mRNA
     # -----------------------------------
-    for i, site in enumerate(my_circuit.site_list):
-        if site.site_type == 'EXT':
-            continue
-        if site_type is not None and site.site_type != site_type:  # Only site types
-            continue
-        if 'DNA_' in site.site_type:  # I'm trying to avoid bare DNA binding sites
-            continue
+    if draw_containers:
+        for i, site in enumerate(my_circuit.site_list):
+            if site.site_type == 'EXT':
+                continue
+            if site_type is not None and site.site_type != site_type:  # Only site types
+                continue
+            if 'DNA_' in site.site_type:  # I'm trying to avoid bare DNA binding sites
+                continue
 
-        rectangle, lit1, lit2 = create_mRNA_container(my_circuit=my_circuit, site=site)
-        ax[0].add_patch(rectangle)
-        ax[0].add_patch(lit1)
-        ax[0].add_patch(lit2)
+            rectangle, lit1, lit2 = create_mRNA_container(my_circuit=my_circuit, site=site)
+            ax[0].add_patch(rectangle)
+            ax[0].add_patch(lit1)
+            ax[0].add_patch(lit2)
 
     # -----------------------------------
     # Draw enzyme labels
@@ -585,6 +586,8 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, environment
     soom = 0.1
     #aax = ax.flat[0]
     for environmental in my_circuit.environmental_list:
+        if 'mRNA' in environmental.enzyme_type:
+            continue
         print(environmental.name)
 
         # Load image
@@ -616,25 +619,26 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, environment
 
     # Calculate max number of transcripts:
     # -----------------------------------
-    gene_names = []
-    for i, site in enumerate(my_circuit.site_list):
-        if site.site_type == 'gene':
-            gene_names.append(site.name)
-    max_mRNA = -1
-    for name in gene_names:
-        # mask = sites_df['name'] == name
-        # gene_df = sites_df[mask]
-        # n_mRNA = gene_df['unbinding'].sum()
+    if draw_containers:
+        gene_names = []
+        for i, site in enumerate(my_circuit.site_list):
+            if site.site_type == 'gene':
+                gene_names.append(site.name)
+        max_mRNA = -1
+        for name in gene_names:
+            # mask = sites_df['name'] == name
+            # gene_df = sites_df[mask]
+            # n_mRNA = gene_df['unbinding'].sum()
 
-        # Using environmental_df instead of sites
-        mask = environmental_df['name'] == name
-        gene_df = environmental_df[mask]
-        if len(gene_df) == 0:
-            continue
-        n_mRNA = gene_df['concentration'].iloc[-1]
+            # Using environmental_df instead of sites
+            mask = environmental_df['name'] == name
+            gene_df = environmental_df[mask]
+            if len(gene_df) == 0:
+                continue
+            n_mRNA = gene_df['concentration'].iloc[-1]
 
-        if n_mRNA > max_mRNA:
-            max_mRNA = n_mRNA
+            if n_mRNA > max_mRNA:
+                max_mRNA = n_mRNA
 
     # Prepare df
     # -----------------------------------
@@ -691,45 +695,46 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, environment
 
         # Containers drawings
         # -----------------------------------------------------------------------------------------
-        container_drawings = []
-        for i, site in enumerate(my_circuit.site_list):
-            if site.site_type == 'EXT':
-                continue
-            if site_type is not None and site.site_type != site_type:  # Only site types
-                continue
-            if 'DNA_' in site.site_type:  # I'm trying to avoid bare DNA binding sites
-                continue
+        if draw_containers:
+            container_drawings = []
+            for i, site in enumerate(my_circuit.site_list):
+                if site.site_type == 'EXT':
+                    continue
+                if site_type is not None and site.site_type != site_type:  # Only site types
+                    continue
+                if 'DNA_' in site.site_type:  # I'm trying to avoid bare DNA binding sites
+                    continue
 
-            # Calculate number of mRNA
+                # Calculate number of mRNA
 
-            # Using sites_df
-            #mask = (sites_df['name'] == site.name) & (sites_df['frame'] <= k)
-            #gene_df = sites_df[mask]
-            #n_mRNA = gene_df['unbinding'].sum()
+                # Using sites_df
+                #mask = (sites_df['name'] == site.name) & (sites_df['frame'] <= k)
+                #gene_df = sites_df[mask]
+                #n_mRNA = gene_df['unbinding'].sum()
 
-            # Using environmental_df
-            mask = (environmental_df['name'] == site.name) & (environmental_df['frame']  == k )
-            gene_df = environmental_df[mask]
+                # Using environmental_df
+                mask = (environmental_df['name'] == site.name) & (environmental_df['frame']  == k )
+                gene_df = environmental_df[mask]
 
-            if len(gene_df) == 0:
-                n_mRNA = 0
-            else:
-                n_mRNA = gene_df['concentration'].iloc[-1]
+                if len(gene_df) == 0:
+                    n_mRNA = 0
+                else:
+                    n_mRNA = gene_df['concentration'].iloc[-1]
 
 
-            if n_mRNA < 1: continue # Skip if there are no mRNA yet
+                if n_mRNA < 1: continue # Skip if there are no mRNA yet
 
-            if site_colours is not None:
-                rectangle, lit1, lit2 = create_mRNA_container(my_circuit=my_circuit, site=site,
-                                                       site_color=site_colours[site.name],
-                                                       n_mRNA=n_mRNA, max_mRNA=max_mRNA)
-            else:
-                rectangle, lit1, lit2 = create_mRNA_container(my_circuit=my_circuit, site=site, site_color=gene_colour,
-                                                       n_mRNA=n_mRNA, max_mRNA=max_mRNA)
+                if site_colours is not None:
+                    rectangle, lit1, lit2 = create_mRNA_container(my_circuit=my_circuit, site=site,
+                                                           site_color=site_colours[site.name],
+                                                           n_mRNA=n_mRNA, max_mRNA=max_mRNA)
+                else:
+                    rectangle, lit1, lit2 = create_mRNA_container(my_circuit=my_circuit, site=site, site_color=gene_colour,
+                                                           n_mRNA=n_mRNA, max_mRNA=max_mRNA)
 
-            container_drawings.append(ax[0].add_patch(rectangle))
-            container_drawings.append(ax[0].add_patch(lit1))
-            container_drawings.append(ax[0].add_patch(lit2))
+                container_drawings.append(ax[0].add_patch(rectangle))
+                container_drawings.append(ax[0].add_patch(lit1))
+                container_drawings.append(ax[0].add_patch(lit2))
 
         # Time drawing
         # -----------------------------------------------------------------------------------------
@@ -739,7 +744,10 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, environment
 
         # Join all animations
         # -----------------------------------------------------------------------------------------
-        animation_frames.append(molecule_drawings + superhelical_drawings + container_drawings + [time_drawing])
+        if draw_containers:
+            animation_frames.append(molecule_drawings + superhelical_drawings + container_drawings + [time_drawing])
+        else:
+            animation_frames.append(molecule_drawings + superhelical_drawings +  [time_drawing])
 
     # ------------------------------------------------------------
     # ANIMATE

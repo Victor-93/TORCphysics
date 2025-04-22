@@ -21,7 +21,6 @@ outfile = 'define_new_loss'
 mean_weight = 1.0
 error_weight = 1.0#1#0.1#1.0
 
-
 # This list of dicts will include all the input information
 info_list = [
     # genearch_V0 - gamma 0.05
@@ -178,7 +177,6 @@ outfig = 'genearch_susceptibility'
 fig, axs = plt.subplots(nrows, ncols, figsize=(ncols*width, nrows*height),
 tight_layout=True, sharex=True, sharey=True)
 
-
 # Go through case - V0, V1, V2
 # ---------------------------------------------------
 s= -1
@@ -196,7 +194,7 @@ for i, case in enumerate(info_list):
         ax.set_title(figtitle, fontsize=title_size)  # color=colors[i],
 
         # Experimental susceptibility
-        exp = pd.read_csv(susceptibility_files[0])  # read
+        exp = pd.read_csv(susceptibility_files[j])  # read
         exp_x = exp['distance']
         exp_y = exp['Signal']
         exp_ys = exp['Error']

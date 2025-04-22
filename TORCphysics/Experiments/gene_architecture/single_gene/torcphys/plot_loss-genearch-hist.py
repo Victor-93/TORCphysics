@@ -8,10 +8,10 @@ import numpy as np
 
 # Inputs
 #-----------------------------------------------------------------------------------------------------------------------
-model_code='sus_GB-Stages-avgx2-02-'
+model_code='sus_GB-Stages-avgx2-01-'
 promoter_cases = ['weak', 'medium', 'strong']
 pcase = promoter_cases[2]
-percentage_threshold = 0.005#.10
+percentage_threshold = 0.001#.10
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
 dt = 1.0 #0.25
@@ -60,8 +60,8 @@ ax.set_title(title)
 # Create a histogram
 minv = min(loss)
 maxv = np.mean(loss) + 1*np.std(loss)
-maxv = 1.#max(loss)*.5
-bins = np.linspace(minv, maxv, 100)  # Define bins
+maxv = 0.5#1.#max(loss)*.5
+bins = np.linspace(minv, maxv, 200)  # Define bins
 hist, bin_edges = np.histogram(loss, bins=bins)
 
 # Plot the full histogram
@@ -88,5 +88,5 @@ ax.set_xlabel('loss')
 #ax.set_xscale('log')
 ax.grid(True)
 
-plt.savefig(file_out+'.png', dpi=300)
+#plt.savefig(file_out+'.png', dpi=300)
 plt.show()

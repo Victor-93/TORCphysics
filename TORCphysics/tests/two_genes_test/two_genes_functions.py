@@ -1,6 +1,7 @@
 from TORCphysics import Enzyme
 from TORCphysics import effect_model as em
 from TORCphysics import binding_model as bm
+from TORCphysics import models_workflow as mw
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -36,21 +37,36 @@ object_text = 10  # NAPs, genes, etc...
 
 
 def run_simulation_two_genes(my_circuit, add_time):
+#    RNAP1 = Enzyme(e_type='RNAP', name='test1', site=site_list1[0], size=100, effective_size=50, position=30,
+#                     twist=0.0, superhelical=0.0, effect_model=RNAPUniform_default)
+
+    gene_list = [site for site in my_circuit.site_list if site.site_type == 'gene']
+
+
     RNAP1 = Enzyme(e_type=my_circuit.environmental_list[-1].enzyme_type,
-                   name=my_circuit.environmental_list[-1].name, site=my_circuit.site_list[1],
-                   position=my_circuit.site_list[1].start,
-                   size=my_circuit.environmental_list[-1].size, twist=0.0, superhelical=0.0, k_cat=0.0, k_off=0.0)
+                   name=my_circuit.environmental_list[-1].name, site=gene_list[0],
+                   position=gene_list[0].start,
+                   size=my_circuit.environmental_list[-1].size, effective_size=my_circuit.environmental_list[-1].effective_size,
+                   effect_model=my_circuit.environmental_list[-1].effect_model,
+                   unbinding_model=my_circuit.environmental_list[-1].unbinding_model,
+                   twist=0.0, superhelical=0.0)
 
     RNAP2 = Enzyme(e_type=my_circuit.environmental_list[-1].enzyme_type,
-                   name=my_circuit.environmental_list[-1].name, site=my_circuit.site_list[2],
-                   position=my_circuit.site_list[2].start,
-                   size=my_circuit.environmental_list[-1].size, twist=0.0, superhelical=0.0, k_cat=0.0, k_off=0.0)
+                   name=my_circuit.environmental_list[-1].name, site=gene_list[1],
+                   position=gene_list[1].start,
+                   size=my_circuit.environmental_list[-1].size, effective_size=my_circuit.environmental_list[-1].effective_size,
+                   effect_model=my_circuit.environmental_list[-1].effect_model,
+                   unbinding_model=my_circuit.environmental_list[-1].unbinding_model,
+                   twist=0.0, superhelical=0.0)
 
     # Let's turn off topoisomerase activity
-    my_circuit.environmental_list[0].k_cat = 0.0
-    my_circuit.environmental_list[1].k_cat = 0.0
+    #my_circuit.environmental_list[0].k_cat = 0.0
+    #my_circuit.environmental_list[1].k_cat = 0.0
 
-    # This is similar to the Run function... but the idea is that we will control when the bridge is formed
+    #my_circuit.environmental_list[0].gamma = 0.0
+    #my_circuit.environmental_list[1].gamma = 0.0
+
+# This is similar to the Run function... but the idea is that we will control when the bridge is formed
     for frame in range(1, my_circuit.frames + 1):
         my_circuit.frame = frame
         my_circuit.time = frame * my_circuit.dt
@@ -66,14 +82,25 @@ def run_simulation_two_genes(my_circuit, add_time):
 
         # EFFECT
         # --------------------------------------------------------------
-        effects_list = em.effect_model(my_circuit.enzyme_list, my_circuit.environmental_list, my_circuit.dt,
-                                       my_circuit.topoisomerase_model, my_circuit.mechanical_model)
+        effects_list = mw.effect_workflow(my_circuit.enzyme_list, my_circuit.environmental_list, my_circuit.dt)
         my_circuit.apply_effects(effects_list)
 
+        # EFFECT
+        # --------------------------------------------------------------
+        #effects_list = em.effect_model(my_circuit.enzyme_list, my_circuit.environmental_list, my_circuit.dt,
+        #                               my_circuit.topoisomerase_model, my_circuit.mechanical_model)
+        #my_circuit.apply_effects(effects_list)
+
         # UNBINDING
-        drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list, my_circuit.dt, my_circuit.rng)
+        # UNBINDING
+        # --------------------------------------------------------------
+        drop_list_index, drop_list_enzyme = mw.unbinding_workflow(my_circuit.enzyme_list, my_circuit.dt, my_circuit.rng)
         my_circuit.drop_enzymes(drop_list_index)
         my_circuit.add_to_environment(drop_list_enzyme)
+
+        #drop_list_index, drop_list_enzyme = bm.unbinding_model(my_circuit.enzyme_list, my_circuit.dt, my_circuit.rng)
+        #my_circuit.drop_enzymes(drop_list_index)
+        #my_circuit.add_to_environment(drop_list_enzyme)
 
         # UPDATE GLOBALS
         my_circuit.update_global_twist()

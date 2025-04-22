@@ -13,7 +13,7 @@ import seaborn as sns
 # Mas nuevos
 dir_source = '../optimization/third_strategy_v3-01_runs/'
 #v_code = 'block-full-dist_op_TORC_plasmid_st3.3_05'
-v_code = 'block-full-trackingON-dist_op_TORC_plasmid_st3.3_05'
+v_code = 'block-full-trackingON-dist_op_TORC_plasmid_st3.3_02'
 
 # Nuevos
 #dir_source = '../optimization/third_strategy.2/'

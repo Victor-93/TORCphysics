@@ -572,18 +572,26 @@ class RNAPStall(EffectModel):
                 self.stall_torque = params.stall_torque
                 self.kappa = params.RNAP_kappa
             else:  # There is a file!
-                # TODO: Do it for the other new parameters
                 mydata = pd.read_csv(filename)
+                if 'kappa' in mydata.columns:
+                    self.kappa = mydata['kappa'][0]
+                else:
+                    self.kappa = params.RNAP_kappa
+                if 'stall_torque' in mydata.columns:
+                    self.stall_torque = mydata['stall_torque'][0]
+                else:
+                    self.stall_torque = params.stall_torque
                 if 'velocity' in mydata.columns:
                     #  self.velocity = float(mydata['velocity'])
                     self.velocity = mydata['velocity'][0]
                 else:
-                    raise ValueError('Error, velocity parameter missing in csv file for RNAPUniform')  # ', filename)
+                    raise ValueError('Error, velocity parameter missing in csv file for RNAPStall')  # ', filename)
                 if 'gamma' in mydata.columns:
                     #  self.gamma = float(mydata['gamma'])
                     self.gamma = mydata['gamma'][0]
                 else:
-                    raise ValueError('Error, gamma parameter missing in csv file for RNAPUniform')  #: ', filename)
+                    raise ValueError('Error, gamma parameter missing in csv file for RNAPStall')  #: ', filename)
+
         else:
             self.velocity = float(oparams['velocity'])
             self.gamma = float(oparams['gamma'])
