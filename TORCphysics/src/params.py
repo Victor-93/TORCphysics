@@ -68,7 +68,7 @@ spacer_factor = 15.0 # Effective energy used to scale down the geometric modulat
 # ---------------------------------------------------------------------------------------------------------------------
 # RNA Polymerase (RNAP)
 v0 = 30.0  # 60.0  # Velocity (bp/sec) of RNAPs
-gamma = 0.13#0.05 #0.835 #0.5 # How much supercoiling is injected per bp
+gamma = 0.1#0.157#0.13#0.05 #0.835 #0.5 # How much supercoiling is injected per bp
 stall_torque = 12.0#12.0  # 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper.
 # 12pN*nm according 2022SevierBioJ
 sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall - According Gleng?
@@ -90,26 +90,37 @@ gene_RNAP_threshold = (60/12) * v0 # This quantity is used to define a threshold
                                    # RNAPs is gene_length/150; which for a gene_length=900 is 6.
 
 # ---------------------------------------------------------------------------------------------------------------------
-# BINDING MODEL PARAMETERS
+# STOCHASTIC TOPOISOMERASE  PARAMETERS
 # ---------------------------------------------------------------------------------------------------------------------
+# TopoIRecognition
+topo_b_w = 0.00425#0.012  # binding width
+topo_b_t = 0.012##-0.04  # binding threshold
+topo_b_k_on = 0.000354 #0.005
+
+# Linear Effect
+topo_e_k_cat = 15.11
+
+# GyraseRecognition
+gyra_b_w = 0.0123 #0.025  # binding width
+gyra_b_t = -0.059  #0.01  # binding threshold
+gyra_b_k_on = 0.000217  #0.005
+
+# Linear Effect
+gyra_e_k_cat = 13.94
+gyra_e_sigma0 = -0.146
+
+# Uniform effect
+gyra_uniform_k_cat = -10.5  # (bp/second)
+topoI_uniform_k_cat = 7.5  # (bp/second)
+
+# ---------------------------------------------------------------------------------------------------------------------
+# OTHER MODELS
+#  ---------------------------------------------------------------------------------------------------------------------
 # PoissonBinding
 k_on = 0.01  # default binding rate
 
-# TopoIRecognition
-topo_b_w = 0.012  # binding width
-topo_b_t = -0.04  # binding threshold
-topo_b_k_on = 0.005
-
-# GyraseRecognition
-gyra_b_w = 0.025  # binding width
-gyra_b_t = 0.01  # binding threshold
-gyra_b_k_on = 0.005
-
-# ---------------------------------------------------------------------------------------------------------------------
-# TODO: UNBINDING MODEL PARAMETERS
-#  ---------------------------------------------------------------------------------------------------------------------
 # PoissonUnBinding
-k_off = 0.01  # default unbinding rate for any enzyme
+k_off = 0.02  # default unbinding rate for any enzyme - For both topoI and gyrase, it is approximately ~0.2
 
 # Houdagui et al. 2019 parameters for topo I activity (effect)
 topo_sam_width = 0.012  # effect width
@@ -126,8 +137,6 @@ gyra_sam_kcat = 0.001  # minus because it removes negative supercoils
 # I think it makes more sense to put the negative in the equation rather than in
 # the parameter
 
-gyra_uniform_k_cat = -10.5  # (bp/second)
-topoI_uniform_k_cat = 7.5  # (bp/second)
 
 # Sam Meyer's PROMOTER CURVE (parameters taken from Houdaigi NAR 2019)
 SM_sigma_t = -0.042  # threshold of promoter openning

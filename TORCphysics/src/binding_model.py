@@ -325,8 +325,11 @@ class MaxMinPromoterBinding(BindingModel):
         super().__init__(filename, **oparams)
         if not oparams:
             if filename is None:
-                self.width = .003
-                self.threshold = -.094
+                # Assuming it responds like the pelE promoter
+                self.width = params.SM_epsilon_t
+                self.threshold = params.SM_sigma_t
+                # self.width = .003
+                # self.threshold = -.094
                 self.k_min = 0.001
                 self.k_max = 0.01
             else:
@@ -796,23 +799,23 @@ class GaussianBinding(BindingModel):
             if filename is None:
 
                 # Binding related params witht he spacer length modulation
-                self.k_on = 0.05 # 0.05~ 20secs, let's assume that it is fast
-                self.spread = 0.05 # About halfway when relaxed
-                self.superhelical_op = -0.06 #optimal superhelical density for binding
+                self.k_on = 0.1 # 0.05~ 20secs, let's assume that it is fast
+                self.spread = 0.01 # About halfway when relaxed
+                self.superhelical_op = -0.05 #optimal superhelical density for binding
 
                 # Closed complex
-                self.k_closed = 0.02  # 0.01~100secs Goes from open complex to closed complex
+                self.k_closed = 0.25#0.02  # 0.01~100secs Goes from open complex to closed complex
 
                 # Open complex
-                self.k_open = 0.05  # Goes from closed complex to opean complex
-                self.width = .003   # Width and threshold give the shape to the melting energy
-                self.threshold = -.04
+                self.k_open = 0.47#0.05  # Goes from closed complex to opean complex
+                self.width = .001   # Width and threshold give the shape to the melting energy
+                self.threshold = -.06
 
                 # Initiation (start of elongation)
-                self.k_ini = 0.1
+                self.k_ini = 0.17
 
                 # Unbinding from closed_complex
-                self.k_off = 0.03
+                self.k_off = 0.016
 
             else:
                 mydata = pd.read_csv(filename)
@@ -1236,8 +1239,8 @@ class TopoIRecognitionRNAPTracking(BindingModel):
                 self.width = params.topo_b_w
                 self.threshold = params.topo_b_t
                 self.k_on = params.topo_b_k_on
-                self.RNAP_dist = 200.0  # in bp
-                self.fold_change = 10  # 40.0  # Fold change when RNAP is close
+                self.RNAP_dist = 450.0  # in bp
+                self.fold_change = 18.6  # 40.0  # Fold change when RNAP is close
             else:
                 mydata = pd.read_csv(filename)
                 if 'k_on' in mydata.columns:

@@ -1,17 +1,21 @@
 [tool.poetry]
-name = "torcphysics"
+name = "TORCphysics"
 version = "0.0.1"
-description = "A nice model"
-authors = ["Victor Velasco"]
-license = "GPv3"
+description = "A physics-based simulation platform of supercoiling-mediated regulation of gene expression."
+authors = ["Victor Manuel Velasco Berrelleza"]
+license = "GPL-3.0"
 readme = "README.md"
+packages = [{ include = "TORCphysics"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 pandas = "^1.5.3"
 numpy = "^1.24.2"
 matplotlib = "^3.7.0"
+scipy = "^1.13.0"
 
+[tool.poetry.scripts]
+TORCphysics = "TORCphysics.src.cli:main"
 
 [build-system]
 requires = ["poetry-core"]

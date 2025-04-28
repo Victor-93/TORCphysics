@@ -603,45 +603,49 @@ class RNAPStall(EffectModel):
 
     def calculate_effect(self, index, z, z_list, dt) -> Effect:
 
-        # if z.direction == 0:
-        #    raise ValueError('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')
+        # Elongation
+        position, twist_left, twist_right = utils.RNAP_stall_mec_model(z, z_list, dt)
+        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
-        # Get enzymes on the right and left
-        z_right = [e for e in z_list if e.position > z.position][0]  # after - On the right
-        z_left = [e for e in z_list if e.position < z.position][-1]  # before - On the left
+#        # if z.direction == 0:
+#        #    raise ValueError('Error in calculating motion of RNAP. The RNAP enzyme has no direction.')#
+#
+#        # Get enzymes on the right and left
+#        z_right = [e for e in z_list if e.position > z.position][0]  # after - On the right
+#        z_left = [e for e in z_list if e.position < z.position][-1]  # before - On the left#
+#
+#        # First, we need to calculate the Torque acting on our RNAP.
+#        # Calculate torques and determine if the RNAP will stall
+#        torque_right = Marko_torque(z.superhelical)  # Torque on the right
+#        torque_left = Marko_torque(z_left.superhelical)  # Torque on the left
+#
+#        if z.direction > 0:  # Moving to the right
+#            torque = torque_right - torque_left
+#        else:  # Moving to the left
+#            torque = torque_left - torque_right#
 
-        # First, we need to calculate the Torque acting on our RNAP.
-        # Calculate torques and determine if the RNAP will stall
-        torque_right = Marko_torque(z.superhelical)  # Torque on the right
-        torque_left = Marko_torque(z_left.superhelical)  # Torque on the left
+#        velocity = velocity_2022SevierBioJ(z, torque)
 
-        if z.direction > 0:  # Moving to the right
-            torque = torque_right - torque_left
-        else:  # Moving to the left
-            torque = torque_left - torque_right
-
-        velocity = velocity_2022SevierBioJ(z, torque)
-
-        position = z.direction * velocity * dt
+#        position = z.direction * velocity * dt
 
         # Injects twist: denatures w = gamma*velocity*dt base-pairs
-        twist_left = -z.direction * z.effect_model.gamma * params.w0 * velocity * dt
-        twist_right = z.direction * z.effect_model.gamma * params.w0 * velocity * dt
+#        twist_left = -z.direction * z.effect_model.gamma * params.w0 * velocity * dt
+#        twist_right = z.direction * z.effect_model.gamma * params.w0 * velocity * dt
 
         # Check if there's one enzyme on the direction of movement. If there is one, then it will stall to avoid
-        # clashing
-        if z.direction > 0:  # Moving to the right
-            if z_right.position - (z.position + position) <= 0:
-                position = 0.0
-                twist_left = 0.0
-                twist_right = 0.0
-        else:  # Moves to the left
-            if z_left.position - (z.position + position) >= 0:
-                position = 0.0
-                twist_left = 0.0
-                twist_right = 0.0
-
-        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+        # clashing#
+#        if z.direction > 0:  # Moving to the right
+#            if z_right.position - (z.position + position) <= 0:
+#                position = 0.0
+#                twist_left = 0.0
+#                twist_right = 0.0
+#        else:  # Moves to the left
+#            if z_left.position - (z.position + position) >= 0:
+#                position = 0.0
+#                twist_left = 0.0
+#                twist_right = 0.0#
+#
+#        return Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
 # TODO: Check that effect distributes supercoiling on both side (left and right)
@@ -1000,8 +1004,8 @@ class GyraseLinear(EffectModel):
         # TODO: Check correct parametrization
         if not oparams:
             if filename is None:
-                self.k_cat = params.gyra_uniform_k_cat
-                self.sigma0 = -0.2  # TODO: I don't know why like this
+                self.k_cat = params.gyra_e_k_cat # gyra_uniform_k_cat
+                self.sigma0 = params.gyra_e_sigma0 #  -0.2
             else:  # There is a file!
                 mydata = pd.read_csv(filename)
                 if 'k_cat' in mydata.columns:
@@ -1055,7 +1059,7 @@ class TopoILinear(EffectModel):
         # TODO: Check correct parametrization
         if not oparams:
             if filename is None:
-                self.k_cat = params.topoI_uniform_k_cat
+                self.k_cat = params.topo_e_k_cat  #topoI_uniform_k_cat
             else:  # There is a file!
                 mydata = pd.read_csv(filename)
                 if 'k_cat' in mydata.columns:

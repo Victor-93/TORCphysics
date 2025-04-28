@@ -154,6 +154,10 @@ def plot_cross_correlation_with_site(my_circuit, sites_df, ref_name, axs=None, i
         if ignore is not None:
             if name in ignore:
                 continue
+        if my_circuit.name in name:
+            continue
+        if 'DNA_' in name:  # I'm trying to avoid bare DNA binding sites
+            continue
         j += 1
         # We need to find the maximum correlation write it
         maxlag.append(lag[np.argmax(cross[index, i, :])])
@@ -191,6 +195,8 @@ def plot_supercoiling_profiles(my_circuit, sites_df, axs=None, ignore=None, colo
             if ignore is not None:
                 if name in ignore:
                     continue
+            if 'DNA_' in name:  # I'm trying to avoid bare DNA binding sites
+                continue
             mask = sites_df['name'] == name
             superhelical = sites_df[mask]['superhelical'].to_numpy()
             if colors is not None:
@@ -200,6 +206,7 @@ def plot_supercoiling_profiles(my_circuit, sites_df, axs=None, ignore=None, colo
 
     if labels:
         ax_params(axis=axs, xl='time (seconds)', yl='Supercoiling at site', grid=True, legend=True)
+    axs.set_ylim(-0.2,0.1)
 
 
 # This one plots the signal profiles.
@@ -211,6 +218,30 @@ def plot_signal_profiles(my_circuit, sites_df, axs=None, ignore=None, colors=Non
         signals, names = an.build_signals(sites_df)
     else:
         signals, names = an.build_signal_by_type(sites_df, site_type)
+    time = np.arange(0, my_circuit.dt * len(signals[0]), my_circuit.dt)
+    y_0s = time * 0.0
+    for i, signal in enumerate(signals):
+        name = names[i]
+        if ignore is not None:
+            if name in ignore:
+                continue
+        if colors is not None:
+            axs.plot(time, signal, color=colors[name], label=names[i], alpha=0.5, **kwargs)
+            axs.fill_between(time, signal, y_0s, color=colors[name], alpha=0.5, **kwargs)
+        else:
+            axs.plot(time, signal, label=names[i], alpha=0.5, **kwargs)
+    if labels:
+        ax_params(axis=axs, xl='time (seconds)', yl='Transcription signal', grid=True, legend=True)
+
+
+# This one plots the elongation signal profiles.
+def plot_elongation_signal_profiles(my_circuit, enzymes_df, gene_names, axs=None, ignore=None, colors=None,
+                         labels=True, **kwargs):
+
+    names = gene_names
+    if axs is None:
+        axs = plt.gca()
+    signals = an.build_elongation_signal_stages(enzymes_df, names)
     time = np.arange(0, my_circuit.dt * len(signals[0]), my_circuit.dt)
     y_0s = time * 0.0
     for i, signal in enumerate(signals):
@@ -588,7 +619,7 @@ def create_animation_linear_artist(my_circuit, sites_df, enzymes_df, environment
     for environmental in my_circuit.environmental_list:
         if 'mRNA' in environmental.enzyme_type:
             continue
-        print(environmental.name)
+        #print(environmental.name)
 
         # Load image
         image = enzyme_shapes_dir + '/' + environmental.name + '.png'

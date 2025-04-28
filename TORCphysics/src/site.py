@@ -167,6 +167,9 @@ class Site:
         if self.binding_model is not None:
             self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case
             self.binding_model.k_on = self.k_on
+            if hasattr(self.binding_model, 'k_max'):  # This is for some models that have maximum rate
+                self.binding_model_oparams['k_max'] = self.k_on  # Add k_on - just in case
+                self.binding_model.k_max = self.k_on
 
     #            if 'k_on' not in self.binding_model_oparams:  # But no k_on
     #                self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case

@@ -1,0 +1,3 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+gene,left,1000,2000,0.05,MaxMinPromoterBinding,none
+gene,right,3000,4000,0.8,MaxMinPromoterBinding,none
