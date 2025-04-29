@@ -9,7 +9,7 @@
 [![GitHub](https://img.shields.io/badge/Source-GitHub-black?logo=github)](https://github.com/Victor-93/TORCphysics)
 
 ---
-
+ 
 **TORCphysics** is a physics-based simulation framework to model gene expression regulated through 
 DNA supercoiling. It simulates interactions between DNA-binding proteins such as RNA polymerases and 
 topoisomerases, capturing both physical DNA properties and dynamics. 
