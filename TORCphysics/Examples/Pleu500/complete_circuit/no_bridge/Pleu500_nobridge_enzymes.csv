@@ -1,5 +1,0 @@
-type,name,site,position,size,effective_size,twist,superhelical,effect_model,effect_oparams,unbinding_model,unbinding_oparams
-EXT,EXT_L,EXT,-2815.0,0.0,0.0,-53.144888252604126,-0.02928185047392603,,,,
-RNAP,RNAP,tetA,218.0,50.0,32.0,-15.343369187796004,-0.009044344629339307,RNAPUniform,,RNAPSimpleUnbinding,
-origin,ori,ori,3085.0,100.0,100.0,-53.144888252604126,-0.02928185047392603,,,,
-EXT,EXT_R,EXT,6218.0,0.0,0.0,0.0,-0.06,,,,

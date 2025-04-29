@@ -1,13 +1,0 @@
-Hello, this is the info file for the calibration of Topo I and Gyrase Models.
-Topo I Binding Model = TopoIRecognition
-Topo I Effect Model = TopoILinear
-Topo I Unbinding Model = PoissonUnBinding
-Gyrase Binding Model = GyraseRecognition
-Gyrase Effect Model = GyraseLinear
-Gyrase Unbinding Model = PoissonUnBinding
-Ran 16 simulations per test. 
-Number of tests = 2
-  0%|          | 0/2 [00:00<?, ?trial/s, best loss=?] 50%|█████     | 1/2 [00:05<00:05,  5.37s/trial, best loss: 0.9162125379281247]100%|██████████| 2/2 [00:11<00:00,  5.77s/trial, best loss: 0.9162125379281247]100%|██████████| 2/2 [00:11<00:00,  5.71s/trial, best loss: 0.9162125379281247]
- 
-Optimal parameters found from random search: 
-{'k_cat_gyrase': 13.828017129619763, 'k_cat_topoI': 9.790490532136694, 'k_off_gyrase': 0.6303243788733132, 'k_off_topoI': 0.09262966522962973, 'k_on_gyrase': 0.00010843582722117008, 'k_on_topoI': 0.00013127163747526276, 'sigma0_gyrase': -0.13439488841332126, 'threshold_gyrase': 0.07137958407839706, 'threshold_topoI': 0.042495019241894416, 'width_gyrase': 0.00999963348713006, 'width_topoI': 0.10994937667850312}

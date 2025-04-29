@@ -1,5 +1,0 @@
-type,name,start,end,k_on,binding_model,binding_oparams
-gene,bla,1152,291,0.016,MaxMinPromoterBinding,bla.csv
-gene,mKalama1,2074,1360,0.001,MaxMinPromoterBinding,mKalama1.csv
-gene,mRaspberry,2509,3190,0.004,MaxMinPromoterBinding,mRaspberry.csv
-gene,tetA,3281,4472,0.033,PoissonBinding,""

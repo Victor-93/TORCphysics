@@ -1,13 +1,0 @@
-Hello, this is the info file for the calibration of Topo I and Gyrase Models.
-Topo I Binding Model = TopoIRecognition
-Topo I Effect Model = TopoILinear
-Topo I Unbinding Model = PoissonUnBinding
-Gyrase Binding Model = GyraseRecognition
-Gyrase Effect Model = GyraseLinear
-Gyrase Unbinding Model = PoissonUnBinding
-Ran 4 simulations per test. 
-Number of tests = 10
-  0%|          | 0/10 [00:00<?, ?trial/s, best loss=?] 10%|█         | 1/10 [00:05<00:48,  5.37s/trial, best loss: 5.289390874358048] 20%|██        | 2/10 [00:10<00:41,  5.16s/trial, best loss: 2.7266618073378073] 30%|███       | 3/10 [00:16<00:37,  5.42s/trial, best loss: 2.7266618073378073] 40%|████      | 4/10 [00:25<00:42,  7.15s/trial, best loss: 2.7266618073378073] 50%|█████     | 5/10 [00:32<00:35,  7.08s/trial, best loss: 2.7266618073378073] 60%|██████    | 6/10 [00:37<00:25,  6.35s/trial, best loss: 1.1911214382010564] 70%|███████   | 7/10 [00:42<00:17,  5.82s/trial, best loss: 1.1911214382010564] 80%|████████  | 8/10 [00:48<00:11,  5.76s/trial, best loss: 1.1911214382010564] 90%|█████████ | 9/10 [00:52<00:05,  5.43s/trial, best loss: 1.1911214382010564]100%|██████████| 10/10 [00:57<00:00,  5.15s/trial, best loss: 1.1911214382010564]100%|██████████| 10/10 [00:57<00:00,  5.74s/trial, best loss: 1.1911214382010564]
- 
-Optimal parameters found from random search: 
-{'k_cat_gyrase': 15.058328017411696, 'k_cat_topoI': 3.0426306717384177, 'threshold_gyrase': 0.04891543947712632, 'threshold_topoI': 0.031548880093460595, 'width_gyrase': 0.008381875169020997, 'width_topoI': 0.021249930427819277}

@@ -1,2 +1,0 @@
-type,name,start,end,k_on,binding_model,binding_oparams
-gene,reporter,111,1011,1,MaxMinPromoterBinding_cutoff,../promoter_responses/weak.csv
