@@ -41,17 +41,6 @@ TORCphysics can be used from the command line or directly in Python scripts.
 
 Each simulation requires four interconnected input files:
 
-**environment, sites and enzymes**.
-* The **Environment** input is composed by the DNA-binding molecules that have the capacity of binding
-particular DNA **sites** such as promoters or protein binding sites.
-* **Sites** represent the binding sites of particular molecules, for example, RNA polymerases can bind
-gene start sites (promoters), while proteins bind their indicated binding sites.
-* **Enzymes** correspond to the bound molecules (e.g., enzymes and proteins) to the DNA at
-the start of the simulation.
-* **Circuit**  input represents overall information about the simulated system, such as
-size, open (linear, .e.g., chromosomal) or closed (circular e.g., plasmid)  structure,
-and the initial superhelical density.
-
 
 | Input                 | Description                                                                                                                                                                        |
 |-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
