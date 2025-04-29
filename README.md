@@ -1,100 +1,153 @@
 # TORCphysics: A Physical Model of DNA-Topology-Controlled Gene Expression
+
 <p align="center">
-<img src="TORCphysics/logo.svg" />
+  <img src="TORCphysics/logo.svg" alt="TORCphysics Logo" width="200"/>
 </p>
 
-And the other thingyis with the links to PyPI, paper, and something else.
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![PyPI version](https://badge.fury.io/py/torcphysics.svg)](https://pypi.org/project/torcphysics/)
+[![GitHub](https://img.shields.io/badge/Source-GitHub-black?logo=github)](https://github.com/Victor-93/TORCphysics)
 
-[TORCphysics](https://github.com/Victor-93/TORCphysics) is a physics-based simulation 
-platform for simulating the interactions of DNA-binding molecules through DNA supercoiling, with a 
-particular emphasis on transcription. Transcription is described according the twin-supercoiling 
-domain model, and the model can account for the stochastic binding of DNA 
-topoisomerases (topo I  and gyrase). Outputs can be directly compared with experimental results 
-by outputing transcription rates, and parameters can be inferred through parameter exploration 
-and comparing with experimental data.
+---
 
-## Installation and Versions
+**TORCphysics** is a physics-based simulation framework to model gene expression regulated through 
+DNA supercoiling. It simulates interactions between DNA-binding proteins such as RNA polymerases and 
+topoisomerases, capturing both physical DNA properties and dynamics. 
 
-Install the latest version of **TORCphysics**:
-```ruby
-pip install TORCphysics
+Transcription is modeled based on the twin-supercoiling domain model, and the simulation supports 
+supercoiling-sensitive and non-sensitive promoters, as well as multi-stage binding kinetics. 
+Outputs include transcription rates and time-series data, enabling direct comparisons with experimental 
+results or kinetics inference via parameter search.
+
+---
+
+## 📦 Installation
+
+### Latest version from PyPI:
+```bash
+pip install torcphysics
 ```
-Install the TORCphysics paper version with scripts for reproducing experiments:
-```ruby
-pip install git+https://github.com/Victor-93/TORCphysics.git@sub_models
+
+### TORCphysics paper version for reproducing results:
+```bash
+pip install git+https://github.com/Victor-93/TORCphysics.git@TORCphysics_paper
 ```
 
+---
 
-## Usage
+## 🚀 Quick Start
 
-TORCphysics can be quickly used through the command line or scripting, 
-providing a higher flexibility and verstility for manioulating simulations.
+TORCphysics can be used from the command line or directly in Python scripts.
 
-In either case, to run TORCphysics it needs four inputs that are inter-connected: 
+Each simulation requires four interconnected input files:
+
 **environment, sites and enzymes**.
 * The **Environment** input is composed by the DNA-binding molecules that have the capacity of binding
-particular DNA **sites** such as promoters or protein binding sites. 
-* **Sites** represent the binding sites of particular molecules, for example, RNA polymerases can bind 
+particular DNA **sites** such as promoters or protein binding sites.
+* **Sites** represent the binding sites of particular molecules, for example, RNA polymerases can bind
 gene start sites (promoters), while proteins bind their indicated binding sites.
-* **Enzymes** correspond to the bound molecules (e.g., enzymes and proteins) to the DNA at 
+* **Enzymes** correspond to the bound molecules (e.g., enzymes and proteins) to the DNA at
 the start of the simulation.
 * **Circuit**  input represents overall information about the simulated system, such as
-size, open (linear, .e.g., chromosomal) or closed (circular e.g., plasmid)  structure, 
-and the initial superhelical density. 
+size, open (linear, .e.g., chromosomal) or closed (circular e.g., plasmid)  structure,
+and the initial superhelical density.
 
-These inputs can be defined through csv files, e.g., **environment.csv, 
-sites.csv, enzymes.csv and circuit.csv**, or through scripting using TORCphysics 
-libraries (see example REF). 
 
-For more detailed information regarding inputs and outputs can be found in REF.
+| Input                 | Description                                                                                                                                                                        |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `circuit.csv`         | General information of gene circuit, such as open (linear, .e.g., chromosomal) or closed (circular e.g., plasmid)  structure,and the initial superhelical density.. **(Required)** |
+| `environment.csv`     | List of DNA-binding molecules (e.g., RNAPs, topoisomerases, NAPs), that can bind particular DNA sites such as promoters or protein binding sites.                                  |
+| `sites.csv`           | List of binding sites on the DNA (e.g., promoters, protein binding sites).                                                                                                         |
+| `enzymes.csv`         | Initial state: DNA-bound molecules present at the beginning of the simulation.                                                                                                     |
 
 > **⚠️ Inputs warnings**  
-* The only required input to run a simulation is the **circuit**, however if **sites**
-are not provided, the molecules in the environment will not bind the DNA, 
-and if the **environment** is missing, no molecules will bind sites. 
-Lastly, if **enzymes** is not provided, the code will not have any starting
-bound molecules but simulation can progress without problems.
+> The only required input to run a simulation is `circuit.csv`. 
+> However, if `sites.csv` is not provided, molecules from the environment will not bind to the DNA. 
+> If `environment.csv` is missing, no molecules will bind to the sites. 
+> Lastly, if `enzymes.csv` is not provided, the simulation will start without any pre-bound molecules, 
+> but it will still run without issues.
 
-#### Command Line Usage
-To quickly run TORCphysics, do the following command:
+---
 
-```ruby
+### 🖥️ Command-Line Usage
+
+Run a simulation with command:
+
+```bash
 TORCphysics -c circuit.csv -s sites.csv -e enzymes.csv -n environment.csv -o out -f 3000 -t 1.0 -r
 ```
 
-This will produce a simulation using the input system described through the csv files, 
-will run a simulation with 3000 frames with 1.0 seconds time-step, and 
-outputing dataframes and log files with prefix name "out". You can run this command
-in the example directory with the example csv files. 
+This will simulate:
+- `3000` frames with `1.0` second time step of the system described by the csv files.
+- Outputs will be saved as dataframes and log files with prefix "out".
 
-You can get more information regarding inputs and outputs with:
+For more information type:
 
-```ruby
+```bash
 TORCphysics --help
 ```
 
-#### Scripting Usage
+---
 
+### 🐍 Scripting Usage
 
-## Examples
+TORCphysics can also be used via Python scripting for custom simulations:
 
-Hay que hacer varios ejemplitos con el mismo sistema.
+```python
+from TORCphysics import Circuit
 
-* Ejemplo 1 basico single sim, correr simulacion, cargar DFs, plotear senales, y producir animacion. Hacer para continuum model of topos y stochastic.En este hagamos todo: 
-  * 1.- Stochastic initiation, RNAP sin topos ni stalling. RNAP con stalling simple.
-  * 2.- Sigmoid initiation, RNAP uniform y topos continuum
-  * 3.- Sigmoid inititaion, RNAP stall y stochastic topos
-* Ejemplo 2 simulaciones multiples: correr muchas simulaciones, no producir dfs pero mantenerlos en el codigo, y analyzar correlaciones, production rates, local supercoiling, y global supercoiling
-* Ejemplo 3 Definir lac model en medio, y hacer lo mismo que el ejemplo 2.
+my_circuit = Circuit(
+    circuit_filename="circuit.csv",
+    sites_filename="sites.csv",
+    enzymes_filename="enzymes.csv",
+    environment_filename="environment.csv",
+    output_prefix="out",
+    frames=3000,
+    series=True,
+    continuation=False,
+    dt=1.0
+)
 
-## Algorithms or functions?
+my_circuit.print_general_information()
+my_circuit.run()
+```
 
+---
 
-## Citations
-If you use this code, please site the paper below:
+## 📚 Examples
+
+Example files and Jupyter notebooks are available in the [`Examples/`](TORCphysics/Examples/) directory:
+
+- `Example_1.ipynb` — Single gene simulations and analysis.
+- `Example_2.ipynb` — Multiple simulations with statistical analysis.
+- `Example_3.ipynb` — Defining custom enzyme/site models using built-in models.
+
+---
+
+## ⚙️ Algorithms
+
+> Detailed documentation and algorithmic explanations coming soon on the [Wiki](https://github.com/Victor-93/TORCphysics/wiki)
+
+---
+
+## 📖 Citation
+
+If you use TORCphysics in your research, please cite the paper below:
 
 TORCphysics paper coming soon!
 
-## Contact Information
+---
 
-## License
+## 📬 Contact
+
+Questions or collaborations?
+
+📧 V.VelascoBerrelleza@sheffield.ac.uk
+
+---
+
+## 🔓 License
+
+This project is licensed under the **GNU General Public License v3.0** (GPLv3).  
+See the [LICENSE](./LICENSE) file for more details.
+```

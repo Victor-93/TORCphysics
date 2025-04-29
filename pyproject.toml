@@ -3,7 +3,7 @@ name = "TORCphysics"
 version = "0.0.1"
 description = "A physics-based simulation platform of supercoiling-mediated regulation of gene expression."
 authors = ["Victor Manuel Velasco Berrelleza"]
-license = "GPL-3.0"
+license = "GPL-3.0-or-later"
 readme = "README.md"
 packages = [{ include = "TORCphysics"}]
 

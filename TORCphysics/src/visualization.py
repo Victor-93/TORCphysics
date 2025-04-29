@@ -177,6 +177,7 @@ def plot_supercoiling_profiles(my_circuit, sites_df, axs=None, ignore=None, colo
     if axs is None:
         axs = plt.gca()
     time = np.arange(0, my_circuit.dt * (my_circuit.frames + 1), my_circuit.dt)
+    nt = len(time)
     # Let's plot the global superhelical density
     mask = sites_df['type'] == 'circuit'  # This one contains global superhelical density
     global_sigma = sites_df[mask]['superhelical'].to_numpy()
@@ -199,10 +200,11 @@ def plot_supercoiling_profiles(my_circuit, sites_df, axs=None, ignore=None, colo
                 continue
             mask = sites_df['name'] == name
             superhelical = sites_df[mask]['superhelical'].to_numpy()
+            n = len(superhelical)
             if colors is not None:
-                axs.plot(time, superhelical, color=colors[name], label=name, alpha=0.5, **kwargs)
+                axs.plot(time[nt-n:], superhelical, color=colors[name], label=name, alpha=0.5, **kwargs)
             else:
-                axs.plot(time, superhelical, label=name, alpha=0.5, **kwargs)
+                axs.plot(time[nt-n:], superhelical, label=name, alpha=0.5, **kwargs)
 
     if labels:
         ax_params(axis=axs, xl='time (seconds)', yl='Supercoiling at site', grid=True, legend=True)
