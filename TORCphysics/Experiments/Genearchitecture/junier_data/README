@@ -1,0 +1,7 @@
+The data collected here is from the paper:
+Assessing in vivo the impact of gene context on transcription through DNA supercoiling
+
+With authors: Ihab Boulas, Lisa Bruno, Sylvie Rimsky, Olivier Espeli, Ivan Junier, Olivier Rivoire
+
+For the experimental data (weak.csv, medium.csv, strong.csv), I collected it from their data that they uploaded to
+github (in the Notebook folder).

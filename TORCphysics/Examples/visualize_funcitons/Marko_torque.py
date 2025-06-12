@@ -1,5 +1,5 @@
 from TORCphysics import effect_model as ef
-from TORCphysics import Enzyme, Site, params
+from TORCphysics import Enzyme, Site, params, utils
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -17,6 +17,20 @@ sigma_s_c = 'red'
 sigma_p_c = 'blue'
 torque_color = 'black'
 
+C_length = params.C_length
+A_length = params.A_length
+f_stretching = params.f_stretching
+kBT_pN_nm = params.kBT_pN_nm
+
+# Print values of interes
+print('p',params.p_stiffness)
+print('c', params.c_stiffness)
+print('cs',params.cs_energy)
+print(1.0 - ((C_length / (4.0 * A_length)) *
+             np.sqrt(kBT_pN_nm / (A_length * f_stretching))))
+print(params.g_energy)
+print(params.P_length)
+
 # Plot
 # ----------------------------------------------------------------------------------------------------------------------
 fig, axs = plt.subplots(2, figsize=(width, 2*height), tight_layout=True)
@@ -27,7 +41,7 @@ torque = np.zeros(len(sigma))
 print('sigma_s', params.sigma_s, ' sigma_p', params.sigma_p)
 
 for i,s in enumerate(sigma):
-    torque[i] = ef.Marko_torque(s)
+    torque[i] = utils.Marko_torque(s)
 
 ax = axs[0]
 ax.plot(sigma, torque, lw=lw, color=torque_color)
@@ -35,7 +49,7 @@ ax.plot([params.sigma_s,params.sigma_s], [-100,100], lw=lw, color=sigma_s_c)
 ax.plot([-params.sigma_s,-params.sigma_s], [-100,100], lw=lw, color=sigma_s_c)
 ax.plot([params.sigma_p,params.sigma_p], [-200,200], lw=lw, color=sigma_p_c)
 ax.plot([-params.sigma_p,-params.sigma_p], [-200,200], lw=lw, color=sigma_p_c)
-ax.set_ylim(-40,40)
+#ax.set_ylim(-40,40)
 ax.set_xlim(-.1,.1)
 ax.grid(True)
 ax.set_xlabel(r'$\sigma$')

@@ -462,8 +462,10 @@ def Marko_torque(sigma):
     if abs(sigma) <= abs(params.sigma_s):
         torque = sigma * params.cs_energy / params.w0
     elif abs(params.sigma_s) < abs(sigma) < abs(params.sigma_p):
-        torque = np.sqrt(
+        torque = np.sign(sigma)*np.sqrt(
             2 * params.p_stiffness * params.g_energy / (1 - params.p_stiffness / params.cs_energy)) / params.w0_nm
+        # torque = np.sqrt(
+        #     2 * params.p_stiffness * params.g_energy / (1 - params.p_stiffness / params.cs_energy)) / params.w0_nm
     elif abs(sigma) >= abs(params.sigma_p):
         torque = sigma * params.p_stiffness / params.w0
     else:

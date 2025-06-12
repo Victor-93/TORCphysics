@@ -1,0 +1,13 @@
+Run sequence_generator.py to generate the 3 sequences with flanking G's:
+python sequence_generator.py
+
+Move each sequence to their respective directory, e.g., weak/SIST_code
+And in SIST_code, rename it as input.fasta.
+
+Run all *sh files!
+
+Go to filtering, and run all *sh again.
+
+Then go to plots, plot heatmaps, and then fit the sigmoid functions!
+
+Or run the python scripts here to analyse energy profiles and the fits.

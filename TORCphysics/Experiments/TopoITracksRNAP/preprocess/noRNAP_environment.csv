@@ -1,0 +1,3 @@
+type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
+topo,topoI,DNA,17.0,20,10,TopoIRecognition,../../Topokinetics/analysis/avg_dt1.0_topoI.csv,TopoILinear,../../Topokinetics/analysis/avg_dt1.0_topoI.csv,PoissonUnBinding,../../Topokinetics/analysis/avg_dt1.0_topoI.csv
+topo,gyrase,DNA,44.6,30,20,GyraseRecognition,../../Topokinetics/analysis/avg_dt1.0_gyrase.csv,GyraseLinear,../../Topokinetics/analysis/avg_dt1.0_gyrase.csv,PoissonUnBinding,../../Topokinetics/analysis/avg_dt1.0_gyrase.csv

@@ -1,5 +1,5 @@
 from TORCphysics import effect_model as ef
-from TORCphysics import Enzyme, Site, params
+from TORCphysics import Enzyme, Site, params, utils
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.cm as cm
@@ -64,11 +64,29 @@ time = np.arange(0,total_time,0.1)
 sigmaup = sigma_upstream_v0(sigma0, x0, v0, gamma, time)
 sigmadown=sigma_downstream_v0(sigma0,xd,lg,v0,gamma,time)
 
+# TORQUES
+torque_up = np.zeros_like(time)
+torque_down = np.zeros_like(time)
+for i,s in enumerate(sigmaup):
+    torque_up[i] = utils.Marko_torque(s)
+for i,s in enumerate(sigmadown):
+    torque_down[i] = utils.Marko_torque(s)
+torque_T = torque_down - torque_up
+#torque_T = torque_down + torque_up
+stall_array = np.zeros_like(time)
+for i, tor in enumerate(torque_T):
+    if tor >= params.stall_torque:
+        stall_array[i] = np.max(torque_T)
+    else:
+        stall_array[i] = 0
+
 # sigma
 ax = axs[0]
 ax.plot(time, sigmaup, lw=lw, color=up_c,label='upstream')
 ax.plot(time, sigmadown, lw=lw, color=down_c, label='downstream')
+ax.fill_between(time, np.zeros_like(torque_T) - stall_array, np.zeros_like(torque_T) + stall_array, color='green', alpha=0.2)
 ax.grid(True)
+ax.set_ylim(-.1,.1)
 ax.legend(loc='best')
 ax.set_xlabel('Time (s)')
 ax.set_ylabel(r'$\sigma$')
@@ -85,17 +103,13 @@ site_list1 = [site_gene1, site_gene2, site_gene3, site_tf]
 RNAP = Enzyme(e_type='RNAP', name='test1', site=site_list1[0], size=30, effective_size=15, position=30,
               twist=0.0, superhelical=0.0, effect_model_name='RNAPStall')
 
+# PLOT TORQUES
 ax = axs[1]
-torque_up = np.zeros_like(time)
-torque_down = np.zeros_like(time)
-for i,s in enumerate(sigmaup):
-    torque_up[i] = ef.Marko_torque(s)
-for i,s in enumerate(sigmadown):
-    torque_down[i] = ef.Marko_torque(s)
-torque_T = torque_down - torque_up
 ax.plot(time, torque_up, lw=lw, color=up_c,label='upstream')
 ax.plot(time, torque_down, lw=lw, color=down_c, label='downstream')
 ax.plot(time, torque_T, lw=lw, color='black', label='total')
+ax.fill_between(time, np.zeros_like(torque_T) - stall_array, np.zeros_like(torque_T) + stall_array, color='green', alpha=0.2)
+ax.plot(time, np.ones_like(torque_T)*params.stall_torque, lw=lw, color='green', label='stall')
 ax.grid(True)
 ax.legend(loc='best')
 ax.set_xlabel('Time (s)')
@@ -112,9 +126,10 @@ sigma_down = np.arange(-.15,.151,0.001)
 torque = np.zeros( (len(sigma_up), len(sigma_down)))
 for i, s_up  in enumerate(sigma_up):
     for j, s_down in enumerate(sigma_down):
-        t_up = ef.Marko_torque(s_up)
-        t_down = ef.Marko_torque(s_down)
+        t_up = utils.Marko_torque(s_up)
+        t_down = utils.Marko_torque(s_down)
         total_torque = t_down - t_up
+        #total_torque = t_down + t_up
         #if abs(total_torque) >= params.stall_torque:
         if total_torque >= params.stall_torque:
                 torque[i,j] = 0
@@ -173,11 +188,12 @@ for j in range(iterations):
     sigmadown = sigma_downstream_v0(sigma0, xd, lg, v0, gamma, time)
 
     for i, s in enumerate(sigmaup):
-        torque_up[i] = ef.Marko_torque(s)
+        torque_up[i] = utils.Marko_torque(s)
     for i, s in enumerate(sigmadown):
-        torque_down[i] = ef.Marko_torque(s)
+        torque_down[i] = utils.Marko_torque(s)
 
     total_torque = torque_down - torque_up
+    #total_torque = torque_down + torque_up
 
     for k, t in enumerate(total_torque):
         if t >= params.stall_torque:

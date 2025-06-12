@@ -31,7 +31,8 @@ for i, s_up  in enumerate(sigma_up):
     for j, s_down in enumerate(sigma_down):
         t_up = ef.Marko_torque(s_up)
         t_down = ef.Marko_torque(s_down)
-        total_torque = t_down - t_up
+        # total_torque = t_down - t_up
+        total_torque = t_down + t_up
         if total_torque >= params.stall_torque:
             torque[i,j] = 0
         else:
