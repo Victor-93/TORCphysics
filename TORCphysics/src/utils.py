@@ -27,6 +27,38 @@ topo_t = params.topo_b_t
 gyra_w = params.gyra_b_w
 gyra_t = params.gyra_b_t
 
+def calculate_twist_writhe_partition(superhelical, length, twist_writhe_ratio=params.twist_writhe_ratio):
+    """
+    Calculate the twist–writhe partition for a given superhelical density.
+
+    This function computes the linking number difference (ΔLk) and partitions it
+    into twist and writhe contributions according to a given twist–writhe ratio.
+    The calculation can be applied to either local or global superhelical densities.
+
+    Parameters
+    ----------
+    superhelical : float
+        Local or global superhelical density (σ).
+    length : float
+        Length of the topological domain in base pairs (bp).
+    twist_writhe_ratio : float, optional
+        Fraction of the linking difference assigned to twist (default from `params.twist_writhe_ratio`).
+
+    Returns
+    -------
+    dLk : float
+        Linking number difference (ΔLk).
+    twist : float
+        Partitioned twist contribution (in turns).
+    writhe : float
+        Partitioned writhe contribution (in turns).
+    """
+    L0 = length / params.T_bp  # Relaxed linking number for a B-DNA structure of same length
+    dLk = superhelical * L0    # Linking difference
+    twist = dLk * twist_writhe_ratio
+    writhe = dLk - twist
+    return dLk, twist, writhe
+
 # Having an enzyme E sourrounded by a molecules L and R, on the left and right respectively (L____E____R),
 # calculate the change in twist on the left and right sides of E given the fact that enzyme E completely
 # leaks the twist on both sides (it doesn't form a topological barrier).
@@ -479,8 +511,10 @@ def Marko_torque(sigma):
 #  where vmax = maximum velocity, k = torque parameter, T_0 = Torque acting on enzyme
 #  and T_c = cutoff or stalling torque.
 #  This function is based on the 2022SevierBioJ paper
-def velocity_2022SevierBioJ(z, torque):
+def velocity_2022SevierBioJ(z, input_torque):
     # top = 2.0 * z.effect_model.velocity
+    #torque = input_torque
+    torque = abs(input_torque) # This is to make it symmetric. We do it like this to avoid cases with huge torques
     top = z.effect_model.velocity
     exp_arg = z.effect_model.kappa * (torque - z.effect_model.stall_torque)
     exp_arg = np.float128(exp_arg)

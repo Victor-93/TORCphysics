@@ -35,6 +35,14 @@ q = 2350 * RT  # Coefficient associated to the superhelical free energy
 #ATP_hydrolysis = 28  # kJ / mol
 ATP_hydrolysis = 6.7  # kcal / mol
 
+# This is how the linking difference is partitioned between twist and writhe.
+# Twist should be partitioned as twist = dLK * twist_writhe_ratio, while writhe is the rest.
+# Notice that a partition of 1/4 corresponds to a ratio 1:3, that means that the linking difference is divided
+# by 4, and writhe is 3 times larger than twist. Similarly, a twist_writhe_ratio of 1/5, corresponds to
+# actually a ratio of 1:4, where writhe is 4 times bigger than twist.
+# Take into account this, as the ratios of 1:3 and 1:4 have been observed in vivo.
+twist_writhe_ratio = 1/4
+
 # Elasticity parameters - from Marko's elasticity model
 # -----------------------------------------------------------
 P_length = 24.0  # nm - twist stiffness of plectonomic DNA - is it a persistence length?
@@ -45,12 +53,14 @@ f_stretching = 1.0  # 0.15  # pN - stretching force of enzymes in vivo - this mi
 p_stiffness = kBT_pN_nm * P_length * w0_nm * w0_nm  # pN - stiffness related to P
 c_stiffness = kBT_pN_nm * C_length * w0_nm * w0_nm  # pN - stiffness related to C
 # related to free energy of twist stiffness of extended state
-#cs_energy = c_stiffness * (
-#        1.0 - ((C_length / (4 * A_length)) *
-#             np.sqrt(kBT_pN_nm / (A_length * f_stretching))))
+# This is the one without the bug
 cs_energy = c_stiffness * (
-        1.0 - ((C_length / 4 * A_length) *
+        1.0 - ((C_length / (4 * A_length)) *
              np.sqrt(kBT_pN_nm / (A_length * f_stretching))))
+# This was the one used in experiments
+#cs_energy = c_stiffness * (
+#        1.0 - ((C_length / 4 * A_length) *
+#             np.sqrt(kBT_pN_nm / (A_length * f_stretching))))
 
 # related to free energy of stretched state
 g_energy = f_stretching - np.sqrt(kBT_pN_nm * f_stretching / A_length)
@@ -72,7 +82,7 @@ spacer_factor = 15.0 # Effective energy used to scale down the geometric modulat
 # ---------------------------------------------------------------------------------------------------------------------
 # RNA Polymerase (RNAP)
 v0 = 30.0  # 60.0  # Velocity (bp/sec) of RNAPs
-gamma = 0.1#0.157#0.13#0.05 #0.835 #0.5 # How much supercoiling is injected per bp
+gamma = 0.157#0.1#0.157#0.13#0.05 #0.835 #0.5 # How much supercoiling is injected per bp
 stall_torque = 12.0#12.0  # 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper.
 # 12pN*nm according 2022SevierBioJ
 sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall - According Gleng?

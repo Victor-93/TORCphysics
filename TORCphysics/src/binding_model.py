@@ -1096,6 +1096,88 @@ class MaxMinPromoterBinding_cutoff(BindingModel):
         rate = self.k_max * np.exp(a / b)
         return rate
 
+class TopoIPoisson(BindingModel):
+    """
+     A BindingModel subclass that calculates binding probabilities according a Poisson process.
+     The difference between this and Poisson, is that in this model, topoI can only bind negatively supercoiled
+     DNA.
+
+     Attributes
+     ----------
+     k_on : float
+        Rate (1/s) at which the enzymes bind.
+     threshold : float
+        The superhelical threshold at which enzymes start binding. This is a dimensionless parameter.
+     filename : str, optional
+        Path to the site csv file that parametrises the binding model.
+     oparams : dict, optional
+        A dictionary containing the parameters used for the binding model.
+    """
+
+    def __init__(self, filename=None, interacts=False, **oparams):
+        """ The constructor of the TopoIRecognition subclass.
+
+        Parameters
+        ----------
+        filename : str, optional
+            Path to the site csv file that parametrises the binding model; this file should have the k_on, width and
+             threshold parameters.
+        oparams : dict, optional
+            A dictionary containing the parameters used for the binding model. In this case, it would be k_on, width
+            and threshold.
+        """
+
+        super().__init__(filename, **oparams)
+        self.threshold = 0.0
+        if not oparams:
+            if filename is None:
+                self.k_on = params.topo_b_k_on
+            else:
+                mydata = pd.read_csv(filename)
+                if 'k_on' in mydata.columns:
+                    self.k_on = mydata['k_on'][0]
+                else:
+                    raise ValueError('Error, k_on parameter missing in csv file for TopoIRecognition')
+        else:
+            self.k_on = float(oparams['k_on'])
+
+        self.interacts = interacts
+        self.oparams = {'threshold': self.threshold, 'k_on': self.k_on}  # Just in case
+
+    # Notice that the concentration of enzyme is outside the model as it can vary during the simulation.
+    def binding_probability(self, environmental, superhelical, dt) -> float:
+        """ Method for calculating the probability of binding according the TopoIPoisson model.
+
+        Parameters
+        ----------
+        dt : float
+            Timestep in seconds (s).
+        environmental : Environment
+            The environmental molecule that is trying to bind the site.
+        superhelical : float
+            The local supercoiling region in the site.
+
+        Returns
+        ----------
+        probability : float
+            A number that indicates the probability of binding in the current timestep.
+        """
+
+        # Past the threshold then there's no binding.
+        # It only binds to negatively supercoiled DNA
+        if superhelical >= self.threshold:
+            return 0.0
+        else:
+            return utils.Poisson_process(self.k_on * environmental.concentration, dt)
+
+    def rate_modulation(self, superhelical) -> float:
+        return np.where(superhelical <= self.threshold, self.k_on, 0.0)
+        #if superhelical >= self.threshold:
+        #    return 0.0
+        #else:
+        #    return self.k_on
+
+
 class TopoIRecognition(BindingModel):
     """
      A BindingModel subclass that calculates binding probabilities according a sigmoid recognition curve.
@@ -1597,6 +1679,8 @@ def assign_binding_model(model_name, oparams_file=None, **oparams):
         my_model = SpacerStagesBinding(filename=oparams_file, **oparams)
     elif model_name == 'GaussianBinding':
         my_model = GaussianBinding(filename=oparams_file, **oparams)
+    elif model_name == 'TopoIPoisson':
+        my_model = TopoIPoisson(filename=oparams_file, **oparams)
     elif model_name == 'TopoIRecognition':
         my_model = TopoIRecognition(filename=oparams_file, **oparams)
     elif model_name == 'TopoIRecognitionRNAPTracking':
