@@ -45,9 +45,13 @@ f_stretching = 1.0  # 0.15  # pN - stretching force of enzymes in vivo - this mi
 p_stiffness = kBT_pN_nm * P_length * w0_nm * w0_nm  # pN - stiffness related to P
 c_stiffness = kBT_pN_nm * C_length * w0_nm * w0_nm  # pN - stiffness related to C
 # related to free energy of twist stiffness of extended state
+# This is the one without the bug
 cs_energy = c_stiffness * (
-        1 - ((C_length / 4 * A_length) *
-             np.sqrt(kBT_pN_nm / (A_length * f_stretching))))
+        1.0 - ((C_length / (4 * A_length)) *
+               np.sqrt(kBT_pN_nm / (A_length * f_stretching))))
+#cs_energy = c_stiffness * (
+#        1 - ((C_length / 4 * A_length) *
+#             np.sqrt(kBT_pN_nm / (A_length * f_stretching))))
 # related to free energy of stretched state
 g_energy = f_stretching - np.sqrt(kBT_pN_nm * f_stretching / A_length)
 # |sigma| <= |sigma_s| - > only twist exists
