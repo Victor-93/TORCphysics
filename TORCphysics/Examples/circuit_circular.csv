@@ -1,2 +1,2 @@
 name,structure,size,twist,superhelical,sequence
-TORCphys,linear,6000,0.0,-0.049,none
+TORCphys_circ,circular,6000,0.0,-0.049,none

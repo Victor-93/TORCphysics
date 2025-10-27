@@ -1,0 +1,2 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+gene,single,3000,3500,0.05,GaussianBinding,none
