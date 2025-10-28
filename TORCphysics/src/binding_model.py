@@ -1179,7 +1179,8 @@ class TopoIRecognition(BindingModel):
 
         a = environmental.concentration * self.k_on
         # b1 = np.float128((superhelical + self.threshold) / self.width)
-        b1 = np.float128((superhelical - self.threshold) / self.width)
+        #b1 = np.float128((superhelical - self.threshold) / self.width)
+        b1 = np.float((superhelical - self.threshold) / self.width)
         b = 1 + np.exp(b1)
         rate = a / b
         return utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
@@ -1300,7 +1301,8 @@ class TopoIRecognitionRNAPTracking(BindingModel):
         # Calculate rate based on superhelical density
         a = environmental.concentration * self.k_on
         # b1 = np.float128((superhelical + self.threshold) / self.width)
-        b1 = np.float128((superhelical - self.threshold) / self.width)
+        #b1 = np.float128((superhelical - self.threshold) / self.width)
+        b1 = np.float((superhelical - self.threshold) / self.width)
         b = 1 + np.exp(b1)
         rate = a / b
         # b = 1 + np.exp((superhelical - self.threshold) / self.width)
@@ -1435,7 +1437,8 @@ class GyraseRecognition(BindingModel):
 
         a = environmental.concentration * self.k_on
         # b1 = np.float128(-(superhelical + self.threshold) / self.width)
-        b1 = np.float128(-(superhelical - self.threshold) / self.width)
+        #b1 = np.float128(-(superhelical - self.threshold) / self.width)
+        b1 = np.float(-(superhelical - self.threshold) / self.width)
         b = 1 + np.exp(b1)
         rate = a / b
         # Configure NumPy to suppress overflow warnings
