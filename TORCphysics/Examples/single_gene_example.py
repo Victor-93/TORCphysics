@@ -13,13 +13,13 @@ enzymes_filename = None  # This input is optional, no enzymes_file means that no
 environment_filename = 'environment_4.csv'  # Topoisomerases act continuously in this one (they dont bind so its faster)
 output_prefix = 'single_gene_continuum-topos'
 frames = 5000
-#frames = 200 # Just a few for the video - specially if topoisomerase can bind as we have more objects binding to the DNA
+#frames = 300 # Just a few for the video - specially if topoisomerase can bind as we have more objects binding to the DNA
 series = True
 continuation = False
 dt = 1.0
 do_animation = False
 animation_format = '.gif' # or '.mp4'
-#animation_format = '.mp4' # or '.mp4'
+animation_format = '.mp4' # or '.mp4'
 
 colors_dict = {'single': 'purple', 'left': 'blue', 'right': 'red'}
 

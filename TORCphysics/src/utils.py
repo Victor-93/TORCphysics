@@ -481,7 +481,8 @@ def velocity_2022SevierBioJ(z, torque):
     # top = 2.0 * z.effect_model.velocity
     top = z.effect_model.velocity
     exp_arg = z.effect_model.kappa * (torque - z.effect_model.stall_torque)
-    exp_arg = np.float128(exp_arg)
+    #exp_arg = np.float128(exp_arg)
+    exp_arg = np.float(exp_arg)
 
     # Define a maximum value for the argument to exp to prevent overflow
     max_exp_arg = 709  # slightly below the overflow threshold for float64
