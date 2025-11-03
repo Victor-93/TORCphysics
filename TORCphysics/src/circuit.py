@@ -1050,3 +1050,22 @@ class Circuit:
 
         # Sort list of enzymes and sites by position/start
         # self.sort_lists()
+
+
+    # Adds a pre-defined custom site
+    def add_custom_Site(self, custom_site):
+        self.site_list.append(custom_site)
+        self.sort_lists()
+        self.log.update_events_size(self.site_list)  # Update log as it depends on the number of binding sites
+        self.update_global_twist()
+        self.update_global_superhelical()
+
+    # Adds a pre-defined custom environment
+    # TODO: We may need to update this one, as the user may want to define new environments that would
+    #       need to define new binding sites, if it binds to bare DNA
+    def add_custom_Environment(self, custom_environment):
+        self.environmental_list.append(custom_environment)
+        self.sort_lists()
+        self.update_global_twist()
+        self.update_global_superhelical()
+

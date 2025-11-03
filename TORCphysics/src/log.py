@@ -72,6 +72,16 @@ class Log:
     def calculate_elongation_rates(self):
         pass
 
+    # We need to increase the size of these numpy arrays when defining new sites.
+    def update_events_size(self, site_list):
+        # Useful information per site - Calculated with the metadata
+        self.n_sites = len(site_list)  # number of sites
+        self.total_unbinding_events = np.zeros(self.n_sites)
+        self.total_binding_events = np.zeros(self.n_sites)
+        self.binding_rates = np.zeros(self.n_sites)
+        self.unbinding_rates = np.zeros(self.n_sites)
+        self.elongation_rates = np.zeros(self.n_sites)
+
     # Writes information to a log file named self.name+.log
     def log_out(self):
         # TODO: Maybe you can clean a little bit your log (binding_rates), so you don't print EXT or extra stuff

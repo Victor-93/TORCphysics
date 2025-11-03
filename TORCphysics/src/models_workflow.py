@@ -1,6 +1,7 @@
 import numpy as np
 from TORCphysics import utils, Enzyme, params
 import sys
+import copy
 
 
 # TODO: Properly sort, comment and document your functions.
@@ -127,9 +128,14 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
                 enzyme = Enzyme(e_type=environment.enzyme_type, name=environment.name, site=site, position=position,
                                 size=environment.size, effective_size=environment.effective_size, twist=0.0,
                                 superhelical=0.0,
-                                effect_model_name=environment.effect_model_name,
-                                effect_model_oparams=environment.effect_model_oparams,
+                                # So, I had it like this before but something happened and I commented it
                                 # effect_model=environment.effect_model,
+                                # Then, I had like the ones below to pass the oparams and the name,
+                                # but can't add custom enzymes
+                                # effect_model_name=environment.effect_model_name,
+                                # effect_model_oparams=environment.effect_model_oparams,
+                                # Finally, I'm doing it with deep_copy(), so I don't modify the orignal model.
+                                effect_model=copy.deepcopy(environment.effect_model),
                                 unbinding_model=environment.unbinding_model)
                 new_enzymes.append(enzyme)
 
