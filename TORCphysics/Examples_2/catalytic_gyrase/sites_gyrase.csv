@@ -1,0 +1,2 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+gyrase_site,gyrase_s,1000,0,0.000205,GyraseRecognition,../../Examples/gyrase_params.csv

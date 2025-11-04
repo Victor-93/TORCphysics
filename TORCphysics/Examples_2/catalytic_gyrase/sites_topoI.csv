@@ -1,0 +1,2 @@
+type,name,start,end,k_on,binding_model,binding_oparams
+topoI_site,topoI_s,1000,0,0.000354,TopoIRecognition,../../Examples/topoI_params.csv

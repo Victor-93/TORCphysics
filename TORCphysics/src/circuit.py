@@ -1069,3 +1069,13 @@ class Circuit:
         self.update_global_twist()
         self.update_global_superhelical()
 
+
+    # This one resets the circuit superhelicity to a custom value
+    def reset_circuit_superhelicity(self,sigma):
+        for enzyme in self.enzyme_list:
+            enzyme.superhelical = sigma
+        self.update_twist()
+        self.update_supercoiling()
+        self.update_global_twist()
+        self.update_global_superhelical()
+
