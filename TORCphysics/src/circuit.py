@@ -11,7 +11,39 @@ from TORCphysics import models_workflow as mw
 
 
 # TODO: Check which inputs are optional (this is not urgent right now).
+# TODO: Find a way how you can define a circuit in command line, without the need of csv files.
+# TODO: Let's try tidying up this function with all of this optinal inputs.
 class Circuit:
+    """
+     The Circuit class used for defining a genetic circuit. This is the main class for setting up and running
+     simulations within TORCphysics. It functions connect the TORCphysics workflow to simulate the binding, effect
+     and unbinding of biomacromolecules.
+
+     Attributes
+     ----------
+     circuit_filename : str, optional
+         Path to the circuit csv file that indicates the circuit properties such as name, structure (linear or circular),
+         size (number of base-pairs), initial twist, initial superhelical density (this one is prioritised over twist
+         and is distributed across the circuit) and sequence (can be none).
+     site_filename : str, optional
+         Path to the site csv file.
+     enzyme_filename : str, optional
+         Path to the enzyme csv file.
+     environment_filename : str, optional
+         Path to the environment csv file.
+     output_prefix : str, optional
+         Prefix for output files.
+     frames : int, optional
+         number of frames for the simulation.
+     series : bool, optional, default True
+         indicates if we want to keep track of the time series of the dataframes (simulation objects, e.g., enzymes, sites, etc...)
+     continuation : bool, optional, default False
+         indicates if simulation is a continuation.
+     dt : float, optional, default 1.0 second
+         indicates the timestep
+     random_seed : int, optional, default None
+         random seed number used for simulation. If none, random seed is chosen according sys.maxsize
+    """
 
     def __init__(self, circuit_filename, sites_filename, enzymes_filename, environment_filename,
                  output_prefix, frames, series, continuation, dt, random_seed=random.randrange(sys.maxsize)):
