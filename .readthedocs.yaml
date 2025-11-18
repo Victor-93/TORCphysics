@@ -13,3 +13,7 @@ python:
 
 sphinx:
   configuration: TORCphysics/docs/conf.py
+
+formats:
+  - pdf
+  - epub
