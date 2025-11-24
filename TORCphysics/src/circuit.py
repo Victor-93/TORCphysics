@@ -1,3 +1,13 @@
+"""
+Circuit is the main object for the TORCphysics package.
+
+This module defines the core Circuit object and functions used to simulate
+supercoiling and transcription dynamics. It includes:
+
+- `Circuit`: The object that connects all components, e.g., sites, enzymes, environmentals.
+- Utilities for setting up and updating Circuits
+"""
+
 import pandas as pd
 import random
 import numpy as np

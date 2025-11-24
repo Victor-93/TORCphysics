@@ -1,5 +1,15 @@
 # API Reference
 
+Welcome to the full API documentation of **TORCphysics**.  
+Click the sections below to explore each module in detail.
+
+---
+
+## Core Models
+
+### Circuit
+::: TORCphysics.circuit
+
 ::: TORCphysics.src.analysis
 ::: TORCphysics.src.binding_model
 ::: TORCphysics.src.circuit
