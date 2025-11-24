@@ -26,3 +26,15 @@ nav:
           - Site: api/core_objects/site.md
           - Environment: api/core_objects/environment.md
           - Enzyme/Effector: api/core_objects/enzyme.md
+      - Models:
+          - Binding Model: api/models/binding_model.md
+          - Effect Model: api/models/effect_model.md
+          - Unbinding Model: api/models/unbinding_model.md
+      - Utilities:
+          - Analysis: api/utilities/analysis.md
+          - Visualization: api/utilities/visualization.md
+          - Utils: api/utilities/utils.md
+          - Parameters: api/utilities/parameters.md
+          - Log: api/utilities/log.md
+          - Models Workflow: api/utilities/models_workflow.md
+      - Command-Line Interface: api/cli.md
