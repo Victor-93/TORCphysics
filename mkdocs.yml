@@ -16,3 +16,11 @@ markdown_extensions:
   - markdown_include.include:
       base_path: TORCphysics
   - admonition
+
+nav:
+  - Home: index.md
+  - Getting Started: getting_started.md
+  - API:
+      - Overview: api/index.md
+      - Core:
+          - Circuit: api/core/circuit.md

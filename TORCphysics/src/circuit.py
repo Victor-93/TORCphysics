@@ -96,21 +96,6 @@ class Circuit:
           and `UnbindingModel` for each site/enzyme.
         - Custom workflows can be defined in this class.
         - Supercoiling propagates instantly.
-
-        Example
-        --------
-        Initialize and run a simple simulation:
-
-        >>> from TORCphysics import Circuit
-        >>> circuit = Circuit(
-        ...     circuit_filename="circuit.csv",
-        ...     site_filename="sites.csv",
-        ...     enzyme_filename="enzymes.csv",
-        ...     environment_filename="environment.csv",
-        ...     dt=1.0,
-        ...     frames=1000,
-        ... )
-        >>> circuit.run()  # Simulates 1000 frames
     """
 
     def __init__(self, circuit_filename, sites_filename, enzymes_filename, environment_filename,

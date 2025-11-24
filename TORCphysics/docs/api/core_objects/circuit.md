@@ -10,7 +10,7 @@ It connects TORCphysics workflows (binding, effect, unbinding) and tracks time-s
 ```python
 from TORCphysics.src.circuit import Circuit
 
-c = Circuit(
+my_circuit = Circuit(
     circuit_filename="circuit.csv",
     site_filename="sites.csv",
     enzyme_filename="enzymes.csv",
@@ -19,10 +19,10 @@ c = Circuit(
     dt=1.0,
 )
 
-c.run() 
+my_circuit.run() 
 ```
 
-::: TORCphysics.src.circuit
-options:
-show_root_heading: false
-show_source: false
+::: TORCphysics.src.binding_model.BindingModel
+    options:
+      show_root_heading: false
+      show_source: false
