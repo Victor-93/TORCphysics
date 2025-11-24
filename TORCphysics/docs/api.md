@@ -1,6 +1,6 @@
 # API Reference
 
-::: TORCphysics.src
+::: TORCphysics.src.effects_model
 
 
 
