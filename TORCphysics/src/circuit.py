@@ -25,34 +25,92 @@ from TORCphysics import models_workflow as mw
 # TODO: Let's try tidying up this function with all of this optinal inputs.
 class Circuit:
     """
-     The Circuit class used for defining a genetic circuit. This is the main class for setting up and running
-     simulations within TORCphysics. It functions connect the TORCphysics workflow to simulate the binding, effect
-     and unbinding of biomacromolecules.
+        The central class for defining and simulating a genetic circuit in **TORCphysics**.
 
-     Attributes
-     ----------
-     circuit_filename : str, optional
-         Path to the circuit csv file that indicates the circuit properties such as name, structure (linear or circular),
-         size (number of base-pairs), initial twist, initial superhelical density (this one is prioritised over twist
-         and is distributed across the circuit) and sequence (can be none).
-     site_filename : str, optional
-         Path to the site csv file.
-     enzyme_filename : str, optional
-         Path to the enzyme csv file.
-     environment_filename : str, optional
-         Path to the environment csv file.
-     output_prefix : str, optional
-         Prefix for output files.
-     frames : int, optional
-         number of frames for the simulation.
-     series : bool, optional, default True
-         indicates if we want to keep track of the time series of the dataframes (simulation objects, e.g., enzymes, sites, etc...)
-     continuation : bool, optional, default False
-         indicates if simulation is a continuation.
-     dt : float, optional, default 1.0 second
-         indicates the timestep
-     random_seed : int, optional, default None
-         random seed number used for simulation. If none, random seed is chosen according sys.maxsize
+        The `Circuit` object coordinates every component required to run a
+        supercoiling-transcription simulation. It loads and initializes:
+
+        - the **DNA circuit** (structure, size, twist/supercoiling, sequence)
+        - **binding sites** (e.g., genes, protein binding sites)
+        - **enzymes** bound molecules (e.g., gyrase, topoI, RNAP)
+        - the **environmentals** not bound molecules with the capacity to bind and become enzymes/effectors (RNAPs, topoisomerases)
+        - simulation parameters and output configuration
+
+        Once initialized, the `Circuit` instance provides an interface for
+        simulating the genetic circuit, computing binding, effect and unbinding events,
+        updating DNA supercoiling/twist, and storing the resulting time series as data-frames.
+
+        Parameters
+        ----------
+        circuit_filename : str, optional
+            Path to the CSV file describing the DNA circuit.
+            The file may define:
+
+            - circuit name
+            - structure (`linear` or `circular`)
+            - total length in base pairs
+            - initial twist
+            - initial superhelical density (if provided, this overrides `twist`)
+            - DNA sequence (optional)
+
+        site_filename : str, optional
+            Path to the CSV file describing **binding sites** on the DNA.
+            Each entry includes the position, binding model, start/end, and
+            relevant parameters.
+
+        enzyme_filename : str, optional
+            Path to the CSV file listing bound **enzymes** at the start of the simulation
+            (RNAP, gyrase, topoI, etc.) and their physical properties (position, size, site, etc...).
+
+        environment_filename : str, optional
+            Path to the CSV file specifying **environmentals**, such as
+            RNAPs, topoisomerases and proteins.
+
+        output_prefix : str, optional
+            Prefix used for naming output files (profiles, logs, data-frames).
+
+        frames : int, optional
+            Number of frames during the simulation.
+
+        series : bool, optional, default=True
+            Whether to store complete time-series trajectories for internal objects
+            (enzymes, sites and environmentals.).
+            Set to `False` when only the final state is needed.
+
+        continuation : bool, optional, default=False
+            If `True`, the simulation continues from previously saved state instead
+            of initializing a new circuit.
+
+        dt : float, optional, default=1.0
+            Simulation timestep in seconds.
+
+        random_seed : int, optional
+            Seed for the random number generator.
+            If `None`, a seed is drawn from `sys.maxsize`.
+            Setting a fixed seed ensures reproducible stochastic trajectories.
+
+        Notes
+        -----
+        - The `Circuit` class is the *entry point* for the TORCphysics workflow.
+          It internally creates and links the `BindingModel`, `EffectModel`,
+          and `UnbindingModel` for each site/enzyme.
+        - Custom workflows can be defined in this class.
+        - Supercoiling propagates instantly.
+
+        Example
+        --------
+        Initialize and run a simple simulation:
+
+        >>> from TORCphysics import Circuit
+        >>> circuit = Circuit(
+        ...     circuit_filename="circuit.csv",
+        ...     site_filename="sites.csv",
+        ...     enzyme_filename="enzymes.csv",
+        ...     environment_filename="environment.csv",
+        ...     dt=1.0,
+        ...     frames=1000,
+        ... )
+        >>> circuit.run()  # Simulates 1000 frames
     """
 
     def __init__(self, circuit_filename, sites_filename, enzymes_filename, environment_filename,
