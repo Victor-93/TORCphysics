@@ -2,7 +2,7 @@
 
 ::: TORCphysics.analysis
 ::: TORCphysics.binding_model
-::: TORCphysics.circuit
+::: TORCphysics.Circuit
 ::: TORCphysics.cli
 ::: TORCphysics.effect_model
 ::: TORCphysics.environment
