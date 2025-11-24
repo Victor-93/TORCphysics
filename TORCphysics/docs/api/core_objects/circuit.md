@@ -8,7 +8,7 @@ It connects TORCphysics workflows (binding, effect, unbinding) and tracks time-s
 ## Usage Example
 
 ```python
-from TORCphysics.src.circuit import Circuit
+from TORCphysics import Circuit
 
 my_circuit = Circuit(
     circuit_filename="circuit.csv",

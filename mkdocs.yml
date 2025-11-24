@@ -23,3 +23,6 @@ nav:
       - Overview: api/index.md
       - Core Objects:
           - Circuit: api/core_objects/circuit.md
+          - Site: api/core_objects/site.md
+          - Environment: api/core_objects/environment.md
+          - Enzyme/Effector: api/core_objects/enzyme.md
