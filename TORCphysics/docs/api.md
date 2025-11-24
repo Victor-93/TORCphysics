@@ -1,6 +1,6 @@
 # API Reference
 
-::: TORCphysics.binding_model
+::: TORCphysics
 
 
 
