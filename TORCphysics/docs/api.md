@@ -8,7 +8,7 @@ Click the sections below to explore each module in detail.
 ## Core Models
 
 ### Circuit
-::: TORCphysics.circuit
+::: TORCphysics.src.circuit
 
 ::: TORCphysics.src.analysis
 ::: TORCphysics.src.binding_model
