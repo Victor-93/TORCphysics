@@ -14,5 +14,5 @@ plugins:
             docstring_style: sphinx
 markdown_extensions:
   - markdown_include.include:
-      base_path: TORCphysics
+      base_path: .
   - admonition
