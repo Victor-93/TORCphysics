@@ -1,4 +1,4 @@
-{!../../README.md!}
+{!../README.md!}
 
 # Welcome to TORCphysics's documentation!
 
