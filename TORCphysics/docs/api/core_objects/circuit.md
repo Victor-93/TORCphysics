@@ -22,7 +22,7 @@ my_circuit = Circuit(
 my_circuit.run() 
 ```
 
-::: TORCphysics.src.binding_model.BindingModel
+::: TORCphysics.src.circuit.Circuit
     options:
       show_root_heading: false
       show_source: false
