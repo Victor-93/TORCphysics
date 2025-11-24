@@ -6,7 +6,7 @@ API
 
    TORCphysics.analysis
    TORCphysics.binding_model
-   TORCphysics.circuit
+   TORCphysics.src.circuit
    TORCphysics.cli
    TORCphysics.effect_model
    TORCphysics.environment
