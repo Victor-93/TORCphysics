@@ -1,4 +1,6 @@
-site_name: TORCPhysics Project
+site_name: TORCPhysics
+docs_dir: TORCphysics/docs
+
 theme:
   name: readthedocs
   highlightjs: true
