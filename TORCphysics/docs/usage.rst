@@ -1,34 +1,22 @@
-Usage
-=====
+Welcome to Lumache's documentation!
+===================================
 
-.. _installation:
+**Lumache** (/lu'make/) is a Python library for cooks and food lovers
+that creates recipes mixing random ingredients.
+It pulls data from the `Open Food Facts database <https://world.openfoodfacts.org/>`_
+and offers a *simple* and *intuitive* API.
 
-Installation
-------------
+Check out the :doc:`usage` section for further information, including
+how to :ref:`installation` the project.
 
-To use TORCphysics, first install it using pip:
+.. note::
 
-.. code-block:: console
+   This project is under active development.
 
-   (.venv) $ pip install TORCphysics
+Contents
+--------
 
-Creating recipes
-----------------
+.. toctree::
 
-To retrieve a list of random ingredients,
-you can use the ``TORCphysics.get_random_ingredients()`` function:
-
-.. autofunction:: TORCphysics.get_random_ingredients
-
-The ``kind`` parameter should be either ``"meat"``, ``"fish"``,
-or ``"veggies"``. Otherwise, :py:func:`TORCphysics.get_random_ingredients`
-will raise an exception.
-
-.. autoexception:: TORCphysics.InvalidKindError
-
-For example:
-
->>> import TORCphysics
->>> TORCphysics.get_random_ingredients()
-['shells', 'gorgonzola', 'parsley']
-
+   usage
+   api

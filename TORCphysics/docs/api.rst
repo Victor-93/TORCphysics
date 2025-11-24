@@ -2,12 +2,11 @@ API
 ===
 
 .. autosummary::
-   :toctree: api
-   :recursive:
+   :toctree: generated
 
-   TORCphysics.analysis
-   TORCphysics.binding_model
-   TORCphysics.circuit
+   TORCphysics.src..analysis
+   TORCphysics.src.binding_model
+   TORCphysics.src.circuit
    TORCphysics.cli
    TORCphysics.effect_model
    TORCphysics.environment
