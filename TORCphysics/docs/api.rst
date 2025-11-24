@@ -4,9 +4,9 @@ API
 .. autosummary::
    :toctree: generated
 
-   TORCphysics.src..analysis
-   TORCphysics.src.binding_model
-   TORCphysics.src.circuit
+   TORCphysics.analysis
+   TORCphysics.binding_model
+   TORCphysics.circuit
    TORCphysics.cli
    TORCphysics.effect_model
    TORCphysics.environment
