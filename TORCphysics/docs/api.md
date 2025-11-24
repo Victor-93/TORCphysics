@@ -5,23 +5,23 @@ Click the sections below to explore each module in detail.
 
 ---
 
-# Core Objects 
+## Core Objects 
 
-## Circuit
+### Circuit
 ::: TORCphysics.src.circuit
 
-## Sites
+### Sites
 ::: TORCphysics.src.site
 
-## Environmentals
+### Environmentals
 ::: TORCphysics.src.environment
 
-## Enzymes/Effectors
+### Enzymes/Effectors
 ::: TORCphysics.src.enzyme
 
 ---
 
-# Core Models
+## Core Models
 
 ### Binding Model
 ::: TORCphysics.src.binding_model
