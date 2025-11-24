@@ -5,24 +5,57 @@ Click the sections below to explore each module in detail.
 
 ---
 
-## Core Models
+## Core Objects 
 
 ### Circuit
 ::: TORCphysics.src.circuit
 
-::: TORCphysics.src.analysis
-::: TORCphysics.src.binding_model
-::: TORCphysics.src.circuit
-::: TORCphysics.src.cli
-::: TORCphysics.src.effect_model
-::: TORCphysics.src.environment
-::: TORCphysics.src.enzyme
-::: TORCphysics.src.log
-::: TORCphysics.src.models_workflow
-::: TORCphysics.src.params
+### Sites
 ::: TORCphysics.src.site
-::: TORCphysics.src.unbinding_model
-::: TORCphysics.src.utils
-::: TORCphysics.src.visualization
 
+### Environmentals
+::: TORCphysics.src.environment
+
+### Enzymes/Effectors
+::: TORCphysics.src.enzyme
+
+---
+
+## Core Models
+
+### Binding Model
+::: TORCphysics.src.binding_model
+
+### Effect Model
+::: TORCphysics.src.effect_model
+
+### Unbinding Model
+::: TORCphysics.src.unbinding_model
+
+---
+
+### Command Line
+::: TORCphysics.src.cli
+
+---
+
+## Utilities
+
+### Parameters
+::: TORCphysics.src.params
+
+### Utility functions - mathematical and physical functions
+::: TORCphysics.src.utils
+
+### Log
+::: TORCphysics.src.log
+
+### Models Workflow
+::: TORCphysics.src.models_workflow
+
+### Analysis functions - post simulation
+::: TORCphysics.src.analysis
+
+### Visualization 
+::: TORCphysics.src.visualization
 
