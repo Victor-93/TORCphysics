@@ -135,7 +135,8 @@ for n, e_dict in enumerate([topoI_dict, gyrase_dict, gyrase_pos_dict]):
     # Histogram
     #ax.hist(mtwists, bins=nbins, density=True, color='blue', edgecolor='black')#, nbins=10)
     #sns.histplot(mtwists, kde=True, bins=nbins, ax=ax, color=hist_color, stat='probability')
-    sns.histplot(mtwists, kde=True, ax=ax, color=hist_color, stat='probability')
+    #sns.histplot(mtwists, kde=True, ax=ax, color=hist_color, stat='probability')
+    sns.histplot(mtwists, kde=True, ax=ax, bins=10, color=hist_color, stat='probability')
 axs[2,1].set_xlabel('Time (mins)', fontsize=xlabel_size)
 axs[2,0].set_xlabel('Rotations induced per binding event', fontsize=xlabel_size)
 
