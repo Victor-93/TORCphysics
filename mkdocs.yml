@@ -34,7 +34,7 @@ nav:
           - Analysis: api/utilities/analysis.md
           - Visualization: api/utilities/visualization.md
           - Utils: api/utilities/utils.md
-          - Parameters: api/utilities/parameters.md
+          - Parameters: api/utilities/params.md
           - Log: api/utilities/log.md
           - Models Workflow: api/utilities/models_workflow.md
       - Command-Line Interface: api/cli.md
