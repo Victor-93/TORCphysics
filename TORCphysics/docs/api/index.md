@@ -7,4 +7,4 @@ Use the navigation below to explore modules and classes.
 
 ## Core Objects
 
-- [Circuit](core/circuit.md)
+- [Circuit](core_objects/circuit.md)
