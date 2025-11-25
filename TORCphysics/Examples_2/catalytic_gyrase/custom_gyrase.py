@@ -32,8 +32,13 @@ class GyraseCyclesEffect(em.EffectModel):
             self.k_go = float(oparams['k_go'])
             self.k_dwell = float(oparams['k_dwell'])
 
+            # For making it linear
+            #self.a = float(oparams['a'])
+            #self.b = float(oparams['b'])
+
         self.oparams = {'k_cat': self.k_cat, 'k_wrap': self.k_wrap, 'k_unwrap': self.k_unwrap,
                         'k_go': self.k_go, 'k_dwell': self.k_dwell}  # Just in case
+                        #'a': self.a, 'b': self.b}
 
     def calculate_effect(self, index, z, z_list, dt) -> em.Effect:
 
@@ -93,6 +98,9 @@ class GyraseCyclesEffect(em.EffectModel):
 
             z.name = 'gyrase_' + self.state
 
+            # Get superhelical density in the region
+            # superhelical = utils.get_superhelical_in_region(z, z_list)
+
             # Calculate probabilities as Poisson processes
             p_remains = utils.Poisson_process(self.k_dwell, dt)  # probability of unwrapping
 
@@ -101,6 +109,10 @@ class GyraseCyclesEffect(em.EffectModel):
             if random_number < p_remains:
                 twist_left = -0.5 * self.k_cat * params.w0 * dt
                 twist_right = -0.5 * self.k_cat * params.w0 * dt
+
+                # For the linear model!
+                #twist_left = -0.5(self.a + self.b *superhelical* self.k_cat )* params.w0 * dt
+                #twist_right = -0.5(self.a + self.b *superhelical* self.k_cat )* params.w0 * dt
             else:
                 self.state = 'UNWRAPPED'  # TRANSITIONS TO UNWRAPPED
                 twist_left = 0.0
