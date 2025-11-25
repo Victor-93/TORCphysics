@@ -100,8 +100,11 @@ class Circuit:
     """
 
     def __init__(self, circuit_filename=None, sites_filename=None, enzymes_filename=None, environment_filename=None,
-                 output_prefix='output', frames=2000, series=None, continuation=False, dt=1.0, random_seed=random.randrange(sys.maxsize)):
-        # I'll save the input filenames just in case
+                 output_prefix='output', frames=2000, series=None, continuation=False, dt=1.0,
+                 random_seed=random.randrange(sys.maxsize),
+                 size=3000, sequence=None, structure='linear', superhelicity=-0.06):
+
+        # Sort inputs
         self.circuit_filename = circuit_filename
         self.sites_filename = sites_filename
         self.enzymes_filename = enzymes_filename
@@ -112,20 +115,26 @@ class Circuit:
         self.series = series
         self.continuation = continuation
         self.name = 'TORCphysics' #None
-        self.structure = 'linear' #None
-        self.circle = False #None
-        self.size = 1000
-        self.twist = None
-        self.superhelical = 0.0 # None
-        self.sequence = None
+        self.structure = structure #'linear' #None
+        if self.structure == 'linear':
+            self.circle = False #None
+        elif self.structure == 'circular':
+            self.circle = True
+        else:
+            raise ValueError('Error, circuit structure not recognised.')
+        self.size = size
+        self.twist = 0.0
+        self.superhelical = superhelicity # None
+        self.sequence = sequence
         self.dt = dt  # time step
+
         if self.circuit_filename is not None:
             self.read_csv()  # Here, it gets the name,structure, etc
         self.site_list = SiteFactory(filename=sites_filename).site_list
         self.enzyme_list = EnzymeFactory(filename=enzymes_filename, site_list=self.site_list).enzyme_list
         self.environmental_list = EnvironmentFactory(filename=environment_filename,
                                                      site_list=self.site_list).environment_list
-        self.check_object_inputs()  # Checks that the site, environmental and enzyme lists are correct
+        # self.check_object_inputs()  # Checks that the site, environmental and enzyme lists are correct
         self.time = 0
         # create a time-based seed and save it, and initialize our random generator with this seed
         self.seed = random_seed  # random.randrange(sys.maxsize)
@@ -138,9 +147,7 @@ class Circuit:
         # -----------------------------------------------
         # We add new DNA sites which is the ones that we will link topos binding
         # Note: In the future there might be cases in which new enzymes will be added to the environment, so maybe,
-        # these new sites will need to be created
-        # TODO: Maybe we can store it in define_bar_DNA_binding_sites, so this happens in general, for DNA binding
-        #  enzymes.
+        # these new sites will need to be created - DONE
         # Define bare DNA binding sites for bare DNA binding enzymes
         self.define_bare_DNA_binding_sites()
 
@@ -658,6 +665,8 @@ class Circuit:
                     return site  # the first one?
         else:
             return None
+
+    # TODO match site with type - Maybe we can use the pre-defined environments to match with them
 
     # Prints general information
     def print_general_information(self):
