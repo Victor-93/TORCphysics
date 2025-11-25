@@ -68,6 +68,7 @@ class Circuit:
 
         output_prefix : str, optional
             Prefix used for naming output files (profiles, logs, data-frames).
+            Default value: TORCphysics.
 
         frames : int, optional
             Number of frames during the simulation.
@@ -98,8 +99,8 @@ class Circuit:
         - Supercoiling propagates instantly.
     """
 
-    def __init__(self, circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                 output_prefix, frames, series, continuation, dt, random_seed=random.randrange(sys.maxsize)):
+    def __init__(self, circuit_filename=None, sites_filename=None, enzymes_filename=None, environment_filename=None,
+                 output_prefix='output', frames=2000, series=None, continuation=False, dt=1.0, random_seed=random.randrange(sys.maxsize)):
         # I'll save the input filenames just in case
         self.circuit_filename = circuit_filename
         self.sites_filename = sites_filename
@@ -110,15 +111,16 @@ class Circuit:
         self.frame = 0
         self.series = series
         self.continuation = continuation
-        self.name = None
-        self.structure = None
-        self.circle = None
-        self.size = 0
+        self.name = 'TORCphysics' #None
+        self.structure = 'linear' #None
+        self.circle = False #None
+        self.size = 1000
         self.twist = None
-        self.superhelical = None
+        self.superhelical = 0.0 # None
         self.sequence = None
         self.dt = dt  # time step
-        self.read_csv()  # Here, it gets the name,structure, etc
+        if self.circuit_filename is not None:
+            self.read_csv()  # Here, it gets the name,structure, etc
         self.site_list = SiteFactory(filename=sites_filename).site_list
         self.enzyme_list = EnzymeFactory(filename=enzymes_filename, site_list=self.site_list).enzyme_list
         self.environmental_list = EnvironmentFactory(filename=environment_filename,
