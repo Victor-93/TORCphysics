@@ -912,6 +912,45 @@ class Circuit:
         self.sort_site_list()
         return
 
+    # This function defines the binding sites of enzymes that recognize bare DNA, that means just DNA.
+    # It partitions the DNA in N binding sites of size enzyme.size
+    def define_bare_DNA_binding_sites_for_added_environmental(self, environmental):
+
+        # Let's create the global sites.
+        # -----------------------------------------------
+
+        # These global sites count how many times enzymes bound to the DNA molecule in general, but these sites
+        # are not actually bound for any type of environmental, so they don't have binding/effect/unbinding models.
+        if 'DNA' in environmental.site_type:
+            t_site = Site(site_type='DNA_' + environmental.name, name='DNA_' + environmental.name,
+                          start=1, end=float(self.size), k_on=0.0, global_site=True)
+            self.site_list.append(t_site)
+
+        # Let's create the local sites.
+        # -----------------------------------------------
+        if environmental.binding_model is None:  # There is no point in defining local sites if the environmentals
+            # don't have a binding model
+            return
+        if 'DNA' in environmental.site_type:
+            n_sites = int(self.size / environmental.size)
+            s = 0
+            for n in range(n_sites):
+                start = 1 + environmental.size * n
+                end = environmental.size * (1 + n)
+                if end > self.size:  # Little break to avoid making it bigger than the actual plasmid
+                    continue
+                local_site = Site(site_type='DNA_' + environmental.name, name=str(s), start=start, end=end,
+                                  k_on=environmental.binding_model.k_on, binding_model=environmental.binding_model)
+                self.site_list.append(local_site)
+                environmental.site_list.append(local_site)
+
+                s = s + 1
+
+            # The next line makes the environmental recognize the specific binding site
+            environmental.site_type = 'DNA_' + environmental.name
+
+        self.sort_site_list()
+        return
     def check_object_inputs(self):
 
         """
@@ -1065,6 +1104,7 @@ class Circuit:
     #       need to define new binding sites, if it binds to bare DNA
     def add_custom_Environment(self, custom_environment):
         self.environmental_list.append(custom_environment)
+        self.define_bare_DNA_binding_sites_for_added_environmental(custom_environment) # This one automatically detects if we need to define bare binding sites.
         self.sort_lists()
         self.update_global_twist()
         self.update_global_superhelical()

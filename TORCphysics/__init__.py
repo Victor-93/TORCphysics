@@ -15,3 +15,6 @@ from .src.circuit import Circuit
 from .src.extra_tools import parallelization_tools, add_enzyme
 from .src.extra_tools import topo_calibration_tools
 from .src.extra_tools import parameter_search
+
+# Extra tools
+from .src.environment import GyraseEnvironment

@@ -3,7 +3,8 @@ from TORCphysics import utils
 from TORCphysics import binding_model as bm
 from TORCphysics import unbinding_model as ubm
 from TORCphysics import effect_model as em
-
+import importlib.resources as pkg_resources
+from TORCphysics.src import model_params_dir
 
 class Environment:
     """
@@ -453,3 +454,183 @@ class EnvironmentFactory:
                                           unbinding_model_name=str(row['unbinding_model']),
                                           unbinding_oparams_file=str(row['unbinding_oparams']))
             self.environment_list.append(new_environment)
+
+# Pre-defined Gyrase Environment
+def GyraseEnvironment(e_type='topoI', name='gyrase', site_list=[], concentration=44.6, size=30, effective_size=20, site_type='DNA',
+                      binding_model=None,
+                      binding_model_name='GyraseRecognition',
+                      binding_oparams_file= model_params_dir + '/Gyrase_Recognition.csv',
+                      binding_model_oparams=None,
+                      effect_model=None,
+                      effect_model_name='GyraseLinear',
+                      effect_oparams_file=model_params_dir + '/Gyrase_Recognition.csv',
+                      effect_model_oparams=None,
+                      unbinding_model = None,
+                      unbinding_model_name='PoissonUnBinding',
+                      unbinding_oparams_file=model_params_dir + '/Gyrase_Recognition.csv',
+                      unbinding_model_oparams=None,
+                      circuit=None):
+    """
+       Create a pre-configured **DNA gyrase environment** with default parameterisations.
+
+       This function constructs an :class:`Environment` object describing
+       the concentration, binding, effect, and unbindg behaviours of
+       a DNA gyrase. It optionally attaches the created environment to a given
+       :class:`Circuit`.
+
+       Parameters
+       ----------
+       e_type : str, default "topo"
+           Enzyme category/type (e.g., "topo").
+       name : str, default "gyrase"
+           Name of this environmental, as it appears in the circuit.
+       site_list : list
+           Specific site objects the gyrase can bind to. If ``site_type='DNA'``,
+           the circuit automatically construct binding sites along the DNA.
+       concentration : float, default 44.6
+           Molecular concentration in nM.
+       size : int, default 30
+           Physical size of the enzyme on DNA, in base pairs.
+       effective_size : int, default 20
+           Effective “interaction size” on the DNA.
+       site_type : str, default "DNA"
+           Type of target site ("DNA", "gyrase-binding-site", etc.).
+           If ``site_type='DNA'``, binding sites along the DNA are created.
+       binding_model : object or None
+           Optional pre-constructed binding model. If ``None``, the model is loaded
+           from ``binding_model_name`` and its parameter CSV file.
+       binding_model_name : str or None, default "GyraseRecognition"
+           Name of the binding model class to load.
+           The default model is the pre-calibrated Gyrase Recognition model.
+       binding_model_oparams : dict or None
+           Optional override parameters. If ``None``, CSV parameters are loaded.
+       binding_oparams_file : str or None, default model_params/Gyrase_Recognition.csv
+           Path to the CSV containing binding parameters.
+           Defaults to ``model_params/Gyrase_Recognition.csv``.
+
+       effect_model : Effect object or None
+           Optional constructed effect model.
+       effect_model_name : str or None, default "GyraseLinear"
+           Name of the effect model class.
+           Default is the gyrase linear effect model.
+       effect_model_oparams : dict or None
+           Optional override parameters.
+       effect_oparams_file : str or None
+           CSV path for effect model parameters, same default as binding.
+
+       unbinding_model : Unbinding object or None
+           Optional constructed unbinding model.
+       unbinding_model_name : str, default "PoissonUnBinding"
+           Name of unbinding model class.
+       unbinding_model_oparams : dict or None
+           Optional overrides.
+       unbinding_oparams_file : str or None
+           CSV file for unbinding parameters.
+
+       circuit : Circuit or None
+           If provided, the constructed gyrase environment is automatically added to the circuit.
+
+       Returns
+       -------
+       Environment
+           The constructed gyrase environment object.
+           If ``circuit`` is provided, it is also registered inside the circuit.
+
+       Notes
+       -----
+       This function is a convenience factory intended to provide a clean, fast,
+       reproducible way of constructing gyrase environments using parameter files
+       stored under :mod:`TORCphysics.src.model_params`.
+
+       Special careful with site_type='DNA', as it may result in a long list of avaialble sites through the DNA,
+       which may lead to system saturation.
+
+       If a list of sites is provided in ``site_list=list_of_sites``, it is assumed that this list of sites have already
+       being defined and added to the circuit.
+
+       Examples
+       --------
+       Create an isolated gyrase environment
+
+        gyr = GyraseEnvironment()
+
+       Add gyrase directly to an existing circuit
+
+         circ = Circuit(...)
+         gyr = GyraseEnvironment(circuit=circ)
+       """
+
+    # -----------------------------------------------------
+    # Resolve default CSV parameter paths using importlib.resources
+    # -----------------------------------------------------
+
+    # Create gyrase environment object
+    gyrase_env = Environment(e_type=e_type, name=name, site_list=site_list, concentration=concentration, size=size,
+                           effective_size=effective_size, site_type=site_type,
+                           binding_model_name=binding_model_name, binding_oparams_file=binding_oparams_file,
+                           effect_model_name=effect_model_name, effect_oparams_file=effect_oparams_file,
+                           unbinding_model_name=unbinding_model_name, unbinding_oparams_file=unbinding_oparams_file,
+                           binding_model=binding_model, effect_model=effect_model, unbinding_model=unbinding_model,
+                           binding_model_oparams=binding_model_oparams, effect_model_oparams=effect_model_oparams,
+                           unbinding_model_oparams=unbinding_model_oparams)
+
+    # -----------------------------------------------------
+    # Register into circuit if provided
+    # -----------------------------------------------------
+    if circuit is not None:
+        circuit.add_custom_Environment(gyrase_env)
+
+    return gyrase_env
+
+
+
+# This was a test doing it as a class, but I think it's better these as functions. But I'll leave it here just in case.
+class Gyrase(Environment):
+    DEFAULT_BINDING_FILE = model_params_dir + '/Gyrase_Recognition.csv'
+    DEFAULT_EFFECT_FILE = model_params_dir + '/Gyrase_Recognition.csv'
+    DEFAULT_UNBINDING_FILE = model_params_dir + '/Gyrase_Recognition.csv'
+
+    def __init__(self,
+                 e_type='topoI', name='gyrase', site_list=None, concentration=44.6,
+                 size=30, effective_size=20, site_type='DNA',
+                 binding_model=None,
+                 binding_model_name='GyraseRecognition',
+                 binding_oparams_file= model_params_dir + '/Gyrase_Recognition.csv',
+                 binding_model_oparams=None,
+                 effect_model=None,
+                 effect_model_name='GyraseLinear',
+                 effect_oparams_file=model_params_dir + '/Gyrase_Recognition.csv',
+                 effect_model_oparams=None,
+                 unbinding_model = None,
+                 unbinding_model_name='PoissonUnBinding',
+                 unbinding_oparams_file=model_params_dir + '/Gyrase_Recognition.csv',
+                 unbinding_model_oparams=None,
+                 circuit=None):
+
+    # -----------------------------------------------------
+    # Resolve default CSV parameter paths using importlib.resources
+    # -----------------------------------------------------
+        super().__init__(e_type=e_type, name=name, site_list=site_list, concentration=concentration, size=size,
+                               effective_size=effective_size, site_type=site_type,
+                               binding_model_name=binding_model_name, binding_oparams_file=binding_oparams_file,
+                               effect_model_name=effect_model_name, effect_oparams_file=effect_oparams_file,
+                               unbinding_model_name=unbinding_model_name, unbinding_oparams_file=unbinding_oparams_file,
+                               binding_model=binding_model, effect_model=effect_model, unbinding_model=unbinding_model,
+                               binding_model_oparams=binding_model_oparams, effect_model_oparams=effect_model_oparams,
+                               unbinding_model_oparams=unbinding_model_oparams)
+
+        # Create gyrase environment object
+ #   gyrase_env = Environment(e_type=e_type, name=name, site_list=site_list, concentration=concentration, size=size,
+ #                          effective_size=effective_size, site_type=site_type,
+ #                          binding_model_name=binding_model_name, binding_oparams_file=binding_oparams_file,
+  #                         effect_model_name=effect_model_name, effect_oparams_file=effect_oparams_file,
+ #                          unbinding_model_name=unbinding_model_name, unbinding_oparams_file=unbinding_oparams_file,
+ #                          binding_model=binding_model, effect_model=effect_model, unbinding_model=unbinding_model,
+ #                          binding_model_oparams=binding_model_oparams, effect_model_oparams=effect_model_oparams,
+ #                          unbinding_model_oparams=unbinding_model_oparams)
+
+    # -----------------------------------------------------
+    # Register into circuit if provided
+    # -----------------------------------------------------
+        if circuit is not None:
+            circuit.add_custom_Environment(self)

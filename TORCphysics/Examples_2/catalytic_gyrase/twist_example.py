@@ -26,8 +26,8 @@ import pickle
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
 dt = 1.0 #0.25
 initial_time = 0
-#final_time = 10800
-final_time = 10800 // 10
+final_time = 10800
+#final_time = 10800 // 2
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 file_out = 'twist-contribution'

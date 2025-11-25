@@ -1391,9 +1391,11 @@ class GyraseRecognition(BindingModel):
         super().__init__(filename, **oparams)
         if not oparams:
             if filename is None:
-                self.width = params.gyra_b_w
-                self.threshold = params.gyra_b_t
-                self.k_on = params.gyra_b_k_on
+                # These values were calibrated from the TORCphysics paper
+                self.width = 0.012489787771202422 # params.gyra_b_w
+                self.threshold = -0.05988114074954452 # params.gyra_b_t
+                self.k_on = 0.00020506482813255903 #params.gyra_b_k_on
+
             else:
                 mydata = pd.read_csv(filename)
                 if 'k_on' in mydata.columns:

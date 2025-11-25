@@ -15,6 +15,7 @@ class GyraseCyclesEffect(em.EffectModel):
 
         self.state = 'UNWRAPPED' # The initial state
 
+        # This is just to load some parameters, but won't need it right now.
         if not oparams:
             if filename is None:
                 self.k_cat = 0.01
@@ -29,10 +30,10 @@ class GyraseCyclesEffect(em.EffectModel):
             self.k_wrap = float(oparams['k_wrap'])
             self.k_unwrap = float(oparams['k_unwrap'])
             self.k_go = float(oparams['k_go'])
-            self.k_duration = float(oparams['k_duration'])
+            self.k_dwell = float(oparams['k_dwell'])
 
         self.oparams = {'k_cat': self.k_cat, 'k_wrap': self.k_wrap, 'k_unwrap': self.k_unwrap,
-                        'k_go': self.k_go, 'k_duration': self.k_duration}  # Just in case
+                        'k_go': self.k_go, 'k_dwell': self.k_dwell}  # Just in case
 
     def calculate_effect(self, index, z, z_list, dt) -> em.Effect:
 
@@ -42,6 +43,8 @@ class GyraseCyclesEffect(em.EffectModel):
         # -----------------------------------------------------------------
         # From unwrapped, it can transition to wrap or unbind, but the unbind is decided in the unbind model
         if self.state == 'UNWRAPPED':
+
+            z.name = 'gyrase_' + self.state
 
             rate = self.k_wrap
             probability =  utils.Poisson_process(rate=rate, dt=dt) # Probability modeled as poisson process
@@ -60,6 +63,8 @@ class GyraseCyclesEffect(em.EffectModel):
         # Posibilities, it either transitions to ACTIVE, stays in the WRAPPED state or UNWRAPS.
         if self.state == 'WRAPPED':
 
+            z.name = 'gyrase_' + self.state
+
             # Calculate probabilities as Poisson processes
             p_unwrapped = utils.Poisson_process(self.k_unwrap, dt) # probability of unwrapping
             p_active = utils.Poisson_process(self.k_go, dt)  # probability of transitioning to the active state
@@ -71,7 +76,7 @@ class GyraseCyclesEffect(em.EffectModel):
             random_number = random.random()
             if random_number < p_unwrapped:
                 self.state = 'UNWRAPPED'  # TRANSITIONS TO UNWRAPPED
-            elif p_active <= random_number < p_unwrapped + p_active:
+            elif p_unwrapped <= random_number < p_unwrapped + p_active:
                 self.state = 'ACTIVE'
             # Else, do nothing... it stays as WRAPPED
 
@@ -86,25 +91,42 @@ class GyraseCyclesEffect(em.EffectModel):
         # Posibilities: It either keeps acting or stops and returns to the unwrapped state
         if self.state == 'ACTIVE':
 
+            z.name = 'gyrase_' + self.state
+
             # Calculate probabilities as Poisson processes
-            p_remains = utils.Poisson_process(self.k_duration, dt)  # probability of unwrapping
+            p_remains = utils.Poisson_process(self.k_dwell, dt)  # probability of unwrapping
 
             # Generate a random number between 0 and 1 to help us decide if it'll transition or not
             random_number = random.random()
-            if random_number >= p_remains:
+            if random_number < p_remains:
+                twist_left = -0.5 * self.k_cat * params.w0 * dt
+                twist_right = -0.5 * self.k_cat * params.w0 * dt
+            else:
                 self.state = 'UNWRAPPED'  # TRANSITIONS TO UNWRAPPED
-
-            twist_left = -0.5 * self.k_cat * params.w0 * dt
-            twist_right = -0.5 * self.k_cat * params.w0 * dt
+                twist_left = 0.0
+                twist_right = 0.0
 
             return em.Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
+
+        #return em.Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
 
 
 # TODO: Needs additional functions
 class GyraseCyclesUnbinding(ubm.UnBindingModel):
 
     def __init__(self, filename=None, **oparams):
-        self.k_off = 0.001  # 0.01  # Rate at which bridge separates
+
+        if not oparams:
+            if filename is None:
+                self.k_off = 0.1
+            else:  # There is a file!
+                mydata = pd.read_csv(filename)
+                if 'k_off' in mydata.columns:
+                    self.velocity = mydata['k_cat'][0]
+                else:
+                    raise ValueError('Error, k_off parameter missing in csv file for GyraseCyclesUnbinding')  # ', filename)
+        else:
+            self.k_off = float(oparams['k_off'])
         self.oparams = {'k_off': self.k_off}  # Just in case
 
     #    def unbinding_probability(self, off_rate, dt) -> float:

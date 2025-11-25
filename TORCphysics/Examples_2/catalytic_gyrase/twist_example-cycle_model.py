@@ -37,8 +37,8 @@ from custom_gyrase import GyraseCyclesEffect, GyraseCyclesUnbinding
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
 dt = 1.0 #0.25
 initial_time = 0
-#final_time = 10800
-final_time = 10800 // 10
+final_time = 10800
+#final_time = 10800 // 10
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
 file_out = 'twist-contribution'
@@ -63,7 +63,7 @@ series = True
 continuation = False
 
 # Variation params
-gyrase_oparams = {'k_on': 0.0002, 'k_off':0.1, 'k_wrap': 0.5, 'k_unwrap': 0.5, 'k_go':0.2, 'k_cat': 5.0, 'k_duration':0.25}
+gyrase_oparams = {'k_on': 0.0002, 'k_off':0.25, 'k_wrap': 0.5, 'k_unwrap': 0.5, 'k_go':0.5, 'k_cat': 20., 'k_dwell':.25}
 
 # ----------------------------------------------------------------------------------------------------------------------
 # We assign the effect and unbinding model.
@@ -188,5 +188,5 @@ topoI_dict = {'sites_df': sites_df_list}
 big_dict = {'gyrase_positive': gyrase_pos_dict, 'gyrase': gyrase_dict, 'topoI': topoI_dict}
 
 # We can save python objects in binary with pickle.
-with open('example_data.pkl', 'wb') as file:
+with open('example_data_cycles.pkl', 'wb') as file:
     pickle.dump(big_dict, file)
