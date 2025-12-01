@@ -18,7 +18,7 @@ markdown_extensions:
   - admonition
 
 nav:
-  - Home: index.md
+  - Home: README.md
   - API:
       - Overview: api/index.md
       - Core Objects:
