@@ -12,13 +12,9 @@ plugins:
         python:
           options:
             docstring_style: sphinx
-markdown_extensions:
-  - markdown_include.include:
-      base_path: TORCphysics
-  - admonition
 
 nav:
-  - Home: README.md
+  - Home: index.md
   - API:
       - Overview: api/index.md
       - Core Objects:
