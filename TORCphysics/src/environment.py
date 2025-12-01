@@ -544,7 +544,7 @@ def GyraseEnvironment(e_type='topo', name='gyrase', site_list=[], concentration=
        reproducible way of constructing gyrase environments using parameter files
        stored under :mod:`TORCphysics.src.model_params`.
 
-       Special careful with site_type='DNA', as it may result in a long list of avaialble sites through the DNA,
+       Special careful with site_type='DNA', as it may result in a long list of available sites through the DNA,
        which may lead to system saturation.
 
        If a list of sites is provided in ``site_list=list_of_sites``, it is assumed that this list of sites have already
@@ -584,7 +584,136 @@ def GyraseEnvironment(e_type='topo', name='gyrase', site_list=[], concentration=
 
     return gyrase_env
 
+# Pre-defined Topoisomerase I Environment
+def TopoisomeraseIEnvironment(e_type='topo', name='topoI', site_list=[], concentration=17.0, size=20, effective_size=10, site_type='DNA',
+                      binding_model=None,
+                      binding_model_name='TopoIRecognitionRNAPTracking',
+                      binding_oparams_file= model_params_dir + '/TopoI_RecognitionRNAPTracking.csv',
+                      binding_model_oparams=None,
+                      effect_model=None,
+                      effect_model_name='TopoILinear',
+                      effect_oparams_file=model_params_dir + '/TopoI_RecognitionRNAPTracking.csv',
+                      effect_model_oparams=None,
+                      unbinding_model = None,
+                      unbinding_model_name='PoissonUnBinding',
+                      unbinding_oparams_file=model_params_dir + '/TopoI_RecognitionRNAPTracking.csv',
+                      unbinding_model_oparams=None,
+                      circuit=None):
+    """
+       Create a pre-configured **DNA Topoisomerase I environment** with default parameterisations.
 
+       This function constructs an :class:`Environment` object describing
+       the concentration, binding, effect, and unbindg behaviours of
+       a DNA topoisomerase I. It optionally attaches the created environment to a given
+       :class:`Circuit`.
+
+       Parameters
+       ----------
+       e_type : str, default "topo"
+           Enzyme category/type (e.g., "topo").
+       name : str, default "topoI"
+           Name of this environmental, as it appears in the circuit.
+       site_list : list, optional
+           Specific site objects the topoI can bind to. If ``site_type='DNA'``,
+           the circuit automatically construct binding sites along the DNA.
+           If a site_list is not provided and site_type is not DNA, then, when adding it to the Circuit, the program
+           tries to match it with its site_type automatically.
+       concentration : float, default 17.0
+           Molecular concentration in nM.
+       size : int, default 20
+           Physical size of the enzyme on DNA, in base pairs.
+       effective_size : int, default 10
+           Effective “interaction size” on the DNA.
+       site_type : str, default "DNA"
+           Type of target site ("DNA", "topoI-binding-site", etc.).
+           If ``site_type='DNA'``, binding sites along the DNA are created.
+       binding_model : object or None
+           Optional pre-constructed binding model. If ``None``, the model is loaded
+           from ``binding_model_name`` and its parameter CSV file.
+       binding_model_name : str or None, default "TopoIRecognitionRNAPTracking"
+           Name of the binding model class to load.
+           The default model is the pre-calibrated TopoI Recognition with RNAP-Tracking model.
+       binding_model_oparams : dict or None
+           Optional override parameters. If ``None``, CSV parameters are loaded.
+       binding_oparams_file : str or None, default model_params/TopoI_RecognitionRNAPTracking.csv
+           Path to the CSV containing binding parameters.
+           Defaults to ``model_params/TopoI_RecognitionRNAPTracking.csv``.
+
+       effect_model : Effect object or None
+           Optional constructed effect model.
+       effect_model_name : str or None, default "TopoILinear"
+           Name of the effect model class.
+           Default is the topoI linear effect model.
+       effect_model_oparams : dict or None
+           Optional override parameters.
+       effect_oparams_file : str or None
+           CSV path for effect model parameters, same default as binding.
+
+       unbinding_model : Unbinding object or None
+           Optional constructed unbinding model.
+       unbinding_model_name : str, default "PoissonUnBinding"
+           Name of unbinding model class.
+       unbinding_model_oparams : dict or None
+           Optional overrides.
+       unbinding_oparams_file : str or None
+           CSV file for unbinding parameters.
+
+       circuit : Circuit or None
+           If provided, the constructed topoI environment is automatically added to the circuit.
+
+       Returns
+       -------
+       Environment
+           The constructed topoI environment object.
+           If ``circuit`` is provided, it is also registered inside the circuit.
+
+       Notes
+       -----
+       This function is a convenience factory intended to provide a clean, fast,
+       reproducible way of constructing topoI environments using parameter files
+       stored under :mod:`TORCphysics.src.model_params`.
+
+       Special careful with site_type='DNA', as it may result in a long list of available sites through the DNA,
+       which may lead to system saturation.
+
+       If a list of sites is provided in ``site_list=list_of_sites``, it is assumed that this list of sites have already
+       being defined and added to the circuit.
+
+       Examples
+       --------
+       Create an isolated topoI environment
+
+        topoI = TopoisomeraseIEnvironment()
+
+       Add topoI directly to an existing circuit
+
+         circ = Circuit(...)
+         topoI = TopoisomeraseIEnvironment(circuit=circ)
+       """
+
+    # -----------------------------------------------------
+    # Resolve default CSV parameter paths using importlib.resources
+    # -----------------------------------------------------
+
+    # Create topoI environment object
+    topoI_env = Environment(e_type=e_type, name=name, site_list=site_list, concentration=concentration, size=size,
+                           effective_size=effective_size, site_type=site_type,
+                           binding_model_name=binding_model_name, binding_oparams_file=binding_oparams_file,
+                           effect_model_name=effect_model_name, effect_oparams_file=effect_oparams_file,
+                           unbinding_model_name=unbinding_model_name, unbinding_oparams_file=unbinding_oparams_file,
+                           binding_model=binding_model, effect_model=effect_model, unbinding_model=unbinding_model,
+                           binding_model_oparams=binding_model_oparams, effect_model_oparams=effect_model_oparams,
+                           unbinding_model_oparams=unbinding_model_oparams)
+
+    # -----------------------------------------------------
+    # Register into circuit if provided
+    # -----------------------------------------------------
+    if circuit is not None:
+        circuit.add_custom_Environment(topoI_env)
+
+    return topoI_env
+
+# TODO: Add default RNAP
 
 # This was a test doing it as a class, but I think it's better these as functions. But I'll leave it here just in case.
 class Gyrase(Environment):
