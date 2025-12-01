@@ -12,6 +12,9 @@ plugins:
         python:
           options:
             docstring_style: sphinx
+markdown_extensions:
+  - include-markdown
+  - admonition
 
 nav:
   - Home: index.md
