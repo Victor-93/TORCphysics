@@ -20,8 +20,7 @@ from TORCphysics import unbinding_model as ubm
 from TORCphysics import models_workflow as mw
 
 
-# TODO: Check which inputs are optional (this is not urgent right now).
-# TODO: Let's try tidying up this function with all of this optional inputs.
+# TODO: We still need to code the continuation, because currently we dont support it.
 class Circuit:
     """
         The central class for defining and simulating a genetic circuit in **TORCphysics**.
@@ -241,6 +240,11 @@ class Circuit:
 
     # This reads the circuit csv and sorts out the twist and structure
     def read_csv(self):
+        """
+            Read the circuit_filename if it was provided.
+            From this, it assigns sequence, circuit name, structure, size, twist and superhelical density.
+        :return:
+        """
         df = pd.read_csv(self.circuit_filename)
         sequence_file = df['sequence'][0]
         self.name = df['name'][0]
@@ -268,7 +272,15 @@ class Circuit:
     #  versatile and will allow you create experiments where you add stuff manually
     # TODO: It might be worth adding an action and time? Or not? So that maybe it could perform an action at a given
     #  time?
-    def run(self):
+    # TOOD: Should we add a frames input? So, we can extend the simulations?
+    def run(self, frames=None):
+
+        # This is new - If frames is provided, then we increase the number of frames simulated.
+        if frames is not None:
+            self.frames += frames
+        # If frames is not provided, then we re run for the number of frames.
+        else:
+            frames = self.frames
         #  What I need to do for including more frames is modify the log as well, and all other places where
         #  self.frames is used...
         #  if n_frames is not None:
@@ -279,7 +291,8 @@ class Circuit:
         #    frames_f = self.frames =
         #
 
-        for frame in range(1, self.frames + 1):
+        for frame in range(1, frames + 1):
+#        for frame in range(1, self.frames + 1):
             self.frame += 1
             self.time = frame * self.dt
             if self.series:
