@@ -307,7 +307,6 @@ class Circuit:
     #  versatile and will allow you create experiments where you add stuff manually
     # TODO: It might be worth adding an action and time? Or not? So that maybe it could perform an action at a given
     #  time?
-    # TOOD: Should we add a frames input? So, we can extend the simulations?
     def run(self, frames=None):
         """
         Runs the genetic ``Circuit``.
@@ -414,7 +413,47 @@ class Circuit:
     # to run the simulation and return the actual dataframes so we can process them within the same script.
     # This function is particularly useful for that, as it returns the three types of dataframes: sites_df,
     # enzyme_df and environmental_df.
-    def run_return_dfs(self):
+    def run_return_dfs(self, frames=None):
+        """
+        Runs the genetic ``Circuit``.
+
+        This function is intended for scripting purposes, where it returns the dataframes of
+        **sites**, **environmentals**, and **enzymes**.
+
+        It implements the following **workflow**:
+
+        - **Binding**, where **environmentals** can bind DNA **sites. Once bound, they become **enzymes** (effectors).
+        - **Effect**, where bound **enzymes** can modify the local twist/supercoiling or move.
+        - **Unbinding**, where **enzymes** can unbind DNA **sites.
+
+        This time, it does not output a **log** file after running the simulation.
+        If series=``True``, it prints out dataframes of **sites**, **environmentals**, and **enzymes**.
+
+        Parameters
+        ----------
+        frames: int, optional, default: None
+            Number of frames to run.
+            If frames is not provided, then the circuit is run for self.frames.
+            If frames is provided, it overrides self.frames.
+
+        Returns
+        ----------
+        enzymes_df: pd.DataFrame
+            A pandas dataframe with records of all **enzyme** interactions.
+
+        sites_df: pd.DataFrame
+            A pandas dataframe with records of all **site** interactions, such as **binding/unbinding** events,
+            change in local **twist** or **superhelicity**.
+
+        environmental_df: pd.DataFrame
+            A pandas dataframe that records all **environmental** reactions. Currently, only increases are
+            accounted for **mRNA**.
+        """
+
+        # This is new - If frames is provided, then we increase the number of frames simulated.
+        if frames is not None:
+            #self.frames += frames
+            self.frames = frames  # Updates the current number of frames from which the simulation is ran for
 
         # run simulation
         for frame in range(1, self.frames + 1):
