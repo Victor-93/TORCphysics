@@ -41,7 +41,7 @@ class Site:
     These default parameters are saved in params.py
     """
 
-    def __init__(self, site_type, name, start, end, k_on,
+    def __init__(self, site_type, name, start, end, k_on=None,
                  binding_model_name=None, binding_oparams_file=None,
                  binding_model=None, binding_model_oparams=None,
                  global_site=False):
@@ -58,7 +58,7 @@ class Site:
             The starting position of the site.
         end : float
             The ending position of the site.
-        k_on : float
+        k_on : float, optional
             The minimum binding rate.
         binding_model_name : str, optional
             The name of the site model or binding model. It indicates how environmentals
@@ -109,6 +109,10 @@ class Site:
         # Loads the binding model
         self.get_models()
 
+        # Finally, make sure that k_on matches to our desired k_on.
+        self.priority_checks()
+
+
     def check_inputs(self):
         """ Checks that Site parameters are of the correct type.
         """
@@ -121,8 +125,9 @@ class Site:
             raise ValueError('Error, site start need a number')
         if not isinstance(self.end, float) and not isinstance(self.end, int):
             raise ValueError('Error, site end need a number')
-        if not isinstance(self.k_on, float) and not isinstance(self.k_on, int):
-            raise ValueError('Error, site k_on must be a number')
+        if self.k_on is not None: # Only if something else is provided
+            if not isinstance(self.k_on, float) and not isinstance(self.k_on, int):
+                raise ValueError('Error, site k_on must be a number')
         #        if not isinstance(self.k_min, float) and not isinstance(self.k_min, int):
         #            raise ValueError('Error, site k_min must be a number')
         #        if not isinstance(self.k_max, float) and not isinstance(self.k_max, int):
@@ -142,12 +147,15 @@ class Site:
                 self.binding_model_oparams == 'none' or self.binding_model_oparams == 'nan'):
             self.binding_model_oparams = None
 
+        # Maybe this is no longer needed?
         # Check k_on coincides with the one in oparams
-        if self.binding_model_oparams is None:  # No dict
-            if self.binding_oparams_file is None:  # No path
-                self.binding_model_oparams = {'k_on', self.k_on}  # Then add k_on
-        else:  # With dict
-            self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case
+        # if self.binding_model_oparams is None:  # No dict
+         #   if self.binding_oparams_file is None:  # No path
+        #        self.binding_model_oparams = {'k_on', self.k_on}  # Then add k_on
+        #else:  # With dict
+        #    self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case
+
+
             #  if 'k_on' not in self.binding_model_oparams:  # But no k_on
             #    self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case
             #  else:  # There is k_on, but the site also has a k_on. Let's prioritise the one on the site.
@@ -164,12 +172,12 @@ class Site:
                                  self.binding_oparams_file, self.binding_model_oparams))
 
         # Check one more that k_on is the same as the one in oparams.
-        if self.binding_model is not None:
-            self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case
-            self.binding_model.k_on = self.k_on
-            if hasattr(self.binding_model, 'k_max'):  # This is for some models that have maximum rate
-                self.binding_model_oparams['k_max'] = self.k_on  # Add k_on - just in case
-                self.binding_model.k_max = self.k_on
+        #if self.binding_model is not None:
+        #    self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case
+        #    self.binding_model.k_on = self.k_on
+        #    if hasattr(self.binding_model, 'k_max'):  # This is for some models that have maximum rate
+        #        self.binding_model_oparams['k_max'] = self.k_on  # Add k_on - just in case
+        #        self.binding_model.k_max = self.k_on
 
     #            if 'k_on' not in self.binding_model_oparams:  # But no k_on
     #                self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case
@@ -177,6 +185,33 @@ class Site:
     #            else:  # There is k_on, but the site also has a k_on. Let's prioritise the one on the site.
     #                self.binding_model_oparams['k_on'] = self.k_on
     #                self.binding_model.k_on = self.k_on
+
+    def priority_checks(self):
+        """ Checks that the Site.k_on priorities are correct.
+            We assume that if a binding_model was given, it already has sorted its oparams dict.
+        """
+
+        # Priority rule:
+        if self.k_on is not None: # This is the priority!
+            if self.binding_model is not None and hasattr(self.binding_model, "k_on"):
+                # Overwrite the model k_on for the site.k_on
+                self.binding_model.k_on = self.k_on
+                self.binding_model_oparams['k_on'] = self.k_on  # Add k_on - just in case
+            elif self.binding_model is not None and hasattr(self.binding_model, "k_max"):
+                # Some models have k_max, so let's overwrite it
+                self.binding_model_oparams['k_max'] = self.k_on  # Add k_on - just in case
+                self.binding_model.k_max = self.k_on
+        else: # Site.k_on was not given
+            # If no Site.k_on was given, but what if a binding_model was given?
+            if self.binding_model is not None and hasattr(self.binding_model, "k_on"):
+                self.k_on = self.binding_model.k_on
+            elif self.binding_model is not None and hasattr(self.binding_model, "k_max"):
+                self.k_on = self.binding_model.k_max
+            else:
+                # Final priority.
+                # If theres no Site.k_on, and a binding_model was not given or doesn't have a k_on, then we have a
+                # Site.k_on = 0.0
+                self.k_on = 0.0
 
     def get_direction(self):
         """

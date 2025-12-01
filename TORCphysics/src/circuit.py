@@ -21,8 +21,7 @@ from TORCphysics import models_workflow as mw
 
 
 # TODO: Check which inputs are optional (this is not urgent right now).
-# TODO: Find a way how you can define a circuit in command line, without the need of csv files.
-# TODO: Let's try tidying up this function with all of this optinal inputs.
+# TODO: Let's try tidying up this function with all of this optional inputs.
 class Circuit:
     """
         The central class for defining and simulating a genetic circuit in **TORCphysics**.
@@ -72,6 +71,7 @@ class Circuit:
 
         frames : int, optional
             Number of frames during the simulation.
+            Default 2000 frames.
 
         series : bool, optional, default=True
             Whether to store complete time-series trajectories for internal objects
@@ -90,6 +90,16 @@ class Circuit:
             If `None`, a seed is drawn from `sys.maxsize`.
             Setting a fixed seed ensures reproducible stochastic trajectories.
 
+        sequence : optional, default=None
+            The sequence of the genetic circuit. Currently, there is no use for the sequence.
+
+        superhelicity : float, optional, default=-0.06
+            Global superhelical density. Superhelical density is set so every topological domain has the current
+            input value. The global superhelical density of the circuit may not necessarily match this input value
+            because its calculation takes into account the size of bound enzymes and the amount of twist on the DNA.
+        structure : str, optional, default=linear
+            Circuit's structure. Accepted values are 'linear' and 'circular'.
+
         Notes
         -----
         - The `Circuit` class is the *entry point* for the TORCphysics workflow.
@@ -97,6 +107,55 @@ class Circuit:
           and `UnbindingModel` for each site/enzyme.
         - Custom workflows can be defined in this class.
         - Supercoiling propagates instantly.
+
+        Attributes
+        ----------
+        circuit_filename : str, None
+            Path to the CSV file describing the DNA **circuit**.
+        sites_filename : str, None
+            Path to the CSV file listing DNA **sites**.
+        enzymes_filename : str, None
+            Path to the CSV file listing bound **enzymes**.
+        environment_filename : str, None
+            Path to the CSV file specifying **environmentals**, such as RNAPs, topoisomerases and proteins.
+        output_prefix : str
+            Prefix used for naming output files (logs, data-frames).
+        frames : int
+            Number of frames during the simulation.
+        frame : int
+            Current frame of the simulation.
+        series : bool
+            Indicates if data-frames are being stored in memory for outputting porpuses.
+        continuation : bool
+            Indicates if current run is continuation of previous run.
+        name : str
+            Name of the genetic circuit.
+        structure : str
+            Indicates if the structure is 'linear' or 'circular'.
+        size : int
+            Size of circuit in bp.
+        twist : float
+            Amount of excess of twist in bp units, e.g., twist=1.0 is one base-pair of overtwist.
+        superhelical : float
+            Global superhelical density of the circuit.
+        sequence : str, None
+            Sequence of the genetic circuit.
+        dt : float
+            Simulation timestep in seconds.
+        time : float
+            Current simulation time in seconds.
+        seed : int
+            Random seed.
+        rng : np.random.default_rng(self.seed)
+            Random number generator.
+        write_nonspecific_sites : bool
+            Flag indicating if rates of specific sites are outputed in log.
+        site_list : list
+            Contains the list of **sites**
+        environmental_list : list
+            Contains the list of **environmentals**
+        enzyme_list : list
+            Contains list of bound **enzymes**
     """
 
     def __init__(self, circuit_filename=None, sites_filename=None, enzymes_filename=None, environment_filename=None,
@@ -1190,25 +1249,53 @@ class Circuit:
 
     # Adds a pre-defined custom site
     def add_custom_Site(self, custom_site):
+        """ Adds a pre-defined custom site to the circuit. It automatically links environmentals to the custom sites."""
         self.site_list.append(custom_site)
+        self.update_site_environmental_link() # Update the links between environmentals and sites so they can bind their type
         self.sort_lists()
         self.log.update_events_size(self.site_list)  # Update log as it depends on the number of binding sites
         self.update_global_twist()
         self.update_global_superhelical()
 
     # Adds a pre-defined custom environment
-    # TODO: We may need to update this one, as the user may want to define new environments that would
-    #       need to define new binding sites, if it binds to bare DNA
     def add_custom_Environment(self, custom_environment):
+        """
+            Adds a pre-defined custom environmental to the circuit.
+            It automatically links environmentals to the custom sites.
+            Environmentals can have site_type='DNA', and the program would automatically generate grid sites that cover
+            the whole DNA.
+        """
         self.environmental_list.append(custom_environment)
         self.define_bare_DNA_binding_sites_for_added_environmental(custom_environment) # This one automatically detects if we need to define bare binding sites.
+        self.log.update_events_size(self.site_list)  # Update log as it depends on the number of binding sites and these may changed when doing the bare DNA
+        self.update_site_environmental_link() # Update the links between environmentals and sites so they can bind their type
+                                              # This might be a bit redundant for bare_DNA_sites, but we'll just do it once so whatever
         self.sort_lists()
         self.update_global_twist()
         self.update_global_superhelical()
 
+    def update_site_environmental_link(self):
+        """Update the link between environmentals and sites.
+           This function should be used after adding a new site/environmental to the circuit.
+           It goes through
+        """
+        for environmental in self.environmental_list:
+            environmental.site_list = utils.site_match_by_type(self.site_list, environmental.site_type)
+            #environmental.site_list = site_list
+
 
     # This one resets the circuit superhelicity to a custom value
     def reset_circuit_superhelicity(self,sigma):
+        """
+            Resets the cicuit's superhelicity to a particular value.
+            Superhelicity is assigned so all topological domains have the value of the new superhelicity.
+            Global superhelicity might not agree with this value because the adjustments related with enzyme sizes.
+
+            Parameters
+            ----------
+            Sigma: float
+                New superhelical density.
+        """
         for enzyme in self.enzyme_list:
             enzyme.superhelical = sigma
         self.update_twist()

@@ -439,8 +439,10 @@ def site_match_by_type(site_list, label):
 
     """
     #        enzyme_before = [enzyme.position for enzyme in enzyme_list if enzyme.position <= site.start][-1]
-    site_list = [site for site in site_list if site.site_type == label]
-    return site_list
+    my_site_list = [site for site in site_list if site.site_type == label]
+    return my_site_list
+    #site_list = [site for site in site_list if site.site_type == label]
+    #return site_list
 
 
 # Read fasta file. Returns the sequence

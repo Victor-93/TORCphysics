@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="65.195816mm"
+   height="76.182259mm"
+   viewBox="0 0 65.195816 76.182259"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     transform="translate(-28.74303,-66.096902)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:50.8px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.264583"
+       x="45.410606"
+       y="123.4143"
+       id="text1"><tspan
+         id="tspan1"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:50.8px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#8800aa;stroke-width:0.264583"
+         x="45.410606"
+         y="123.4143">T</tspan></text>
+    <ellipse
+       style="fill:#d42aff;fill-opacity:0.47351;stroke:#660080;stroke-width:7.22514;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0.954052;paint-order:stroke markers fill"
+       id="path1"
+       cx="61.340939"
+       cy="104.18803"
+       rx="28.985338"
+       ry="34.478558" />
+  </g>
+</svg>

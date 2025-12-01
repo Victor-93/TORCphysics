@@ -456,7 +456,7 @@ class EnvironmentFactory:
             self.environment_list.append(new_environment)
 
 # Pre-defined Gyrase Environment
-def GyraseEnvironment(e_type='topoI', name='gyrase', site_list=[], concentration=44.6, size=30, effective_size=20, site_type='DNA',
+def GyraseEnvironment(e_type='topo', name='gyrase', site_list=[], concentration=44.6, size=30, effective_size=20, site_type='DNA',
                       binding_model=None,
                       binding_model_name='GyraseRecognition',
                       binding_oparams_file= model_params_dir + '/Gyrase_Recognition.csv',
@@ -484,9 +484,11 @@ def GyraseEnvironment(e_type='topoI', name='gyrase', site_list=[], concentration
            Enzyme category/type (e.g., "topo").
        name : str, default "gyrase"
            Name of this environmental, as it appears in the circuit.
-       site_list : list
+       site_list : list, optional
            Specific site objects the gyrase can bind to. If ``site_type='DNA'``,
            the circuit automatically construct binding sites along the DNA.
+           If a site_list is not provided and site_type is not DNA, then, when adding it to the Circuit, the program
+           tries to match it with its site_type automatically.
        concentration : float, default 44.6
            Molecular concentration in nM.
        size : int, default 30
@@ -591,7 +593,7 @@ class Gyrase(Environment):
     DEFAULT_UNBINDING_FILE = model_params_dir + '/Gyrase_Recognition.csv'
 
     def __init__(self,
-                 e_type='topoI', name='gyrase', site_list=None, concentration=44.6,
+                 e_type='topo', name='gyrase', site_list=None, concentration=44.6,
                  size=30, effective_size=20, site_type='DNA',
                  binding_model=None,
                  binding_model_name='GyraseRecognition',
