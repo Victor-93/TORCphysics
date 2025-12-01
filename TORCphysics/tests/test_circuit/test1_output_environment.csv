@@ -1,8 +1,0 @@
-type,name,site_type,concentration,size,effective_size,binding_model,binding_oparams,effect_model,effect_oparams,unbinding_model,unbinding_oparams
-RNAP,RNAP1,gene,0.0,50.0,32.0,,,RNAPUniform,,RNAPSimpleUnbinding,
-RNAP,RNAP2,gene,0.0,70.0,42.0,,,RNAPUniform,,RNAPSimpleUnbinding,
-NAP,IHF,IHF_op,0.01,100.0,70.0,,,,,,
-topo,topoI_stochastic,DNA_topoI_stochastic,0.025,120.0,100.0,TopoIRecognition,,TopoIUniform,,PoissonUnBinding,
-topo,gyra_stochastic,DNA_gyra_stochastic,0.25,120.0,100.0,GyraseRecognition,,GyraseUniform,,PoissonUnBinding,
-topo,topoI_continuum,,0.025,0.0,0.0,,,TopoIContinuum,,,
-topo,gyra_continuum,,0.25,0.0,0.0,,,GyraseContinuum,,,
