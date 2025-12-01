@@ -1502,6 +1502,7 @@ def get_binding_model(name, b_model, model_name, oparams_file, oparams):
         Path to the csv file containing the parametrisation of the BindingModel to use.
     oparams : dict, optional
         A dictionary containing the parameters used for the binding model. In this case, it would be k_on.
+        This parameterisation is given priority over oparams_file. That means, if both are given, oparams will be given priority.
 
     Returns
     ----------
@@ -1560,7 +1561,7 @@ def get_binding_model(name, b_model, model_name, oparams_file, oparams):
             oparams_file = None
 
         else:
-            print('Warning, binding model given is not a class for environmental or site ', name)
+            print('Warning, binding model given is not a BindingModel class for environmental or site ', name)
             b_model = None
             model_name = None
             oparams_file = None

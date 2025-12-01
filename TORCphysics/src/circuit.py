@@ -1,3 +1,13 @@
+"""
+Circuit is the main object for the TORCphysics package.
+
+This module defines the core Circuit object and functions used to simulate
+supercoiling and transcription dynamics. It includes:
+
+- `Circuit`: The object that connects all components, e.g., sites, enzymes, environmentals.
+- Utilities for setting up and updating Circuits
+"""
+
 import pandas as pd
 import random
 import numpy as np
@@ -10,12 +20,185 @@ from TORCphysics import unbinding_model as ubm
 from TORCphysics import models_workflow as mw
 
 
-# TODO: Check which inputs are optional (this is not urgent right now).
+# TODO: We still need to code the continuation, because currently we dont support it.
 class Circuit:
+    """
+    The central class for defining and simulating a genetic circuit in **TORCphysics**.
 
-    def __init__(self, circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                 output_prefix, frames, series, continuation, dt, random_seed=random.randrange(sys.maxsize)):
-        # I'll save the input filenames just in case
+    The ``Circuit`` object coordinates every component required to run a
+    supercoiling–transcription simulation. It loads and initializes:
+
+    - the **DNA circuit** (structure, size, twist/supercoiling, sequence)
+    - **binding sites** (e.g., genes, protein binding sites)
+    - **enzymes** already bound to DNA (e.g., gyrase, TopoI, RNAP)
+    - **environmentals**: molecules not currently bound but capable of binding
+      (RNAPs, topoisomerases, proteins)
+    - simulation parameters and output configuration
+
+    Once initialized, a ``Circuit`` instance provides the interface for simulating
+    the genetic circuit: computing binding, effect, and unbinding events; updating
+    DNA supercoiling/twist; and storing the resulting time series as data frames.
+
+    Parameters
+    ----------
+    circuit_filename : str, optional
+        Path to the CSV file describing the DNA circuit. This file may define:
+
+        - circuit name
+        - structure (``linear`` or ``circular``)
+        - total length in base pairs
+        - initial twist
+        - initial superhelical density (overrides ``twist`` if provided)
+        - DNA sequence (optional)
+
+    site_filename : str, optional
+        Path to the CSV file describing **binding sites** on the DNA.
+        Each entry includes the position, binding model, start/end coordinates,
+        and relevant parameters.
+
+    enzyme_filename : str, optional
+        Path to the CSV file listing **enzymes initially bound** to the DNA
+        (RNAP, gyrase, TopoI, etc.) and their physical properties
+        (position, size, site, etc.).
+
+    environment_filename : str, optional
+        Path to the CSV file specifying **environmentals**, such as RNAPs,
+        topoisomerases, and other proteins.
+
+    output_prefix : str, optional
+        Prefix used for naming output files (profiles, logs, data frames).
+        Default is ``TORCphysics``.
+
+    frames : int, optional
+        Number of simulation frames per simulation run.
+        Default is ``2000``.
+        If Circuit.run() is ran twice, then 4000 frames will be simulated.
+
+    series : bool, optional
+        Whether to store complete time-series trajectories for internal objects
+        (enzymes, sites, and environmentals).
+        Set to ``False`` if only the final state is required.
+        Default is ``True``.
+
+    continuation : bool, optional
+        If ``True``, the simulation continues from a previously saved state
+        instead of initializing a new circuit.
+        Default is ``False``.
+
+    dt : float, optional
+        Simulation timestep in seconds.
+        Default is ``1.0``.
+
+    random_seed : int, optional
+        Seed for the random number generator.
+        If ``None``, a seed is drawn from ``sys.maxsize``.
+        Setting a fixed seed ensures reproducible stochastic trajectories.
+
+    sequence : optional
+        Sequence of the genetic circuit.
+        Currently unused.
+        Default is ``None``.
+
+    superhelicity : float, optional
+        Global superhelical density.
+        Each topological domain is initialized to this value.
+        The final global superhelical density may differ, because it depends on
+        bound-enzyme sizes and the accumulated twist on the DNA.
+        Default is ``-0.06``.
+
+    structure : str, optional
+        Structure of the circuit.
+        Accepted values are ``linear`` and ``circular``.
+        Default is ``linear``.
+
+    Notes
+    -----
+    - The ``Circuit`` class is the **entry point** for the TORCphysics workflow.
+      It automatically creates and links the corresponding ``BindingModel``,
+      ``EffectModel``, and ``UnbindingModel`` for each site or enzyme.
+    - Custom workflows can be implemented within this class.
+    - Supercoiling propagation is instantaneous.
+
+    Attributes
+    ----------
+    circuit_filename : str or None
+        Path to the CSV file describing the DNA circuit.
+
+    sites_filename : str or None
+        Path to the CSV file listing DNA sites.
+
+    enzymes_filename : str or None
+        Path to the CSV file listing bound enzymes.
+
+    environment_filename : str or None
+        Path to the CSV file listing environmental molecules.
+
+    output_prefix : str
+        Prefix used for naming output files.
+
+    frames : int
+        Total number of simulation frames.
+
+    frame : int
+        Current simulation frame.
+
+    series : bool
+        Indicates whether time-series data are stored in memory.
+
+    continuation : bool
+        Whether this run is a continuation of a previous simulation.
+
+    name : str
+        Name of the genetic circuit.
+
+    structure : str
+        ``linear`` or ``circular``.
+
+    size : int
+        Circuit size in base pairs.
+
+    twist : float
+        Excess twist in base-pair units
+        (e.g., ``twist=1.0`` corresponds to one extra base-pair of over-twist).
+
+    superhelical : float
+        Global superhelical density of the circuit.
+
+    sequence : str or None
+        Genetic sequence of the circuit.
+
+    dt : float
+        Simulation timestep in seconds.
+
+    time : float
+        Current simulation time in seconds.
+
+    seed : int
+        Random seed.
+
+    rng : numpy.random.Generator
+        Random number generator instance.
+
+    write_nonspecific_sites : bool
+        Whether rates for non-specific sites are written to the log.
+
+    site_list : list
+        List of site objects.
+
+    environmental_list : list
+        List of environmental objects.
+
+    enzyme_list : list
+        List of enzyme objects.
+    """
+
+    def __init__(self, circuit_filename=None, sites_filename=None, enzymes_filename=None, environment_filename=None,
+                 name='TORCphysics', output_prefix='output', frames=2000, series=None, continuation=False, dt=1.0,
+                 random_seed=random.randrange(sys.maxsize),
+                 size=3000, sequence=None, structure='linear', superhelicity=-0.06):
+        """Initialize a Circuit instance."""
+
+        # Sort inputs
         self.circuit_filename = circuit_filename
         self.sites_filename = sites_filename
         self.enzymes_filename = enzymes_filename
@@ -25,20 +208,27 @@ class Circuit:
         self.frame = 0
         self.series = series
         self.continuation = continuation
-        self.name = None
-        self.structure = None
-        self.circle = None
-        self.size = 0
-        self.twist = None
-        self.superhelical = None
-        self.sequence = None
+        self.name = 'TORCphysics' #None
+        self.structure = structure #'linear' #None
+        if self.structure == 'linear':
+            self.circle = False #None
+        elif self.structure == 'circular':
+            self.circle = True
+        else:
+            raise ValueError('Error, circuit structure not recognised.')
+        self.size = size
+        self.twist = 0.0
+        self.superhelical = superhelicity # None
+        self.sequence = sequence
         self.dt = dt  # time step
-        self.read_csv()  # Here, it gets the name,structure, etc
+
+        if self.circuit_filename is not None:
+            self.read_csv()  # Here, it gets the name,structure, etc
         self.site_list = SiteFactory(filename=sites_filename).site_list
         self.enzyme_list = EnzymeFactory(filename=enzymes_filename, site_list=self.site_list).enzyme_list
         self.environmental_list = EnvironmentFactory(filename=environment_filename,
                                                      site_list=self.site_list).environment_list
-        self.check_object_inputs()  # Checks that the site, environmental and enzyme lists are correct
+        # self.check_object_inputs()  # Checks that the site, environmental and enzyme lists are correct
         self.time = 0
         # create a time-based seed and save it, and initialize our random generator with this seed
         self.seed = random_seed  # random.randrange(sys.maxsize)
@@ -51,9 +241,7 @@ class Circuit:
         # -----------------------------------------------
         # We add new DNA sites which is the ones that we will link topos binding
         # Note: In the future there might be cases in which new enzymes will be added to the environment, so maybe,
-        # these new sites will need to be created
-        # TODO: Maybe we can store it in define_bar_DNA_binding_sites, so this happens in general, for DNA binding
-        #  enzymes.
+        # these new sites will need to be created - DONE
         # Define bare DNA binding sites for bare DNA binding enzymes
         self.define_bare_DNA_binding_sites()
 
@@ -88,6 +276,10 @@ class Circuit:
 
     # This reads the circuit csv and sorts out the twist and structure
     def read_csv(self):
+        """
+        Read the circuit_filename if it was provided.
+        From this, it assigns sequence, circuit name, structure, size, twist and superhelical density.
+        """
         df = pd.read_csv(self.circuit_filename)
         sequence_file = df['sequence'][0]
         self.name = df['name'][0]
@@ -115,7 +307,34 @@ class Circuit:
     #  versatile and will allow you create experiments where you add stuff manually
     # TODO: It might be worth adding an action and time? Or not? So that maybe it could perform an action at a given
     #  time?
-    def run(self):
+    def run(self, frames=None):
+        """
+        Runs the genetic ``Circuit``.
+
+        It implements the following **workflow**:
+
+        - **Binding**, where **environmentals** can bind DNA **sites. Once bound, they become **enzymes** (effectors).
+        - **Effect**, where bound **enzymes** can modify the local twist/supercoiling or move.
+        - **Unbinding**, where **enzymes** can unbind DNA **sites.
+
+        After running the simulation, it creates a **log** file with overall information.
+        If series=``True``, it prints out dataframes of **sites**, **environmentals**, and **enzymes**.
+
+        Parameters
+        ----------
+        frames: int, optional, default: None
+            Number of frames to run.
+            If frames is not provided, then the circuit is run for self.frames.
+            If frames is provided, it overrides self.frames.
+        """
+
+        # This is new - If frames is provided, then we increase the number of frames simulated.
+        if frames is not None:
+            #self.frames += frames
+            self.frames = frames  # Updates the current number of frames from which the simulation is ran for
+        # If frames is not provided, then we re run for the number of frames.
+        #else:
+        #    frames = self.frames
         #  What I need to do for including more frames is modify the log as well, and all other places where
         #  self.frames is used...
         #  if n_frames is not None:
@@ -194,7 +413,47 @@ class Circuit:
     # to run the simulation and return the actual dataframes so we can process them within the same script.
     # This function is particularly useful for that, as it returns the three types of dataframes: sites_df,
     # enzyme_df and environmental_df.
-    def run_return_dfs(self):
+    def run_return_dfs(self, frames=None):
+        """
+        Runs the genetic ``Circuit``.
+
+        This function is intended for scripting purposes, where it returns the dataframes of
+        **sites**, **environmentals**, and **enzymes**.
+
+        It implements the following **workflow**:
+
+        - **Binding**, where **environmentals** can bind DNA **sites. Once bound, they become **enzymes** (effectors).
+        - **Effect**, where bound **enzymes** can modify the local twist/supercoiling or move.
+        - **Unbinding**, where **enzymes** can unbind DNA **sites.
+
+        This time, it does not output a **log** file after running the simulation.
+        If series=``True``, it prints out dataframes of **sites**, **environmentals**, and **enzymes**.
+
+        Parameters
+        ----------
+        frames: int, optional, default: None
+            Number of frames to run.
+            If frames is not provided, then the circuit is run for self.frames.
+            If frames is provided, it overrides self.frames.
+
+        Returns
+        ----------
+        enzymes_df: pd.DataFrame
+            A pandas dataframe with records of all **enzyme** interactions.
+
+        sites_df: pd.DataFrame
+            A pandas dataframe with records of all **site** interactions, such as **binding/unbinding** events,
+            change in local **twist** or **superhelicity**.
+
+        environmental_df: pd.DataFrame
+            A pandas dataframe that records all **environmental** reactions. Currently, only increases are
+            accounted for **mRNA**.
+        """
+
+        # This is new - If frames is provided, then we increase the number of frames simulated.
+        if frames is not None:
+            #self.frames += frames
+            self.frames = frames  # Updates the current number of frames from which the simulation is ran for
 
         # run simulation
         for frame in range(1, self.frames + 1):
@@ -571,6 +830,8 @@ class Circuit:
                     return site  # the first one?
         else:
             return None
+
+    # TODO match site with type - Maybe we can use the pre-defined environments to match with them
 
     # Prints general information
     def print_general_information(self):
@@ -951,6 +1212,7 @@ class Circuit:
 
         self.sort_site_list()
         return
+
     def check_object_inputs(self):
 
         """
@@ -1093,25 +1355,53 @@ class Circuit:
 
     # Adds a pre-defined custom site
     def add_custom_Site(self, custom_site):
+        """ Adds a pre-defined custom site to the circuit. It automatically links environmentals to the custom sites."""
         self.site_list.append(custom_site)
+        self.update_site_environmental_link() # Update the links between environmentals and sites so they can bind their type
         self.sort_lists()
         self.log.update_events_size(self.site_list)  # Update log as it depends on the number of binding sites
         self.update_global_twist()
         self.update_global_superhelical()
 
     # Adds a pre-defined custom environment
-    # TODO: We may need to update this one, as the user may want to define new environments that would
-    #       need to define new binding sites, if it binds to bare DNA
     def add_custom_Environment(self, custom_environment):
+        """
+            Adds a pre-defined custom environmental to the circuit.
+            It automatically links environmentals to the custom sites.
+            Environmentals can have site_type='DNA', and the program would automatically generate grid sites that cover
+            the whole DNA.
+        """
         self.environmental_list.append(custom_environment)
         self.define_bare_DNA_binding_sites_for_added_environmental(custom_environment) # This one automatically detects if we need to define bare binding sites.
+        self.log.update_events_size(self.site_list)  # Update log as it depends on the number of binding sites and these may changed when doing the bare DNA
+        self.update_site_environmental_link() # Update the links between environmentals and sites so they can bind their type
+                                              # This might be a bit redundant for bare_DNA_sites, but we'll just do it once so whatever
         self.sort_lists()
         self.update_global_twist()
         self.update_global_superhelical()
 
+    def update_site_environmental_link(self):
+        """Update the link between environmentals and sites.
+           This function should be used after adding a new site/environmental to the circuit.
+           It goes through
+        """
+        for environmental in self.environmental_list:
+            environmental.site_list = utils.site_match_by_type(self.site_list, environmental.site_type)
+            #environmental.site_list = site_list
+
 
     # This one resets the circuit superhelicity to a custom value
     def reset_circuit_superhelicity(self,sigma):
+        """
+            Resets the cicuit's superhelicity to a particular value.
+            Superhelicity is assigned so all topological domains have the value of the new superhelicity.
+            Global superhelicity might not agree with this value because the adjustments related with enzyme sizes.
+
+            Parameters
+            ----------
+            Sigma: float
+                New superhelical density.
+        """
         for enzyme in self.enzyme_list:
             enzyme.superhelical = sigma
         self.update_twist()
