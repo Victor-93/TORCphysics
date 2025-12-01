@@ -310,16 +310,16 @@ class Circuit:
     # TOOD: Should we add a frames input? So, we can extend the simulations?
     def run(self, frames=None):
         """
-        Runs the genetic circuit.
+        Runs the genetic ``Circuit``.
 
-        It implements the following workflow:
+        It implements the following **workflow**:
 
-        - Binding, where **environmentals** can bind DNA **sites. Once bound, they become **enzymes** (effectors).
-        - Effect, where bound **enzymes** can modify the local twist/supercoiling or move.
-        - Unbinding, where **enzymes** can unbind DNA **sites.
+        - **Binding**, where **environmentals** can bind DNA **sites. Once bound, they become **enzymes** (effectors).
+        - **Effect**, where bound **enzymes** can modify the local twist/supercoiling or move.
+        - **Unbinding**, where **enzymes** can unbind DNA **sites.
 
-        After running the simulation, it creates a log file with overall information.
-        If series=True, it prints out dataframes of sites, environmentals, and enzymes.
+        After running the simulation, it creates a **log** file with overall information.
+        If series=``True``, it prints out dataframes of **sites**, **environmentals**, and **enzymes**.
 
         Parameters
         ----------
