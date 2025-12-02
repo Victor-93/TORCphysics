@@ -193,7 +193,7 @@ class Circuit:
     """
 
     def __init__(self, circuit_filename=None, sites_filename=None, enzymes_filename=None, environment_filename=None,
-                 name='TORCphysics', output_prefix='output', frames=2000, series=None, continuation=False, dt=1.0,
+                 name='TORCphysics', output_prefix='output', frames=2000, series=True, continuation=False, dt=1.0,
                  random_seed=random.randrange(sys.maxsize),
                  size=3000, sequence=None, structure='linear', superhelicity=-0.06):
         """Initialize a Circuit instance."""
@@ -208,7 +208,7 @@ class Circuit:
         self.frame = 0
         self.series = series
         self.continuation = continuation
-        self.name = 'TORCphysics' #None
+        self.name = name #'TORCphysics' #None
         self.structure = structure #'linear' #None
         if self.structure == 'linear':
             self.circle = False #None

@@ -5,8 +5,7 @@ import pickle
 import sys
 from itertools import product
 
-# This one is to load promoter parameterisations
-from TORCphysics.src import model_params_dir
+from TORCphysics.src import model_params_dir # This one is to load promoter parameterisations
 
 # **********************************************************************************************************************
 # Description
@@ -25,8 +24,9 @@ from TORCphysics.src import model_params_dir
 # **********************************************************************************************************************
 dt=1.0
 initial_time = 0
-final_time = 500#5400 #~1.5hrs
-n_sims = 4 # Number of simulations per system
+# final_time = 5400 #~1.5hrs
+final_time = 500 # 500 is ok for testing.
+n_simulations = 4 # Number of simulations per system
 
 RNAP_gamma = 0.1
 
@@ -75,11 +75,11 @@ gene2_promoters = ['strong']  #[0,1,2]
 total_number_of_systems = (len(dist1_list) * len(intergene_length_list) * len(dist2_list) * len(gene_length_list) *
                            len(gene1_orientation) *len(gene2_orientation) * len(gene1_promoters) * len(gene2_promoters))
 print('Total number of systems that will be simulated: ', total_number_of_systems)
-print('Number of simulations per system: ', n_sims)
-print('Total number of simulations: ', total_number_of_systems*n_sims)
+print('Number of simulations per system: ', n_simulations)
+print('Total number of simulations: ', total_number_of_systems*n_simulations)
 
 # **********************************************************************************************************************
-# Prepare system
+# Prepare system and run it
 # **********************************************************************************************************************
 
 system_outputs = [] # Here, we will store all the results
@@ -87,14 +87,11 @@ system_outputs = [] # Here, we will store all the results
 for dist1, intergene_length, dist2, gene_length, g1_promoter, g2_promoter in product(
         dist1_list, intergene_length_list, dist2_list, gene_length_list, gene1_promoters, gene2_promoters):
 
-    # your code here
-    print(dist1, intergene_length, dist2, gene_length, g1_promoter, g2_promoter)
-
     # Build the circuit
     # ----------------------------------------------
     csize = dist1+gene_length+intergene_length+gene_length+dist2 # This because: B__DIST1_____GENE1_____INTERLENGTH____GENE2____DIST2_____B
     my_circuit = Circuit(name='example3', structure='linear', superhelicity=sigma0, size=csize,
-                         environment_filename=environment_filename)
+                         environment_filename=environment_filename, frames=frames, dt=dt)
     # We just gave it the environmental csv file, but we can also define it through scripting.
 
     # Build Sites
@@ -118,13 +115,12 @@ for dist1, intergene_length, dist2, gene_length, g1_promoter, g2_promoter in pro
 
     # Run simulations!
     # -----------------------------------------------------------------------------
-
     # Prepare lists that will store the outputs for each condition
     enzymes_df_list = []
     sites_df_list = []
     environment_df_list = []
 
-    for n in range(n_sims): # Run multiple simulations
+    for n in range(n_simulations): # Run multiple simulations
 
         my_circuit.name = my_circuit.name + '_' + str(n)  # We can change the name of the circuit, so it is associated with each sim
         my_circuit.seed = my_circuit.seed + n + random.randrange(sys.maxsize)  # Let's change the seed!
