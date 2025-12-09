@@ -1,5 +1,5 @@
 import sys
-#sys.path.append("/users/ph1vvb")  # For stanage
+#sys.path.append("/mnt/parscratch/users/username")  # For stanage
 import numpy as np
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 import pandas as pd
