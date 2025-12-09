@@ -415,12 +415,16 @@ def site_match_by_name(site_list, label):
 
     """
 
+    my_site_list = []
     if label in [site.name for site in site_list]:
         for site in site_list:
             if site.name == label:
-                return site  # the first one?
-    else:
-        return None
+               site.append(site)
+    return my_site_list
+
+#                return site  # the first one?
+#    else:
+ #       return None
 
 
 def site_match_by_type(site_list, label):

@@ -17,4 +17,4 @@ from .src.extra_tools import topo_calibration_tools
 from .src.extra_tools import parameter_search
 
 # Extra tools
-from .src.environment import GyraseEnvironment
+from .src.environment import GyraseEnvironment, TopoisomeraseIEnvironment

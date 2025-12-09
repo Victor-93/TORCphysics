@@ -18,7 +18,11 @@ class GyraseCyclesEffect(em.EffectModel):
         # This is just to load some parameters, but won't need it right now.
         if not oparams:
             if filename is None:
-                self.k_cat = 0.01
+                self.k_cat = 10.0
+                self.k_wrap = 0.5
+                self.k_unwrap = 0.5
+                self.k_go = 0.5
+                self.k_dwell = 0.5
             else:  # There is a file!
                 mydata = pd.read_csv(filename)
                 if 'k_cat' in mydata.columns:

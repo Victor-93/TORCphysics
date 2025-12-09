@@ -15,7 +15,7 @@ from TORCphysics.src import model_params_dir # This one is to load promoter para
 # This one tries to add a second gene. At the moment both genes are according the promoter_case (try mixing them).
 # Here, we will try varying domain sizes, gene orientation, and promoters.
 
-# TODO: 1) Try adding a second gene and modifying the orientation. 2) Mixing promoters
+# TODO: 1) Try modifying the orientation. 2) Mixing promoters
 #       3) Increasing the distances between the gene, and the barriers.
 #
 
