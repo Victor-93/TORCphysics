@@ -6,7 +6,7 @@ import pickle
 import copy
 import parallelization_module as pm
 
-#sys.path.append("/users/ph1vvb")  # For stanage
+#sys.path.append("/mnt/parscratch/users/username")  # For stanage
 from TORCphysics import topo_calibration_tools as tct
 from TORCphysics import binding_model as bm
 from TORCphysics import effect_model as em
