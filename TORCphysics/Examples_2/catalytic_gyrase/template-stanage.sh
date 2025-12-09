@@ -10,7 +10,7 @@
 module load Anaconda3/2022.05
 
 # Load environment
-source activate torc
+source activate torc_topo-cycles
 
 #Run the program
 python gyrase_experiments-variation.py

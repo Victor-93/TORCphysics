@@ -1,7 +1,7 @@
 # Parallelization part
 # ---------------------------------------------------------
 import sys
-# sys.path.append("/users/USERNAME")  # Uncomment it and replace your username
+#sys.path.append("/mnt/parscratch/users/username")  # For stanage
 # ---------------------------------------------------------
 import random
 import pickle
