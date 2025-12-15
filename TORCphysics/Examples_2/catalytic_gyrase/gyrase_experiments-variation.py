@@ -1,12 +1,11 @@
 import sys
+#sys.path.append("/mnt/parscratch/users/username")  # For stanage #TODO: Modify this to your directory, where you uploaded TORCphysics
 import numpy as np
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 import pandas as pd
 import pickle
 import copy
 import parallelization_module as pm
-
-#sys.path.append("/mnt/parscratch/users/username")  # For stanage
 from TORCphysics import topo_calibration_tools as tct
 from TORCphysics import binding_model as bm
 from TORCphysics import effect_model as em
@@ -25,6 +24,12 @@ from TORCphysics import Site
 # Ideally, the new model should be able to reproduce the results from that Kinetic experiment, as well as the
 # single-molecule data from Bustamante et al: Mechanochemical analysis of DNA gyrase using rotor bead tracking
 
+# TODO:
+#  1) Try finding a way to process the simulations of experiment 2, so we don't output all the dataframes (because
+#   it consumes a lot of space.
+#  2) Also, modify the gyrase model. We may need an improved version.
+#  3) If possible, let's define an error that we can use to quantify the model performance in experiment 2.
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Initial conditions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -33,7 +38,7 @@ from TORCphysics import Site
 dt = 1.0
 tests = 2 #10000   # number of tests for parametrization
 parallel = False
-#parallel = True  # This option doesn't work on windows
+#parallel = True  # This option doesn't work on windows # TODO: Turn it on for parallelization
 
 # For parallelization and calibration
 n_simulations = 2 #100 # For stanage

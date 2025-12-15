@@ -1,7 +1,7 @@
 # Parallelization part
 # ---------------------------------------------------------
 import sys
-#sys.path.append("/mnt/parscratch/users/username")  # For stanage
+#sys.path.append("/mnt/parscratch/users/username")  # For stanage - replace with your username
 # ---------------------------------------------------------
 import random
 import pickle
@@ -29,6 +29,8 @@ from TORCphysics.src import model_params_dir  # This one is to load promoter par
 
 # TODO: 1) Try adding a second gene and modifying the orientation. 2) Mixing promoters
 #       3) Increasing the distances between the gene, and the barriers.
+#       4) Maybe pre-process outputs so you don't output all dataframes for every test, as it might require a
+#       lot of disk space...
 #
 
 # **********************************************************************************************************************

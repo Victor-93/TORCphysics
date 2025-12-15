@@ -1,3 +1,5 @@
+import sys
+#sys.path.append("/mnt/parscratch/users/username")  # For stanage
 from custom_gyrase import GyraseCyclesEffect, GyraseCyclesUnbinding
 import numpy as np
 from TORCphysics import Circuit, TopoisomeraseIEnvironment, GyraseEnvironment

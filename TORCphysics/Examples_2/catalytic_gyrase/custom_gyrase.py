@@ -1,10 +1,11 @@
+import sys
+#sys.path.append("/mnt/parscratch/users/username")  # For stanage - replace with you username
 from TORCphysics import utils, params
 from TORCphysics import effect_model as em
 from TORCphysics import unbinding_model as ubm
 import pandas as pd
 import numpy as np
 import random
-import sys
 
 # TODO: The effects need to connect with the environment so it depends on ATP, and that it depends on the force F.
 class GyraseCyclesEffect(em.EffectModel):
