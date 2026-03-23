@@ -3,7 +3,7 @@ from TORCphysics import Circuit
 import random
 import sys
 import pickle
-from custom_gyrase import GyraseCyclesEffect, GyraseCyclesUnbinding
+from custom_gyrase import GyraseCyclesEffect, GyraseCyclesUnbinding, GyraseCyclesForce
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -63,7 +63,8 @@ series = True
 continuation = False
 
 # Variation params
-gyrase_oparams = {'k_on': 0.0002, 'k_off':0.25, 'k_wrap': 0.5, 'k_unwrap': 0.5, 'k_go':0.5, 'k_cat': 20., 'k_dwell':.25}
+gyrase_oparams = {'k_on': 0.0002, 'k_off':0.25, 'k_wrap': 0.5, 'k_unwrap': 0.5, 'k_go':0.5, 'k_cat': 20.,
+                  'x_wrap':0.1, 'force': 1.0, 'k_dwell':.25}
 
 # ----------------------------------------------------------------------------------------------------------------------
 # We assign the effect and unbinding model.
@@ -74,7 +75,8 @@ def assign_GyraseCycles_models(circuit, **oparams):
 
     # Assign effect model
     gyrase_environment = [d for d in circuit.environmental_list if d.name == 'gyrase'][0]
-    gyrase_effect_model = GyraseCyclesEffect(**oparams)
+    #gyrase_effect_model = GyraseCyclesEffect(**oparams)
+    gyrase_effect_model = GyraseCyclesForce(**oparams)
     gyrase_environment.effect_model = gyrase_effect_model
     gyrase_environment.effect_model_name = gyrase_effect_model.__class__.__name__
     gyrase_environment.effect_model_oparams = gyrase_effect_model.oparams
@@ -101,8 +103,12 @@ sites_filename = sites_gyrase
 
 for n in range(n_sims):
     # Initialize circuit with the initial conditions
-    my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                         output_prefix, frames, series, continuation, dt)
+    #my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
+    #                     output_prefix, frames, series, continuation, dt)
+    my_circuit = Circuit(circuit_filename= circuit_filename, sites_filename= sites_filename,
+                         enzymes_filename= enzymes_filename, environment_filename = environment_filename,
+                         output_prefix= output_prefix, frames= frames, series= series,
+                         continuation= continuation, dt= dt)
 
     # Adding custom model section!!!!!!!!
     # ---------------------------------------------------------------------------
@@ -135,8 +141,10 @@ sites_filename = sites_gyrase
 
 for n in range(n_sims):
     # Initialize circuit with the initial conditions
-    my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                         output_prefix, frames, series, continuation, dt)
+    my_circuit = Circuit(circuit_filename= circuit_filename, sites_filename= sites_filename,
+                         enzymes_filename= enzymes_filename, environment_filename = environment_filename,
+                         output_prefix= output_prefix, frames= frames, series= series,
+                         continuation= continuation, dt= dt)
 
     # Adding custom model section!!!!!!!!
     # ---------------------------------------------------------------------------
@@ -167,8 +175,10 @@ sites_filename = sites_topoI
 
 for n in range(n_sims):
     # Initialize circuit with the initial conditions
-    my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                         output_prefix, frames, series, continuation, dt)
+    my_circuit = Circuit(circuit_filename= circuit_filename, sites_filename= sites_filename,
+                         enzymes_filename= enzymes_filename, environment_filename = environment_filename,
+                         output_prefix= output_prefix, frames= frames, series= series,
+                         continuation= continuation, dt= dt)
     my_circuit.name = my_circuit.name + '_' + str(n) # We can change the name of the circuit
     my_circuit.seed = my_circuit.seed + n + random.randrange(sys.maxsize)
     my_circuit.rng = np.random.default_rng(my_circuit.seed)
