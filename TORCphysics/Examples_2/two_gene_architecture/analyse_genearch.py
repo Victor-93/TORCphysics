@@ -66,6 +66,8 @@ axs.set_ylabel('Transcription rate (transcript/s)')
 axs.grid(True)
 axs.set_xlabel('System size (bp)', fontsize=xlabel_size)
 
+# TODO: This is a really simple analysis that might not be enough for explaining the data.
+#       Think of a more clever way to represent results, in terms of promoter, domain size, orientations, etc...
 #plt.savefig(file_out+'.png')
 #plt.savefig(file_out+'.pdf')
 
