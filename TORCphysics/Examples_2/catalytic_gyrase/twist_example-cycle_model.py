@@ -63,7 +63,7 @@ series = True
 continuation = False
 
 # Variation params
-gyrase_oparams = {'k_on': 0.0002, 'k_off':0.25, 'k_wrap': 0.5, 'k_unwrap': 0.5, 'k_go':0.5, 'k_cat': 20.,
+gyrase_oparams = {'k_on': 0.0002, 'k_off':0.25, 'k_wrap': 0.5, 'k_unwrap': 0.5, 'k_go':0.5, 'k_cat': 20.0,
                   'x_wrap':0.1, 'force': 1.0, 'k_dwell':.25}
 
 # ----------------------------------------------------------------------------------------------------------------------

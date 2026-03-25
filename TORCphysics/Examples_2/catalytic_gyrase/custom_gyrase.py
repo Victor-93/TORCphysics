@@ -186,8 +186,10 @@ class GyraseCyclesForce(em.EffectModel):
 
             z.name = 'gyrase_' + self.state
             B = self.force * self.x_wrap / params.kBT_pN_nm
-            rate = self.k_wrap * (1 -B)
-            probability = utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+            # rate = self.k_wrap * (1 -B) # Linear approx
+            rate = self.k_wrap * np.exp(-B)
+            # probability = utils.P_binding_Nonh_Poisson(rate=rate, dt=dt)
+            probability = utils.Poisson_process(rate, dt)  # Maybe Poisson is ok since the force is constant
 
             random_number = random.random()
             if random_number <= probability:

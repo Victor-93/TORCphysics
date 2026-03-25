@@ -141,9 +141,10 @@ for dist1, intergene_length, dist2, gene_length, g1_promoter, g2_promoter in pro
     # The idea is to have a dictionary for each built system.
     # We store information of the build system like sizes, promoters, etc...
     # And store the results from the simulaitons
-
-    info_dict = {'dist1': dist1, 'intergene_length': intergene_length, 'dist2': dist2, 'gene_length': gene_length,
-                    'g1_promoter':g1_promoter, 'g2_promoter':g2_promoter}
+    info_dict = {'dist1': dist1, 'intergene_length': intergene_length, 'dist2': dist2,
+                 'gene_length': gene_length,
+                 'g1_promoter': g1_promoter, 'g2_promoter': g2_promoter,
+                 'g1_orientation': gene1_orientation, 'g2_orientation': gene2_orientation}
     system_outputs.append({'system_info': info_dict, 'results': internal_results_dict})
 
 # Save the dictionary to a file

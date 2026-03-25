@@ -14,6 +14,7 @@ from TORCphysics import analysis as an
 # Initial conditions
 # ----------------------------------------------------------------------------------------------------------------------
 input_data = 'genearch_example.pkl'
+input_data = 'genearch_example_3_parallel.pkl'
 file_out = 'genearch_example'
 promoter_case = 'weak'
 

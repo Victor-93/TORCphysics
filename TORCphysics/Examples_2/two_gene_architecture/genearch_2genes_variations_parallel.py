@@ -27,12 +27,6 @@ from TORCphysics.src import model_params_dir  # This one is to load promoter par
 # This one tries to add a second gene. At the moment both genes are according the promoter_case (try mixing them).
 # Here, we will try varying domain sizes, gene orientation, and promoters.
 
-# TODO: 1) Try adding a second gene and modifying the orientation. 2) Mixing promoters
-#       3) Increasing the distances between the gene, and the barriers.
-#       4) Maybe pre-process outputs so you don't output all dataframes for every test, as it might require a
-#       lot of disk space...
-#
-
 # **********************************************************************************************************************
 # Functions
 # **********************************************************************************************************************
@@ -86,7 +80,17 @@ def setup_simulation_run_in_parallel(item):
     # Run simulations but storing dataframes on memory then adding them to the lists.
     enzymes_df, sites_df, environment_df = my_circuit.run_return_dfs()  # Function run_return_dfs() returns the dataframes with the results of the simulation (it does not write CSV files).
 
-    return {'enzymes_df': enzymes_df, 'sites_df': sites_df, 'environment_df': environment_df}
+    # Calculate the transcription rate for the two genes so it is easier to process the simulation outputs
+    gene_mask_left = environment_df['name'] == 'left' # This gives the positions for which the condition is met
+    gene_mask_right = environment_df['name'] == 'right'
+    mRNA_left = environment_df.loc[gene_mask_left] # This is the filtered dataframe
+    transcription_rate_left = np.mean(mRNA_left['concentration']/mRNA_left['time'])
+    mRNA_right = environment_df.loc[gene_mask_right]
+    transcription_rate_right= np.mean(mRNA_right['concentration']/mRNA_right['time'])
+
+    return {'enzymes_df': enzymes_df, 'sites_df': sites_df, 'environment_df': environment_df,
+            'transcription_rate_left': transcription_rate_left,
+            'transcription_rate_right': transcription_rate_right}
 # **********************************************************************************************************************
 # Script
 # **********************************************************************************************************************
@@ -100,13 +104,13 @@ if __name__ == "__main__":
     dt = 1.0
     initial_time = 0
     # final_time = 5400 #~1.5hrs
-    final_time = 100#500  # 500 is ok for testing.
-    n_simulations = 2#4  # Number of simulations per system
+    final_time = 1500  # 500 is ok for testing.
+    n_simulations = 3#4  # Number of simulations per system
     #n_simulations = 50  # For HPC, 50 or 100 seems ok. Request 51 processes then so approximately each processor runs one or two simulations
 
     RNAP_gamma = 0.1
 
-    file_out = 'genearch_example_3_parallel'
+    file_out = 'genearch_experiment'
 
     # Initial superhelical density
     sigma0 = -0.046
@@ -129,9 +133,9 @@ if __name__ == "__main__":
     #   DIST3 : Distance between gene 2 and barrier on the right
 
     # Length - We can vary the lengths of genes and distances between them and barriers
-    # dist1_list = [320, 1000]
-    dist1_list = [1000]
-    intergene_length_list = [200, 1000]  # Only variation right now because it'd be massive
+    dist1_list = [200, 1000]
+    #dist1_list = [1000]
+    intergene_length_list = [200] #[200, 1000]  # Only variation right now because it'd be massive
     dist2_list = [1000]
     gene_length_list = [900]  # We may not want to vary this one - for now, this will be the length of both genes
 
@@ -142,7 +146,7 @@ if __name__ == "__main__":
     gene2_orientation = [1]
 
     # Promoters - We can vary promoters as well. Let's use promoters that we already calibrated in the TORCphysics paper.
-    gene1_promoters = ['medium']  # ['weak', 'medium']
+    gene1_promoters = ['weak', 'medium']#, 'strong']  # ['weak', 'medium']
     gene2_promoters = ['strong']  # [0,1,2]
 
     # **********************************************************************************************************************
@@ -205,7 +209,10 @@ if __name__ == "__main__":
         # Sort the paralelization outputs so it matches our single core script.
         internal_results_dict = {'sites_df': [pr['sites_df'] for pr in pool_results],
                                  'enzymes_df': [pr['enzymes_df'] for pr in pool_results],
-                                 'environment_df': [pr['environment_df'] for pr in pool_results]}
+                                 'environment_df': [pr['environment_df'] for pr in pool_results],
+                                 'rate_left': [pr['transcription_rate_left'] for pr in pool_results],
+                                 'rate_right': [pr['transcription_rate_right'] for pr in pool_results]
+                                 }
 
         # Let's prepare the output of the current system iteration.
         # -----------------------------------------------------------------------------
@@ -214,8 +221,16 @@ if __name__ == "__main__":
         # And store the results from the simulaitons
 
         info_dict = {'dist1': dist1, 'intergene_length': intergene_length, 'dist2': dist2, 'gene_length': gene_length,
-                     'g1_promoter': g1_promoter, 'g2_promoter': g2_promoter}
-        system_outputs.append({'system_info': info_dict, 'results': internal_results_dict})
+                     'g1_promoter': g1_promoter, 'g2_promoter': g2_promoter,
+                     'g1_orientation': gene1_orientation, 'g2_orientation': gene2_orientation}
+
+        # system_outputs.append({'system_info': info_dict, 'results': internal_results_dict})
+        # Let's just append information preprocessed.
+        system_outputs.append({
+            'system_info': info_dict,
+            'rate_left': internal_results_dict['rate_left'],
+            'rate_right': internal_results_dict['rate_right']
+                               })
 
     # Close multiprocessing pool
     # --------------------------------------------------------------
@@ -224,8 +239,3 @@ if __name__ == "__main__":
     # Save the dictionary to a file
     with open(file_out + '.pkl', 'wb') as file:
         pickle.dump(system_outputs, file)
-
-    # TODO: Try plotting the results!
-    # TODO: When running the actual experiment, this could produce lots of data.
-    #       It might be good idea to process the results to reduce amount of data.
-    #       (or maybe let's just leave it as it is)

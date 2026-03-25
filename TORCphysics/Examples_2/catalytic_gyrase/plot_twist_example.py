@@ -131,6 +131,9 @@ for n, e_dict in enumerate([topoI_dict, gyrase_dict, gyrase_pos_dict]):
                 twist = dif[start:end].sum() # Summing the duration
                 mtwists.append(twist)
 
+            n_avg = -np.mean(np.array(mtwists)/2.0)
+            print(e_name, n_avg)
+
             # Boolean: enzyme active?
             #bound = bound_df['#enzymes'] == 1
 

@@ -106,6 +106,7 @@ def run_objective_function_exp1(global_dict_list, exp_superhelicals, n_simulatio
 
 # Similar to the run_objective_function, but it runs a more general simulation of topoisomerases
 # with specific binding sites. It currently doesnt have a processing step.
+# This one is intended to run Bustamante's experiment
 def run_experiment_2(global_dict_list, n_simulations, parallelization=False):
     n_systems = len(global_dict_list)  # number of systems, e.g., topoI alone, gyrase alone, both on rx DNA, both on sc DNA
     # Initialize outputs
