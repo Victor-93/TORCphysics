@@ -22,10 +22,14 @@ from TORCphysics.src import model_params_dir  # This one is to load promoter par
 # **********************************************************************************************************************
 # Description
 # **********************************************************************************************************************
-# THIS IS THE THIRD EXAMPLE
 # Based on the experiments of assessing the impact of genome architecture...
 # This one tries to add a second gene. At the moment both genes are according the promoter_case (try mixing them).
 # Here, we will try varying domain sizes, gene orientation, and promoters.
+
+# TIP: Check the initial conditions and request HPC resources accordingly.
+
+# The output of this script is a pickle file, which is a list of dictionaries. Each
+# dictionary collects system information and transcription rates of both genes for a particular test.
 
 # **********************************************************************************************************************
 # Functions
@@ -103,10 +107,10 @@ if __name__ == "__main__":
 
     dt = 1.0
     initial_time = 0
-    # final_time = 5400 #~1.5hrs
-    final_time = 1500  # 500 is ok for testing.
-    n_simulations = 3#4  # Number of simulations per system
-    #n_simulations = 50  # For HPC, 50 or 100 seems ok. Request 51 processes then so approximately each processor runs one or two simulations
+    final_time = 5400 #~1.5hrs
+    #final_time = 1500  # 500 is ok for testing.
+    #n_simulations = 3#4  # Number of simulations per system
+    n_simulations = 50  # For HPC, 50 or 100 seems ok. Request 51 processes then so approximately each processor runs one or two simulations
 
     RNAP_gamma = 0.1
 

@@ -20,18 +20,30 @@ import copy
 # This script performs a parameter sweep to find the best parameterisation set that reproduces the observations from
 # Bustamante et al: Mechanochemical analysis of DNA gyrase using rotor bead tracking.
 
+# TIP: Check the initial conditions, and make sure that they make sense and that you request the
+# necessary HPC resources.
+# Also check the parameter space so the parameters explored make sense.
+
+# The output of this file is the hyperopt object (*trials.pkl), which contains all the information
+# for parameter tests and their results.
+# Check the analysis script with the debug option so you can see for yourself the shape of the data.
+# Also, check the output of the objective function so you get a sense of the information stored,
+# which essentially is the loss (error between experiment and simulation, and the rotations induced
+# per binding event for each force tested.
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Initial conditions
 # ----------------------------------------------------------------------------------------------------------------------
 file_out = 'gyrase_calibration' #+ '_' + str(dt)
-tests = 10  # 10000   # number of tests for parametrization
-parallel = False
-#parallel = True
-n_simulations = 2  # 100 # For stanage
+tests = 10000  # 10000   # number of tests for parametrization
+#parallel = False
+parallel = True
+n_simulations = 50 #2  # 100 # For stanage
 
 # Units:
 # concentrations (nM), K_M (nM), velocities (nM/s), time (s)
-dt = 1.0
+dt = 0.1
+#dt = 1.0
 
 # Time parameters
 initial_time = 0
@@ -56,7 +68,7 @@ gyrase_binding_model = bm.PoissonBinding()
 gyrase_effect_model = GyraseCyclesForce()
 gyrase_unbinding_model = GyraseCyclesUnbinding()
 
-gyrase_k_cat = 20.0 # How many turns are added per catalitic event
+gyrase_k_cat = 20.0 # 21 # How many turns are added per catalitic event
 
 single_molecule_size = 2200
 Forces = [0.35, 0.6, 0.8, 1.0, 1.3] # pN
@@ -126,6 +138,9 @@ def objective_function(params):
     output_dict = {'loss': objective, 'status': STATUS_OK,  # hyperopt results
                    # Specific results for processing
                    'rotations_distribution': total_rotations}
+    # loss: is the sum of squared errors between experimental curve and simulation at all forces
+    # rotations_distribution: It is a list that contains the rotation distributions. Each entry represents
+    #                         the rotations at a particular force, so remember the forces tested.
     return output_dict
 
 #----------------------------------------------------------------------------------------------------------------------
