@@ -13,11 +13,11 @@ def Bustamante_objective(output_dict, force, circuit_length=2200):
 
     for i, system_output in enumerate(output_dict):
 
-        n_sims = len(system_output['enzymes_df_list'])
+        n_sims = len(system_output['sites_df_list'])
 
         for n_sim in range(n_sims):
             sites_df = system_output['sites_df_list'][n_sim]
-            enzymes_df = system_output['enzymes_df_list'][n_sim]
+            # enzymes_df = system_output['enzymes_df_list'][n_sim]
             total_rotations_induced += rotations_induced_per_binding_event(sites_df, Lk0)
 
     # Calculate objective

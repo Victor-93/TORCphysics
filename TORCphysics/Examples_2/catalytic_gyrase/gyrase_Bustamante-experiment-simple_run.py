@@ -3,6 +3,7 @@ from TORCphysics import Circuit
 import random
 import sys
 import pickle
+import objective_single_molecule_experiment as osme
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DESCRIPTION
@@ -26,9 +27,7 @@ final_time = 10800
 #final_time = 10800 // 2
 time = np.arange(initial_time, final_time + dt, dt)
 frames = len(time)
-file_out = 'twist-contribution'
 n_sims = 4#100  # This is the total
-n_sim_shown = 4
 
 # For the simulation
 circuit_filename = 'circuit_linear.csv' # This is like the one they used in the experiment
@@ -59,8 +58,10 @@ sites_filename = sites_gyrase
 
 for n in range(n_sims):
     # Initialize circuit with the initial conditions
-    my_circuit = Circuit(circuit_filename, sites_filename, enzymes_filename, environment_filename,
-                         output_prefix, frames, series, continuation, dt)
+    my_circuit = Circuit(circuit_filename= circuit_filename, sites_filename= sites_filename,
+                         enzymes_filename= enzymes_filename, environment_filename= environment_filename,
+                         output_prefix= output_prefix, frames= frames, series= series,
+                         continuation= continuation, dt= dt)
     my_circuit.name = my_circuit.name + '_' + str(n) # We can change the name of the circuit
     my_circuit.seed = my_circuit.seed + n + random.randrange(sys.maxsize)  # Just in case so each simulation has a different random number generator
     my_circuit.rng = np.random.default_rng(my_circuit.seed)
@@ -75,7 +76,15 @@ for n in range(n_sims):
     enzymes_df_list.append(enzymes_df)
     sites_df_list.append(sites_df)
 
-gyrase_dict = {'sites_df': sites_df_list}  # We can save all the info we want
+gyrase_dict = {'sites_df_list': sites_df_list, 'enzymes_df_list': enzymes_df_list}  # We can save all the info we want
+
+# Calculate the number of rotations and compare with Bustamante's data at force 1.0
+force = 1.0
+error, rotations = osme.Bustamante_objective([gyrase_dict], force) # gyrase_dict goes as a list
+                                                                             # because Bustamante_objective expects a list
+# We can add the error and the number of induced rotations to gyrase_dict
+gyrase_dict['loss'] = error  # named loss so it has the same name than the calibration
+gyrase_dict['rotations_distribution'] = rotations
 
 # We can save python objects in binary with pickle.
 with open('standard_gyrase-model.pkl', 'wb') as file:
