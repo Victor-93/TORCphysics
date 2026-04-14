@@ -227,8 +227,10 @@ class GyraseCyclesForce(em.EffectModel):
                 self.state = 'UNWRAPPED'  # Also transitions to UNWRAPPED
                 # But this time, some twist is introduced
                 # TODO: This assumes that gyrase is a barrier, which is not true.. We can fix it later.
-                twist_left = -0.5 * self.k_cat * params.w0 * dt
-                twist_right = -0.5 * self.k_cat * params.w0 * dt
+                # twist_left = -0.5 * self.k_cat * params.w0 * dt
+                # twist_right = -0.5 * self.k_cat * params.w0 * dt
+                twist_left = -0.5 * self.k_cat * params.w0
+                twist_right = -0.5 * self.k_cat * params.w0
                 return em.Effect(index=index, position=position, twist_left=twist_left, twist_right=twist_right)
             else:
                 # Else, do nothing... it stays as WRAPPED

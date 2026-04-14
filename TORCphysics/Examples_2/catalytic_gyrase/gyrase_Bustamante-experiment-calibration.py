@@ -170,7 +170,7 @@ space = {
     'x_wrap_gyrase': hp.uniform('x_wrap_gyrase', 0.01, 30.0),
 
     # Unbinding
-    'k_off_gyrase': hp.uniform('k_off_gyrase', 0.1, 1.0)
+    'k_off_gyrase': hp.uniform('k_off_gyrase', 0.01, 1.0)
 }
 
 # Define the file where you want to save the output
