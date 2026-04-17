@@ -13,8 +13,8 @@ import objective_single_molecule_experiment as osme
 # ----------------------------------------------------------------------------------------------------------------------
 # Initial conditions
 # ----------------------------------------------------------------------------------------------------------------------
-input_data = 'gyrase_calibration-trials.pkl'
-#input_data = 'Ranulph-01_gyrase_calibration-trials.pkl'
+#input_data = 'gyrase_calibration-trials.pkl'
+input_data = 'gyrase_re-run.pkl'
 file_out = 'twist_example'
 
 # Forces tested during the calibration
@@ -33,18 +33,13 @@ nbins=30
 hist_color = 'blue'
 
 colors = ['black', 'red', 'blue', 'green', 'yellow', 'purple', 'gray']
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Load simulations
 # ----------------------------------------------------------------------------------------------------------------------
 with open(input_data, 'rb') as file:
     # Load the pickled data
-    trials_data = pickle.load(file) # This trials data is an object from the hyperopt library,
-                                    # and contains information about all the data tested in the calibraiton process
-
-# USE THE DEBUG OPTION TO EXPLORE THE CONTENTS OF trials_data
-best_case = trials_data.best_trial['result'] # This one contains results for the best calibration result
-results = trials_data.results # This contains results for all the trials (tests). It is a list of dictionaries.
-
+    best_case = pickle.load(file) # This file contains data already processed
 # ----------------------------------------------------------------------------------------------------------------------
 # Plot: Let's plot the distribution of induced rotations and the expected number of cycles.
 # ----------------------------------------------------------------------------------------------------------------------
@@ -76,6 +71,7 @@ axs[0].set_xlabel('Induced rotations per binding event', fontsize=xlabel_size)
 
 axs[1].set_xlabel('Force (pN)', fontsize=xlabel_size)
 axs[1].set_ylabel('Expected number of cycles', fontsize=xlabel_size)
+
 
 #plt.savefig(file_out+'.png')
 #plt.savefig(file_out+'.pdf')
