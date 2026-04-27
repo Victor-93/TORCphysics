@@ -393,7 +393,7 @@ ax.plot(sigma, topoI_ef, color=topoI_color, lw=lw)
 
 ax.set_title(titles[n], fontsize=title_size)
 ax.set_xlabel('Superhelical Density', fontsize=xlabel_size)
-ax.set_ylabel(r'Twist Induced (bp)', fontsize=xlabel_size)
+ax.set_ylabel(r'Twist Induced (bp/s)', fontsize=xlabel_size)
 # Add label outside the plot
 ax.text(-0.12, 1.1, outside_label[n], transform=ax.transAxes,
         fontsize=font_size * 1.5, fontweight='bold', va='center', ha='center')

@@ -86,7 +86,7 @@ gamma = 0.157#0.1#0.157#0.13#0.05 #0.835 #0.5 # How much supercoiling is injecte
 stall_torque = 12.0#12.0  # 10.5 * 5  # * 17 # pN * nm - from Gleng's papers which cited another paper.
 # 12pN*nm according 2022SevierBioJ
 sigma_stall = 0.6  # If sigma greater than this, then the RNAP will stall - According Gleng?
-RNAP_kappa = 0.5  # 12pN^{-1} - According 2022SevierBioJ. This is a parameter used in calculating torque dependant
+RNAP_kappa = 0.5  # 12pN^{-1} nm^{-1} - According 2022SevierBioJ. This is a parameter used in calculating torque dependant
 # velocity.
 
 # TOPOISOMERASE I

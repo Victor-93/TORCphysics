@@ -218,6 +218,8 @@ x = np.arange(n_keys)  # Position of each group on the x-axis
 width = 0.8 / n_cases  # Dynamically calculate the width of each bar
 
 keys = ['k_on', 'k_off', 'k_open', 'k_closed', 'k_ini']
+#lkeys = [r'$k_\text{on}$', r'$k_\text{off}$', r'$k_\text{open}$', r'$k_\text{closed}$', r'$k_\text{ini}$']
+lkeys = [r'$k_{on}(\sigma)$', r'$k_{off}$', r'$k_{open}(\sigma)$', r'$k_{closed}$', r'$k_{ini}$']
 
 # Plot each case in the list
 values = np.array([case_dict[key] for key in keys])  # Get values for the current case
@@ -227,8 +229,8 @@ ax.bar(x +  width / 2, values[:,0], width, yerr=values[:,1], color='purple')
 ax.set_xlabel('Rate Type', fontsize=xlabel_size)
 ax.set_ylabel(r'Rate ($s^{-1}$)', fontsize=xlabel_size)
 ax.set_title('Transition Rates', fontsize=title_size)
-ax.set_xticks(x)
-ax.set_xticklabels(keys)
+ax.set_xticks(x+.4)
+ax.set_xticklabels(lkeys, fontsize=xlabel_size)
 ax.grid(True)
 
 # Add label outside the plot
@@ -239,8 +241,8 @@ ax.text(-0.1, 1.1, outside_label[1], transform=ax.transAxes,
 #        fontsize=font_size*1.5, fontweight='bold', va='center', ha='center')
 
 
-#plt.savefig(output_prefix+'-FE.png')
-#plt.savefig(output_prefix+'-FE.pdf')
+plt.savefig(output_prefix+'-FE.png')
+plt.savefig(output_prefix+'-FE.pdf')
 
 
 plt.show()
