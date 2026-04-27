@@ -41,7 +41,7 @@ class Site:
     These default parameters are saved in params.py
     """
 
-    def __init__(self, site_type, name, start, end, k_on=None,
+    def __init__(self, site_type, name, start, end=0, k_on=None,
                  binding_model_name=None, binding_oparams_file=None,
                  binding_model=None, binding_model_oparams=None,
                  global_site=False):
@@ -56,7 +56,7 @@ class Site:
             The name of the site, e.g. tetA
         start : float
             The starting position of the site.
-        end : float
+        end : float, optional but required for genes.
             The ending position of the site.
         k_on : float, optional
             The minimum binding rate.

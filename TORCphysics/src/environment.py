@@ -713,7 +713,127 @@ def TopoisomeraseIEnvironment(e_type='topo', name='topoI', site_list=[], concent
 
     return topoI_env
 
-# TODO: Add default RNAP
+# Pre-defined RNAP Environment
+def RNAPEnvironment(e_type='RNAP', name='RNAP', site_list=[], concentration=1.0, size=30, effective_size=20, site_type='gene',
+                      binding_model=None,
+                      binding_model_name=None,
+                      binding_oparams_file= None,
+                      binding_model_oparams=None,
+                      effect_model=None,
+                      effect_model_name='RNAPStagesStallv2',
+                      effect_oparams_file=model_params_dir + '/RNAP.csv',
+                      effect_model_oparams=None,
+                      unbinding_model = None,
+                      unbinding_model_name='RNAPStagesSimpleUnbindingv2',
+                      unbinding_oparams_file=model_params_dir + '/RNAP.csv',
+                      unbinding_model_oparams=None,
+                      circuit=None):
+    """
+       Create a pre-configured **RNAP environment** with default parameterisations.
+
+       This function constructs an :class:`Environment` object describing
+       the concentration, effect, and unbinding behaviours of
+       a RNAP. It optionally attaches the created environment to a given
+       :class:`Circuit`.
+
+       Parameters
+       ----------
+       e_type : str, default "RNAP"
+           Enzyme category/type (e.g., "RNAP").
+       name : str, default "RNAP"
+           Name of this environmental, as it appears in the circuit.
+       site_list : list, optional
+           Specific site objects the RNAP can bind to. If ``site_type='gene'``.
+       concentration : float, default 1.0
+           Molecular concentration.
+           At the moment, the model is invariant to concentration, and RNAPs bind if concentration>0.0
+       size : int, default 30
+           Physical size of the enzyme on DNA, in base pairs.
+       effective_size : int, default 20
+           Effective “interaction size” on the DNA.
+       site_type : str, default "gene"
+           Type of target site ("gene", "promoter", etc).
+       binding_model : object or None
+           Optional pre-constructed binding model. If ``None``, the model is loaded
+           from ``binding_model_name`` and its parameter CSV file.
+       binding_model_name : str or None
+           Name of the binding model class to load.
+           There is no binding model provided, as binding is  usually parameterised on genes.
+       binding_model_oparams : dict or None
+           Optional override parameters. If ``None``, CSV parameters are loaded.
+       binding_oparams_file : str or None
+           Path to the CSV containing binding parameters.
+
+       effect_model : Effect object or None
+           Optional constructed effect model.
+       effect_model_name : str or None, default "RNAPStagesStallv2"
+           Name of the effect model class.
+           Default is the RNAP stall effect model.
+       effect_model_oparams : dict or None, default model_params/RNAP.csv
+           Optional override parameters.
+       effect_oparams_file : str or None
+           CSV path for effect model parameters, same default as binding.
+
+       unbinding_model : Unbinding object or None
+           Optional constructed unbinding model.
+       unbinding_model_name : str, default "RNAPStagesSimpleUnbindingv2"
+           Name of unbinding model class.
+       unbinding_model_oparams : dict or None, default model_params/RNAP.csv
+           Optional overrides.
+       unbinding_oparams_file : str or None
+           CSV file for unbinding parameters.
+
+       circuit : Circuit or None
+           If provided, the constructed RNAP environment is automatically added to the circuit.
+
+       Returns
+       -------
+       Environment
+           The constructed RNAP environment object.
+           If ``circuit`` is provided, it is also registered inside the circuit.
+
+       Notes
+       -----
+       This function is a convenience factory intended to provide a clean, fast,
+       reproducible way of constructing RNAP environments using parameter files
+       stored under :mod:`TORCphysics.src.model_params`.
+
+       If a list of sites is provided in ``site_list=list_of_sites``, it is assumed that this list of sites have already
+       being defined and added to the circuit.
+
+       Examples
+       --------
+       Create an isolated RNAP environment
+
+        RNAP = RNAPEnvironment()
+
+       Add RNAP directly to an existing circuit
+
+         circ = Circuit(...)
+         RNAP = RNAPEnvironment(circuit=circ)
+       """
+
+    # -----------------------------------------------------
+    # Resolve default CSV parameter paths using importlib.resources
+    # -----------------------------------------------------
+
+    # Create RNAP environment object
+    RNAP_env = Environment(e_type=e_type, name=name, site_list=site_list, concentration=concentration, size=size,
+                           effective_size=effective_size, site_type=site_type,
+                           binding_model_name=binding_model_name, binding_oparams_file=binding_oparams_file,
+                           effect_model_name=effect_model_name, effect_oparams_file=effect_oparams_file,
+                           unbinding_model_name=unbinding_model_name, unbinding_oparams_file=unbinding_oparams_file,
+                           binding_model=binding_model, effect_model=effect_model, unbinding_model=unbinding_model,
+                           binding_model_oparams=binding_model_oparams, effect_model_oparams=effect_model_oparams,
+                           unbinding_model_oparams=unbinding_model_oparams)
+
+    # -----------------------------------------------------
+    # Register into circuit if provided
+    # -----------------------------------------------------
+    if circuit is not None:
+        circuit.add_custom_Environment(RNAP_env)
+
+    return RNAP_env
 
 # This was a test doing it as a class, but I think it's better these as functions. But I'll leave it here just in case.
 class Gyrase(Environment):
