@@ -49,6 +49,8 @@ def setup_simulation_run_in_parallel(item):
     gl =  item['gene_length']
     g1_p = item['g1_promoter']
     g2_p = item['g2_promoter']
+    g1_o = item['g1_orientation']
+    g2_o = item['g2_orientation']
     genes_binding_model = item['genes_binding_model']
 
     # Build the circuit
@@ -60,12 +62,26 @@ def setup_simulation_run_in_parallel(item):
 
     # Build Sites
     # ----------------------------------------------
-    g1_start = d1
-    g1_end = g1_start + gl
+    # Gene 1 orientaiton and parameterisation
+    if g1_o == 1:
+        g1_start = d1
+        g1_end = g1_start + gl
+    elif g1_o == -1:
+        g1_end = d1
+        g1_start = g1_end + gl
+    else:
+        sys.exit("Error, invalid gene1 orientation")
     g1_params = model_params_dir + '/promoter_' + g1_p + '.csv'  # These parameters are pre-saved!
 
-    g2_start = d1 + gl + ig_length
-    g2_end = g2_start + gl
+    # Gene 2 orientaiton and parameterisation
+    if g2_o == 1:
+        g2_start = d1 + gl + ig_length
+        g2_end = g2_start + gl
+    elif g2_o == -1:
+        g2_end = d1 + gl + ig_length
+        g2_start = g2_end + gl
+    else:
+        sys.exit("Error, invalid gene2 orientation")
     g2_params = model_params_dir + '/promoter_' + g2_p + '.csv'
 
     # Define the sites and add them to the circuit
@@ -144,14 +160,16 @@ if __name__ == "__main__":
     gene_length_list = [900]  # We may not want to vary this one - for now, this will be the length of both genes
 
     # Orientations - We can vary gene orientations
-    # gene1_orientation = [-1, 1]
-    gene1_orientation = [-1]  # Indicates the orientation. If -1, then it points to the left.
+    gene1_orientation = [-1, 1]
+    #gene1_orientation = [-1]  # Indicates the orientation. If -1, then it points to the left.
     # If 1, then points to the right
     gene2_orientation = [1]
 
     # Promoters - We can vary promoters as well. Let's use promoters that we already calibrated in the TORCphysics paper.
-    gene1_promoters = ['weak', 'medium']#, 'strong']  # ['weak', 'medium']
-    gene2_promoters = ['strong']  # [0,1,2]
+    #gene1_promoters = ['weak', 'medium']#, 'strong']  # ['weak', 'medium']
+    #gene2_promoters = ['strong']  # [0,1,2]
+    gene1_promoters = ['medium']#, 'strong']  # ['weak', 'medium']
+    gene2_promoters = ['medium']  # [0,1,2]
 
     # **********************************************************************************************************************
     # A bit pre-processing and displaying system info
@@ -177,8 +195,9 @@ if __name__ == "__main__":
     # Create a multiprocessing pool - this for initializing the parallel process
     #pool = multiprocessing.Pool()
 
-    for dist1, intergene_length, dist2, gene_length, g1_promoter, g2_promoter in product(
-            dist1_list, intergene_length_list, dist2_list, gene_length_list, gene1_promoters, gene2_promoters):
+    for dist1, intergene_length, dist2, gene_length, g1_promoter, g2_promoter, g1_orientation, g2_orientation in (
+            product(dist1_list, intergene_length_list, dist2_list, gene_length_list,
+                    gene1_promoters, gene2_promoters, gene1_orientation, gene2_orientation)):
 
         # Run simulations!
         # -----------------------------------------------------------------------------
@@ -200,6 +219,7 @@ if __name__ == "__main__":
                     'dist1': dist1, 'intergene_length': intergene_length, 'dist2': dist2,
                     'gene_length': gene_length,
                     'g1_promoter': g1_promoter, 'g2_promoter': g2_promoter,
+                    'g1_orientation': g1_orientation, 'g2_orientation': g2_orientation,
                     'genes_binding_model': genes_binding_model
                     }
             Items.append(Item)
@@ -226,7 +246,7 @@ if __name__ == "__main__":
 
         info_dict = {'dist1': dist1, 'intergene_length': intergene_length, 'dist2': dist2, 'gene_length': gene_length,
                      'g1_promoter': g1_promoter, 'g2_promoter': g2_promoter,
-                     'g1_orientation': gene1_orientation, 'g2_orientation': gene2_orientation}
+                     'g1_orientation': g1_orientation, 'g2_orientation': g2_orientation}
 
         # system_outputs.append({'system_info': info_dict, 'results': internal_results_dict})
         # Let's just append information preprocessed.

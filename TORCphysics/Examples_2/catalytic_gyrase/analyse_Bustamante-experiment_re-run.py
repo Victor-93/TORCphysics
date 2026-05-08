@@ -52,8 +52,8 @@ rotations_dist = np.array([x for xs in best_case['rotations_distribution'] for x
 
 # Play with the filter and ranges
 rotations_dist = rotations_dist[(rotations_dist >= -20) & (rotations_dist <= 0)]
-sns.histplot(rotations_dist, kde=True, ax=axs[0], bins=21, color=hist_color, stat='probability')
-#sns.histplot(rotations_dist, kde=True, ax=axs[0], bins=20, binrange=(-20, 0), color=hist_color, stat='probability')
+#sns.histplot(rotations_dist, kde=True, ax=axs[0], bins=21, color=hist_color, stat='probability')
+sns.histplot(rotations_dist, kde=True, ax=axs[0], bins=20, binrange=(-20, 0), color=hist_color, stat='probability')
 
 # Plot the expected number of cycles as a function of force
 # -------------------------------------------------
@@ -63,8 +63,11 @@ axs[1].plot(x_force,n_cycles)
 
 # Calculated expected number of cycles as a function of force from simulation data
 for i, rotations in enumerate(best_case['rotations_distribution']):
+    n_rotations = len(rotations)
     n_cycles_sim = -np.mean(np.array(rotations) / 2.0)
-    axs[1].plot(Forces[i], n_cycles_sim, 'o', color='red')
+    n_cycles_std = np.std(np.array(rotations) / 2.0) # standard deviation
+    axs[1].errorbar(Forces[i], n_cycles_sim, yerr=n_cycles_std, fmt='-o', color='red')
+    # axs[1].plot(Forces[i], n_cycles_sim, 'o', color='red')
 
 axs[0].set_ylabel('Probability', fontsize=xlabel_size)
 axs[0].set_xlabel('Induced rotations per binding event', fontsize=xlabel_size)
