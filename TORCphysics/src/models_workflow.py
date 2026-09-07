@@ -126,8 +126,8 @@ def binding_workflow(enzyme_list, environmental_list, dt, rng):
                 # Create enzyme, and note that it is missing twist and the superhelical density.
                 # Those will be added in the circuit module
                 enzyme = Enzyme(e_type=environment.enzyme_type, name=environment.name, site=site, position=position,
-                                size=environment.size, effective_size=environment.effective_size, twist=0.0,
-                                superhelical=0.0,
+                                size=environment.size, effective_size=environment.effective_size,
+                                not_barrier=environment.not_barrier, twist=0.0, superhelical=0.0,
                                 # So, I had it like this before but something happened and I commented it
                                 # effect_model=environment.effect_model,
                                 # Then, I had like the ones below to pass the oparams and the name,
@@ -276,6 +276,100 @@ def unbinding_workflow(enzymes_list, dt, rng):
             drop_list_enzyme.append(enzyme)
 
     return drop_list_index, drop_list_enzyme
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Equilibration workflow
+# There are enzymes that are not barriers. This workflow is equilibrates the twist in front and behind of these enzymes
+# so the superhelical density is the same.
+def equilibration_workflow(enzyme_list):
+    """
+    This function implements the equilibration workflow, where twist is immediately transfered through enzymes that
+    do not form barriers. That twist is equilibrated in these segments and the superhelical density of consecutive
+    not barriers remains the same.
+
+    Inputs
+    ----------
+    enzyme_list : list
+        This is a list of Enzymes that are currently bound to the DNA.
+
+    Returns
+    ----------
+    effect : list
+        This is a list that contains the Effects that will be applied to local regions on the DNA.
+    """
+
+    # Find domains
+    domains = []
+
+    start = None
+
+    # B1____B2___N3____N4___N5____B6; with B= Barrier, and N = Not barrier
+    # A domain is from B2 to N5.
+
+    # Select segments that form a domian.
+    for i, enzyme in enumerate(enzyme_list):
+
+        if enzyme.not_barrier:
+
+            if start is None:
+                start = i-1 # i
+
+        else:
+
+            if start is not None:
+                domains.append((start, i - 1))
+                start = None
+
+    if start is not None:
+        domains.append((start, len(enzyme_list) - 1))
+    # From our example, domain should be (B2,N5)
+
+    # If no domains are formed, then skip
+    if not domains:
+        return
+
+    # Go through domains, and directly equilibrate and partition the twist and superhelical density (sigma)
+    for domain in domains:
+
+        total_twist = 0.0
+        total_length = 0.0
+        # new_total_twist = 0.0
+
+        # Let's calculate the total twist
+        for i in range(domain[0], domain[1]+1):
+            enzyme = enzyme_list[i]
+            enzyme_after = enzyme_list[i+1]
+            total_twist = total_twist + enzyme.twist
+            total_length = total_length + utils.calculate_length(enzyme, enzyme_after)
+
+        total_sigma = total_twist/(total_length*params.w0)
+
+        # Partition twist
+        for i in range(domain[0], domain[1]+1):
+            enzyme = enzyme_list[i]
+            enzyme_after = enzyme_list[i+1]
+            length = utils.calculate_length(enzyme, enzyme_after)
+            enzyme.sigma = total_sigma
+            enzyme.twist = total_twist * length / total_length # It's just a partition.
+            # new_total_twist = new_total_twist + enzyme.twist
+
+    return
+
+    # list of effects: effect = [index, position, twist_left, twist_right]
+    # I use an effect list because it's easier because there are multiple changes in the local twists
+    #effect_list = []
+
+    # The plan is to go through each enzyme in enzyme_list, and apply their effect_model
+    #for i, enzyme in enumerate(enzyme_list):
+
+    #    if enzyme.not_barrier:  # We can speed up things a bit by ignoring the fake boundaries
+            # Calculate effect and add it to the list.
+            # position, twist_left and twist_right are really the change (to be added), not the actual value of twist.
+    #        position = 0.0
+    #        twist_left, twist_right = utils.instant_twist_transfer(enzyme, enzyme_list)
+    #        effect_list.append(Effect(index=i, position=position, twist_left=twist_left, twist_right=twist_right))
+
+    #return effect_list
 
 
 # ---------------------------------------------------------------------------------------------------------------------

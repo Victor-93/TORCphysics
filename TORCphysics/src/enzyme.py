@@ -40,6 +40,11 @@ class Enzyme:
     direction : float
         The direction of the enzyme. This direction can be either -1, 0 or 1. It moves to the left if -1, and to the
         right if +1, but a direction of 0 indicates that the enzyme will not move.
+    not_barrier : bool, optional (default False)
+        Indicates if the enzyme is not a physical barrier.
+        If False, then the enzyme is a barrier and may block supercoils.
+        IF True, then twist is instantly transferred through the enzyme.
+        Note that effect models may also allow for instant twist transfer.
     effect_model_name : str, optional
         The name of the effect model to use, e.g., 'RNAPUniform'.
     effect_oparams_file : str, optional
@@ -68,7 +73,8 @@ class Enzyme:
     def __init__(self, e_type, name, site, position, size, effective_size, twist, superhelical,
                  effect_model_name=None, effect_oparams_file=None, effect_model=None, effect_model_oparams=None,
                  unbinding_model_name=None, unbinding_oparams_file=None, unbinding_model=None,
-                 unbinding_model_oparams=None):
+                 unbinding_model_oparams=None,
+                 not_barrier=False):
         """
         Constructor of the class Environment, used to represent the enzymes/molecules in the environment.
 
@@ -94,6 +100,11 @@ class Enzyme:
         superhelical : float
             The superhelical density associated with the enzyme. It is the superhelical density within the region
             between the enzyme and the next barrier on the right.
+        not_barrier : bool, optional (default False)
+            Indicates if the enzyme is not a physical barrier.
+            If False, then the enzyme is a barrier and may block supercoils.
+            IF True, then twist is instantly transferred through the enzyme.
+            Note that effect models may also allow for instant twist transfer.
         effect_model_name : str, optional
             The name of the effect model to use, e.g., 'RNAPUniform'.
         effect_oparams_file : str, optional
@@ -133,6 +144,8 @@ class Enzyme:
         self.unbinding_model = unbinding_model
         self.unbinding_model_oparams = unbinding_model_oparams
 
+        self.not_barrier = not_barrier
+
         # Verify inputs
         self.check_inputs()
 
@@ -171,6 +184,8 @@ class Enzyme:
             raise ValueError('Error, enzymes need a number for twist')
         if not isinstance(self.superhelical, float) and not isinstance(self.superhelical, int):
             raise ValueError('Error, enzymes need a number for superhelical')
+        if not isinstance(self.not_barrier, bool):
+            raise ValueError('Error, not_barrier must be a boolean')
 
         if self.effective_size > self.size:
             print('Error, effective size effective_size cannot be larger than size')

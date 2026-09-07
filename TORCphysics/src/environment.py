@@ -28,6 +28,11 @@ class Environment:
         So, effective_size < size.
     site_type : str
         The type of site that this environmental can recognise and bind.
+    not_barrier : bool, optional (default False)
+        Indicates if the environmental does not act as a  physical barrier when bound to the DNA.
+        If False, then the environmental is a barrier and may block supercoils.
+        IF True, then twist is instantly transferred through the environmental.
+        Note that effect models may also allow for instant twist transfer.
     binding_model_name : str, optional
         The name of the binding model to use, e.g., 'PoissonBinding'.
     binding_oparams_file : str, optional
@@ -61,7 +66,8 @@ class Environment:
     These default parameters are saved in params.py
     """
 
-    def __init__(self, e_type, name, site_list, concentration, size, effective_size, site_type,
+    def __init__(self, e_type, name, site_list, concentration, size, effective_size,
+                 site_type, not_barrier=False,
                  binding_model_name=None, binding_oparams_file=None,
                  effect_model_name=None, effect_oparams_file=None,
                  unbinding_model_name=None, unbinding_oparams_file=None,
@@ -88,6 +94,11 @@ class Environment:
             So, effective_size < size.
         site_type : str
             The type of site that this environmental can recognise and bind.
+        not_barrier : bool, optional (default False)
+            Indicates if the environmental does not act as a  physical barrier when bound to the DNA.
+            If False, then the environmental is a barrier and may block supercoils.
+            IF True, then twist is instantly transferred through the environmental.
+            Note that effect models may also allow for instant twist transfer.
         binding_model_name : str, optional
             The name of the binding model to use, e.g., 'PoissonBinding'.
         binding_oparams_file : str, optional
@@ -122,6 +133,8 @@ class Environment:
         self.concentration = concentration
         self.size = size
         self.effective_size = effective_size
+
+        self.not_barrier = not_barrier
 
         # Assign models
         self.binding_model_name = binding_model_name
@@ -160,6 +173,8 @@ class Environment:
         if (self.site_type == '' or self.site_type == 'None' or self.site_type == 'none' or
                 self.site_type == 'nan'):
             self.site_type = ''
+        if not isinstance(self.not_barrier, bool):
+            raise ValueError('Error, not_barrier must be a boolean')
 #        if not isinstance(self.site_type, str) or self.site_type == '':
 #            raise ValueError('Error, environmentals need to recognise a site_type')
         if not isinstance(self.concentration, float) and not isinstance(self.concentration, int):
@@ -456,7 +471,8 @@ class EnvironmentFactory:
             self.environment_list.append(new_environment)
 
 # Pre-defined Gyrase Environment
-def GyraseEnvironment(e_type='topo', name='gyrase', site_list=[], concentration=44.6, size=30, effective_size=20, site_type='DNA',
+def GyraseEnvironment(e_type='topo', name='gyrase', site_list=[], concentration=44.6, size=30, effective_size=20,
+                      site_type='DNA', not_barrier=True,
                       binding_model=None,
                       binding_model_name='GyraseRecognition',
                       binding_oparams_file= model_params_dir + '/Gyrase_Recognition.csv',
@@ -568,7 +584,7 @@ def GyraseEnvironment(e_type='topo', name='gyrase', site_list=[], concentration=
 
     # Create gyrase environment object
     gyrase_env = Environment(e_type=e_type, name=name, site_list=site_list, concentration=concentration, size=size,
-                           effective_size=effective_size, site_type=site_type,
+                           effective_size=effective_size, site_type=site_type, not_barrier=not_barrier,
                            binding_model_name=binding_model_name, binding_oparams_file=binding_oparams_file,
                            effect_model_name=effect_model_name, effect_oparams_file=effect_oparams_file,
                            unbinding_model_name=unbinding_model_name, unbinding_oparams_file=unbinding_oparams_file,
@@ -585,7 +601,8 @@ def GyraseEnvironment(e_type='topo', name='gyrase', site_list=[], concentration=
     return gyrase_env
 
 # Pre-defined Topoisomerase I Environment
-def TopoisomeraseIEnvironment(e_type='topo', name='topoI', site_list=[], concentration=17.0, size=20, effective_size=10, site_type='DNA',
+def TopoisomeraseIEnvironment(e_type='topo', name='topoI', site_list=[], concentration=17.0, size=20, effective_size=10,
+                      site_type='DNA',  not_barrier=True,
                       binding_model=None,
                       binding_model_name='TopoIRecognitionRNAPTracking',
                       binding_oparams_file= model_params_dir + '/TopoI_RecognitionRNAPTracking.csv',
@@ -697,7 +714,7 @@ def TopoisomeraseIEnvironment(e_type='topo', name='topoI', site_list=[], concent
 
     # Create topoI environment object
     topoI_env = Environment(e_type=e_type, name=name, site_list=site_list, concentration=concentration, size=size,
-                           effective_size=effective_size, site_type=site_type,
+                           effective_size=effective_size, site_type=site_type, not_barrier=not_barrier,
                            binding_model_name=binding_model_name, binding_oparams_file=binding_oparams_file,
                            effect_model_name=effect_model_name, effect_oparams_file=effect_oparams_file,
                            unbinding_model_name=unbinding_model_name, unbinding_oparams_file=unbinding_oparams_file,
