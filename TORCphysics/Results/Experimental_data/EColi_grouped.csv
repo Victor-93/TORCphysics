@@ -1,0 +1,289 @@
+bacterium,promoter,strain,mhYFP_by_A600
+Escherichia coli K12 MG1655,None,WT,670.5338809034907
+Escherichia coli K12 MG1655,None,WT,658.5137385512073
+Escherichia coli K12 MG1655,None,WT,665.1877837391662
+Escherichia coli K12 MG1655,None,WT,624.1546914623838
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,12040.714285714286
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,11795.286125977767
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,15691.387070376433
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,13598.449447748513
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,59987.92548298067
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,55332.1699242122
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,61702.977412731
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,51202.759031361646
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,704.5831605143094
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,683.7598018984729
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,719.560669456067
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,631.0975609756098
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,1076.4289459884637
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,808.2176929748483
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,949.1890522047644
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,700.7008216529724
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,18852.85244103127
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,16235.01164144354
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,16075.909831613257
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,19214.89021043001
+Escherichia coli K12 MG1655,None,ΔtopA::cat,901.4900662251654
+Escherichia coli K12 MG1655,None,ΔtopA::cat,1321.0388994307398
+Escherichia coli K12 MG1655,None,ΔtopA::cat,1362.3102466793166
+Escherichia coli K12 MG1655,None,ΔtopA::cat,1509.1821743388832
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,12001.972645975804
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,9293.756268806419
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,9137.512030798844
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,10127.955665024629
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,61396.06996819627
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,64002.37856785178
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,66163.74345549737
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,67264.79057591622
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,896.4016933207901
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,1407.7680525164112
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,1452.2758941012542
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,1506.9368879216538
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1102.5345622119814
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1714.6513895660653
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1767.8571428571427
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1235.2325581395346
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,15524.886306215261
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,12579.219143576827
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,13435.045723507264
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,12822.208436724566
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1374.3276789408355
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1190.6418312387793
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1191.802925989673
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1062.046279491833
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",18033.49037279803
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",20896.700620017717
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",19678.004291845496
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",20913.048498845266
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",85928.88841927303
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",88282.36176596656
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",84106.50319829423
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",95022.68663388466
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1645.408163265306
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1561.8596311475408
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1624.1302186878727
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1378.434065934066
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1129.006038086391
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1172.4876070301937
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1200.6422454804947
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",956.7825661116551
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",15156.54315196998
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",13941.740088105727
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",14883.886810102898
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",15050.022381378694
+Escherichia coli K12 MG1655,None,WT,769.3042002545608
+Escherichia coli K12 MG1655,None,WT,673.8991021804189
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,16056.990881458965
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,17879.587675577706
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,67728.67298578199
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,61159.3003770423
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,836.4474929044463
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,686.9359205776174
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,836.7097061442565
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,648.7723214285714
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,22090.586797066015
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,19150.2552105487
+Escherichia coli K12 MG1655,None,ΔtopA::cat,1309.517953762912
+Escherichia coli K12 MG1655,None,ΔtopA::cat,1111.1248761149652
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,12223.214285714286
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,11981.000546746858
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,71165.89917595734
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,69608.04889298891
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,1409.739609414121
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,1157.5151821862346
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1377.510460251046
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1359.9868015838097
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,18370.906801007557
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,16517.721217887723
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1584.5382462686562
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1614.4616026711185
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",19121.526293287727
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",18753.072033898305
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",91624.1235758107
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",88482.90687919463
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1984.6886258363354
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",2049.7598719316966
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1466.6289592760181
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1464.2024253731338
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",14425.98017124831
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",16795.41086016338
+Escherichia coli K12 MG1655,None,WT,795.8987504005127
+Escherichia coli K12 MG1655,None,WT,709.3415007656968
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,16158.402662229619
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,19971.39792634966
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,65406.358199559334
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,73939.80385525871
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,841.5262976968031
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,659.9373477201531
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,883.9931153184166
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,653.939604304061
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,19511.31221719457
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,20727.272727272724
+Escherichia coli K12 MG1655,None,ΔtopA::cat,1381.0039725532683
+Escherichia coli K12 MG1655,None,ΔtopA::cat,1179.0878754171301
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,11842.611971536206
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,11514.904042466314
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,66780.29485796476
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,68685.01966392563
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,1379.3621013133209
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,1124.5661396066332
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1310.977538753559
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1357.5672841663752
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,18132.41484883276
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,17566.48451730419
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1658.2633053221289
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1532.7580696708214
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",19594.33651629898
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",18768.83284836728
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",92946.84714427203
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",89127.70772712577
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",2034.750462107209
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",2027.5049115913557
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1501.509560550151
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1512.6166609056343
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",14547.917372163902
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",15728.280300321772
+Escherichia coli K12 MG1655,None,WT,16399.503722084366
+Escherichia coli K12 MG1655,None,WT,664.2159816801253
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,16358.901622602974
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,16548.781869688388
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,64373.581579817124
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,89297.78146873887
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,723.7622563854255
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,576.8255884127942
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,709.9345627602618
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,625.8940477633653
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,22088.082901554404
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,24633.96380459927
+Escherichia coli K12 MG1655,None,ΔtopA::cat,1231.063882367478
+Escherichia coli K12 MG1655,None,ΔtopA::cat,1085.4747835646558
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,12396.308676064526
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,11720.560881385036
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,71761.78179470627
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,69713.95032744347
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,1281.6864639081061
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,1022.6319135410045
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1083.0670926517573
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1163.161094224924
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,15857.68119582967
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,17494.66147468911
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1509.9230018436178
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1514.3113705241892
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",19489.36409679235
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",19286.188946727212
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",91517.63125489758
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",92510.8087347745
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1909.0909090909092
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1902.6349161617588
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1322.6095729178344
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1391.2670182754814
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",13826.402488192605
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",16720.306032860906
+Escherichia coli K12 MG1655,None,WT,761.3781369629944
+Escherichia coli K12 MG1655,None,WT,677.9586449626044
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,15750.204081632653
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,18345.530338119497
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,63564.01384083045
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,WT,62210.30582320904
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,751.9522278364722
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,WT,635.1730589335826
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,844.4338725023786
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,WT,711.7537313432834
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,22095.999999999996
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,21285.567010309274
+Escherichia coli K12 MG1655,None,ΔtopA::cat,1357.4338085539714
+Escherichia coli K12 MG1655,None,ΔtopA::cat,1091.7215428033865
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,10815.974096060445
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,10827.247956403271
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,66133.4987593052
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,ΔtopA::cat,71102.57731958762
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,1316.5754106520658
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,ΔtopA::cat,1074.6411483253587
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1486.2112855324563
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,ΔtopA::cat,1271.356783919598
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,15775.286259541981
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,17168.53360488798
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1681.7588158467563
+Escherichia coli K12 MG1655,None,"ΔlacIZYA::FRT
+ΔtopA::cat",1578.4399649430325
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",18792.870036101085
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",18236.8533561351
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",89942.84539473685
+Escherichia coli K12 MG1655,PleuWT.1minRBS mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",86167.8111587983
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1987.9907621247112
+Escherichia coli K12 MG1655,PleuWT.1min mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",2007.7220077220072
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1345.2335738701101
+Escherichia coli K12 MG1655,PleuWT.1minRBS mRaspberry,"ΔlacIZYA::FRT
+ΔtopA::cat",1430.3003137606452
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",14270.44312471448
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",17177.30844793713

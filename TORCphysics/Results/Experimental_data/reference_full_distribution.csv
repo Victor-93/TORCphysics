@@ -1,0 +1,217 @@
+bacterium,promoter,strain,relative
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.5894196176681287
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.5774053659680843
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.7681281316239812
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.665674202059668
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,0.9228888597523176
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,0.7947397577476524
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,0.7869513719679371
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,0.9406114099729143
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.5875231286442519
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.4549499420611566
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.44730144074769723
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.4957858490937892
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.7599775506514084
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.6157806224974148
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.6576752280467978
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.6276754862792517
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.882779272768529
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",1.0229397523857549
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.9632818694097357
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",1.0237400172421054
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.7419463378849436
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.6824790388149481
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.7285992063971748
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.7367319103696157
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.7860252474788063
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.8752453950598514
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,1.081383123544389
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,0.937447383652381
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.5983533966509967
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.5864964979630565
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.8992965538359958
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.8085790173218583
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.9360410395579883
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.918004387948775
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.7061836628009288
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.8221725400063647
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.7909895786331302
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.9776441372762593
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,0.9551219233652034
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,1.014645881989498
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.5797220708688867
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.563680042325085
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.8876218448501195
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.8599183023757224
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.9591861465893478
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.9187759147052453
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.7121527587065151
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.769934136896835
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.8008044465688583
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.8100995049835075
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,1.0812605523164607
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,1.2058870580945833
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.6068267502212068
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.5737473998331133
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.7762685971743842
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.8564024054518855
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.9540475142870511
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.9441016409418839
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.6768330079873409
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.8184959924575056
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.7710073545225891
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,WT,0.8980543198041662
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,1.0816481118106993
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,WT,1.0419756229870176
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.5294658742938638
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,ΔtopA::cat,0.5300177547135162
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.772235182653279
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,ΔtopA::cat,0.8404377243069163
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.9199525882536481
+Escherichia coli K12 MG1655,PleuWT.1min mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.8927343409681456
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.6985697800755519
+Escherichia coli K12 MG1655,PleuWT.1 mhYFP,"ΔlacIZYA::FRT
+ΔtopA::cat",0.8408672722982065
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,1.0343181507364896
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,0.9695520088372851
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,1.0514454137705065
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,1.0055256581296241
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,1.0269003146418063
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,1.032521883186306
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,1.0808052747721617
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,1.0581841917872004
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,2.2821230997944055
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,1.8076710218728802
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,0.9927854657065696
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,1.0326339324305167
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,1.651358110549639
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,1.551114371487588
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,0.8973189138386249
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,0.7407645257785254
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.1192779336519572
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.117327678573528
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.262115512805634
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.0744473668245484
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.877976721626216
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.8503469934653356
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.9508332655531977
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.8423791132353677
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,1.1036829335390212
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,1.0479936131341905
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,0.9865378863126397
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,0.9952999327976485
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,1.4916562891587448
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,1.5606882281693841
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,1.593662137282181
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,1.4921110660940364
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.0757383423748548
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.0855904566846029
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.55390007546979
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.6606760590975012
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,1.0449486476205185
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,1.0568129240219648
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,0.9650859316519635
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,0.9590531204820636
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,1.5123442322963128
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,1.555319488079187
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,1.282076943644962
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,1.4424382276724508
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.0392282503294876
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.0883714830460542
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.598439627910416
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.5962332275049758
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,1.0601059283131629
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,1.1022317107268798
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,1.0611190965334796
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,1.0089273764936404
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,1.5226934077672916
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,1.6249694015382858
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,1.5292211026819376
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,1.5738139676027434
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.1381076745631848
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.0032741529408815
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.6664769137547408
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.837474450417739
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,1.1005062112996677
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,WT,1.0297357620571896
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,0.8540787258519692
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,WT,0.9714862654891208
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,1.4433428487331668
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,ΔtopA::cat,1.4260928200365133
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,1.4921011262219044
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,ΔtopA::cat,1.5528359538737575
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.0572440649513426
+Salmonella enterica Typhimurium SL1344,PleuWT.1min mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",0.9748551545656532
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.6638187238944946
+Salmonella enterica Typhimurium SL1344,PleuWT.1 mhYFP,"ΔSL1483::
+lacIMG1655-FRT
+ΔtopA::cat",1.581579832002314

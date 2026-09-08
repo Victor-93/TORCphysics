@@ -361,9 +361,18 @@ class Circuit:
             #            self.add_binding_events_to_log(new_enzyme_list)
             self.add_new_enzymes(new_enzyme_list)  # It also calculates fixes the twists and updates supercoiling
 
+            # We shouldn't need equilibration in the binding right? Maybe we should test this
+            # But let's do it just in case
+            effects_list = mw.equilibration_workflow(self.enzyme_list)
+            self.apply_effects(effects_list)
+
             # EFFECT
             # --------------------------------------------------------------
             effects_list = mw.effect_workflow(self.enzyme_list, self.environmental_list, self.dt)
+            self.apply_effects(effects_list)
+
+            # Equilibration - Equilibration just makes sure that enzymes that are not barriers pass the twist through
+            effects_list = mw.equilibration_workflow(self.enzyme_list)
             self.apply_effects(effects_list)
 
             # UNBINDING
@@ -372,6 +381,10 @@ class Circuit:
             self.drop_enzymes(drop_list_index)
             self.add_to_environment(drop_list_enzyme)
             #            self.add_unbinding_events_to_log(drop_list)
+
+            # Equilibration
+            effects_list = mw.equilibration_workflow(self.enzyme_list)
+            self.apply_effects(effects_list)
 
             # UPDATE GLOBALS
             # --------------------------------------------------------------
@@ -468,10 +481,17 @@ class Circuit:
 
             self.add_new_enzymes(new_enzyme_list)
 
+            # Equilibration - Equilibration just makes sure that enzymes that are not barriers pass the twist through
+            mw.equilibration_workflow(self.enzyme_list)
+
             # EFFECT
             # --------------------------------------------------------------
             effects_list = mw.effect_workflow(self.enzyme_list, self.environmental_list, self.dt)
             self.apply_effects(effects_list)
+
+            # Equilibration - Equilibration just makes sure that enzymes that are not barriers pass the twist through
+            mw.equilibration_workflow(self.enzyme_list)
+
 
             # UPDATE GLOBALS
             # --------------------------------------------------------------
@@ -483,6 +503,10 @@ class Circuit:
             drop_list_index, drop_list_enzyme = mw.unbinding_workflow(self.enzyme_list, self.dt, self.rng)
             self.drop_enzymes(drop_list_index)
             self.add_to_environment(drop_list_enzyme)
+
+            # Equilibration - Equilibration just makes sure that enzymes that are not barriers pass the twist through
+            mw.equilibration_workflow(self.enzyme_list)
+
 
             # UPDATE GLOBALS
             # --------------------------------------------------------------
@@ -899,7 +923,9 @@ class Circuit:
             new_length_left = utils.calculate_length(enzyme_before, new_enzyme)
             new_length_right = utils.calculate_length(new_enzyme, enzyme_after)
 
-            # now to calculate the new twists
+            # Now to calculate the new twists.
+            # The twist is distributed according to the total twist in the available space (left and right) after
+            # the enzyme binds.
             # NOTE that I don't partition using the supercoiling density because the region that is actually bound
             # is assumed to be relaxed by the enzyme. So the twist in the region increases because of the relaxed
             # bound region.
