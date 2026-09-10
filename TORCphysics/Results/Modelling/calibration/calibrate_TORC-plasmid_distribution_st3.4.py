@@ -89,6 +89,10 @@ if promoter_selection == 'full':
         print('E.g., MAKE promoter_selection == both')
         print('Try again!')
         sys.exit()
+
+if full_minimum_different:
+    file_out = 'full-min-diff-'+file_out
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Models to use
 # ----------------------------------------------------------------------------------------------------------------------
